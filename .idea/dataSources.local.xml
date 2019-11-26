@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="PostgreSQL - sandpiper@localhost" uuid="4eb75e10-37b8-426e-9163-b88bdbe88d6c">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" exact-version="0" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>sandpiper</user-name>
+      <schema-mapping />
+    </data-source>
+  </component>
+</project>
