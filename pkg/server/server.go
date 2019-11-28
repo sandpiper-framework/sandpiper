@@ -14,7 +14,7 @@ import (
 	"autocare.org/sandpiper/pkg/middleware/secure"
 )
 
-// New instantiates new Echo server
+// New instantiates new Echo server.
 func New() *echo.Echo {
 	e := echo.New()
 	e.Use(
@@ -35,15 +35,16 @@ func healthCheck(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Sandpiper API OK")
 }
 
-// Config represents server specific config
+// Config represents server specific config.
 type Config struct {
 	Port                string
 	ReadTimeoutSeconds  int
 	WriteTimeoutSeconds int
 	Debug               bool
+	HideBanner          bool
 }
 
-// Start starts echo server
+// Start starts echo server.
 func Start(srv *echo.Echo, cfg *Config) {
 	httpServer := &http.Server{
 		Addr:         cfg.Port,
@@ -51,6 +52,7 @@ func Start(srv *echo.Echo, cfg *Config) {
 		WriteTimeout: time.Duration(cfg.WriteTimeoutSeconds) * time.Second,
 	}
 	srv.Debug = cfg.Debug
+	srv.HideBanner = cfg.HideBanner
 
 	// Start server
 	go func() {

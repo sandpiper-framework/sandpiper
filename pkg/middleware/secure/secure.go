@@ -1,5 +1,7 @@
 package secure
 
+// middleware functions relating to web security
+
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

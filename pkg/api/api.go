@@ -2,6 +2,8 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
+// The api package creates each service used by the server (grouped by api version)
+// with middleware, logging and routing, and then starts the echo web server.
 package api
 
 import (
@@ -28,7 +30,7 @@ import (
 	"autocare.org/sandpiper/pkg/zlog"
 )
 
-// Start starts the API service
+// Start configures and starts the API services
 func Start(cfg *config.Configuration) error {
 	db, err := postgres.New(cfg.DB.PSN, cfg.DB.Timeout, cfg.DB.LogQueries)
 	if err != nil {
@@ -43,19 +45,25 @@ func Start(cfg *config.Configuration) error {
 	srv := server.New()
 	srv.Static("/swaggerui", cfg.App.SwaggerUIPath)
 
+	// auth service is special (doesn't include api version)
 	at.NewHTTP(al.New(auth.Initialize(db, tok, sec, rba), log), srv, tok.MWFunc())
 
 	v1 := srv.Group("/v1")
 	v1.Use(tok.MWFunc())
 
+	// user service
 	ut.NewHTTP(ul.New(user.Initialize(db, rba, sec), log), v1)
+
+	// password service
 	pt.NewHTTP(pl.New(password.Initialize(db, rba, sec), log), v1)
 
+	// kick it off
 	server.Start(srv, &server.Config{
 		Port:                cfg.Server.Port,
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,
 		WriteTimeoutSeconds: cfg.Server.WriteTimeout,
 		Debug:               cfg.Server.Debug,
+		HideBanner:          true,  // not externally configurable
 	})
 
 	return nil

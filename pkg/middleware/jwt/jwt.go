@@ -45,8 +45,8 @@ func (j *Service) MWFunc() echo.MiddlewareFunc {
 				return c.NoContent(http.StatusUnauthorized)
 			}
 
+			// get the JWT claims
 			claims := token.Claims.(jwt.MapClaims)
-
 			id := int(claims["id"].(float64))
 			companyID := int(claims["c"].(float64))
 			locationID := int(claims["l"].(float64))
@@ -54,6 +54,7 @@ func (j *Service) MWFunc() echo.MiddlewareFunc {
 			email := claims["e"].(string)
 			role := sandpiper.AccessRole(claims["r"].(float64))
 
+			// add claims to context
 			c.Set("id", id)
 			c.Set("company_id", companyID)
 			c.Set("location_id", locationID)

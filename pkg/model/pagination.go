@@ -25,7 +25,7 @@ func (p *PaginationReq) Transform() *Pagination {
 	return &Pagination{Limit: p.Limit, Offset: p.Page * p.Limit}
 }
 
-// Pagination holds paginations data
+// Pagination holds range response settings
 type Pagination struct {
 	Limit  int `json:"limit,omitempty"`
 	Offset int `json:"offset,omitempty"`

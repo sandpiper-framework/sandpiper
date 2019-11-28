@@ -1,5 +1,7 @@
 package auth
 
+// auth service logger
+
 import (
 	"time"
 
@@ -23,14 +25,14 @@ type LogService struct {
 	logger sandpiper.Logger
 }
 
-const name = "auth"
+const svc = "auth"
 
 // Authenticate logging
 func (ls *LogService) Authenticate(c echo.Context, user, password string) (resp *sandpiper.AuthToken, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			name, "Authenticate request", err,
+			svc, "Authenticate request", err,
 			map[string]interface{}{
 				"req":  user,
 				"took": time.Since(begin),
@@ -45,7 +47,7 @@ func (ls *LogService) Refresh(c echo.Context, req string) (resp *sandpiper.Refre
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			name, "Refresh request", err,
+			svc, "Refresh request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -61,7 +63,7 @@ func (ls *LogService) Me(c echo.Context) (resp *sandpiper.User, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			name, "Me request", err,
+			svc, "Me request", err,
 			map[string]interface{}{
 				"resp": resp,
 				"took": time.Since(begin),

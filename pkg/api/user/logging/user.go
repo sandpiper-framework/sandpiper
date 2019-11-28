@@ -1,9 +1,12 @@
 package user
 
+// user service logger
+
 import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+
 	"autocare.org/sandpiper/pkg/api/user"
 	"autocare.org/sandpiper/pkg/model"
 )
@@ -22,7 +25,7 @@ type LogService struct {
 	logger sandpiper.Logger
 }
 
-const name = "user"
+const source = "user"
 
 // Create logging
 func (ls *LogService) Create(c echo.Context, req sandpiper.User) (resp *sandpiper.User, err error) {
@@ -30,7 +33,7 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.User) (resp *sandpipe
 		req.Password = "xxx-redacted-xxx"
 		ls.logger.Log(
 			c,
-			name, "Create user request", err,
+			source, "Create user request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -46,7 +49,7 @@ func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sa
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			name, "List user request", err,
+			source, "List user request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -62,7 +65,7 @@ func (ls *LogService) View(c echo.Context, req int) (resp *sandpiper.User, err e
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			name, "View user request", err,
+			source, "View user request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -78,7 +81,7 @@ func (ls *LogService) Delete(c echo.Context, req int) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			name, "Delete user request", err,
+			source, "Delete user request", err,
 			map[string]interface{}{
 				"req":  req,
 				"took": time.Since(begin),
@@ -93,7 +96,7 @@ func (ls *LogService) Update(c echo.Context, req *user.Update) (resp *sandpiper.
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			name, "Update user request", err,
+			source, "Update user request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,

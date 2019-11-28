@@ -1,14 +1,15 @@
 package transport
 
+// password routing functions
+
 import (
 	"net/http"
 	"strconv"
 
-	"autocare.org/sandpiper/pkg/api/password"
-
-	"autocare.org/sandpiper/pkg/model"
-
 	"github.com/labstack/echo/v4"
+
+	"autocare.org/sandpiper/pkg/api/password"
+	"autocare.org/sandpiper/pkg/model"
 )
 
 // HTTP represents password http transport service

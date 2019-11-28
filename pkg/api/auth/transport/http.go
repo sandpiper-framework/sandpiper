@@ -1,5 +1,7 @@
 package transport
 
+// auth routing functions
+
 import (
 	"net/http"
 

@@ -3,9 +3,9 @@ package auth
 import (
 	"net/http"
 
-	"autocare.org/sandpiper/pkg/model"
-
 	"github.com/labstack/echo/v4"
+
+	"autocare.org/sandpiper/pkg/model"
 )
 
 // Custom errors

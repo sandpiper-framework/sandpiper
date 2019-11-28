@@ -1,9 +1,12 @@
 package password
 
+// password service logger
+
 import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+
 	"autocare.org/sandpiper/pkg/api/password"
 	"autocare.org/sandpiper/pkg/model"
 )
@@ -22,14 +25,14 @@ type LogService struct {
 	logger sandpiper.Logger
 }
 
-const name = "password"
+const source = "password"
 
 // Change logging
 func (ls *LogService) Change(c echo.Context, id int, oldPass, newPass string) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			name, "Change password request", err,
+			source, "Change password request", err,
 			map[string]interface{}{
 				"req":  id,
 				"took": time.Since(begin),
