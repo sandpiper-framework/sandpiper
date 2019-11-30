@@ -1,14 +1,22 @@
+// Package jwt handles json-web-token (RFC7519) middleware to represent
+// claims securely between two parties.
 package jwt
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/model"
+)
+
+// Custom errors
+var (
+	ErrInvalidToken = errors.New("token is missing or invalid")
 )
 
 // New generates new JWT service necessary for auth middleware
@@ -72,27 +80,26 @@ func (j *Service) ParseToken(c echo.Context) (*jwt.Token, error) {
 
 	token := c.Request().Header.Get("Authorization")
 	if token == "" {
-		return nil, sandpiper.ErrGeneric
+		return nil, ErrInvalidToken
 	}
 	parts := strings.SplitN(token, " ", 2)
 	if !(len(parts) == 2 && parts[0] == "Bearer") {
-		return nil, sandpiper.ErrGeneric
+		return nil, ErrInvalidToken
 	}
 
 	return jwt.Parse(parts[1], func(token *jwt.Token) (interface{}, error) {
 		if j.algo != token.Method {
-			return nil, sandpiper.ErrGeneric
+			return nil, ErrInvalidToken
 		}
 		return j.key, nil
 	})
-
 }
 
 // GenerateToken generates new JWT token and populates it with user data
 func (j *Service) GenerateToken(u *sandpiper.User) (string, string, error) {
 	expire := time.Now().Add(j.duration)
 
-	token := jwt.NewWithClaims((j.algo), jwt.MapClaims{
+	token := jwt.NewWithClaims(j.algo, jwt.MapClaims{
 		"id":  u.ID,
 		"u":   u.Username,
 		"e":   u.Email,

@@ -63,7 +63,7 @@ func Start(cfg *config.Configuration) error {
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,
 		WriteTimeoutSeconds: cfg.Server.WriteTimeout,
 		Debug:               cfg.Server.Debug,
-		HideBanner:          true,  // not externally configurable
+		HideBanner:          true, // not externally configurable
 	})
 
 	return nil

@@ -27,7 +27,7 @@ type LogService struct {
 
 const source = "password"
 
-// Change logging
+// Change password logging
 func (ls *LogService) Change(c echo.Context, id int, oldPass, newPass string) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(

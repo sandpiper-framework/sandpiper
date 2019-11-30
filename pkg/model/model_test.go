@@ -3,8 +3,8 @@ package sandpiper_test
 import (
 	"testing"
 
-	"autocare.org/sandpiper/testing/mock"
 	"autocare.org/sandpiper/pkg/model"
+	"autocare.org/sandpiper/testing/mock"
 )
 
 func TestBeforeInsert(t *testing.T) {

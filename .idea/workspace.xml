@@ -1,7 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="" />
+    <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Taskfile.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Taskfile.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/api/api.exe" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/api.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migration/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/logging/password.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/logging/password.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/password_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/password_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/transport/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/transport/http.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/transport/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/transport/http.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/transport/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/transport/http_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/middleware/jwt/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/middleware/jwt/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/error.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/error.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/model_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/model_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/postgres/pg.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/postgres/pg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/rbac/rbac_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/rbac/rbac_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/server/binding_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/server/binding_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/testing/mock/postgres.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/secure.go" beforeDir="false" afterPath="$PROJECT_DIR$/testing/mock/secure.go" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,12 +50,17 @@
     <select />
   </component>
   <component name="GOROOT" path="C:\Go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="1TTceA7CPzo0HsJGJAD678aQk0a" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="postgresql" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
@@ -54,7 +86,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.run sandpiper">
+  <component name="RunManager" selected="Go Test.go test auth">
     <configuration name="run migration" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="sandpiper" />
       <working_directory value="$PROJECT_DIR$/cmd/migration" />
@@ -75,9 +107,21 @@
       <directory value="$PROJECT_DIR$/" />
       <method v="2" />
     </configuration>
+    <configuration name="go test auth" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="sandpiper" />
+      <working_directory value="$PROJECT_DIR$/" />
+      <go_parameters value="-v" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="autocare.org/sandpiper/pkg/api/auth/platform/pgsql" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Go Build.run migration" />
       <item itemvalue="Go Build.run sandpiper" />
+      <item itemvalue="Go Test.go test auth" />
     </list>
   </component>
   <component name="ServiceViewManager">
@@ -93,11 +137,38 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
     <proxy>direct</proxy>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user_test.go</url>
+          <line>115</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user.go</url>
+          <line>23</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
         <watch expression="*(*&quot;[]*github.com/go-pg/pg/v9/orm.columnValue&quot;)(824636858568)" />

@@ -11,6 +11,7 @@ import (
 // Custom errors
 var (
 	ErrInvalidCredentials = echo.NewHTTPError(http.StatusUnauthorized, "Username or password does not exist")
+	ErrNotAuthorized = echo.NewHTTPError(http.StatusUnauthorized, "User is not authorized")
 )
 
 // Authenticate tries to authenticate the user provided by username and password
@@ -25,12 +26,12 @@ func (a *Auth) Authenticate(c echo.Context, user, pass string) (*sandpiper.AuthT
 	}
 
 	if !u.Active {
-		return nil, sandpiper.ErrUnauthorized
+		return nil, ErrNotAuthorized
 	}
 
 	token, expire, err := a.tg.GenerateToken(u)
 	if err != nil {
-		return nil, sandpiper.ErrUnauthorized
+		return nil, ErrNotAuthorized
 	}
 
 	u.UpdateLastLogin(a.sec.Token(token))

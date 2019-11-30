@@ -30,7 +30,7 @@ func New(psn string, timeout int, enableLog bool) (*pg.DB, error) {
 
 	db := pg.Connect(u)
 
-	_, err = db.Exec("SELECT 1")	// test connectivity
+	_, err = db.Exec("SELECT 1") // test connectivity
 	if err != nil {
 		return nil, err
 	}

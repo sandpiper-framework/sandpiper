@@ -34,7 +34,7 @@ func main() {
 	// Migrate all the way up ...
 	err = m.Up()
 	if err != nil {
-		if fmt.Sprintf("%v", err) != "no change" {  // todo: a better way?!
+		if fmt.Sprintf("%v", err) != "no change" { // todo: a better way?!
 			log.Fatal(err)
 		}
 	}

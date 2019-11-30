@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"autocare.org/sandpiper/pkg/api/auth"
+	"autocare.org/sandpiper/pkg/model"
 	"autocare.org/sandpiper/testing/mock"
 	"autocare.org/sandpiper/testing/mock/mockdb"
-	"autocare.org/sandpiper/pkg/model"
 
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"

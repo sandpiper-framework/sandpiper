@@ -11,19 +11,18 @@ import (
 
 	"autocare.org/sandpiper/pkg/api"
 	"autocare.org/sandpiper/pkg/config"
+	"autocare.org/sandpiper/pkg/version"
 )
 
-var version = "undefined"
-
 func main() {
-	fmt.Printf("Sandpiper (%s)\n", version)
+	fmt.Println(version.Banner())
 
 	cfgPath := flag.String("p", "./sandpiper.config.yaml", "Path to config file")
 	flag.Parse()
 
 	cfg, err := config.Load(*cfgPath)
 	if err != nil {
-		log.Fatal("ERROR: ",err)
+		log.Fatal("ERROR: ", err)
 	}
 
 	err = api.Start(cfg)
@@ -31,4 +30,3 @@ func main() {
 		panic(err.Error())
 	}
 }
-

@@ -4,17 +4,20 @@
       <w>algo</w>
       <w>autocare</w>
       <w>bcrypt</w>
+      <w>callstack</w>
       <w>cust</w>
       <w>loginrefresh</w>
       <w>migrator</w>
       <w>noopen</w>
       <w>nosniff</w>
+      <w>pgsql</w>
       <w>postgresql</w>
       <w>prefetching</w>
       <w>rbac</w>
       <w>sslmode</w>
       <w>swagg</w>
       <w>swaggerui</w>
+      <w>taskfile</w>
       <w>uname</w>
       <w>zerolog</w>
       <w>zxcvbn</w>

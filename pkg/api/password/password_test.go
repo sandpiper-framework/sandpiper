@@ -13,6 +13,11 @@ import (
 	"autocare.org/sandpiper/testing/mock/mockdb"
 )
 
+var (
+	// ErrGeneric is used for testing purposes and for errors handled later in the callstack
+	ErrGeneric = errors.New("generic error")
+)
+
 func TestChange(t *testing.T) {
 	type args struct {
 		oldpass string

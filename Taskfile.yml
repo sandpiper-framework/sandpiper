@@ -1,23 +1,36 @@
+# Sandpiper cross-platform build/test file (using https:\\taskfile.dev)
+
+# Copyright Auto Care Association. All rights reserved.
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE.md file.
+
 version: '2'
 
 tasks:
-  print-os:
+  os:
     cmds:
       - echo '{{OS}} {{ARCH}}'
       - echo '{{if eq OS "windows"}}windows-command{{else}}unix-command{{end}}'
       # This will be path/to/file on Unix but path\to\file on Windows
       - echo '{{fromSlash "path/to/file"}}'
+    silent: true
   test:
+    desc: Run test suite (currently doesn't work with tests using dockertest under windows!)
     cmds:
       - echo " *** Running Coverage Tests ***"
-      - $(pwd)/test.sh
+      - go test -v -race -coverprofile=profile.out -covermode=atomic ./...
+      - {sh: cat profile.out >> coverage.txt}
+      - {sh: docker stop $(docker ps -a -q)}
       - echo " *** Completed *** "
+    vars:
+      # couldn't get a "preconditions" to work, but this will fail if not running
+      DOCKER_RUNNING: {sh: docker ps -q}
     silent: true
   build:
     desc: Build sandpiper
     dir: cmd/api
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X main.version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X version.Version={{.VER}}"
     vars:
-      EXE: sandpiper{{exeExt}}
+      EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}

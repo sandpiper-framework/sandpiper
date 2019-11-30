@@ -31,6 +31,8 @@ func NewHTTP(svc user.Service, er *echo.Group) {
 // Custom errors
 var (
 	ErrPasswordsNotMatching = echo.NewHTTPError(http.StatusBadRequest, "passwords do not match")
+	ErrUnknownRoleID        = echo.NewHTTPError(http.StatusBadRequest, "unknown access role")
+	ErrNonNumericUserID     = echo.NewHTTPError(http.StatusBadRequest, "numeric user id expected")
 )
 
 // User create request
@@ -59,7 +61,7 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	if r.RoleID < sandpiper.SuperAdminRole || r.RoleID > sandpiper.UserRole {
-		return sandpiper.ErrBadRequest
+		return ErrUnknownRoleID
 	}
 
 	usr, err := h.svc.Create(c, sandpiper.User{
@@ -103,7 +105,7 @@ func (h *HTTP) list(c echo.Context) error {
 func (h *HTTP) view(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return sandpiper.ErrBadRequest
+		return ErrNonNumericUserID
 	}
 
 	result, err := h.svc.View(c, id)
@@ -127,7 +129,7 @@ type updateReq struct {
 func (h *HTTP) update(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return sandpiper.ErrBadRequest
+		return ErrNonNumericUserID
 	}
 
 	req := new(updateReq)
@@ -154,7 +156,7 @@ func (h *HTTP) update(c echo.Context) error {
 func (h *HTTP) delete(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return sandpiper.ErrBadRequest
+		return ErrNonNumericUserID
 	}
 
 	if err := h.svc.Delete(c, id); err != nil {

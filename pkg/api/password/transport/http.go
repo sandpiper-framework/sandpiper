@@ -9,7 +9,6 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/password"
-	"autocare.org/sandpiper/pkg/model"
 )
 
 // HTTP represents password http transport service
@@ -27,6 +26,7 @@ func NewHTTP(svc password.Service, er *echo.Group) {
 // Custom errors
 var (
 	ErrPasswordsNotMatching = echo.NewHTTPError(http.StatusBadRequest, "passwords do not match")
+	ErrNonNumericID         = echo.NewHTTPError(http.StatusBadRequest, "numeric ID expected")
 )
 
 // Password change request
@@ -40,7 +40,7 @@ type changeReq struct {
 func (h *HTTP) change(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return sandpiper.ErrBadRequest
+		return ErrNonNumericID
 	}
 
 	p := new(changeReq)

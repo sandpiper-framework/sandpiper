@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"autocare.org/sandpiper/pkg/server"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
-	"autocare.org/sandpiper/pkg/server"
 	"github.com/stretchr/testify/assert"
 )
 

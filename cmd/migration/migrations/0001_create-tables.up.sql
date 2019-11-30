@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS locations (
     deleted_at  timestamp
 );
 
-CREATE TABLE IF NOT EXISTS public.roles(
+CREATE TABLE IF NOT EXISTS roles(
     id           serial PRIMARY KEY,
     access_level integer,
     name         text
