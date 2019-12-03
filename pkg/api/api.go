@@ -21,8 +21,8 @@ import (
 	ut "autocare.org/sandpiper/pkg/api/user/transport"
 
 	"autocare.org/sandpiper/pkg/config"
+	"autocare.org/sandpiper/pkg/database"
 	"autocare.org/sandpiper/pkg/middleware/jwt"
-	"autocare.org/sandpiper/pkg/postgres"
 	"autocare.org/sandpiper/pkg/rbac"
 	"autocare.org/sandpiper/pkg/secure"
 	"autocare.org/sandpiper/pkg/server"
@@ -33,7 +33,7 @@ import (
 func Start(cfg *config.Configuration) error {
 
 	// setup database connection with optional query debug logging (using standard "log")
-	db, err := postgres.New(cfg.DB.PSN, cfg.DB.Timeout, cfg.DB.LogQueries)
+	db, err := database.New(cfg.DB.PSN, cfg.DB.Timeout, cfg.DB.LogQueries)
 	if err != nil {
 		return err
 	}

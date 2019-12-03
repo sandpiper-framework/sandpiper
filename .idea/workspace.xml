@@ -2,30 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/cmd/migration/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/postgres/dbmigrate.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Taskfile.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Taskfile.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/api/api.exe" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/api.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/api/sandpiper.config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/sandpiper.config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migration/migration.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migration/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/auth/transport/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/transport/http_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/password/password_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/password_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/user/transport/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/transport/http_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/user/user_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/user_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/model/error.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/model/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/server/error.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/server/error.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/version/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/version/version.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/zlog/zlog.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/zlog/zlog.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/postgres/dbmigrate.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/postgres/pg.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/postgres/pg_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/testing/mock/postgres.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,30 +140,30 @@
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
     <state x="694" y="370" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575325631307" />
-    <state width="1865" height="308" key="GridCell.Tab.0.bottom" timestamp="1575343389496">
+    <state width="1865" height="308" key="GridCell.Tab.0.bottom" timestamp="1575400888256">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="308" key="GridCell.Tab.0.bottom/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575343389496" />
-    <state width="1865" height="308" key="GridCell.Tab.0.center" timestamp="1575343389496">
+    <state width="1865" height="308" key="GridCell.Tab.0.bottom/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575400888256" />
+    <state width="1865" height="308" key="GridCell.Tab.0.center" timestamp="1575400888256">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="308" key="GridCell.Tab.0.center/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575343389496" />
-    <state width="1865" height="308" key="GridCell.Tab.0.left" timestamp="1575343389496">
+    <state width="1865" height="308" key="GridCell.Tab.0.center/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575400888256" />
+    <state width="1865" height="308" key="GridCell.Tab.0.left" timestamp="1575400888256">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="308" key="GridCell.Tab.0.left/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575343389496" />
-    <state width="1865" height="308" key="GridCell.Tab.0.right" timestamp="1575343389496">
+    <state width="1865" height="308" key="GridCell.Tab.0.left/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575400888256" />
+    <state width="1865" height="308" key="GridCell.Tab.0.right" timestamp="1575400888256">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="308" key="GridCell.Tab.0.right/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575343389496" />
+    <state width="1865" height="308" key="GridCell.Tab.0.right/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575400888256" />
     <state x="355" y="136" key="SettingsEditor" timestamp="1575225157566">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
     <state x="355" y="136" key="SettingsEditor/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575225157566" />
-    <state x="1978" y="187" width="1045" height="695" key="find.popup" timestamp="1575325749555">
+    <state x="1978" y="187" width="1045" height="695" key="find.popup" timestamp="1575391491619">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="1978" y="187" width="1045" height="695" key="find.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575325749555" />
+    <state x="1978" y="187" width="1045" height="695" key="find.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575391491619" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

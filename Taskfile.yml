@@ -14,18 +14,20 @@ tasks:
       # This will be path/to/file on Unix but path\to\file on Windows
       - echo '{{fromSlash "path/to/file"}}'
     silent: true
+
   test:
     desc: Run test suite (currently doesn't work with tests using dockertest under windows!)
     cmds:
       - echo " *** Running Coverage Tests ***"
       - go test -v -race -coverprofile=profile.out -covermode=atomic ./...
-      - {sh: cat profile.out >> coverage.txt}
-      - {sh: docker stop $(docker ps -a -q)}
+      - sh: cat profile.out >> coverage.txt
+      - sh: docker stop $(docker ps -a -q)
       - echo " *** Completed *** "
     vars:
-      # couldn't get a "preconditions" to work, but this will fail if not running
+      # couldn't get "preconditions" to work, but this will fail if docker is not running
       DOCKER_RUNNING: {sh: docker ps -q}
     silent: true
+
   build:
     desc: Build sandpiper
     dir: cmd/api
@@ -34,3 +36,24 @@ tasks:
     vars:
       EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
+
+  run:
+    desc: Launch sandpiper server
+    dir: cmd/api
+    cmds:
+      - ./api
+
+  createdb:
+    desc: Create the sandpiper database after default postgresql installation
+    dir: cmd/migration/migrations
+    cmds:
+      #- sh: '{{if eq OS "linux"}}sudo -u postgres psql --username=postgres --file=db_create.sql{{end}}'
+      #- sh: '{{if eq OS "windows"}}psql --username=postgres --file=db_create.sql{{end}}'
+      # Uncomment the correct command below. First is Linux, second is Windows (I couldn't get the above to work)
+      #- sudo -u postgres psql --username=postgres --file=db_create.sql
+     - psql --username=postgres --file=db_create.sql
+
+  update:
+    desc: Get the latest Sandpiper server repo
+    cmds:
+      - go get -u github.com/dougwinsby/sp-srv

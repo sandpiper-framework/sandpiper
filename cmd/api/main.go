@@ -2,6 +2,8 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
+// Package main is the entry point for sandpiper api server.
+// It checks the database-version and launches the server
 package main
 
 import (
@@ -11,7 +13,7 @@ import (
 
 	"autocare.org/sandpiper/pkg/api"
 	"autocare.org/sandpiper/pkg/config"
-	"autocare.org/sandpiper/pkg/postgres"
+	"autocare.org/sandpiper/pkg/database"
 	"autocare.org/sandpiper/pkg/version"
 )
 
@@ -26,7 +28,7 @@ func main() {
 		log.Fatal("ERROR: ", err)
 	}
 
-  msg := postgres.MigrateDatabase(cfg.DB.PSN, cfg.DB.MigrateDir)
+  msg := database.Migrate(cfg.DB.PSN, cfg.DB.MigrateDir)
   fmt.Println(msg)
 
 	err = api.Start(cfg)
