@@ -3,6 +3,7 @@ package transport_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -212,7 +213,7 @@ func TestList(t *testing.T) {
 							},
 						}, nil
 					}
-					return nil, sandpiper.ErrGeneric
+					return nil, errors.New("generic error")
 				},
 			},
 			wantStatus: http.StatusOK,

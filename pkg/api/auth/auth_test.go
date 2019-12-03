@@ -1,6 +1,7 @@
 package auth_test
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -35,7 +36,7 @@ func TestAuthenticate(t *testing.T) {
 			wantErr: true,
 			udb: &mockdb.User{
 				FindByUsernameFn: func(db orm.DB, user string) (*sandpiper.User, error) {
-					return nil, sandpiper.ErrGeneric
+					return nil, errors.New("generic error")
 				},
 			},
 		},
@@ -95,7 +96,7 @@ func TestAuthenticate(t *testing.T) {
 			},
 			jwt: &mock.JWT{
 				GenerateTokenFn: func(u *sandpiper.User) (string, string, error) {
-					return "", "", sandpiper.ErrGeneric
+					return "", "", errors.New("generic error")
 				},
 			},
 		},
@@ -112,7 +113,7 @@ func TestAuthenticate(t *testing.T) {
 					}, nil
 				},
 				UpdateFn: func(db orm.DB, u *sandpiper.User) error {
-					return sandpiper.ErrGeneric
+					return errors.New("generic error")
 				},
 			},
 			sec: &mock.Secure{
@@ -195,7 +196,7 @@ func TestRefresh(t *testing.T) {
 			wantErr: true,
 			udb: &mockdb.User{
 				FindByTokenFn: func(db orm.DB, token string) (*sandpiper.User, error) {
-					return nil, sandpiper.ErrGeneric
+					return nil, errors.New("generic error")
 				},
 			},
 		},
@@ -215,7 +216,7 @@ func TestRefresh(t *testing.T) {
 			},
 			jwt: &mock.JWT{
 				GenerateTokenFn: func(u *sandpiper.User) (string, string, error) {
-					return "", "", sandpiper.ErrGeneric
+					return "", "", errors.New("generic error")
 				},
 			},
 		},

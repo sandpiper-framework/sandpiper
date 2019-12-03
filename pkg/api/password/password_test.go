@@ -1,6 +1,7 @@
 package password_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/go-pg/pg/v9/orm"
@@ -11,11 +12,6 @@ import (
 	"autocare.org/sandpiper/pkg/model"
 	"autocare.org/sandpiper/testing/mock"
 	"autocare.org/sandpiper/testing/mock/mockdb"
-)
-
-var (
-	// ErrGeneric is used for testing purposes and for errors handled later in the callstack
-	ErrGeneric = errors.New("generic error")
 )
 
 func TestChange(t *testing.T) {
@@ -37,7 +33,7 @@ func TestChange(t *testing.T) {
 			args: args{id: 1},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
-					return sandpiper.ErrGeneric
+					return errors.New("generic error")
 				}},
 			wantErr: true,
 		},
@@ -54,7 +50,7 @@ func TestChange(t *testing.T) {
 					if id != 1 {
 						return nil, nil
 					}
-					return nil, sandpiper.ErrGeneric
+					return nil, errors.New("generic error")
 				},
 			},
 		},

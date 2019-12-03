@@ -33,6 +33,7 @@ type Database struct {
 	PSN        string `yaml:"psn,omitempty"`
 	LogQueries bool   `yaml:"log_queries,omitempty"`
 	Timeout    int    `yaml:"timeout_seconds,omitempty"`
+	MigrateDir string `yaml:"migration_directory"`
 }
 
 // Server holds data necessary for server configuration

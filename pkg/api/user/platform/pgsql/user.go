@@ -1,5 +1,7 @@
 package pgsql
 
+// user service database access
+
 import (
 	"net/http"
 	"strings"

@@ -3,6 +3,7 @@ package transport_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -42,7 +43,7 @@ func TestLogin(t *testing.T) {
 			wantStatus: http.StatusInternalServerError,
 			udb: &mockdb.User{
 				FindByUsernameFn: func(orm.DB, string) (*sandpiper.User, error) {
-					return nil, sandpiper.ErrGeneric
+					return nil, errors.New("generic error")
 				},
 			},
 		},
@@ -118,7 +119,7 @@ func TestRefresh(t *testing.T) {
 			wantStatus: http.StatusInternalServerError,
 			udb: &mockdb.User{
 				FindByTokenFn: func(orm.DB, string) (*sandpiper.User, error) {
-					return nil, sandpiper.ErrGeneric
+					return nil, errors.New("generic error")
 				},
 			},
 		},
@@ -181,7 +182,7 @@ func TestMe(t *testing.T) {
 			wantStatus: http.StatusInternalServerError,
 			udb: &mockdb.User{
 				ViewFn: func(orm.DB, int) (*sandpiper.User, error) {
-					return nil, sandpiper.ErrGeneric
+					return nil, errors.New("generic error")
 				},
 			},
 			rbac: &mock.RBAC{

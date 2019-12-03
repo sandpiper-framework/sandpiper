@@ -25,12 +25,6 @@ func getVldErrorMsg(s string) string {
 	return " failed on " + s + " validation"
 }
 
-/* unused???
-type resp struct {
-	Message string `json:"message"`
-}
-*/
-
 func (ce *customErrHandler) handler(err error, c echo.Context) {
 	var (
 		code = http.StatusInternalServerError

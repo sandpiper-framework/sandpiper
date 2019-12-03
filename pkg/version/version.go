@@ -2,6 +2,8 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
+// package version is used to define product identification information.
+// The exported "Version" variable is set by the build process.
 package version
 
 import (
@@ -12,13 +14,13 @@ import (
 // program version is inserted by `go build` task from latest github tag
 var Version = "unknown"
 
-const Copyright = "Copyright (c) Auto Care Association. All rights reserved."
+const copyright = "Copyright (c) Auto Care Association. All rights reserved."
 
 func Banner() string {
-	return fmt.Sprintf("%s\nSandpiper API Server (%s)\n%s\n", sandpiper(), Version, Copyright)
+	return fmt.Sprintf("%s\nSandpiper API Server (%s)\n%s\n", product(), Version, copyright)
 }
 
-func sandpiper() string {
+func product() string {
 	s := []string{
 		"  _____                 _       _",
 		" / ____|               | |     (_)",

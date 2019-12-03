@@ -2,34 +2,31 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/migration/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/postgres/dbmigrate.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Taskfile.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Taskfile.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/api/api.exe" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/api.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migration/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/api/sandpiper.config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/sandpiper.config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migration/migration.exe" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/password/logging/password.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/logging/password.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/transport/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/transport/http_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/password/password_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/password_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/password/transport/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/transport/http.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/user/transport/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/transport/http.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/user/transport/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/transport/http_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/middleware/jwt/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/middleware/jwt/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/model/error.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/error.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/model/model_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/model_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/postgres/pg.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/postgres/pg.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/rbac/rbac_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/rbac/rbac_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/server/binding_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/server/binding_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testing/mock/postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/testing/mock/postgres.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testing/mock/secure.go" beforeDir="false" afterPath="$PROJECT_DIR$/testing/mock/secure.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/user_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/user_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/error.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/log.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/server/error.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/server/error.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/version/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/version/version.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/zlog/zlog.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/zlog/zlog.go" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,15 +55,23 @@
   </component>
   <component name="ProjectId" id="1TTceA7CPzo0HsJGJAD678aQk0a" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="postgresql" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="configurable.Global.GOPATH.is.expanded" value="true" />
+    <property name="configurable.Module.GOPATH.is.expanded" value="false" />
+    <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.folding" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -74,19 +79,7 @@
       <recent name="C:\Users\dougw\autocare\sandpiper\pkg\secure" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="Go Test.go test auth">
+  <component name="RunManager" selected="Go Build.run sandpiper">
     <configuration name="run migration" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="sandpiper" />
       <working_directory value="$PROJECT_DIR$/cmd/migration" />
@@ -125,13 +118,15 @@
     </list>
   </component>
   <component name="ServiceViewManager">
-    <option name="allServicesViewState">
-      <serviceView>
-        <treeState>
-          <expand />
-          <select />
-        </treeState>
-      </serviceView>
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
     </option>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -154,6 +149,36 @@
     <integration-enabled>true</integration-enabled>
     <proxy>direct</proxy>
   </component>
+  <component name="WindowStateProjectService">
+    <state x="694" y="370" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1575325631307">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state x="694" y="370" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575325631307" />
+    <state width="1865" height="308" key="GridCell.Tab.0.bottom" timestamp="1575343389496">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1865" height="308" key="GridCell.Tab.0.bottom/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575343389496" />
+    <state width="1865" height="308" key="GridCell.Tab.0.center" timestamp="1575343389496">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1865" height="308" key="GridCell.Tab.0.center/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575343389496" />
+    <state width="1865" height="308" key="GridCell.Tab.0.left" timestamp="1575343389496">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1865" height="308" key="GridCell.Tab.0.left/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575343389496" />
+    <state width="1865" height="308" key="GridCell.Tab.0.right" timestamp="1575343389496">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1865" height="308" key="GridCell.Tab.0.right/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575343389496" />
+    <state x="355" y="136" key="SettingsEditor" timestamp="1575225157566">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state x="355" y="136" key="SettingsEditor/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575225157566" />
+    <state x="1978" y="187" width="1045" height="695" key="find.popup" timestamp="1575325749555">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1978" y="187" width="1045" height="695" key="find.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575325749555" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -161,11 +186,6 @@
           <url>file://$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user_test.go</url>
           <line>115</line>
           <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user.go</url>
-          <line>23</line>
-          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

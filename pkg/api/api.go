@@ -7,11 +7,10 @@
 package api
 
 import (
-	"crypto/sha1"
-
 	"autocare.org/sandpiper/pkg/api/auth"
 	al "autocare.org/sandpiper/pkg/api/auth/logging"
 	at "autocare.org/sandpiper/pkg/api/auth/transport"
+	"crypto/sha1"
 
 	"autocare.org/sandpiper/pkg/api/password"
 	pl "autocare.org/sandpiper/pkg/api/password/logging"
@@ -30,18 +29,22 @@ import (
 	"autocare.org/sandpiper/pkg/zlog"
 )
 
-// Start configures and starts the API services
+// Start configures and launches the API services
 func Start(cfg *config.Configuration) error {
+
+	// setup database connection with optional query debug logging (using standard "log")
 	db, err := postgres.New(cfg.DB.PSN, cfg.DB.Timeout, cfg.DB.LogQueries)
 	if err != nil {
 		return err
 	}
 
+	// setup middleware and logging services
 	sec := secure.New(cfg.App.MinPasswordStr, sha1.New())
 	rba := rbac.New()
 	tok := jwt.New(cfg.JWT.Secret, cfg.JWT.SigningAlgorithm, cfg.JWT.Duration)
 	log := zlog.New()
 
+	// setup server
 	srv := server.New()
 	srv.Static("/swaggerui", cfg.App.SwaggerUIPath)
 
@@ -63,7 +66,7 @@ func Start(cfg *config.Configuration) error {
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,
 		WriteTimeoutSeconds: cfg.Server.WriteTimeout,
 		Debug:               cfg.Server.Debug,
-		HideBanner:          true, // not externally configurable
+		HideBanner:          true, // hides echo banner (we have our own)... not in config file
 	})
 
 	return nil

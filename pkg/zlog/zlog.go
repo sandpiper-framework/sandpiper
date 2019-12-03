@@ -20,7 +20,7 @@ func New() *Log {
 	}
 }
 
-// Log logs using zerolog
+// Log implements the sandpiper.Logger interface (using zerolog)
 func (z *Log) Log(ctx echo.Context, source, msg string, err error, params map[string]interface{}) {
 
 	if params == nil {

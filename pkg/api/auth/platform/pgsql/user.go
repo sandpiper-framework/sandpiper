@@ -1,5 +1,7 @@
 package pgsql
 
+// auth service database access
+
 import (
 	"github.com/go-pg/pg/v9/orm"
 

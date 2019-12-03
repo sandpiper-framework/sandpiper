@@ -4,6 +4,7 @@
 database:
   log_queries: true
   timeout_seconds: 5
+  migration_directory: ../migration/migrations
   psn: postgres://sandpiper:autocare@localhost:5432/sandpiper?sslmode=disable
 
 server:

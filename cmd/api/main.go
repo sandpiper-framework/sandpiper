@@ -11,6 +11,7 @@ import (
 
 	"autocare.org/sandpiper/pkg/api"
 	"autocare.org/sandpiper/pkg/config"
+	"autocare.org/sandpiper/pkg/postgres"
 	"autocare.org/sandpiper/pkg/version"
 )
 
@@ -24,6 +25,9 @@ func main() {
 	if err != nil {
 		log.Fatal("ERROR: ", err)
 	}
+
+  msg := postgres.MigrateDatabase(cfg.DB.PSN, cfg.DB.MigrateDir)
+  fmt.Println(msg)
 
 	err = api.Start(cfg)
 	if err != nil {

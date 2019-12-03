@@ -1,6 +1,7 @@
 package user_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/go-pg/pg/v9/orm"
@@ -30,7 +31,7 @@ func TestCreate(t *testing.T) {
 		name: "Fail on is lower role",
 		rbac: &mock.RBAC{
 			AccountCreateFn: func(echo.Context, sandpiper.AccessRole, int, int) error {
-				return sandpiper.ErrGeneric
+				return errors.New("generic error")
 			}},
 		wantErr: true,
 		args: args{req: sandpiper.User{
@@ -107,9 +108,9 @@ func TestView(t *testing.T) {
 			args: args{id: 5},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
-					return sandpiper.ErrGeneric
+					return errors.New("generic error")
 				}},
-			wantErr: sandpiper.ErrGeneric,
+			wantErr: errors.New("generic error"),
 		},
 		{
 			name: "Success",
@@ -278,13 +279,13 @@ func TestDelete(t *testing.T) {
 		{
 			name:    "Fail on ViewUser",
 			args:    args{id: 1},
-			wantErr: sandpiper.ErrGeneric,
+			wantErr: errors.New("generic error"),
 			udb: &mockdb.User{
 				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
 					if id != 1 {
 						return nil, nil
 					}
-					return nil, sandpiper.ErrGeneric
+					return nil, errors.New("generic error")
 				},
 			},
 		},
@@ -309,9 +310,9 @@ func TestDelete(t *testing.T) {
 			},
 			rbac: &mock.RBAC{
 				IsLowerRoleFn: func(echo.Context, sandpiper.AccessRole) error {
-					return sandpiper.ErrGeneric
+					return errors.New("generic error")
 				}},
-			wantErr: sandpiper.ErrGeneric,
+			wantErr: errors.New("generic error"),
 		},
 		{
 			name: "Success",
@@ -374,9 +375,9 @@ func TestUpdate(t *testing.T) {
 			}},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
-					return sandpiper.ErrGeneric
+					return errors.New("generic error")
 				}},
-			wantErr: sandpiper.ErrGeneric,
+			wantErr: errors.New("generic error"),
 		},
 		{
 			name: "Fail on Update",
@@ -387,7 +388,7 @@ func TestUpdate(t *testing.T) {
 				EnforceUserFn: func(c echo.Context, id int) error {
 					return nil
 				}},
-			wantErr: sandpiper.ErrGeneric,
+			wantErr: errors.New("generic error"),
 			udb: &mockdb.User{
 				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
 					return &sandpiper.User{
@@ -408,7 +409,7 @@ func TestUpdate(t *testing.T) {
 					}, nil
 				},
 				UpdateFn: func(db orm.DB, usr *sandpiper.User) error {
-					return sandpiper.ErrGeneric
+					return errors.New("generic error")
 				},
 			},
 		},
