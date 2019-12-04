@@ -2,8 +2,8 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package main is the entry point for sandpiper api server.
-// It checks the database-version and launches the server
+// Package main is the entry point for the sandpiper api server.
+// It checks the database-version and uses a config file to launch the server properly
 package main
 
 import (

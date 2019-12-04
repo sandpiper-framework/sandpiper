@@ -12,7 +12,7 @@ func New() *Service {
 	return &Service{}
 }
 
-// Service is RBAC application service
+// Service is RBAC enforcement service
 type Service struct{}
 
 func checkBool(b bool) error {

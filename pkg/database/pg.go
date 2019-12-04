@@ -1,3 +1,6 @@
+// The database package creates a pooled connection to the database. We use a
+// lightweight ORM (with deep support for postgresql). This ORM only supports
+// postgresql. We might consider switching ORM if need more supported dbs.
 package database
 
 import (
@@ -21,7 +24,7 @@ func (d dbLogger) AfterQuery(ctx context.Context, q *pg.QueryEvent) error {
 	return nil
 }
 
-// New creates new database connection to a postgres database
+// New creates new database connection to a postgres database with optional query logging
 func New(psn string, timeout int, enableLog bool) (*pg.DB, error) {
 	u, err := pg.ParseURL(psn)
 	if err != nil {
