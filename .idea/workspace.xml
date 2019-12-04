@@ -4,14 +4,7 @@
     <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Taskfile.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Taskfile.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/api/api.exe" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/api.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migration/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/postgres/dbmigrate.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/postgres/pg.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/postgres/pg_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/testing/mock/postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/testing/mock/postgres.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migration/main.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,6 +41,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="postgresql" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="configurable.Global.GOPATH.is.expanded" value="true" />

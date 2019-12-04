@@ -6,14 +6,40 @@
 
 version: '2'
 
+vars:
+  REPO:
+    github.com/dougwinsby/sp-srv
+  GO_PACKAGES:
+    sh: go list ./...
+
 tasks:
-  os:
+  createdb:
+    desc: Create the sandpiper database after default postgresql installation
+    dir: cmd/migration/migrations
     cmds:
-      - echo '{{OS}} {{ARCH}}'
-      - echo '{{if eq OS "windows"}}windows-command{{else}}unix-command{{end}}'
-      # This will be path/to/file on Unix but path\to\file on Windows
-      - echo '{{fromSlash "path/to/file"}}'
+      - "{{.PSQLCMD}}"
+    vars:
+      PSQLCMD:
+        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql'
+
+  update:
+    desc: Get the latest Sandpiper server repo
+    cmds:
+      - go get -u {{.REPO}}
+
+  packages:
+    cmds:
+      - echo '{{.GO_PACKAGES}}'
     silent: true
+
+  build:
+    desc: Build sandpiper
+    dir: cmd/api
+    cmds:
+      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/version.Version={{.VER}}"
+    vars:
+      EXE: api{{exeExt}}
+      VER: {sh: git describe --always --long --dirty}
 
   test:
     desc: Run test suite (currently doesn't work with tests using dockertest under windows!)
@@ -28,32 +54,22 @@ tasks:
       DOCKER_RUNNING: {sh: docker ps -q}
     silent: true
 
-  build:
-    desc: Build sandpiper
-    dir: cmd/api
-    cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/version.Version={{.VER}}"
-    vars:
-      EXE: api{{exeExt}}
-      VER: {sh: git describe --always --long --dirty}
-
   run:
     desc: Launch sandpiper server
     dir: cmd/api
     cmds:
       - ./api
 
-  createdb:
-    desc: Create the sandpiper database after default postgresql installation
-    dir: cmd/migration/migrations
+  release-docker:
+    desc: Create a docker file for release
+    deps: [build]
     cmds:
-      #- sh: '{{if eq OS "linux"}}sudo -u postgres psql --username=postgres --file=db_create.sql{{end}}'
-      #- sh: '{{if eq OS "windows"}}psql --username=postgres --file=db_create.sql{{end}}'
-      # Uncomment the correct command below. First is Linux, second is Windows (I couldn't get the above to work)
-      #- sudo -u postgres psql --username=postgres --file=db_create.sql
-     - psql --username=postgres --file=db_create.sql
+      - docker build . -t sandpiper
+    preconditions:
+      - test -f Dockerfile
 
-  update:
-    desc: Get the latest Sandpiper server repo
+  clean-docker:
+    desc: Remove any unused docker images (FIX THIS!!!)
     cmds:
-      - go get -u github.com/dougwinsby/sp-srv
+      - docker ps -a -q -f status=exited | xargs docker rm
+      - docker images --no-trunc=true --filter dangling=true --quiet | xargs docker rmi
