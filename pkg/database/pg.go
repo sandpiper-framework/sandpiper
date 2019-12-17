@@ -1,6 +1,6 @@
 // The database package creates a pooled connection to the database. We use a
 // lightweight ORM (with deep support for postgresql). This ORM only supports
-// postgresql. We might consider switching ORM if need more supported dbs.
+// postgresql. We might consider switching if need more supported dbms.
 package database
 
 import (
@@ -15,11 +15,11 @@ import (
 
 type dbLogger struct{}
 
-func (d dbLogger) BeforeQuery(ctx context.Context, pg *pg.QueryEvent) (context.Context, error) {
+func (d dbLogger) BeforeQuery(ctx context.Context, _ *pg.QueryEvent) (context.Context, error) {
 	return ctx, nil
 }
 
-func (d dbLogger) AfterQuery(ctx context.Context, q *pg.QueryEvent) error {
+func (d dbLogger) AfterQuery(_ context.Context, q *pg.QueryEvent) error {
 	log.Printf(q.FormattedQuery())
 	return nil
 }

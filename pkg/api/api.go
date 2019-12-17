@@ -2,7 +2,7 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// The api package creates each service used by the server (grouped by api version)
+// Package api creates each service used by the server (grouped by api version)
 // with middleware, logging and routing, and then starts the echo web server.
 package api
 
@@ -32,7 +32,7 @@ import (
 // Start configures and launches the API services
 func Start(cfg *config.Configuration) error {
 
-	// setup database connection with optional query debug logging (using standard "log")
+	// setup database connection with optional query logging (using standard "log")
 	db, err := database.New(cfg.DB.PSN, cfg.DB.Timeout, cfg.DB.LogQueries)
 	if err != nil {
 		return err
@@ -44,9 +44,8 @@ func Start(cfg *config.Configuration) error {
 	tok := jwt.New(cfg.JWT.Secret, cfg.JWT.SigningAlgorithm, cfg.JWT.Duration)
 	log := zlog.New()
 
-	// setup server
+	// setup echo server (singleton)
 	srv := server.New()
-	srv.Static("/swaggerui", cfg.App.SwaggerUIPath)
 
 	// auth service is special (doesn't include api version)
 	at.NewHTTP(al.New(auth.Initialize(db, tok, sec, rba), log), srv, tok.MWFunc())
@@ -66,7 +65,6 @@ func Start(cfg *config.Configuration) error {
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,
 		WriteTimeoutSeconds: cfg.Server.WriteTimeout,
 		Debug:               cfg.Server.Debug,
-		HideBanner:          true, // hides echo banner (we have our own)... not in config file
 	})
 
 	return nil

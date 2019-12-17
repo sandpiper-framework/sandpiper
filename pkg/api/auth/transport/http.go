@@ -29,11 +29,11 @@ type credentials struct {
 }
 
 func (h *HTTP) login(c echo.Context) error {
-	cred := new(credentials)
-	if err := c.Bind(cred); err != nil {
+	creds := new(credentials)
+	if err := c.Bind(creds); err != nil {
 		return err
 	}
-	r, err := h.svc.Authenticate(c, cred.Username, cred.Password)
+	r, err := h.svc.Authenticate(c, creds.Username, creds.Password)
 	if err != nil {
 		return err
 	}

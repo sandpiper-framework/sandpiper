@@ -28,8 +28,8 @@ func main() {
 		log.Fatal("ERROR: ", err)
 	}
 
-  msg := database.Migrate(cfg.DB.PSN, cfg.DB.MigrateDir)
-  fmt.Println(msg)
+	msg := database.Migrate(cfg.DB.PSN, cfg.DB.MigrateDir)
+	fmt.Println(msg)
 
 	err = api.Start(cfg)
 	if err != nil {

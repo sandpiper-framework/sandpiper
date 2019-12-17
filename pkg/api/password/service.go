@@ -14,6 +14,14 @@ type Service interface {
 	Change(echo.Context, int, string, string) error
 }
 
+// Password represents password application service
+type Password struct {
+	db   *pg.DB
+	udb  UserDB
+	rbac RBAC
+	sec  Securer
+}
+
 // New creates new password application service
 func New(db *pg.DB, udb UserDB, rbac RBAC, sec Securer) *Password {
 	return &Password{
@@ -27,14 +35,6 @@ func New(db *pg.DB, udb UserDB, rbac RBAC, sec Securer) *Password {
 // Initialize initializes password application service with defaults
 func Initialize(db *pg.DB, rbac RBAC, sec Securer) *Password {
 	return New(db, pgsql.NewUser(), rbac, sec)
-}
-
-// Password represents password application service
-type Password struct {
-	db   *pg.DB
-	udb  UserDB
-	rbac RBAC
-	sec  Securer
 }
 
 // UserDB represents user repository interface

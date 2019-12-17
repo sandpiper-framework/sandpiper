@@ -2,12 +2,28 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/pkg/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/migration/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/database/dbmigrate.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/migrate.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.down.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migration/migrations/0002_seed-database.down.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/transport/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/transport/http.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/database/migrate.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/migrate.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/database/pg.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/pg.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/rbac/rbac.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/rbac/rbac.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/location.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/location.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/server/server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +44,13 @@
     <expand />
     <select />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
   <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -44,6 +67,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="postgresql" />
+    <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -54,7 +78,7 @@
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.folding" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.appearance" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -133,58 +157,90 @@
     <proxy>direct</proxy>
   </component>
   <component name="WindowStateProjectService">
+    <state x="457" y="146" key="#Inspections" timestamp="1576080315107">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state x="457" y="146" key="#Inspections/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576080315107" />
     <state x="694" y="370" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1575325631307">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
     <state x="694" y="370" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575325631307" />
-    <state width="1865" height="308" key="GridCell.Tab.0.bottom" timestamp="1575487565583">
+    <state x="626" y="290" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1576531413356">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="308" key="GridCell.Tab.0.bottom/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575487565583" />
-    <state width="1865" height="308" key="GridCell.Tab.0.center" timestamp="1575487565583">
+    <state x="626" y="290" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576531413356" />
+    <state x="639" y="189" key="#run_sandpiper" timestamp="1576273390423">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="308" key="GridCell.Tab.0.center/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575487565583" />
-    <state width="1865" height="308" key="GridCell.Tab.0.left" timestamp="1575487565583">
+    <state x="639" y="189" key="#run_sandpiper/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273390423" />
+    <state x="838" y="249" width="909" height="767" key="#xdebugger.evaluate" timestamp="1575587526193">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="308" key="GridCell.Tab.0.left/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575487565583" />
-    <state width="1865" height="308" key="GridCell.Tab.0.right" timestamp="1575487565583">
+    <state x="838" y="249" width="909" height="767" key="#xdebugger.evaluate/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575587526193" />
+    <state width="1718" height="260" key="GridCell.Tab.0.bottom" timestamp="1576273462531">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="308" key="GridCell.Tab.0.right/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575487565583" />
-    <state width="1865" height="382" key="GridCell.Tab.1.bottom" timestamp="1575484810942">
+    <state width="1718" height="260" key="GridCell.Tab.0.bottom/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273462531" />
+    <state width="1718" height="260" key="GridCell.Tab.0.center" timestamp="1576273462529">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="382" key="GridCell.Tab.1.bottom/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575484810942" />
-    <state width="1865" height="382" key="GridCell.Tab.1.center" timestamp="1575484810942">
+    <state width="1718" height="260" key="GridCell.Tab.0.center/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273462529" />
+    <state width="1718" height="260" key="GridCell.Tab.0.left" timestamp="1576273462529">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="382" key="GridCell.Tab.1.center/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575484810942" />
-    <state width="1865" height="382" key="GridCell.Tab.1.left" timestamp="1575484810941">
+    <state width="1718" height="260" key="GridCell.Tab.0.left/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273462529" />
+    <state width="1718" height="260" key="GridCell.Tab.0.right" timestamp="1576273462530">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="382" key="GridCell.Tab.1.left/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575484810941" />
-    <state width="1865" height="382" key="GridCell.Tab.1.right" timestamp="1575484810942">
+    <state width="1718" height="260" key="GridCell.Tab.0.right/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273462530" />
+    <state width="1718" height="260" key="GridCell.Tab.1.bottom" timestamp="1576273462532">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state width="1865" height="382" key="GridCell.Tab.1.right/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575484810942" />
-    <state x="355" y="136" key="SettingsEditor" timestamp="1575225157566">
+    <state width="1718" height="260" key="GridCell.Tab.1.bottom/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273462532" />
+    <state width="1718" height="260" key="GridCell.Tab.1.center" timestamp="1576273462532">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
-    <state x="355" y="136" key="SettingsEditor/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575225157566" />
-    <state x="1978" y="187" width="1045" height="695" key="find.popup" timestamp="1575391491619">
+    <state width="1718" height="260" key="GridCell.Tab.1.center/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273462532" />
+    <state width="1718" height="260" key="GridCell.Tab.1.left" timestamp="1576273462531">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1718" height="260" key="GridCell.Tab.1.left/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273462531" />
+    <state width="1718" height="260" key="GridCell.Tab.1.right" timestamp="1576273462532">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1718" height="260" key="GridCell.Tab.1.right/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576273462532" />
+    <state x="645" y="157" key="SettingsEditor" timestamp="1576531703548">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state x="645" y="157" key="SettingsEditor/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576531703548" />
+    <state width="623" height="498" key="SwitcherDM" timestamp="1575587086056">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="623" height="498" key="SwitcherDM/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575587086056" />
+    <state width="895" height="552" key="XDebugger.FullValuePopup" timestamp="1575587688090">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="895" height="552" key="XDebugger.FullValuePopup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575587688090" />
+    <state x="397" y="286" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1575587201466">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state x="397" y="286" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575587201466" />
+    <state x="1978" y="187" width="1045" height="695" key="find.popup" timestamp="1576619521015">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="1978" y="187" width="1045" height="695" key="find.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575391491619" />
+    <state x="1978" y="187" width="1045" height="695" key="find.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576619521015" />
+    <state x="484" y="125" key="search.everywhere.popup" timestamp="1575660029881">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state x="484" y="125" key="search.everywhere.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575660029881" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user_test.go</url>
-          <line>115</line>
-          <option name="timeStamp" value="4" />
+          <url>file://$PROJECT_DIR$/cmd/api/main.go</url>
+          <line>25</line>
+          <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

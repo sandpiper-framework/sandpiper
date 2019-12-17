@@ -66,5 +66,5 @@ func migrationMessage(v1, v2 uint) string {
 	if v1 != v2 {
 		return fmt.Sprintf("DB Version: %d (migrated from %d to %d)\n", v2, v1, v2)
 	}
-	return fmt.Sprintf("DB Version: %d (no migrations required)\n", v2)
+	return fmt.Sprintf("DB Version: %d\n", v1)
 }

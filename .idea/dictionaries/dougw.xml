@@ -5,21 +5,29 @@
       <w>autocare</w>
       <w>bcrypt</w>
       <w>callstack</w>
+      <w>creds</w>
       <w>cust</w>
       <w>loginrefresh</w>
+      <w>marketcopy</w>
       <w>migrator</w>
+      <w>mockapi</w>
       <w>noopen</w>
       <w>nosniff</w>
+      <w>partspro</w>
       <w>pgsql</w>
       <w>postgresql</w>
       <w>prefetching</w>
+      <w>pricesheet</w>
+      <w>psql</w>
       <w>rbac</w>
       <w>refreshtoken</w>
       <w>sslmode</w>
+      <w>statustype</w>
       <w>swagg</w>
       <w>swaggerui</w>
       <w>taskfile</w>
       <w>uname</w>
+      <w>validater</w>
       <w>zerolog</w>
       <w>zxcvbn</w>
     </words>

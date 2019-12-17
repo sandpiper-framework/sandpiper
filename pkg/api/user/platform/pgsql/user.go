@@ -29,6 +29,7 @@ var (
 // Create creates a new user on database
 func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
 	var user = new(sandpiper.User)
+	
 	err := db.Model(user).Where("lower(username) = ? or lower(email) = ? and deleted_at is null",
 		strings.ToLower(usr.Username), strings.ToLower(usr.Email)).Select()
 
@@ -45,6 +46,7 @@ func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
 // View returns single user by ID
 func (u *User) View(db orm.DB, id int) (*sandpiper.User, error) {
 	var user = new(sandpiper.User)
+
 	sql := `SELECT "user".*, "role"."id" AS "role__id", "role"."access_level" AS "role__access_level", "role"."name" AS "role__name" 
 	FROM "users" AS "user" LEFT JOIN "roles" AS "role" ON "role"."id" = "user"."role_id" 
 	WHERE ("user"."id" = ? and deleted_at is null)`

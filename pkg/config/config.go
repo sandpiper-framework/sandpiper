@@ -14,6 +14,7 @@ func Load(path string) (*Configuration, error) {
 		return nil, fmt.Errorf("error reading config file (use -p flag), %s", err)
 	}
 	var cfg = new(Configuration)
+
 	if err := yaml.Unmarshal(bytes, cfg); err != nil {
 		return nil, fmt.Errorf("unable to decode into struct, %v", err)
 	}

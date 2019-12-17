@@ -1,3 +1,5 @@
+// Package server sets up the echo server with middleware, binder and validater
+// from configuration file allows starting (with graceful shutdown)
 package server
 
 import (
@@ -41,7 +43,6 @@ type Config struct {
 	ReadTimeoutSeconds  int
 	WriteTimeoutSeconds int
 	Debug               bool
-	HideBanner          bool
 }
 
 // Start starts echo server.
@@ -52,7 +53,7 @@ func Start(srv *echo.Echo, cfg *Config) {
 		WriteTimeout: time.Duration(cfg.WriteTimeoutSeconds) * time.Second,
 	}
 	srv.Debug = cfg.Debug
-	srv.HideBanner = cfg.HideBanner
+	srv.HideBanner = true
 
 	// Start server
 	go func() {

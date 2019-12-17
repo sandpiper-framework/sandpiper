@@ -9,7 +9,16 @@ import (
 	"autocare.org/sandpiper/pkg/model"
 )
 
-// New creates new iam service
+// Auth represents auth application service
+type Auth struct {
+	db   *pg.DB
+	udb  UserDB
+	tg   TokenGenerator
+	sec  Securer
+	rbac RBAC
+}
+
+// New creates a new auth service
 func New(db *pg.DB, udb UserDB, j TokenGenerator, sec Securer, rbac RBAC) *Auth {
 	return &Auth{
 		db:   db,
@@ -30,15 +39,6 @@ type Service interface {
 	Authenticate(echo.Context, string, string) (*sandpiper.AuthToken, error)
 	Refresh(echo.Context, string) (*sandpiper.RefreshToken, error)
 	Me(echo.Context) (*sandpiper.User, error)
-}
-
-// Auth represents auth application service
-type Auth struct {
-	db   *pg.DB
-	udb  UserDB
-	tg   TokenGenerator
-	sec  Securer
-	rbac RBAC
 }
 
 // UserDB represents user repository interface
