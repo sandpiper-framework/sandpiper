@@ -27,13 +27,13 @@ func main() {
 
 	// todo: pull config from external yaml file (or maybe from args)
 	cfg := Config{
-		Port: "localhost:3030",
+		Port:                "localhost:3030",
 		ReadTimeoutSeconds:  5,
 		WriteTimeoutSeconds: 5,
 		Debug:               true,
 	}
 
-	// instantiate an echo server
+	// instantiate http server
 	srv := echo.New()
 
 	// configure routes
@@ -57,15 +57,25 @@ func postObject(c echo.Context) error {
 
 // getMySlices only returns slice information assigned to the login user.
 func getMySlices(c echo.Context) error {
-	type resp struct {
-		Token string `json:"token"`
-		Expires string `json:"expires"`
-		RefreshTok string `json:"refresh_token"`
+	type Slice struct {
+		SliceID   string `json:"slice-id"`
+		SliceName string `json:"slice-name"`
+		SliceHash string `json:"slice-hash"`
 	}
+
+	type resp struct {
+		Slices []Slice `json:"slices"`
+		Count  int     `json:"count"`
+	}
+
+	slice := []Slice{
+		{"08efdf90-a815-4cf7-b71c-008e5fd31cce", "AAP-Brakes", "cf23df2207d99a74fbe169e3eba035e633b65d94"},
+		{"cb4b768b-6d6b-4965-a29a-9052a80dbbbb", "AAP-Wipers", "1a804c61e1a70ab37b912792ee846de7378c4a36"},
+	}
+
 	var r = resp{
-		Token: "",
-		Expires: "2019-12-16T16:33:47-06:00",
-		RefreshTok: "04782f813406b7686fc83f7aa43e694d2b3b9004",
+		Slices: slice,
+		Count:  len(slice),
 	}
 	return c.JSON(http.StatusOK, r)
 }
@@ -75,17 +85,17 @@ func getMySlices(c echo.Context) error {
 func login(c echo.Context) error {
 	const (
 		tok = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
-				".eyJjIjoxLCJlIjoiam9obmRvZUBtYWlsLmNvbSIsImV4cCI6MTU3NjI3Mzg4NywiaWQiOjEsImwiOjEsInIiOjEwMCwidSI6ImFkbWluIn0" +
-				".0u9B4GjwmI2VnEhEWVdp5khxgvNoHPR8yGj2f3n4PKY"
+			".eyJjIjoxLCJlIjoiam9obmRvZUBtYWlsLmNvbSIsImV4cCI6MTU3NjI3Mzg4NywiaWQiOjEsImwiOjEsInIiOjEwMCwidSI6ImFkbWluIn0" +
+			".0u9B4GjwmI2VnEhEWVdp5khxgvNoHPR8yGj2f3n4PKY"
 	)
 	type resp struct {
-		Token string `json:"token"`
-		Expires string `json:"expires"`
+		Token      string `json:"token"`
+		Expires    string `json:"expires"`
 		RefreshTok string `json:"refresh_token"`
 	}
 	var r = resp{
-		Token: tok,
-		Expires: time.Now().Add(time.Hour).Format(time.RFC3339),
+		Token:      tok,
+		Expires:    time.Now().Add(time.Hour).Format(time.RFC3339),
 		RefreshTok: "04782f813406b7686fc83f7aa43e694d2b3b9004",
 	}
 	return c.JSON(http.StatusOK, r)
@@ -93,10 +103,9 @@ func login(c echo.Context) error {
 
 // listRoutes uses an echo built-in function to return all registered routes.
 func listRoutes(c echo.Context) error {
-  r, _ := json.Marshal(c.Echo().Routes())
+	r, _ := json.Marshal(c.Echo().Routes())
 	return c.String(http.StatusOK, string(r))
 }
-
 
 // Start starts the echo server in a separate goroutine.
 func Start(srv *echo.Echo, cfg *Config) {

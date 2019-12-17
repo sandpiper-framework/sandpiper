@@ -2,28 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/pkg/client/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migration/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.down.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migration/migrations/0001_create-tables.up.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migration/migrations/0002_seed-database.down.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/auth/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/auth/transport/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/transport/http.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/password/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/database/migrate.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/migrate.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/database/pg.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/pg.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/model/location.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/location.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/model/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/mockapi/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
