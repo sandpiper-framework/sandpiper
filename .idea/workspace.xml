@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/mockapi/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/mockapi/README.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/README.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/mockapi/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/mockapi/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

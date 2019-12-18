@@ -7,6 +7,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/labstack/gommon/log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -52,15 +53,23 @@ func main() {
 func postObject(c echo.Context) error {
 	// todo: provide error for slice not found condition
 	// todo: provide error for duplicate object-id
+	// todo: validate missing required values
+	sliceID := c.Param("id")
+	c.Logger().Debugf("slice-id: %s", sliceID)
 	return c.String(http.StatusOK, "OK")
 }
 
 // getMySlices only returns slice information assigned to the login user.
 func getMySlices(c echo.Context) error {
+
+	type metaMap map[string]string
+
 	type Slice struct {
 		SliceID   string `json:"slice-id"`
 		SliceName string `json:"slice-name"`
 		SliceHash string `json:"slice-hash"`
+		MetaData  metaMap
+		Count     int `json:"count"`
 	}
 
 	type resp struct {
@@ -68,15 +77,34 @@ func getMySlices(c echo.Context) error {
 		Count  int     `json:"count"`
 	}
 
-	slice := []Slice{
-		{"08efdf90-a815-4cf7-b71c-008e5fd31cce", "AAP-Brakes", "cf23df2207d99a74fbe169e3eba035e633b65d94"},
-		{"cb4b768b-6d6b-4965-a29a-9052a80dbbbb", "AAP-Wipers", "1a804c61e1a70ab37b912792ee846de7378c4a36"},
-	}
+	metadata := make(metaMap)
+	metadata["vcdb-version"] = "2019-09-27"
+	metadata["pcdb-version"] = "2019-09-27"
 
-	var r = resp{
-		Slices: slice,
-		Count:  len(slice),
-	}
+	var (
+		slices = []Slice{
+			{
+				SliceID:   "08efdf90-a815-4cf7-b71c-008e5fd31cce",
+				SliceName: "AAP-Brakes",
+				SliceHash: "cf23df2207d99a74fbe169e3eba035e633b65d94",
+				MetaData:  metadata,
+				Count:     2919,
+			},
+			{
+				SliceID:   "cb4b768b-6d6b-4965-a29a-9052a80dbbbb",
+				SliceName: "AAP-Wipers",
+				SliceHash: "1a804c61e1a70ab37b912792ee846de7378c4a36",
+				MetaData:  metadata,
+				Count:     2342,
+			},
+		}
+
+		r = resp{
+			Slices: slices,
+			Count:  len(slices),
+		}
+	)
+
 	return c.JSON(http.StatusOK, r)
 }
 
@@ -116,6 +144,7 @@ func Start(srv *echo.Echo, cfg *Config) {
 	}
 	srv.Debug = cfg.Debug
 	srv.HideBanner = true
+	srv.Logger.SetLevel(log.DEBUG)
 
 	// Start server
 	go func() {
