@@ -1,13 +1,17 @@
-// mockapi creates an http server that mimics responses to a subset of the
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
+// Package mockapi creates an http server that mimics responses to a subset of the
 // sandpiper api for client testing purposes (without a database and before the
-// sandpiper server is completed). We anticipate this utility having a short lifespan.
+// sandpiper server is completed). We anticipate this utility having a relatively
+// short lifespan.
 
 package main
 
 import (
 	"context"
 	"encoding/json"
-	"github.com/labstack/gommon/log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -65,11 +69,11 @@ func getMySlices(c echo.Context) error {
 	type metaMap map[string]string
 
 	type Slice struct {
-		SliceID   string `json:"slice-id"`
-		SliceName string `json:"slice-name"`
-		SliceHash string `json:"slice-hash"`
-		MetaData  metaMap
-		Count     int `json:"count"`
+		SliceID   string  `json:"slice-id"`
+		SliceName string  `json:"slice-name"`
+		SliceHash string  `json:"slice-hash"`
+		MetaData  metaMap `json:"metadata"`
+		Count     int     `json:"count"`
 	}
 
 	type resp struct {
@@ -142,9 +146,8 @@ func Start(srv *echo.Echo, cfg *Config) {
 		ReadTimeout:  time.Duration(cfg.ReadTimeoutSeconds) * time.Second,
 		WriteTimeout: time.Duration(cfg.WriteTimeoutSeconds) * time.Second,
 	}
-	srv.Debug = cfg.Debug
+	srv.Debug = cfg.Debug  // can also set logging level to log.DEBUG
 	srv.HideBanner = true
-	srv.Logger.SetLevel(log.DEBUG)
 
 	// Start server
 	go func() {

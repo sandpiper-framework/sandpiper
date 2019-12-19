@@ -7,8 +7,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/password"
-	"autocare.org/sandpiper/pkg/model"
 )
 
 // New creates new password logging service

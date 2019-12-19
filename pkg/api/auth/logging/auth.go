@@ -7,8 +7,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/auth"
-	"autocare.org/sandpiper/pkg/model"
 )
 
 // New creates new auth logging service

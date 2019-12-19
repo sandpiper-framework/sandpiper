@@ -3,11 +3,11 @@ package pgsql_test
 import (
 	"testing"
 
-	"autocare.org/sandpiper/pkg/model"
-
-	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
-	"autocare.org/sandpiper/testing/mock"
 	"github.com/stretchr/testify/assert"
+
+	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
+	"autocare.org/sandpiper/test/mock"
 )
 
 func TestCreate(t *testing.T) {

@@ -4,8 +4,8 @@ package user
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/model"
-	"autocare.org/sandpiper/pkg/query"
+	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/query"
 )
 
 // Create creates a new user account

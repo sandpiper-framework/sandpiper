@@ -8,10 +8,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
+	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/password"
-	"autocare.org/sandpiper/pkg/model"
-	"autocare.org/sandpiper/testing/mock"
-	"autocare.org/sandpiper/testing/mock/mockdb"
+	"autocare.org/sandpiper/test/mock"
+	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestChange(t *testing.T) {

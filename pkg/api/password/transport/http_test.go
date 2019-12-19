@@ -10,12 +10,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
+	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/server"
 	"autocare.org/sandpiper/pkg/api/password"
 	"autocare.org/sandpiper/pkg/api/password/transport"
-	"autocare.org/sandpiper/pkg/model"
-	"autocare.org/sandpiper/pkg/server"
-	"autocare.org/sandpiper/testing/mock"
-	"autocare.org/sandpiper/testing/mock/mockdb"
+	"autocare.org/sandpiper/test/mock"
+	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestChangePassword(t *testing.T) {
@@ -101,10 +101,10 @@ func TestChangePassword(t *testing.T) {
 			defer ts.Close()
 			path := ts.URL + "/password/" + tt.id
 			req, err := http.NewRequest("PATCH", path, bytes.NewBufferString(tt.req))
-			req.Header.Set("Content-Type", "application/json")
 			if err != nil {
 				t.Fatal(err)
 			}
+			req.Header.Set("Content-Type", "application/json")
 			res, err := client.Do(req)
 			if err != nil {
 				t.Fatal(err)

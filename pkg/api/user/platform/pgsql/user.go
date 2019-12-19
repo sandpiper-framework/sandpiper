@@ -10,7 +10,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/model"
+	"autocare.org/sandpiper/internal/model"
 )
 
 // NewUser returns a new user database instance

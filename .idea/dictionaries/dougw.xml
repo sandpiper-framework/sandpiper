@@ -14,6 +14,7 @@
       <w>noopen</w>
       <w>nosniff</w>
       <w>partspro</w>
+      <w>pcdb</w>
       <w>pgsql</w>
       <w>postgresql</w>
       <w>prefetching</w>
@@ -28,6 +29,7 @@
       <w>taskfile</w>
       <w>uname</w>
       <w>validater</w>
+      <w>vcdb</w>
       <w>zerolog</w>
       <w>zxcvbn</w>
     </words>

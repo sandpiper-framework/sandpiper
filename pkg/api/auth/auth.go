@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/model"
+	"autocare.org/sandpiper/internal/model"
 )
 
 // Custom errors

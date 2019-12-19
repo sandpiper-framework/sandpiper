@@ -20,13 +20,13 @@ import (
 	ul "autocare.org/sandpiper/pkg/api/user/logging"
 	ut "autocare.org/sandpiper/pkg/api/user/transport"
 
-	"autocare.org/sandpiper/pkg/config"
-	"autocare.org/sandpiper/pkg/database"
-	"autocare.org/sandpiper/pkg/middleware/jwt"
-	"autocare.org/sandpiper/pkg/rbac"
-	"autocare.org/sandpiper/pkg/secure"
-	"autocare.org/sandpiper/pkg/server"
-	"autocare.org/sandpiper/pkg/zlog"
+	"autocare.org/sandpiper/internal/config"
+	"autocare.org/sandpiper/internal/database"
+	"autocare.org/sandpiper/internal/middleware/jwt"
+	"autocare.org/sandpiper/internal/rbac"
+	"autocare.org/sandpiper/internal/secure"
+	"autocare.org/sandpiper/internal/server"
+	"autocare.org/sandpiper/internal/zlog"
 )
 
 // Start configures and launches the API services

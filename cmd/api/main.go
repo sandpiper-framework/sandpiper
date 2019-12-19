@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"log"
 
+	"autocare.org/sandpiper/internal/config"
+	"autocare.org/sandpiper/internal/database"
+	"autocare.org/sandpiper/internal/version"
 	"autocare.org/sandpiper/pkg/api"
-	"autocare.org/sandpiper/pkg/config"
-	"autocare.org/sandpiper/pkg/database"
-	"autocare.org/sandpiper/pkg/version"
 )
 
 func main() {
@@ -28,6 +28,7 @@ func main() {
 		log.Fatal("ERROR: ", err)
 	}
 
+	// Update the database if necessary
 	msg := database.Migrate(cfg.DB.PSN, cfg.DB.MigrateDir)
 	fmt.Println(msg)
 

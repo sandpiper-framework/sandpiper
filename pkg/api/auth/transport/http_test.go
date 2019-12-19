@@ -13,13 +13,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
+	"autocare.org/sandpiper/internal/middleware/jwt"
+	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/server"
 	"autocare.org/sandpiper/pkg/api/auth"
 	"autocare.org/sandpiper/pkg/api/auth/transport"
-	"autocare.org/sandpiper/pkg/middleware/jwt"
-	"autocare.org/sandpiper/pkg/model"
-	"autocare.org/sandpiper/pkg/server"
-	"autocare.org/sandpiper/testing/mock"
-	"autocare.org/sandpiper/testing/mock/mockdb"
+	"autocare.org/sandpiper/test/mock"
+	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestLogin(t *testing.T) {
@@ -239,10 +239,10 @@ func TestMe(t *testing.T) {
 			defer ts.Close()
 			path := ts.URL + "/me"
 			req, err := http.NewRequest("GET", path, nil)
-			req.Header.Set("Authorization", tt.header)
 			if err != nil {
 				t.Fatal(err)
 			}
+			req.Header.Set("Authorization", tt.header)
 			res, err := client.Do(req)
 			if err != nil {
 				t.Fatal(err)

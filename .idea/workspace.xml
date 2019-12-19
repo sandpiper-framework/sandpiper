@@ -2,11 +2,95 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0f16a484-6da1-4a66-8f11-aeaba4a5c325" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/dougw.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/mockapi/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/mockapi/README.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/README.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/mockapi/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Taskfile.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Taskfile.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/favicon-16x16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/favicon-32x32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/oauth2-redirect.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger-ui-bundle.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger-ui-bundle.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger-ui-standalone-preset.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger-ui-standalone-preset.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger-ui.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger-ui.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger-ui.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger-ui.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/swaggerui/swagger.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/mockapi/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/mockapi/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/auth_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/auth_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/logging/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/logging/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/platform/pgsql/user_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/transport/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/auth/transport/http_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/auth/transport/swagger.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/logging/password.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/logging/password.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/password.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/password.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/password_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/password_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/platform/pgsql/user_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/password/transport/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/password/transport/http_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/logging/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/logging/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/platform/pgsql/user_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/transport/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/transport/http.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/transport/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/transport/http_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/transport/swagger.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/user/user_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/user/user_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/config/config_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/config/testdata/config.invalid.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/config/testdata/config.testdata.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/database/migrate.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/database/pg.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/database/pg_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/middleware/jwt/jwt.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/middleware/jwt/jwt_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/middleware/secure/secure.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/middleware/secure/secure_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/auth.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/company.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/location.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/log.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/model.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/model_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/pagination.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/role.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/swagger.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/user.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/model/user_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/query/query.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/query/query_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/rbac/rbac.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/rbac/rbac_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/secure/secure.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/secure/secure_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/server/binding.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/server/binding_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/server/error.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/server/server.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/server/server_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/version/version.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/zlog/zlog.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/httplive/api.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/httplive/httplive.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/mock.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/mockdb/user.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/mw.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/postgres.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/rbac.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mock/secure.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/test.sh" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -208,25 +292,16 @@
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
     <state x="397" y="286" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575587201466" />
-    <state x="1978" y="187" width="1045" height="695" key="find.popup" timestamp="1576619521015">
+    <state x="1978" y="187" width="1045" height="695" key="find.popup" timestamp="1576782570202">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="1978" y="187" width="1045" height="695" key="find.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576619521015" />
+    <state x="1978" y="187" width="1045" height="695" key="find.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1576782570202" />
     <state x="484" y="125" key="search.everywhere.popup" timestamp="1575660029881">
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
     <state x="484" y="125" key="search.everywhere.popup/0.0.1920.1160/1920.0.1920.1040@0.0.1920.1160" timestamp="1575660029881" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/cmd/api/main.go</url>
-          <line>25</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
         <watch expression="*(*&quot;[]*github.com/go-pg/pg/v9/orm.columnValue&quot;)(824636858568)" />

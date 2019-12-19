@@ -5,15 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"autocare.org/sandpiper/pkg/api/auth"
-	"autocare.org/sandpiper/pkg/model"
-	"autocare.org/sandpiper/testing/mock"
-	"autocare.org/sandpiper/testing/mock/mockdb"
-
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
-
 	"github.com/stretchr/testify/assert"
+
+	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/api/auth"
+	"autocare.org/sandpiper/test/mock"
+	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestAuthenticate(t *testing.T) {

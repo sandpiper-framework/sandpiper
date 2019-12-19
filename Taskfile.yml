@@ -14,7 +14,7 @@ vars:
 
 tasks:
   createdb:
-    desc: Create the sandpiper database after default postgresql installation
+    desc: Create the sandpiper database after default postgresql installation using "psql"
     dir: cmd/migration/migrations
     cmds:
       - "{{.PSQLCMD}}"
@@ -36,7 +36,7 @@ tasks:
     desc: Build sandpiper
     dir: cmd/api
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/internal/version.Version={{.VER}}"
     vars:
       EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}

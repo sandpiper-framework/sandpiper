@@ -8,8 +8,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/user"
-	"autocare.org/sandpiper/pkg/model"
 )
 
 // HTTP represents user http service

@@ -166,7 +166,7 @@ You can log in as admin to the application by sending a post request to localhos
 
 Let's say you have a table named 'cars' that handles employee's cars. To implement CRUD on this table you need:
 
-1. Inside `pkg/model` create a new file named `car.go`. Inside put your entity (struct), and methods on the struct if you need them.
+1. Inside `internal/model` create a new file named `car.go`. Inside put your entity (struct), and methods on the struct if you need them.
 
 2. Create a new `car` folder in the (micro)service where your service will be located, most probably inside `api`. Inside create a file/service named car.go and test file for it (`car/car.go` and `car/car_test.go`). You can test your code without writing a single query by mocking the database logic inside /mock/mockdb folder. If you have complex queries interfering with other entities, you can create in this folder other files such as car_users.go or car_templates.go for example.
 

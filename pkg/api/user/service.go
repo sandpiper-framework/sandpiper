@@ -5,8 +5,8 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
+	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
-	"autocare.org/sandpiper/pkg/model"
 )
 
 // Service represents user application interface

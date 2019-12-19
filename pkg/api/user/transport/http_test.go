@@ -8,14 +8,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"autocare.org/sandpiper/pkg/model"
-
+	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/server"
 	"autocare.org/sandpiper/pkg/api/user"
 	"autocare.org/sandpiper/pkg/api/user/transport"
-
-	"autocare.org/sandpiper/pkg/server"
-	"autocare.org/sandpiper/testing/mock"
-	"autocare.org/sandpiper/testing/mock/mockdb"
+	"autocare.org/sandpiper/test/mock"
+	"autocare.org/sandpiper/test/mock/mockdb"
 
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"

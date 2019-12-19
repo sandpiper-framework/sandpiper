@@ -1,4 +1,4 @@
-// The password package manages the password service which allows setting a new password,
+// Package password manages the password service which allows setting a new password,
 // validating password strength, and generating the encrypted hash to save in the db.
 package password
 
