@@ -1,6 +1,7 @@
 # Sandpiper
 
-One Paragraph of project description goes here
+The Sandpiper framework provides a standard decentralized model to classify, distribute, and synchronize shared product
+data sets between a canonical sender (the origin) and a derivative receiver (the branch).
 
 ## Getting Started
 

@@ -4,7 +4,7 @@
 database:
   log_queries: true
   timeout_seconds: 5
-  psn: postgres://sandpiper:autocare@localhost:5432/sandbag?sslmode=disable
+  psn: postgres://sandpiper:autocare@localhost:5432/tidepool?sslmode=disable
 
 server:
   port: :8080

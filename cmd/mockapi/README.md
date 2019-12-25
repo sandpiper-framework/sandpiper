@@ -32,7 +32,7 @@ You should see something like the following:
 [
   {
     "method": "GET",
-    "path": "/v1/login",
+    "path": "/login",
     "name": "main.login"
   },
   {
