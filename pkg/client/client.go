@@ -30,6 +30,7 @@ func New(baseURL *url.URL) *Client {
 
 	c := &Client{
 		BaseURL:    baseURL,
+		UserAgent: "Sandpiper",
 		httpClient: netClient,
 	}
 	return c
@@ -74,7 +75,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	// consider json.NewDecoder(io.LimitReader(response.Body, SomeSaneConst)).Decode(v)
+	// consider limits using json.NewDecoder(io.LimitReader(response.Body, SomeSaneConst)).Decode(v)
 	err = json.NewDecoder(resp.Body).Decode(v)
 	return resp, err
 }

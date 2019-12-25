@@ -11,8 +11,8 @@ import (
 )
 
 // Migrate applies database migrations necessary to bring the database-version up to date.
-// These migrations are embedded in a source file by `go-bindata`. It reports any problems
-// using the standard logger (not an api logger)
+// These migrations are embedded in a source file by `go-bindata`. Reports problems using
+// the standard logger (not an api logger)
 func Migrate(psn string, bin *bindata.AssetSource) string {
 	src, err := bindata.WithInstance(bin)
 	if err != nil {

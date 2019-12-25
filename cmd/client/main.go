@@ -31,16 +31,15 @@ func main() {
 	}
 
 	// Update the database if necessary
-	bin := assetResource()
-	msg := database.Migrate(cfg.DB.PSN, bin)
+	msg := database.Migrate(cfg.DB.PSN, embeddedFiles())
 	fmt.Println(msg)
 
-	// todo: do stuff
+	// todo: poll subscriptions and sync any changes
 }
 
-// assetResource returns a pointer to the structure that manages access to embedded migration files.
-// It uses migrations specific to the pkg we are building (based on the correct import).
-func assetResource() *bindata.AssetSource {
+// embeddedFiles returns a pointer to the structure that manages access to embedded migration files.
+// It uses a "migrations" import specific to the pkg we are building (so it cannot be DRY).
+func embeddedFiles() *bindata.AssetSource {
 	r := bindata.Resource(migrations.AssetNames(),
 		func(name string) ([]byte, error) {
 			return migrations.Asset(name)
