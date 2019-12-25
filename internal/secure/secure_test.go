@@ -4,7 +4,7 @@ import (
 	"crypto/sha1"
 	"testing"
 
-	"autocare.org/sandpiper/pkg/secure"
+	"autocare.org/sandpiper/internal/secure"
 	"github.com/stretchr/testify/assert"
 )
 

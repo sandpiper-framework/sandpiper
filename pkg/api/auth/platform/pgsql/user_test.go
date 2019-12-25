@@ -7,7 +7,7 @@ import (
 
 	"autocare.org/sandpiper/pkg/api/auth/platform/pgsql"
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/testing/mock"
+	"autocare.org/sandpiper/test/mock"
 )
 
 func TestView(t *testing.T) {

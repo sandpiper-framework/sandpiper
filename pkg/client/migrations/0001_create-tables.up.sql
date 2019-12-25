@@ -7,11 +7,6 @@
  
 BEGIN;
 
-CREATE TYPE "statustype" AS ENUM (
-  'active',
-  'inactive'
-);
-
 CREATE TYPE "payloadtype" AS ENUM (
   'aces-file',
   'aces-item',
@@ -34,7 +29,8 @@ CREATE TABLE IF NOT EXISTS "slices" (
   "name"          text,
   "content_hash"  text,
   "content_count" integer,
-  "last_update"   timestamp
+  "last_update"   timestamp,
+  "subscription_id" uuid REFERENCES "subscriptons" ("id")
 );
 
 CREATE TABLE IF NOT EXISTS "slice_metadata" (
@@ -44,20 +40,12 @@ CREATE TABLE IF NOT EXISTS "slice_metadata" (
   PRIMARY KEY ("slice_id", "key")
 );
 
-CREATE TABLE IF NOT EXISTS "subscribers" (
-  "id" uuid PRIMARY KEY,
-  "company" text,
-  "contact" text,
-  "email"   text,
-  "status"  statustype
-);
-
 CREATE TABLE IF NOT EXISTS "subscriptions" (
-  "slice_id"      uuid REFERENCES "slices" ("id"),
-  "subscriber_id" uuid REFERENCES "subscribers" ("id"),
-  "name"          text,
-  "description"   text,
-  PRIMARY KEY ("slice_id", "subscriber_id")
+  "id"              uuid PRIMARY KEY,
+  "sandpiper_addr"  text,
+  "slice_id"        uuid REFERENCES "slices" ("id"),
+  "name"            text,
+  "description"     text
 );
 
 CREATE TABLE IF NOT EXISTS "data_objects" (
@@ -66,26 +54,6 @@ CREATE TABLE IF NOT EXISTS "data_objects" (
   "payload_type" payloadtype,
   "payload"      text
 ); 
-
-CREATE TABLE IF NOT EXISTS companies (
-  "id"          serial PRIMARY KEY,
-  "name"        varchar(30) NOT NULL,
-  "active"      boolean,
-  "created_at"  timestamp,
-  "updated_at"  timestamp,
-  "deleted_at"  timestamp
-);
-
-CREATE TABLE IF NOT EXISTS locations (
-  "id"          serial PRIMARY KEY,
-  "name"        text,
-  "address"     text,
-  "active"      boolean,
-  "company_id"  integer REFERENCES "companies" ("id"),
-  "created_at"  timestamp,
-  "updated_at"  timestamp,
-  "deleted_at"  timestamp
-);
 
 CREATE TABLE IF NOT EXISTS roles(
   "id"           serial PRIMARY KEY,

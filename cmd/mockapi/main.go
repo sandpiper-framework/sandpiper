@@ -2,10 +2,10 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package mockapi creates an http server that mimics responses to a subset of the
-// sandpiper api for client testing purposes (without a database and before the
-// sandpiper server is completed). We anticipate this utility having a relatively
-// short lifespan.
+// Package main is the entry point for mockapi which creates an http server that mimics
+// responses to a subset of the sandpiper api for client testing purposes (without a
+// database and before the sandpiper server is completed). We anticipate this utility
+// having a relatively short lifespan.
 
 package main
 
@@ -29,7 +29,6 @@ type Config struct {
 }
 
 func main() {
-
 	// todo: pull config from external yaml file (or maybe from args)
 	cfg := Config{
 		Port:                "localhost:3030",
@@ -42,15 +41,22 @@ func main() {
 	srv := echo.New()
 
 	// configure routes
-	v1 := srv.Group("/v1")
-	v1.GET("/routes", listRoutes)
-	v1.GET("/login", login)
-	v1.GET("/slices", getMySlices)
-	//v1.GET("/slices/:id", getSliceInfo)
-	v1.POST("/slices/:id", postObject)
+  addRoutes(srv)
 
 	// kick it off
 	Start(srv, &cfg)
+}
+
+func addRoutes(srv *echo.Echo) {
+	srv.GET("/login", login)
+
+	v1 := srv.Group("/v1")
+	v1.GET("/routes", listRoutes)
+
+	v1.GET("/slices", getMySlices)
+	//v1.PUT("/slices/:id", addSlice)
+	//v1.GET("/slices/:id", getSliceByID)
+	v1.POST("/slices/:id", postObject)
 }
 
 // postObject adds a new object to the slice.

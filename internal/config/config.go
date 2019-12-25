@@ -34,7 +34,6 @@ type Database struct {
 	PSN        string `yaml:"psn,omitempty"`
 	LogQueries bool   `yaml:"log_queries,omitempty"`
 	Timeout    int    `yaml:"timeout_seconds,omitempty"`
-	MigrateDir string `yaml:"migration_directory"`
 }
 
 // Server holds data necessary for server configuration
@@ -57,5 +56,4 @@ type JWT struct {
 // Application holds application configuration details
 type Application struct {
 	MinPasswordStr int    `yaml:"min_password_strength,omitempty"`
-	SwaggerUIPath  string `yaml:"swagger_ui_path,omitempty"`
 }

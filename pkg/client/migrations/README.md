@@ -1,7 +1,5 @@
 # Database Migrations
 
-NOTE: We might move migrations internal to the binary which would allow these to be moved under pkg.
-
 This directory contains SQL files for migrating the database from one version to the next.
 
 The database version is checked each time the server is started and "migrated" to the latest version as required. If a
@@ -13,7 +11,7 @@ It should not be necessary, but a standalone migration tool (CLI) is available t
 
 https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
 
-Download the correct executable (Linux or Windows) to the `cmd/migration` directory and use `./migrations` as the
+Download the correct executable (Linux or Windows) to the correct `cmd/migrations` directory and use `./migrations` as the
 migration "source". For example:
 
 ```

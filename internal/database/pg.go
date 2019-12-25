@@ -15,10 +15,12 @@ import (
 
 type dbLogger struct{}
 
+// BeforeQuery is an unused stub at this time.
 func (d dbLogger) BeforeQuery(ctx context.Context, _ *pg.QueryEvent) (context.Context, error) {
 	return ctx, nil
 }
 
+// AfterQuery is a callback hook allowing us to log the query if in debug mode.
 func (d dbLogger) AfterQuery(_ context.Context, q *pg.QueryEvent) error {
 	log.Printf(q.FormattedQuery())
 	return nil

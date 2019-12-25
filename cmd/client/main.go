@@ -2,7 +2,7 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package main is the entry point for the sandpiper api server.
+// Package main is the entry point for the sandpiper client.
 // It checks the database-version and uses a config file to launch the server properly.
 package main
 
@@ -15,15 +15,14 @@ import (
 
 	"autocare.org/sandpiper/internal/config"
 	"autocare.org/sandpiper/internal/database"
-	"autocare.org/sandpiper/pkg/api"
-	"autocare.org/sandpiper/pkg/api/migrations"
-	"autocare.org/sandpiper/pkg/api/version"
+	"autocare.org/sandpiper/pkg/client/migrations"
+	"autocare.org/sandpiper/pkg/client/version"
 )
 
 func main() {
 	fmt.Println(version.Banner())
 
-	cfgPath := flag.String("p", "./server.config.yaml", "Path to config file")
+	cfgPath := flag.String("p", "./client.config.yaml", "Path to config file")
 	flag.Parse()
 
 	cfg, err := config.Load(*cfgPath)
@@ -36,14 +35,11 @@ func main() {
 	msg := database.Migrate(cfg.DB.PSN, bin)
 	fmt.Println(msg)
 
-	err = api.Start(cfg)
-	if err != nil {
-		panic(err.Error())
-	}
+	// todo: do stuff
 }
 
 // assetResource returns a pointer to the structure that manages access to embedded migration files.
-// It uses "migrations" import specific to the pkg we are building (so cannot be generic).
+// It uses migrations specific to the pkg we are building (based on the correct import).
 func assetResource() *bindata.AssetSource {
 	r := bindata.Resource(migrations.AssetNames(),
 		func(name string) ([]byte, error) {

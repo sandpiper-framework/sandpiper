@@ -6,10 +6,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"autocare.org/sandpiper/pkg/server"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+
+	"autocare.org/sandpiper/internal/server"
 )
 
 type Req struct {

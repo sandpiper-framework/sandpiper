@@ -3,7 +3,7 @@ package server_test
 import (
 	"testing"
 
-	"autocare.org/sandpiper/pkg/server"
+	"autocare.org/sandpiper/internal/server"
 )
 
 // Improve tests

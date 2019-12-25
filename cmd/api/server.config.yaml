@@ -4,7 +4,6 @@
 database:
   log_queries: true
   timeout_seconds: 5
-  migration_directory: ../migration/migrations
   psn: postgres://sandpiper:autocare@localhost:5432/sandpiper?sslmode=disable
 
 server:
@@ -22,4 +21,3 @@ jwt:
 
 application:
   min_password_strength: 1  # 0,1,2,3,4
-  swagger_ui_path: assets/swaggerui

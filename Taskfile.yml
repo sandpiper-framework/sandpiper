@@ -32,14 +32,41 @@ tasks:
       - echo '{{.GO_PACKAGES}}'
     silent: true
 
-  build:
-    desc: Build sandpiper
-    dir: cmd/api
+  bindata-server:
+    desc: Use go-bindata to encode file migrations in a go source file
+    dir: pkg/api/migrations
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/internal/version.Version={{.VER}}"
+      - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
+
+  bindata-client:
+    desc: Use go-bindata to encode file migrations in a go source file
+    dir: pkg/client/migrations
+    cmds:
+      - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
+
+  build-server:
+    desc: Build sandpiper server
+    dir: cmd/api
+    deps: [bindata-server]
+    cmds:
+      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/api/version.Version={{.VER}}"
     vars:
       EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
+
+  build-client:
+    desc: Build sandpiper client
+    deps: [bindata-client]
+    dir: cmd/client
+    cmds:
+      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/client/version.Version={{.VER}}"
+    vars:
+      EXE: client{{exeExt}}
+      VER: {sh: git describe --always --long --dirty}
+
+  build:
+    desc: Build all sandpiper executables
+    deps: [build-server, build-client]
 
   test:
     desc: Run test suite (currently doesn't work with tests using dockertest under windows!)

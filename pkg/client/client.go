@@ -1,3 +1,9 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
+// Package client is the sandpiper client process which polls the sandpiper server
+// for changes and executes the sync.
 package client
 
 import (
@@ -12,17 +18,18 @@ import (
 )
 
 type Client struct {
-	BaseURL    *url.URL  // basePath holds the path to prepend to the requests.
+	BaseURL    *url.URL // basePath holds the path to prepend to the requests.
 	UserAgent  string
 	httpClient *http.Client // client used to send and receive http requests.
 }
 
-func New(url *url.URL) *Client {
+func New(baseURL *url.URL) *Client {
 	netClient := &http.Client{
 		Timeout: 10 * time.Second,
 	}
+
 	c := &Client{
-		BaseURL:    url,
+		BaseURL:    baseURL,
 		httpClient: netClient,
 	}
 	return c

@@ -5,16 +5,20 @@ import (
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/source/go_bindata"
+
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 // Migrate applies database migrations necessary to bring the database-version up to date.
-// Report any problems with the standard logger (not an api logger)
-func Migrate(psn string, migrationDir string) string {
-
-	// Read migrations from directory and connect to database.
-	m, err := migrate.New("file://"+migrationDir, psn)
+// These migrations are embedded in a source file by `go-bindata`. It reports any problems
+// using the standard logger (not an api logger)
+func Migrate(psn string, bin *bindata.AssetSource) string {
+	src, err := bindata.WithInstance(bin)
+	if err != nil {
+		log.Fatal(err)
+	}
+	m, err := migrate.NewWithSourceInstance("go-bindata", src, psn)
 	if err != nil {
 		log.Fatal(err)
 	}
