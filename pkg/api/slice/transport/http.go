@@ -31,7 +31,7 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 
 // Custom errors
 var (
-	ErrUnknownRoleID    = echo.NewHTTPError(http.StatusBadRequest, "unknown access role")
+	// ErrInvalidSliceUUID indicates a malformed uuid
 	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "invalid slice uuid")
 )
 
@@ -42,9 +42,9 @@ type createReq struct {
 	ContentCount uint      `json:"content_count"`
 	LastUpdate   time.Time `json:"last_update"`
 
-	CompanyID  int                  `json:"company_id" validate:"required"`
-	LocationID int                  `json:"location_id" validate:"required"`
-	RoleID     sandpiper.AccessRole `json:"role_id" validate:"required"`
+	//CompanyID  int                  `json:"company_id" validate:"required"`
+	//LocationID int                  `json:"location_id" validate:"required"`
+	//RoleID     sandpiper.AccessRole `json:"role_id" validate:"required"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -54,11 +54,8 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	if r.RoleID < sandpiper.SuperAdminRole || r.RoleID > sandpiper.UserRole {
-		return ErrUnknownRoleID
-	}
-
 	usr, err := h.svc.Create(c, sandpiper.Slice{
+		ID:           uuid.NewV4(),
 		Name:         r.Name,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,

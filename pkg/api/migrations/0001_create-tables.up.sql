@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS "slices" (
   "name"          text,
   "content_hash"  text,
   "content_count" integer,
-  "last_update"   timestamp
+  "last_update"   timestamp,
+  "created_at"    timestamp,
+  "updated_at"    timestamp,
+  "deleted_at"    timestamp
 );
 
 CREATE TABLE IF NOT EXISTS "slice_metadata" (

@@ -25,8 +25,8 @@ func TestCreate(t *testing.T) {
 		name       string
 		req        string
 		wantStatus int
-		wantResp   *sandpiper.User
-		udb        *mockdb.User
+		wantResp   *sandpiper.Slice
+		sdb        *mockdb.Slice
 		rbac       *mock.RBAC
 		sec        *mock.Secure
 	}{
@@ -69,8 +69,8 @@ func TestCreate(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.User{
-				CreateFn: func(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
+			sdb: &mockdb.Slice{
+				CreateFn: func(db orm.DB, usr sandpiper.Slice) (*sandpiper.Slice, error) {
 					usr.ID = 1
 					usr.CreatedAt = mock.TestTime(2018)
 					usr.UpdatedAt = mock.TestTime(2018)
@@ -82,7 +82,7 @@ func TestCreate(t *testing.T) {
 					return "h4$h3d"
 				},
 			},
-			wantResp: &sandpiper.User{
+			wantResp: &sandpiper.Slice{
 				Base: sandpiper.Base{
 					ID:        1,
 					CreatedAt: mock.TestTime(2018),
@@ -103,7 +103,7 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.udb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 			path := ts.URL + "/users"
@@ -113,7 +113,7 @@ func TestCreate(t *testing.T) {
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.User)
+				response := new(sandpiper.Slice)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -126,7 +126,7 @@ func TestCreate(t *testing.T) {
 
 func TestList(t *testing.T) {
 	type listResponse struct {
-		Users []sandpiper.User `json:"users"`
+		Users []sandpiper.Slice `json:"users"`
 		Page  int              `json:"page"`
 	}
 	cases := []struct {
@@ -134,7 +134,7 @@ func TestList(t *testing.T) {
 		req        string
 		wantStatus int
 		wantResp   *listResponse
-		udb        *mockdb.User
+		sdb        *mockdb.Slice
 		rbac       *mock.RBAC
 		sec        *mock.Secure
 	}{
@@ -152,7 +152,7 @@ func TestList(t *testing.T) {
 						ID:         1,
 						CompanyID:  2,
 						LocationID: 3,
-						Role:       sandpiper.UserRole,
+						Role:       sandpiper.SliceRole,
 						Email:      "john@mail.com",
 					}
 				}},
@@ -171,10 +171,10 @@ func TestList(t *testing.T) {
 						Email:      "john@mail.com",
 					}
 				}},
-			udb: &mockdb.User{
-				ListFn: func(db orm.DB, q *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.User, error) {
+			sdb: &mockdb.Slice{
+				ListFn: func(db orm.DB, q *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 					if p.Limit == 100 && p.Offset == 100 {
-						return []sandpiper.User{
+						return []sandpiper.Slice{
 							{
 								Base: sandpiper.Base{
 									ID:        10,
@@ -216,7 +216,7 @@ func TestList(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &listResponse{
-				Users: []sandpiper.User{
+				Users: []sandpiper.Slice{
 					{
 						Base: sandpiper.Base{
 							ID:        10,
@@ -259,7 +259,7 @@ func TestList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.udb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 			path := ts.URL + "/users" + tt.req
@@ -285,8 +285,8 @@ func TestView(t *testing.T) {
 		name       string
 		req        string
 		wantStatus int
-		wantResp   *sandpiper.User
-		udb        *mockdb.User
+		wantResp   *sandpiper.Slice
+		sdb        *mockdb.Slice
 		rbac       *mock.RBAC
 		sec        *mock.Secure
 	}{
@@ -313,9 +313,9 @@ func TestView(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
+			sdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id int) (*sandpiper.Slice, error) {
+					return &sandpiper.Slice{
 						Base: sandpiper.Base{
 							ID:        1,
 							CreatedAt: mock.TestTime(2000),
@@ -328,7 +328,7 @@ func TestView(t *testing.T) {
 				},
 			},
 			wantStatus: http.StatusOK,
-			wantResp: &sandpiper.User{
+			wantResp: &sandpiper.Slice{
 				Base: sandpiper.Base{
 					ID:        1,
 					CreatedAt: mock.TestTime(2000),
@@ -345,7 +345,7 @@ func TestView(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.udb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 			path := ts.URL + "/users/" + tt.req
@@ -355,7 +355,7 @@ func TestView(t *testing.T) {
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.User)
+				response := new(sandpiper.Slice)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -372,8 +372,8 @@ func TestUpdate(t *testing.T) {
 		req        string
 		id         string
 		wantStatus int
-		wantResp   *sandpiper.User
-		udb        *mockdb.User
+		wantResp   *sandpiper.Slice
+		sdb        *mockdb.Slice
 		rbac       *mock.RBAC
 		sec        *mock.Secure
 	}{
@@ -408,9 +408,9 @@ func TestUpdate(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
+			sdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id int) (*sandpiper.Slice, error) {
+					return &sandpiper.Slice{
 						Base: sandpiper.Base{
 							ID:        1,
 							CreatedAt: mock.TestTime(2000),
@@ -424,14 +424,14 @@ func TestUpdate(t *testing.T) {
 						Mobile:    "991991",
 					}, nil
 				},
-				UpdateFn: func(db orm.DB, usr *sandpiper.User) error {
+				UpdateFn: func(db orm.DB, usr *sandpiper.Slice) error {
 					usr.UpdatedAt = mock.TestTime(2010)
 					usr.Mobile = "991991"
 					return nil
 				},
 			},
 			wantStatus: http.StatusOK,
-			wantResp: &sandpiper.User{
+			wantResp: &sandpiper.Slice{
 				Base: sandpiper.Base{
 					ID:        1,
 					CreatedAt: mock.TestTime(2000),
@@ -453,7 +453,7 @@ func TestUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.udb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 			path := ts.URL + "/users/" + tt.id
@@ -465,7 +465,7 @@ func TestUpdate(t *testing.T) {
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.User)
+				response := new(sandpiper.Slice)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -481,7 +481,7 @@ func TestDelete(t *testing.T) {
 		name       string
 		id         string
 		wantStatus int
-		udb        *mockdb.User
+		sdb        *mockdb.Slice
 		rbac       *mock.RBAC
 		sec        *mock.Secure
 	}{
@@ -493,9 +493,9 @@ func TestDelete(t *testing.T) {
 		{
 			name: "Fail on RBAC",
 			id:   `1`,
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
+			sdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id int) (*sandpiper.Slice, error) {
+					return &sandpiper.Slice{
 						Role: &sandpiper.Role{
 							AccessLevel: sandpiper.CompanyAdminRole,
 						},
@@ -512,15 +512,15 @@ func TestDelete(t *testing.T) {
 		{
 			name: "Success",
 			id:   `1`,
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
+			sdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id int) (*sandpiper.Slice, error) {
+					return &sandpiper.Slice{
 						Role: &sandpiper.Role{
 							AccessLevel: sandpiper.CompanyAdminRole,
 						},
 					}, nil
 				},
-				DeleteFn: func(orm.DB, *sandpiper.User) error {
+				DeleteFn: func(orm.DB, *sandpiper.Slice) error {
 					return nil
 				},
 			},
@@ -539,7 +539,7 @@ func TestDelete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.udb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 			path := ts.URL + "/users/" + tt.id

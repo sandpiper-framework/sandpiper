@@ -28,7 +28,7 @@ func NewPGContainer(t *testing.T) *dockertest.Container {
 
 // NewDB instantiates new postgresql database connection via docker container
 func NewDB(t *testing.T, con *dockertest.Container, models ...interface{}) *pg.DB {
-	db, err := postgres.New("postgres://postgres:postgres@"+con.Addr+"/postgres?sslmode=disable", 10, false)
+	db, err := database.New("postgres://postgres:postgres@"+con.Addr+"/postgres?sslmode=disable", 10, false)
 	fatalErr(t, err)
 
 	for _, v := range models {
