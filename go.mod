@@ -16,6 +16,7 @@ require (
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/rs/zerolog v1.10.3
+	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20191029031824-8986dd9e96cf
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect

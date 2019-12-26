@@ -13,13 +13,13 @@ import (
 	"autocare.org/sandpiper/internal/model"
 )
 
+// User represents the client for user table
+type User struct{}
+
 // NewUser returns a new user database instance
 func NewUser() *User {
 	return &User{}
 }
-
-// User represents the client for user table
-type User struct{}
 
 // Custom errors
 var (

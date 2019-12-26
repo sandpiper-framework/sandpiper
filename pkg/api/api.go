@@ -7,10 +7,11 @@
 package api
 
 import (
+	"crypto/sha1"
+
 	"autocare.org/sandpiper/pkg/api/auth"
 	al "autocare.org/sandpiper/pkg/api/auth/logging"
 	at "autocare.org/sandpiper/pkg/api/auth/transport"
-	"crypto/sha1"
 
 	"autocare.org/sandpiper/pkg/api/password"
 	pl "autocare.org/sandpiper/pkg/api/password/logging"
@@ -19,6 +20,10 @@ import (
 	"autocare.org/sandpiper/pkg/api/user"
 	ul "autocare.org/sandpiper/pkg/api/user/logging"
 	ut "autocare.org/sandpiper/pkg/api/user/transport"
+
+	"autocare.org/sandpiper/pkg/api/slice"
+	sl "autocare.org/sandpiper/pkg/api/slice/logging"
+	st "autocare.org/sandpiper/pkg/api/slice/transport"
 
 	"autocare.org/sandpiper/internal/config"
 	"autocare.org/sandpiper/internal/database"
@@ -58,6 +63,9 @@ func Start(cfg *config.Configuration) error {
 
 	// password service
 	pt.NewHTTP(pl.New(password.Initialize(db, rba, sec), log), v1)
+
+	// slice service
+	st.NewHTTP(sl.New(slice.Initialize(db, rba, sec), log), v1)
 
 	// kick it off
 	server.Start(srv, &server.Config{
