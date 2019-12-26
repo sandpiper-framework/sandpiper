@@ -1,30 +1,16 @@
 # Sandpiper
 
 The Sandpiper framework provides a standard decentralized model to classify, distribute, and synchronize shared product
-data sets between a canonical sender (the origin) and a derivative receiver (the branch).
+data sets between an originating sender (the "publisher") and a derivative receiver (the "subscriber").
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
-
-What things you need to install the software and how to install them
-
-```
-Golang
-[Task](https://taskfile.dev/)
-```
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-```
-Give the example
-```
+There are only a few prerequisites for getting a Sandpiper installation up and running. 
 
 #### PostgreSQL Database
+
+Sandpiper requires access to a PostgreSQL sever for its data storage (for both primary and secondary roles). This can be an existing installation (either on premises or in the cloud) or follow
+the instructions below to install locally for your desired platform.
 
 ##### Windows
 
@@ -32,12 +18,59 @@ https://www.postgresql.org/download/windows/
 
 To start/stop service, run `pg_ctl start`, `pg_ctl stop`.
 
-create the sandpiper database:
+##### Linux
 
-db_create.bat (enter the master postgres user password)
+https://www.postgresql.org/download/windows/
+
+To start/stop service, run `pg_ctl start`, `pg_ctl stop`.
+
+##### Create Database (for each desired role)
+
+*todo:* this process is automated with 'task', but we don't want that dependency. Create .bat and .sh files to handle this for those not running from source.
 
 ```
-until finished
+win64: psql --username=postgres --file=db_create.sql
+linux: sudo -u postgres psql --username=postgres --file=db_create.sql
+```
+
+Enter the master postgresql user password when prompted. The following commands should be included in the db_create.sql file (depending on desired role).
+
+*Primary:*
+```
+CREATE DATABASE sandpiper;
+CREATE USER admin WITH ENCRYPTED PASSWORD '--password here--';
+GRANT ALL PRIVILEGES ON DATABASE sandpiper TO admin;
+```
+
+*Secondary:*
+```
+CREATE DATABASE tidepool;
+CREATE USER admin WITH ENCRYPTED PASSWORD '--password here--';
+GRANT ALL PRIVILEGES ON DATABASE tidepool TO admin;
+```
+
+### Running in Production
+
+To run Sandpiper in a production environment, simply download the correct binary from the Sandpiper web site and follow the installation instructions:
+
+[Downloads](https://sandpiper.org/downloads)
+
+### Source Code
+
+These instructions will help you get up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
+The following software must exist on your target development machine.
+
+* [Go](https://golang.org/)
+* [PostgreSQL](https://www.postgresql.org/)
+* [Task](https://taskfile.dev/)
+
+### Installing
+
+A step by step series of examples that tell you how to get a development env running
+
+```
+Give the example
 ```
 
 End with an example of getting some data out of the system or using it for a little demo
@@ -49,7 +82,6 @@ The application runs as an HTTP server at port 8080. It provides the following R
 * `POST /login`: accepts username/passwords and returns jwt token and refresh token
 * `GET /refresh/:token`: refreshes sessions and returns jwt token
 * `GET /me`: returns info about currently logged in user
-* `GET /swaggerui/` (with trailing slash): launches swaggerui in browser
 * `GET /v1/users`: returns list of users
 * `GET /v1/users/:id`: returns single user
 * `POST /v1/users`: creates a new user
@@ -77,20 +109,11 @@ You can log in as admin to the application by sending a post request to localhos
 
 8. Utl directory contains helper packages and models. Packages such as mock, middleware, configuration, server are located here.
 
-
 ## Running the tests
 
 Explain how to run the automated tests for this system
 
 ### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
 
 Explain what these tests test and why
 
@@ -146,61 +169,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 11. Testify/Assert - Asserting test results
 
 Most of these can easily be replaced with your own choices since their usage is abstracted and localized.
-
-## Getting started
-
-The application runs as an HTTP server at port 8080. It provides the following RESTful endpoints:
-
-* `POST /login`: accepts username/passwords and returns jwt token and refresh token
-* `GET /refresh/:token`: refreshes sessions and returns jwt token
-* `GET /me`: returns info about currently logged in user
-* `GET /swaggerui/` (with trailing slash): launches swaggerui in browser
-* `GET /v1/users`: returns list of users
-* `GET /v1/users/:id`: returns single user
-* `POST /v1/users`: creates a new user
-* `PATCH /v1/password/:id`: changes password for a user
-* `DELETE /v1/users/:id`: deletes a user
-
-You can log in as admin to the application by sending a post request to localhost:8080/login with username `admin` and password `admin` in JSON body.
-
-### Implementing CRUD of another table
-
-Let's say you have a table named 'cars' that handles employee's cars. To implement CRUD on this table you need:
-
-1. Inside `internal/model` create a new file named `car.go`. Inside put your entity (struct), and methods on the struct if you need them.
-
-2. Create a new `car` folder in the (micro)service where your service will be located, most probably inside `api`. Inside create a file/service named car.go and test file for it (`car/car.go` and `car/car_test.go`). You can test your code without writing a single query by mocking the database logic inside /mock/mockdb folder. If you have complex queries interfering with other entities, you can create in this folder other files such as car_users.go or car_templates.go for example.
-
-3. Inside car folder, create folders named `platform`, `transport` and `logging`.
-
-4. Code for interacting with a platform like database (postgresql) should be placed under `car/platform/pgsql`. (`pkg/api/car/platform/pgsql/car.go`)
-
-5. In `pkg/api/car/transport` create a new file named `http.go`. This is where your handlers are located. Under the same location create http_test.go to test your API.
-
-6. In logging directory create a file named `car.go` and copy the logic from another service. This serves as request/response logging.
-
-6. In `pkg/api/api.go` wire up all the logic, by instantiating car service, passing it to the logging and transport service afterwards.
-
-### Implementing other platforms
-
-Similarly to implementing APIs relying only on a database, you can implement other platforms by:
-
-1. In the service package, in car.go add interface that corresponds to the platform, for example, Indexer or Reporter.
-
-2. Rest of the procedure is same, except that in `/platform` you would create a new folder for your platform, for example, `elastic`.
-
-3. Once the new platform logic is implemented, create an instance of it in main.go (for example `elastic.Client`) and pass it as an argument to car service (`pkg/api/car/car.go`).
-
-### Running database queries in transaction
-
-To use a transaction, before interacting with db create a new transaction:
-
-```go
-err := s.db.RunInTransaction(func (tx *pg.Tx) error{
-    // Application service here
-})
-````
-
-Instead of passing database client as `s.db` , inside this function pass it as `tx`. Handle the error accordingly.
-
-

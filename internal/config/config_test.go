@@ -30,9 +30,15 @@ func TestLoad(t *testing.T) {
 			path: "testdata/config.testdata.yaml",
 			wantData: &config.Configuration{
 				DB: &config.Database{
-					PSN:        "postgres://postgres:postgres@postgres",
 					LogQueries: true,
 					Timeout:    20,
+					Dialect:    "postgres",
+					Database:   "sandpiper",
+					User:       "admin",
+					Password:   "secret",
+					Host:       "localhost",
+					Port:       "1234",
+					SSLMode:    "disable",
 				},
 				Server: &config.Server{
 					Port:         ":8080",

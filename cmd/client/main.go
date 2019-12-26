@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// Update the database if necessary
-	msg := database.Migrate(cfg.DB.PSN, embeddedFiles())
+	msg := database.Migrate(cfg.DB.URL(), embeddedFiles())
 	fmt.Println(msg)
 
 	// todo: poll subscriptions and sync any changes

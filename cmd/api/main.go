@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// Update the database if necessary
-	msg := database.Migrate(cfg.DB.PSN, embeddedFiles())
+	msg := database.Migrate(cfg.DB.URL(), embeddedFiles())
 	fmt.Println(msg)
 
 	err = api.Start(cfg)

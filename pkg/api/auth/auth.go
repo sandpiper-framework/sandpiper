@@ -1,4 +1,4 @@
-// The auth package is for identity and access management
+// Package auth is for identity and access management
 package auth
 
 import (

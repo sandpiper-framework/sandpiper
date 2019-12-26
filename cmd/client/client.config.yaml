@@ -1,13 +1,18 @@
-# sandpiper configuration file
-# psn format: postgres://username:password@host:port/database?sslmode=disable
+# sandpiper client configuration file
 
 database:
   log_queries: true
   timeout_seconds: 5
-  psn: postgres://sandpiper:autocare@localhost:5432/tidepool?sslmode=disable
+  dialect: postgres
+  database: sandpiper
+  user: sandpiper       # Can override with "DB_USER" env variable
+  password: autocare    # Use "DB_PASSWORD" env variable in production!!!
+  host: localhost
+  port: 5432
+  sslmode: disable
 
 server:
-  port: :8080
+  port: :4040
   debug: true
   read_timeout_seconds: 10
   write_timeout_seconds: 5

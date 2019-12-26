@@ -33,7 +33,7 @@ import (
 func Start(cfg *config.Configuration) error {
 
 	// setup database connection with optional query logging (using standard "log")
-	db, err := database.New(cfg.DB.PSN, cfg.DB.Timeout, cfg.DB.LogQueries)
+	db, err := database.New(cfg.DB.URL(), cfg.DB.Timeout, cfg.DB.LogQueries)
 	if err != nil {
 		return err
 	}

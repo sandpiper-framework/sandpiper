@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -29,11 +30,31 @@ type Configuration struct {
 	App    *Application `yaml:"application,omitempty"`
 }
 
-// Database holds data necessary for database configuration
+// Database structure holds settings for database configuration
 type Database struct {
-	PSN        string `yaml:"psn,omitempty"`
 	LogQueries bool   `yaml:"log_queries,omitempty"`
 	Timeout    int    `yaml:"timeout_seconds,omitempty"`
+	Dialect    string `yaml:"dialect,omitempty"`
+	Database   string `yaml:"database,omitempty"`
+	User       string `yaml:"user,omitempty"`     // can override from env var
+	Password   string `yaml:"password,omitempty"` // can override from env var
+	Host       string `yaml:"host,omitempty"`
+	Port       string `yaml:"port,omitempty"`
+	SSLMode    string `yaml:"sslmode,omitempty"`
+}
+
+// URL formats a URL string from the Database structure overriding User/Password from env vars
+func (d *Database) URL() string {
+	// postgres://username:password@host:port/database?sslmode=disable
+	return fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=%s",
+		d.Dialect,
+		env("DB_USER", "sandpiper"),
+		env("DB_PASSWORD", "autocare"),
+		d.Host,
+		d.Port,
+		d.Database,
+		d.SSLMode,
+	)
 }
 
 // Server holds data necessary for server configuration
@@ -55,5 +76,13 @@ type JWT struct {
 
 // Application holds application configuration details
 type Application struct {
-	MinPasswordStr int    `yaml:"min_password_strength,omitempty"`
+	MinPasswordStr int `yaml:"min_password_strength,omitempty"`
+}
+
+func env(key, defValue string) string {
+	envValue := os.Getenv(key)
+	if envValue != "" {
+		return envValue
+	}
+	return defValue
 }

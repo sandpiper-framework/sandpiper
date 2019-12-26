@@ -1,8 +1,8 @@
-# Sandpiper cross-platform build/test file (using https:\\taskfile.dev)
+# Sandpiper cross-platform build/test/deploy file (using https:\\taskfile.dev)
 
 # Copyright Auto Care Association. All rights reserved.
-# Use of this source code is governed by an MIT-style
-# license that can be found in the LICENSE.md file.
+# Use of this source code is governed by an MIT-style license that can
+# be found in the LICENSE.md file.
 
 version: '2'
 
@@ -13,14 +13,27 @@ vars:
     sh: go list ./...
 
 tasks:
-  createdb:
-    desc: Create the sandpiper database after default postgresql installation using "psql"
-    dir: cmd/migration/migrations
+  create-pub-db:
+    desc: Create the publishing database from default postgresql installation using "psql"
+    dir: pkg/api/migrations
     cmds:
       - "{{.PSQLCMD}}"
     vars:
       PSQLCMD:
         '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql'
+
+  create-sub-db:
+    desc: Create the subscribing database from default postgresql installation using "psql"
+    dir: pkg/client/migrations
+    cmds:
+      - "{{.PSQLCMD}}"
+    vars:
+      PSQLCMD:
+        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql'
+
+  create-both-db:
+    desc: Create both databases
+    deps: [create-pub-db, create-sub-db]
 
   update:
     desc: Get the latest Sandpiper server repo
