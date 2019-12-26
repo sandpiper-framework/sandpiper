@@ -9,6 +9,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
+	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
@@ -27,7 +28,7 @@ var (
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Slice name already exists.")
 )
 
-// Create creates a new slice in database
+// Create creates a new slice in database (assumes allowed to do this)
 func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
 	var dummy = new(sandpiper.Slice)
 
@@ -44,8 +45,8 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 	return &slice, nil
 }
 
-// View returns single user by ID
-func (s *Slice) View(db orm.DB, id sandpiper.UUID) (*sandpiper.Slice, error) {
+// View returns a single slice by ID (assumes allowed to do this)
+func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: id}
 
 	err := db.Select(slice)
@@ -56,9 +57,9 @@ func (s *Slice) View(db orm.DB, id sandpiper.UUID) (*sandpiper.Slice, error) {
 	return slice, nil
 }
 
-// Update updates slice info by primary key
-func (s *Slice) Update(db orm.DB, user *sandpiper.Slice) error {
-	_, err := db.Model(user).Update()
+// Update updates slice info by primary key (assumes allowed to do this)
+func (s *Slice) Update(db orm.DB, slice *sandpiper.Slice) error {
+	_, err := db.Model(slice).Update()
 	return err
 }
 

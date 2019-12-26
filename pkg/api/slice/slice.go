@@ -10,18 +10,17 @@ import (
 	"autocare.org/sandpiper/internal/query"
 )
 
-// Create creates a new slice to reference data-objects
+// Create creates a new slice to hold data-objects
 func (s *Slice) Create(c echo.Context, req sandpiper.Slice) (*sandpiper.Slice, error) {
-	if err := s.rbac.AccountCreate(c, req.RoleID, req.CompanyID, req.LocationID); err != nil {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}
-	//req.Password = s.sec.Hash(req.Password)
 	return s.sdb.Create(s.db, req)
 }
 
 // List returns list of slices
 func (s *Slice) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
-	au := s.rbac.User(c)
+	au := s.rbac.CurrentUser(c)
 	q, err := query.List(au)
 	if err != nil {
 		return nil, err
@@ -30,22 +29,24 @@ func (s *Slice) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Slice
 }
 
 // View returns a single slice if allowed
-func (s *Slice) View(c echo.Context, id int) (*sandpiper.Slice, error) {
-	if err := s.rbac.EnforceUser(c, id); err != nil {
-		return nil, err
-	}
+func (s *Slice) View(c echo.Context, id uuid.UUID) (*sandpiper.Slice, error) {
+	//if err := s.rbac.EnforceVisibility(c); err != nil {
+	//	return nil, err
+	//}
 	return s.sdb.View(s.db, id)
 }
 
-// Delete deletes a slice
+// Delete deletes a slice if allowed
 func (s *Slice) Delete(c echo.Context, id uuid.UUID) error {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+		return err
+	}
+
 	slice, err := s.sdb.View(s.db, id)
 	if err != nil {
 		return err
 	}
-	if err := s.rbac.IsLowerRole(c, slice.Role.AccessLevel); err != nil {
-		return err
-	}
+
 	return s.sdb.Delete(s.db, slice)
 }
 
@@ -60,8 +61,7 @@ type Update struct {
 
 // Update updates slice information
 func (s *Slice) Update(c echo.Context, r *Update) (*sandpiper.Slice, error) {
-
-	if err := s.rbac.EnforceUser(c, r.ID); err != nil {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}
 

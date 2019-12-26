@@ -4,10 +4,10 @@ package transport
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/slice"
@@ -32,7 +32,7 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 // Custom errors
 var (
 	ErrUnknownRoleID    = echo.NewHTTPError(http.StatusBadRequest, "unknown access role")
-	ErrNonNumericUserID = echo.NewHTTPError(http.StatusBadRequest, "numeric user id expected")
+	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "invalid slice uuid")
 )
 
 // Slice create request
@@ -93,9 +93,9 @@ func (h *HTTP) list(c echo.Context) error {
 }
 
 func (h *HTTP) view(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := uuid.FromString(c.Param("id"))
 	if err != nil {
-		return ErrNonNumericUserID
+		return ErrInvalidSliceUUID
 	}
 
 	result, err := h.svc.View(c, id)
@@ -108,17 +108,17 @@ func (h *HTTP) view(c echo.Context) error {
 
 // Slice update request
 type updateReq struct {
-	ID           int    `json:"-"`
-	Name         string `json:"name,omitempty" validate:"omitempty,min=3"`
-	ContentHash  string `json:"content_hash,omitempty" validate:"omitempty,min=2"`
-	ContentCount uint   `json:"content_count,omitempty"`
-	LastUpdate   string `json:"last_update,omitempty"`
+	ID           uuid.UUID `json:"-"`
+	Name         string    `json:"name,omitempty" validate:"omitempty,min=3"`
+	ContentHash  string    `json:"content_hash,omitempty" validate:"omitempty,min=2"`
+	ContentCount uint      `json:"content_count,omitempty"`
+	LastUpdate   time.Time `json:"last_update,omitempty"`
 }
 
 func (h *HTTP) update(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := uuid.FromString(c.Param("id"))
 	if err != nil {
-		return ErrNonNumericUserID
+		return ErrInvalidSliceUUID
 	}
 
 	req := new(updateReq)
@@ -142,9 +142,9 @@ func (h *HTTP) update(c echo.Context) error {
 }
 
 func (h *HTTP) delete(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := uuid.FromString(c.Param("id"))
 	if err != nil {
-		return ErrNonNumericUserID
+		return ErrInvalidSliceUUID
 	}
 
 	if err := h.svc.Delete(c, id); err != nil {

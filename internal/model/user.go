@@ -25,7 +25,7 @@ type User struct {
 	LocationID         int        `json:"location_id"`
 }
 
-// AuthUser represents data stored in JWT token for user
+// AuthUser represents data stored in JWT token for the current user
 type AuthUser struct {
 	ID         int
 	CompanyID  int

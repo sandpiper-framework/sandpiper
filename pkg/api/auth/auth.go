@@ -57,8 +57,8 @@ func (a *Auth) Refresh(c echo.Context, token string) (*sandpiper.RefreshToken, e
 	return &sandpiper.RefreshToken{Token: token, Expires: expire}, nil
 }
 
-// Me returns info about currently logged user
+// Me returns info about currently logged in user
 func (a *Auth) Me(c echo.Context) (*sandpiper.User, error) {
-	au := a.rbac.User(c)
+	au := a.rbac.CurrentUser(c)
 	return a.udb.View(a.db, au.ID)
 }

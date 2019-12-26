@@ -15,28 +15,15 @@ func New() *Service {
 // Service is RBAC enforcement service
 type Service struct{}
 
-func checkBool(b bool) error {
-	if b {
-		return nil
-	}
-	return echo.ErrForbidden
-}
-
-// User returns user data stored in jwt token
-func (s *Service) User(c echo.Context) *sandpiper.AuthUser {
-	id := c.Get("id").(int)
-	companyID := c.Get("company_id").(int)
-	locationID := c.Get("location_id").(int)
-	user := c.Get("username").(string)
-	email := c.Get("email").(string)
-	role := c.Get("role").(sandpiper.AccessRole)
+// CurrentUser returns login data stored in jwt token
+func (s *Service) CurrentUser(c echo.Context) *sandpiper.AuthUser {
 	return &sandpiper.AuthUser{
-		ID:         id,
-		Username:   user,
-		CompanyID:  companyID,
-		LocationID: locationID,
-		Email:      email,
-		Role:       role,
+		ID:         c.Get("id").(int),
+		Username:   c.Get("username").(string),
+		CompanyID:  c.Get("company_id").(int),
+		LocationID: c.Get("location_id").(int),
+		Email:      c.Get("email").(string),
+		Role:       c.Get("role").(sandpiper.AccessRole),
 	}
 }
 
@@ -103,3 +90,11 @@ func (s *Service) AccountCreate(c echo.Context, roleID sandpiper.AccessRole, com
 func (s *Service) IsLowerRole(c echo.Context, r sandpiper.AccessRole) error {
 	return checkBool(c.Get("role").(sandpiper.AccessRole) < r)
 }
+
+func checkBool(b bool) error {
+	if b {
+		return nil
+	}
+	return echo.ErrForbidden
+}
+

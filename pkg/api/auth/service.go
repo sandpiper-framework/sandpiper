@@ -62,5 +62,5 @@ type Securer interface {
 
 // RBAC represents role-based-access-control interface
 type RBAC interface {
-	User(echo.Context) *sandpiper.AuthUser
+	CurrentUser(echo.Context) *sandpiper.AuthUser
 }

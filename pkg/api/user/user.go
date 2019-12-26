@@ -19,7 +19,7 @@ func (u *User) Create(c echo.Context, req sandpiper.User) (*sandpiper.User, erro
 
 // List returns list of users
 func (u *User) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.User, error) {
-	au := u.rbac.User(c)
+	au := u.rbac.CurrentUser(c)
 	q, err := query.List(au)
 	if err != nil {
 		return nil, err

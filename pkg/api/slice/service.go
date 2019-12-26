@@ -14,8 +14,8 @@ import (
 type Service interface {
 	Create(echo.Context, sandpiper.Slice) (*sandpiper.Slice, error)
 	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Slice, error)
-	View(echo.Context, int) (*sandpiper.Slice, error)
-	Delete(echo.Context, int) error
+	View(echo.Context, uuid.UUID) (*sandpiper.Slice, error)
+	Delete(echo.Context, uuid.UUID) error
 	Update(echo.Context, *Update) (*sandpiper.Slice, error)
 }
 
@@ -42,7 +42,7 @@ type Securer interface {
 	Hash(string) string
 }
 
-// Repository represents Slice repository pattern interface
+// Repository represents Slice repository-pattern interface
 type Repository interface {
 	Create(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
 	View(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
@@ -53,8 +53,6 @@ type Repository interface {
 
 // RBAC represents role-based-access-control interface
 type RBAC interface {
-	User(echo.Context) *sandpiper.AuthUser
-	EnforceUser(echo.Context, int) error
-	AccountCreate(echo.Context, sandpiper.AccessRole, int, int) error
-	IsLowerRole(echo.Context, sandpiper.AccessRole) error
+	CurrentUser(echo.Context) *sandpiper.AuthUser
+	EnforceRole(echo.Context, sandpiper.AccessRole) error
 }

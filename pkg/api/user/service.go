@@ -18,6 +18,14 @@ type Service interface {
 	Update(echo.Context, *Update) (*sandpiper.User, error)
 }
 
+// User represents user application service
+type User struct {
+	db   *pg.DB
+	udb  UDB
+	rbac RBAC
+	sec  Securer
+}
+
 // New creates new user application service
 func New(db *pg.DB, udb UDB, rbac RBAC, sec Securer) *User {
 	return &User{db: db, udb: udb, rbac: rbac, sec: sec}
@@ -26,14 +34,6 @@ func New(db *pg.DB, udb UDB, rbac RBAC, sec Securer) *User {
 // Initialize initializes User application service with defaults
 func Initialize(db *pg.DB, rbac RBAC, sec Securer) *User {
 	return New(db, pgsql.NewUser(), rbac, sec)
-}
-
-// User represents user application service
-type User struct {
-	db   *pg.DB
-	udb  UDB
-	rbac RBAC
-	sec  Securer
 }
 
 // Securer represents security interface
@@ -52,7 +52,7 @@ type UDB interface {
 
 // RBAC represents role-based-access-control interface
 type RBAC interface {
-	User(echo.Context) *sandpiper.AuthUser
+	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceUser(echo.Context, int) error
 	AccountCreate(echo.Context, sandpiper.AccessRole, int, int) error
 	IsLowerRole(echo.Context, sandpiper.AccessRole) error

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/slice"
@@ -60,7 +61,7 @@ func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sa
 }
 
 // View logging
-func (ls *LogService) View(c echo.Context, req int) (resp *sandpiper.Slice, err error) {
+func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Slice, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
@@ -76,7 +77,7 @@ func (ls *LogService) View(c echo.Context, req int) (resp *sandpiper.Slice, err 
 }
 
 // Delete logging
-func (ls *LogService) Delete(c echo.Context, req int) (err error) {
+func (ls *LogService) Delete(c echo.Context, req uuid.UUID) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
