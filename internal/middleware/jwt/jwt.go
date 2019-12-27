@@ -16,6 +16,7 @@ import (
 
 // Custom errors
 var (
+	// ErrInvalidToken indicates a missing or invalid token was supplied
 	ErrInvalidToken = errors.New("token is missing or invalid")
 )
 
@@ -57,7 +58,6 @@ func (j *Service) MWFunc() echo.MiddlewareFunc {
 			claims := token.Claims.(jwt.MapClaims)
 			id := int(claims["id"].(float64))
 			companyID := int(claims["c"].(float64))
-			locationID := int(claims["l"].(float64))
 			username := claims["u"].(string)
 			email := claims["e"].(string)
 			role := sandpiper.AccessRole(claims["r"].(float64))
@@ -65,7 +65,6 @@ func (j *Service) MWFunc() echo.MiddlewareFunc {
 			// add claims to context
 			c.Set("id", id)
 			c.Set("company_id", companyID)
-			c.Set("location_id", locationID)
 			c.Set("username", username)
 			c.Set("email", email)
 			c.Set("role", role)
@@ -105,7 +104,6 @@ func (j *Service) GenerateToken(u *sandpiper.User) (string, string, error) {
 		"e":   u.Email,
 		"r":   u.Role.AccessLevel,
 		"c":   u.CompanyID,
-		"l":   u.LocationID,
 		"exp": expire.Unix(),
 	})
 

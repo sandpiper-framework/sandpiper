@@ -4,6 +4,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
+	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
@@ -54,6 +55,6 @@ type UDB interface {
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceUser(echo.Context, int) error
-	AccountCreate(echo.Context, sandpiper.AccessRole, int, int) error
+	AccountCreate(echo.Context, sandpiper.AccessRole, uuid.UUID) error
 	IsLowerRole(echo.Context, sandpiper.AccessRole) error
 }

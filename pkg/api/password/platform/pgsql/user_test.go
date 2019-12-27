@@ -32,7 +32,6 @@ func TestView(t *testing.T) {
 				Username:   "tomjones",
 				RoleID:     1,
 				CompanyID:  1,
-				LocationID: 1,
 				Password:   "newPass",
 				Base: sandpiper.Base{
 					ID: 2,
@@ -99,7 +98,6 @@ func TestUpdate(t *testing.T) {
 				Username:   "tomjones",
 				RoleID:     1,
 				CompanyID:  1,
-				LocationID: 1,
 				Password:   "newPass",
 				Address:    "Address",
 				Phone:      "123456",

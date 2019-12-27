@@ -12,7 +12,6 @@ type RBAC struct {
 	EnforceRoleFn     func(echo.Context, sandpiper.AccessRole) error
 	EnforceUserFn     func(echo.Context, int) error
 	EnforceCompanyFn  func(echo.Context, int) error
-	EnforceLocationFn func(echo.Context, int) error
 	AccountCreateFn   func(echo.Context, sandpiper.AccessRole, int, int) error
 	IsLowerRoleFn     func(echo.Context, sandpiper.AccessRole) error
 }
@@ -37,14 +36,9 @@ func (a *RBAC) EnforceCompany(c echo.Context, id int) error {
 	return a.EnforceCompanyFn(c, id)
 }
 
-// EnforceLocation mock
-func (a *RBAC) EnforceLocation(c echo.Context, id int) error {
-	return a.EnforceLocationFn(c, id)
-}
-
 // AccountCreate mock
-func (a *RBAC) AccountCreate(c echo.Context, roleID sandpiper.AccessRole, companyID, locationID int) error {
-	return a.AccountCreateFn(c, roleID, companyID, locationID)
+func (a *RBAC) AccountCreate(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
+	return a.AccountCreateFn(c, roleID, companyID int)
 }
 
 // IsLowerRole mock

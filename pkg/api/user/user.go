@@ -10,7 +10,7 @@ import (
 
 // Create creates a new user account
 func (u *User) Create(c echo.Context, req sandpiper.User) (*sandpiper.User, error) {
-	if err := u.rbac.AccountCreate(c, req.RoleID, req.CompanyID, req.LocationID); err != nil {
+	if err := u.rbac.AccountCreate(c, req.RoleID, req.CompanyID); err != nil {
 		return nil, err
 	}
 	req.Password = u.sec.Hash(req.Password)

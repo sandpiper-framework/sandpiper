@@ -24,13 +24,21 @@ CREATE TABLE IF NOT EXISTS "settings" (
   "value" text
 );
 
+CREATE TABLE IF NOT EXISTS "subscriptions" (
+   "id"              uuid PRIMARY KEY,
+   "sandpiper_addr"  text,
+   "slice_id"        uuid REFERENCES "slices" ("id"),
+   "name"            text,
+   "description"     text
+);
+
 CREATE TABLE IF NOT EXISTS "slices" (
   "id"            uuid PRIMARY KEY,
   "name"          text,
   "content_hash"  text,
   "content_count" integer,
   "last_update"   timestamp,
-  "subscription_id" uuid REFERENCES "subscriptons" ("id")
+  "subscription_id" uuid REFERENCES "subscriptions" ("id")
 );
 
 CREATE TABLE IF NOT EXISTS "slice_metadata" (
@@ -38,14 +46,6 @@ CREATE TABLE IF NOT EXISTS "slice_metadata" (
   "key"      text,
   "value"    text,
   PRIMARY KEY ("slice_id", "key")
-);
-
-CREATE TABLE IF NOT EXISTS "subscriptions" (
-  "id"              uuid PRIMARY KEY,
-  "sandpiper_addr"  text,
-  "slice_id"        uuid REFERENCES "slices" ("id"),
-  "name"            text,
-  "description"     text
 );
 
 CREATE TABLE IF NOT EXISTS "data_objects" (
@@ -76,8 +76,6 @@ CREATE TABLE IF NOT EXISTS users (
   "last_password_change" timestamp,
   "token"                text,
   "role_id"              integer REFERENCES "roles" ("id"),
-  "company_id"           integer REFERENCES "companies" ("id"),
-  "location_id"          integer REFERENCES "locations" ("id"),
   "created_at"           timestamp,
   "updated_at"           timestamp,
   "deleted_at"           timestamp

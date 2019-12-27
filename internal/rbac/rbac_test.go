@@ -15,13 +15,12 @@ import (
 
 func TestUser(t *testing.T) {
 	ctx := mock.EchoCtxWithKeys([]string{
-		"id", "company_id", "location_id", "username", "email", "role"},
-		9, 15, 52, "ribice", "ribice@gmail.com", sandpiper.SuperAdminRole)
+		"id", "company_id", "username", "email", "role"},
+		9, 15, "ribice", "ribice@gmail.com", sandpiper.SuperAdminRole)
 	wantUser := &sandpiper.AuthUser{
 		ID:         9,
 		Username:   "ribice",
 		CompanyID:  15,
-		LocationID: 52,
 		Email:      "ribice@gmail.com",
 		Role:       sandpiper.SuperAdminRole,
 	}
@@ -134,52 +133,11 @@ func TestEnforceCompany(t *testing.T) {
 	}
 }
 
-func TestEnforceLocation(t *testing.T) {
-	type args struct {
-		ctx echo.Context
-		id  int
-	}
-	cases := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name:    "Not same location, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"location_id", "role"}, 7, sandpiper.UserRole), id: 9},
-			wantErr: true,
-		},
-		{
-			name:    "Same location, not company admin or admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"location_id", "role"}, 22, sandpiper.UserRole), id: 22},
-			wantErr: true,
-		},
-		{
-			name:    "Same location, company admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"location_id", "role"}, 5, sandpiper.CompanyAdminRole), id: 5},
-			wantErr: false,
-		},
-		{
-			name:    "Location admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"location_id", "role"}, 5, sandpiper.LocationAdminRole), id: 5},
-			wantErr: false,
-		},
-	}
-	for _, tt := range cases {
-		t.Run(tt.name, func(t *testing.T) {
-			rbacSvc := rbac.New()
-			res := rbacSvc.EnforceLocation(tt.args.ctx, tt.args.id)
-			assert.Equal(t, tt.wantErr, res == echo.ErrForbidden)
-		})
-	}
-}
-
 func TestAccountCreate(t *testing.T) {
 	type args struct {
 		ctx         echo.Context
 		roleID      sandpiper.AccessRole
 		company_id  int
-		location_id int
 	}
 	cases := []struct {
 		name    string
@@ -187,40 +145,40 @@ func TestAccountCreate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "Different location, company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "location_id", "role"}, 2, 3, sandpiper.UserRole), roleID: 500, company_id: 7, location_id: 8},
+			name:    "Different company, creating user role, not an admin",
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.UserRole), roleID: 500, company_id: 7},
 			wantErr: true,
 		},
 		{
 			name:    "Same location, not company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "location_id", "role"}, 2, 3, sandpiper.UserRole), roleID: 500, company_id: 2, location_id: 8},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.UserRole), roleID: 500, company_id: 2},
 			wantErr: true,
 		},
 		{
-			name:    "Different location, company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "location_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 400, company_id: 2, location_id: 4},
+			name:    "Different company, creating user role, not an admin",
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 400, company_id: 2},
 			wantErr: false,
 		},
 		{
-			name:    "Same location, company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "location_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 500, company_id: 2, location_id: 3},
+			name:    "Same company, creating user role, not an admin",
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 500, company_id: 2},
 			wantErr: false,
 		},
 		{
-			name:    "Same location, company, creating user role, admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "location_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 500, company_id: 2, location_id: 3},
+			name:    "Same company, creating user role, admin",
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 500, company_id: 2},
 			wantErr: false,
 		},
 		{
 			name:    "Different everything, admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "location_id", "role"}, 2, 3, sandpiper.AdminRole), roleID: 200, company_id: 7, location_id: 4},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.AdminRole), roleID: 200, company_id: 7},
 			wantErr: false,
 		},
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			rbacSvc := rbac.New()
-			res := rbacSvc.AccountCreate(tt.args.ctx, tt.args.roleID, tt.args.company_id, tt.args.location_id)
+			res := rbacSvc.AccountCreate(tt.args.ctx, tt.args.roleID, tt.args.company_id)
 			assert.Equal(t, tt.wantErr, res == echo.ErrForbidden)
 		})
 	}

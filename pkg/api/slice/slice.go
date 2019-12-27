@@ -29,11 +29,13 @@ func (s *Slice) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Slice
 }
 
 // View returns a single slice if allowed
-func (s *Slice) View(c echo.Context, id uuid.UUID) (*sandpiper.Slice, error) {
-	//if err := s.rbac.EnforceVisibility(c); err != nil {
-	//	return nil, err
-	//}
-	return s.sdb.View(s.db, id)
+func (s *Slice) View(c echo.Context, sliceID uuid.UUID) (*sandpiper.Slice, error) {
+	au := s.rbac.CurrentUser(c)
+	if au.Role != sandpiper.AdminRole {
+		// make sure the slice belongs to this user's company
+    return s.sdb.ViewByCompany(s.db, au.CompanyID, sliceID)
+	}
+	return s.sdb.View(s.db, sliceID)
 }
 
 // Delete deletes a slice if allowed

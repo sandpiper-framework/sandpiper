@@ -97,7 +97,6 @@ func TestGenerateToken(t *testing.T) {
 					AccessLevel: sandpiper.SuperAdminRole,
 				},
 				CompanyID:  1,
-				LocationID: 1,
 			},
 			wantToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
 		},

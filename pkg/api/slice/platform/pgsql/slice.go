@@ -57,6 +57,22 @@ func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 	return slice, nil
 }
 
+// ViewByCompany returns a single slice by ID joined through subscriptions to company
+func (s *Slice) ViewByCompany(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
+	var slice = &sandpiper.Slice{ID: sliceID}
+
+	err := db.Model(slice).
+		Relation("subscriptions").
+		Where("slice_id = ? and subscriber_id = ?", sliceID, companyID).
+		Select()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return slice, nil
+}
+
 // Update updates slice info by primary key (assumes allowed to do this)
 func (s *Slice) Update(db orm.DB, slice *sandpiper.Slice) error {
 	_, err := db.Model(slice).Update()

@@ -3,6 +3,7 @@ package rbac
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
@@ -20,8 +21,7 @@ func (s *Service) CurrentUser(c echo.Context) *sandpiper.AuthUser {
 	return &sandpiper.AuthUser{
 		ID:         c.Get("id").(int),
 		Username:   c.Get("username").(string),
-		CompanyID:  c.Get("company_id").(int),
-		LocationID: c.Get("location_id").(int),
+		CompanyID:  c.Get("company_id").(uuid.UUID),
 		Email:      c.Get("email").(string),
 		Role:       c.Get("role").(sandpiper.AccessRole),
 	}
@@ -34,8 +34,8 @@ func (s *Service) EnforceRole(c echo.Context, r sandpiper.AccessRole) error {
 
 // EnforceUser checks whether the request to change user data is done by the same user
 func (s *Service) EnforceUser(c echo.Context, ID int) error {
-	// TODO: Implement querying db and checking the requested user's company_id/location_id
-	// to allow company/location admins to view the user
+	// TODO: Implement querying db and checking the requested user's company_id
+	// to allow company admins to view the user
 	if s.isAdmin(c) {
 		return nil
 	}
@@ -45,26 +45,14 @@ func (s *Service) EnforceUser(c echo.Context, ID int) error {
 // EnforceCompany checks whether the request to apply change to company data
 // is done by the user belonging to the that company and that the user has role CompanyAdmin.
 // If user has admin role, the check for company doesnt need to pass.
-func (s *Service) EnforceCompany(c echo.Context, ID int) error {
+func (s *Service) EnforceCompany(c echo.Context, ID uuid.UUID) error {
 	if s.isAdmin(c) {
 		return nil
 	}
 	if err := s.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
 		return err
 	}
-	return checkBool(c.Get("company_id").(int) == ID)
-}
-
-// EnforceLocation checks whether the request to change location data
-// is done by the user belonging to the requested location
-func (s *Service) EnforceLocation(c echo.Context, ID int) error {
-	if s.isCompanyAdmin(c) {
-		return nil
-	}
-	if err := s.EnforceRole(c, sandpiper.LocationAdminRole); err != nil {
-		return err
-	}
-	return checkBool(c.Get("location_id").(int) == ID)
+	return checkBool(c.Get("company_id").(uuid.UUID) == ID)
 }
 
 func (s *Service) isAdmin(c echo.Context) bool {
@@ -77,9 +65,8 @@ func (s *Service) isCompanyAdmin(c echo.Context) bool {
 }
 
 // AccountCreate performs auth check when creating a new account
-// Location admin cannot create accounts, needs to be fixed on EnforceLocation function
-func (s *Service) AccountCreate(c echo.Context, roleID sandpiper.AccessRole, companyID, locationID int) error {
-	if err := s.EnforceLocation(c, locationID); err != nil {
+func (s *Service) AccountCreate(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
+	if err := s.EnforceCompany(c, companyID); err != nil {
 		return err
 	}
 	return s.IsLowerRole(c, roleID)

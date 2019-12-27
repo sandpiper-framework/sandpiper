@@ -32,19 +32,19 @@ func TestCreate(t *testing.T) {
 	}{
 		{
 			name:       "Fail on validation",
-			req:        `{"first_name":"John","last_name":"Doe","username":"ju","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"location_id":2,"role_id":300}`,
+			req:        `{"first_name":"John","last_name":"Doe","username":"ju","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":300}`,
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name:       "Fail on non-matching passwords",
-			req:        `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter1234","email":"johndoe@gmail.com","company_id":1,"location_id":2,"role_id":300}`,
+			req:        `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter1234","email":"johndoe@gmail.com","company_id":1,"role_id":300}`,
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Fail on invalid role",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"location_id":2,"role_id":50}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":50}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID, locationID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -52,9 +52,9 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "Fail on RBAC",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"location_id":2,"role_id":200}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":200}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID, locationID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -63,9 +63,9 @@ func TestCreate(t *testing.T) {
 
 		{
 			name: "Success",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"location_id":2,"role_id":200}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":200}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID, locationID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
 					return nil
 				},
 			},
@@ -93,7 +93,6 @@ func TestCreate(t *testing.T) {
 				Username:   "juzernejm",
 				Email:      "johndoe@gmail.com",
 				CompanyID:  1,
-				LocationID: 2,
 			},
 			wantStatus: http.StatusOK,
 		},
@@ -151,7 +150,6 @@ func TestList(t *testing.T) {
 					return &sandpiper.AuthUser{
 						ID:         1,
 						CompanyID:  2,
-						LocationID: 3,
 						Role:       sandpiper.SliceRole,
 						Email:      "john@mail.com",
 					}
@@ -166,7 +164,6 @@ func TestList(t *testing.T) {
 					return &sandpiper.AuthUser{
 						ID:         1,
 						CompanyID:  2,
-						LocationID: 3,
 						Role:       sandpiper.SuperAdminRole,
 						Email:      "john@mail.com",
 					}
@@ -185,7 +182,6 @@ func TestList(t *testing.T) {
 								LastName:   "Doe",
 								Email:      "john@mail.com",
 								CompanyID:  2,
-								LocationID: 3,
 								Role: &sandpiper.Role{
 									ID:          1,
 									AccessLevel: 1,
@@ -202,7 +198,6 @@ func TestList(t *testing.T) {
 								LastName:   "Dye",
 								Email:      "joanna@mail.com",
 								CompanyID:  1,
-								LocationID: 2,
 								Role: &sandpiper.Role{
 									ID:          2,
 									AccessLevel: 2,
@@ -227,7 +222,6 @@ func TestList(t *testing.T) {
 						LastName:   "Doe",
 						Email:      "john@mail.com",
 						CompanyID:  2,
-						LocationID: 3,
 						Role: &sandpiper.Role{
 							ID:          1,
 							AccessLevel: 1,
@@ -244,7 +238,6 @@ func TestList(t *testing.T) {
 						LastName:   "Dye",
 						Email:      "joanna@mail.com",
 						CompanyID:  1,
-						LocationID: 2,
 						Role: &sandpiper.Role{
 							ID:          2,
 							AccessLevel: 2,

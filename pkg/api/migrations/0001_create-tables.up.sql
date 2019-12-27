@@ -42,20 +42,12 @@ CREATE TABLE IF NOT EXISTS "slice_metadata" (
   PRIMARY KEY ("slice_id", "key")
 );
 
-CREATE TABLE IF NOT EXISTS "subscribers" (
-  "id" uuid PRIMARY KEY,
-  "company" text,
-  "contact" text,
-  "email"   text,
-  "active"  boolean
-);
-
 CREATE TABLE IF NOT EXISTS "subscriptions" (
-  "slice_id"      uuid REFERENCES "slices" ("id"),
-  "subscriber_id" uuid REFERENCES "subscribers" ("id"),
-  "name"          text,
-  "description"   text,
-  PRIMARY KEY ("slice_id", "subscriber_id")
+  "slice_id"     uuid REFERENCES "slices" ("id"),
+  "company_id"   uuid REFERENCES "companies" ("id"),
+  "name"         text,
+  "description"  text,
+  PRIMARY KEY ("slice_id", "company_id")
 );
 
 CREATE TABLE IF NOT EXISTS "data_objects" (
@@ -66,20 +58,9 @@ CREATE TABLE IF NOT EXISTS "data_objects" (
 ); 
 
 CREATE TABLE IF NOT EXISTS companies (
-  "id"          serial PRIMARY KEY,
-  "name"        varchar(30) NOT NULL,
+  "id"          uuid PRIMARY KEY,
+  "name"        text NOT NULL,
   "active"      boolean,
-  "created_at"  timestamp,
-  "updated_at"  timestamp,
-  "deleted_at"  timestamp
-);
-
-CREATE TABLE IF NOT EXISTS locations (
-  "id"          serial PRIMARY KEY,
-  "name"        text,
-  "address"     text,
-  "active"      boolean,
-  "company_id"  integer REFERENCES "companies" ("id"),
   "created_at"  timestamp,
   "updated_at"  timestamp,
   "deleted_at"  timestamp
@@ -106,8 +87,7 @@ CREATE TABLE IF NOT EXISTS users (
   "last_password_change" timestamp,
   "token"                text,
   "role_id"              integer REFERENCES "roles" ("id"),
-  "company_id"           integer REFERENCES "companies" ("id"),
-  "location_id"          integer REFERENCES "locations" ("id"),
+  "company_id"           uuid REFERENCES "companies" ("id"),
   "created_at"           timestamp,
   "updated_at"           timestamp,
   "deleted_at"           timestamp

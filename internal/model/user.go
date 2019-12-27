@@ -2,6 +2,8 @@ package sandpiper
 
 import (
 	"time"
+
+	"github.com/satori/go.uuid"
 )
 
 // User represents user domain model
@@ -21,15 +23,13 @@ type User struct {
 	Token              string     `json:"-"`
 	Role               *Role      `json:"role,omitempty"`
 	RoleID             AccessRole `json:"-"`
-	CompanyID          int        `json:"company_id"`
-	LocationID         int        `json:"location_id"`
+	CompanyID          uuid.UUID  `json:"company_id"`
 }
 
 // AuthUser represents data stored in JWT token for the current user
 type AuthUser struct {
 	ID         int
-	CompanyID  int
-	LocationID int
+	CompanyID  uuid.UUID
 	Username   string
 	Email      string
 	Role       AccessRole

@@ -36,17 +36,6 @@ func TestList(t *testing.T) {
 				ID:    1},
 		},
 		{
-			name: "Location admin user",
-			args: args{user: &sandpiper.AuthUser{
-				Role:       sandpiper.LocationAdminRole,
-				CompanyID:  1,
-				LocationID: 2,
-			}},
-			wantData: &sandpiper.ListQuery{
-				Query: "location_id = ?",
-				ID:    2},
-		},
-		{
 			name: "Normal user",
 			args: args{user: &sandpiper.AuthUser{
 				Role: sandpiper.UserRole,

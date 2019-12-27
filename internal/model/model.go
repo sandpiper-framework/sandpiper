@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/satori/go.uuid"
 )
 
 // Base contains common fields for all tables
@@ -15,10 +16,10 @@ type Base struct {
 	DeletedAt time.Time `json:"deleted_at,omitempty" pg:",soft_delete"`
 }
 
-// ListQuery holds company/location data used for list db queries
+// ListQuery holds company data used for list db queries
 type ListQuery struct {
 	Query string
-	ID    int
+	ID    uuid.UUID
 }
 
 // compile-time check variables for model hooks (which take no memory)

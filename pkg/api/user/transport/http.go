@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/user"
@@ -44,9 +45,8 @@ type createReq struct {
 	PasswordConfirm string `json:"password_confirm" validate:"required"`
 	Email           string `json:"email" validate:"required,email"`
 
-	CompanyID  int                  `json:"company_id" validate:"required"`
-	LocationID int                  `json:"location_id" validate:"required"`
-	RoleID     sandpiper.AccessRole `json:"role_id" validate:"required"`
+	CompanyID uuid.UUID            `json:"company_id" validate:"required"`
+	RoleID    sandpiper.AccessRole `json:"role_id" validate:"required"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -65,14 +65,13 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	usr, err := h.svc.Create(c, sandpiper.User{
-		Username:   r.Username,
-		Password:   r.Password,
-		Email:      r.Email,
-		FirstName:  r.FirstName,
-		LastName:   r.LastName,
-		CompanyID:  r.CompanyID,
-		LocationID: r.LocationID,
-		RoleID:     r.RoleID,
+		Username:  r.Username,
+		Password:  r.Password,
+		Email:     r.Email,
+		FirstName: r.FirstName,
+		LastName:  r.LastName,
+		CompanyID: r.CompanyID,
+		RoleID:    r.RoleID,
 	})
 
 	if err != nil {

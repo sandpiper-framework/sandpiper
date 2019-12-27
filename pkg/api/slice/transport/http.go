@@ -43,7 +43,6 @@ type createReq struct {
 	LastUpdate   time.Time `json:"last_update"`
 
 	//CompanyID  int                  `json:"company_id" validate:"required"`
-	//LocationID int                  `json:"location_id" validate:"required"`
 	//RoleID     sandpiper.AccessRole `json:"role_id" validate:"required"`
 }
 

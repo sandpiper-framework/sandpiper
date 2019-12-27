@@ -182,7 +182,6 @@ func TestList(t *testing.T) {
 					return &sandpiper.AuthUser{
 						ID:         1,
 						CompanyID:  2,
-						LocationID: 3,
 						Role:       sandpiper.UserRole,
 					}
 				}}},
@@ -197,7 +196,6 @@ func TestList(t *testing.T) {
 					return &sandpiper.AuthUser{
 						ID:         1,
 						CompanyID:  2,
-						LocationID: 3,
 						Role:       sandpiper.AdminRole,
 					}
 				}},
@@ -398,7 +396,6 @@ func TestUpdate(t *testing.T) {
 							UpdatedAt: mock.TestTime(1991),
 						},
 						CompanyID:  1,
-						LocationID: 2,
 						RoleID:     3,
 						FirstName:  "John",
 						LastName:   "Doe",
@@ -433,7 +430,6 @@ func TestUpdate(t *testing.T) {
 					UpdatedAt: mock.TestTime(2000),
 				},
 				CompanyID:  1,
-				LocationID: 2,
 				RoleID:     3,
 				FirstName:  "John",
 				LastName:   "Doe",
@@ -451,7 +447,6 @@ func TestUpdate(t *testing.T) {
 							UpdatedAt: mock.TestTime(2000),
 						},
 						CompanyID:  1,
-						LocationID: 2,
 						RoleID:     3,
 						FirstName:  "John",
 						LastName:   "Doe",
