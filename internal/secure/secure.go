@@ -1,7 +1,12 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 // Package secure handles password scoring, encrypting and token generation.
 package secure
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"hash"
 	"strconv"
@@ -18,8 +23,8 @@ type Service struct {
 }
 
 // New initializes security service.
-func New(minPasswordScore int, h hash.Hash) *Service {
-	return &Service{minScore: minPasswordScore, h: h}
+func New(minPasswordScore int) *Service {
+	return &Service{minScore: minPasswordScore, h: sha1.New()}
 }
 
 // Password checks whether password is secure enough using zxcvbn library.

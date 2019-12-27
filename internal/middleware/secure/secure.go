@@ -1,6 +1,9 @@
-package secure
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
 
-// middleware functions relating to web security
+// Package secure contains middleware functions relating to web security.
+package secure
 
 import (
 	"github.com/labstack/echo/v4"

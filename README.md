@@ -90,24 +90,23 @@ The application runs as an HTTP server at port 8080. It provides the following R
 
 You can log in as admin to the application by sending a post request to localhost:8080/login with username `admin` and password `admin` in JSON body.
 
-
 ## Project Structure
 
-1. Root directory contains things not related to code directly, e.g. docker-compose, CI/CD, readme, bash scripts etc. It may also contain vendor folder.
+1. Root directory contains things not related to code directly, e.g. readme, license, docker-compose, taskfile, etc.
 
-2. Cmd package contains code for starting applications (main packages). The directory name for each application should match the name of the executable you want to have. Sandpiper is structured as a monolith application but can be restructured to contain multiple microservices. We use the Go convention of placing main package as a subdirectory of the cmd package. As an example, scheduler application's binary would be located under cmd/cron. It also loads the necessary configuration and passes it to the service initializers.
+2. Cmd package contains code for starting applications ("main" packages). The directory name for each application should match the name of the executable you want to have. Sandpiper is structured as a monolith application but can be restructured to contain multiple microservices. We use the Go convention of placing main package as a subdirectory of the cmd package. As an example, the "client" application's binary would be located under cmd/client. It also loads the necessary configuration and passes it to the service initializers.
 
-3. Rest of the code is located under /pkg. The pkg directory contains `utl` and 'microservice' directories.
+3. The rest of the code is located under two directories: `internal` and `pkg`. The pkg directory contains a directory for each of the executables found in the cmd directory. These can be thought of like microservices of Sandpiper. The internal directory contains code common to all cmds. 
 
-4. Microservice directories, like api (naming corresponds to `cmd/` folder naming) contains multiple folders for each domain it interacts with, for example: user, car, appointment etc.
+4. Microservice directories, like api (naming corresponds to `cmd/` folder naming) contains multiple folders for each domain it interacts with, for example: `user`, `company`, `slice` etc.
 
-5. Domain directories, like "user", contain all application/business logic and two additional directories: "platform" and "transport".
+5. Domain directories, like "user", contain all application/business logic and three additional directories: "logging", "platform" and "transport".
 
-6. Platform folder contains various packages that provide support for things like databases, authentication and marshaling. Most of the packages located under platform are decoupled by using interfaces. Every platform has its own package, for example, postgres, elastic, redis, memcache etc.
+6. The `platform` folder contains various packages that provide support for things like databases, authentication and marshaling. Most of the packages located under platform are decoupled by using interfaces (with the "Repository pattern"). Every platform has its own package, for example, pgsql (orm for postgres), elastic, redis, memcache etc.
 
-7. Transport package contains HTTP handlers. The package receives the requests, marshals, validates then passes it to the corresponding service.
+7. The `transport` package contains HTTP handlers. This package receives the requests, marshals, validates then passes it to the corresponding service.
 
-8. Utl directory contains helper packages and models. Packages such as mock, middleware, configuration, server are located here.
+8. The `internal` folder contains helper packages and models. Packages such as mock, middleware, configuration, server are located here.
 
 ## Running the tests
 
@@ -141,7 +140,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Doug Winsby** - *Initial work* - [Winsby Group LLC](https://winsbygroup.com)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
@@ -155,7 +154,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Inspiration
 * etc
 
-
 1. Echo - HTTP 'framework'.
 2. Go-Pg - PostgreSQL ORM
 3. JWT-Go - JWT Authentication
@@ -167,5 +165,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 9. zxcvbn-go - Password strength checker
 10. DockerTest - Testing database queries
 11. Testify/Assert - Asserting test results
+12. uuid - generate and manipulate uuid values
 
 Most of these can easily be replaced with your own choices since their usage is abstracted and localized.

@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 // Package database creates a pooled connection to the database. We use a
 // lightweight ORM (with deep support for postgresql). This ORM only supports
 // postgresql. We might consider switching if need more supported dbms.

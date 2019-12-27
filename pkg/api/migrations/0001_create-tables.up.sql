@@ -10,6 +10,7 @@ BEGIN;
 CREATE TYPE "payloadtype" AS ENUM (
   'aces-file',
   'aces-item',
+  'asset-file',
   'partspro-file',
   'partspro-item',
   'pies-file',
@@ -22,6 +23,15 @@ CREATE TABLE IF NOT EXISTS "settings" (
   "id"    SERIAL PRIMARY KEY,
   "key"   text UNIQUE NOT NULL,
   "value" text
+);
+
+CREATE TABLE IF NOT EXISTS companies (
+  "id"          uuid PRIMARY KEY,
+  "name"        text NOT NULL,
+  "active"      boolean,
+  "created_at"  timestamp,
+  "updated_at"  timestamp,
+  "deleted_at"  timestamp
 );
 
 CREATE TABLE IF NOT EXISTS "slices" (
@@ -56,15 +66,6 @@ CREATE TABLE IF NOT EXISTS "data_objects" (
   "payload_type" payloadtype,
   "payload"      text
 ); 
-
-CREATE TABLE IF NOT EXISTS companies (
-  "id"          uuid PRIMARY KEY,
-  "name"        text NOT NULL,
-  "active"      boolean,
-  "created_at"  timestamp,
-  "updated_at"  timestamp,
-  "deleted_at"  timestamp
-);
 
 CREATE TABLE IF NOT EXISTS roles(
   "id"           serial PRIMARY KEY,

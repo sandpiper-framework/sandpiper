@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package password
 
 import (
@@ -17,13 +21,13 @@ type Service interface {
 // Password represents password application service
 type Password struct {
 	db   *pg.DB
-	udb  UserDB
+	udb  Repository
 	rbac RBAC
 	sec  Securer
 }
 
 // New creates new password application service
-func New(db *pg.DB, udb UserDB, rbac RBAC, sec Securer) *Password {
+func New(db *pg.DB, udb Repository, rbac RBAC, sec Securer) *Password {
 	return &Password{
 		db:   db,
 		udb:  udb,
@@ -37,8 +41,8 @@ func Initialize(db *pg.DB, rbac RBAC, sec Securer) *Password {
 	return New(db, pgsql.NewUser(), rbac, sec)
 }
 
-// UserDB represents user repository interface
-type UserDB interface {
+// Repository represents available resource actions using a repository-abstraction-pattern interface.
+type Repository interface {
 	View(orm.DB, int) (*sandpiper.User, error)
 	Update(orm.DB, *sandpiper.User) error
 }

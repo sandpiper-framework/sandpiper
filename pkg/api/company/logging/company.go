@@ -2,42 +2,42 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-package user
+package company
 
-// user service logger
+// company service logger
 
 import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/pkg/api/user"
+	"autocare.org/sandpiper/pkg/api/company"
 )
 
-// New creates new user logging service
-func New(svc user.Service, logger sandpiper.Logger) *LogService {
+// New creates new company logging service
+func New(svc company.Service, logger sandpiper.Logger) *LogService {
 	return &LogService{
 		Service: svc,
 		logger:  logger,
 	}
 }
 
-// LogService represents user logging service
+// LogService represents company logging service
 type LogService struct {
-	user.Service
+	company.Service
 	logger sandpiper.Logger
 }
 
-const source = "user"
+const source = "company"
 
 // Create logging
-func (ls *LogService) Create(c echo.Context, req sandpiper.User) (resp *sandpiper.User, err error) {
+func (ls *LogService) Create(c echo.Context, req sandpiper.Company) (resp *sandpiper.Company, err error) {
 	defer func(begin time.Time) {
-		req.Password = "xxx-redacted-xxx"
 		ls.logger.Log(
 			c,
-			source, "Create user request", err,
+			source, "Create company request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -49,11 +49,11 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.User) (resp *sandpipe
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.User, err error) {
+func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Company, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "List user request", err,
+			source, "List company request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -65,11 +65,11 @@ func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sa
 }
 
 // View logging
-func (ls *LogService) View(c echo.Context, req int) (resp *sandpiper.User, err error) {
+func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Company, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "View user request", err,
+			source, "View company request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -81,11 +81,11 @@ func (ls *LogService) View(c echo.Context, req int) (resp *sandpiper.User, err e
 }
 
 // Delete logging
-func (ls *LogService) Delete(c echo.Context, req int) (err error) {
+func (ls *LogService) Delete(c echo.Context, req uuid.UUID) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "Delete user request", err,
+			source, "Delete company request", err,
 			map[string]interface{}{
 				"req":  req,
 				"took": time.Since(begin),
@@ -96,11 +96,11 @@ func (ls *LogService) Delete(c echo.Context, req int) (err error) {
 }
 
 // Update logging
-func (ls *LogService) Update(c echo.Context, req *user.Update) (resp *sandpiper.User, err error) {
+func (ls *LogService) Update(c echo.Context, req *company.Update) (resp *sandpiper.Company, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "Update user request", err,
+			source, "Update company request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,

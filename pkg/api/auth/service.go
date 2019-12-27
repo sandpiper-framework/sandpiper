@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package auth
 
 import (
@@ -12,14 +16,14 @@ import (
 // Auth represents auth application service
 type Auth struct {
 	db   *pg.DB
-	udb  UserDB
+	udb  Repository
 	tg   TokenGenerator
 	sec  Securer
 	rbac RBAC
 }
 
 // New creates a new auth service
-func New(db *pg.DB, udb UserDB, j TokenGenerator, sec Securer, rbac RBAC) *Auth {
+func New(db *pg.DB, udb Repository, j TokenGenerator, sec Securer, rbac RBAC) *Auth {
 	return &Auth{
 		db:   db,
 		udb:  udb,
@@ -41,8 +45,8 @@ type Service interface {
 	Me(echo.Context) (*sandpiper.User, error)
 }
 
-// UserDB represents user repository interface
-type UserDB interface {
+// Repository represents available resource actions using a repository-abstraction-pattern interface.
+type Repository interface {
 	View(orm.DB, int) (*sandpiper.User, error)
 	FindByUsername(orm.DB, string) (*sandpiper.User, error)
 	FindByToken(orm.DB, string) (*sandpiper.User, error)

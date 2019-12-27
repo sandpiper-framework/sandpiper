@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 // Package password manages the password service which allows setting a new password,
 // validating password strength, and generating the encrypted hash to save in the db.
 package password

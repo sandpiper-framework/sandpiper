@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package pgsql
 
 // user service database access
@@ -23,10 +27,11 @@ func NewUser() *User {
 
 // Custom errors
 var (
+	// ErrAlreadyExists the username or email already exists
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Username or email already exists.")
 )
 
-// Create creates a new user on database
+// Create creates a new user in database
 func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
 	var user = new(sandpiper.User)
 	

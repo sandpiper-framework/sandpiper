@@ -4,28 +4,26 @@
 
 package transport
 
-// slice routing functions
+// company routing functions
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/labstack/echo/v4"
 	"github.com/satori/go.uuid"
+	"net/http"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/pkg/api/slice"
+	"autocare.org/sandpiper/pkg/api/company"
 )
 
 // HTTP represents user http service
 type HTTP struct {
-	svc slice.Service
+	svc company.Service
 }
 
-// NewHTTP creates new slice http service
-func NewHTTP(svc slice.Service, er *echo.Group) {
+// NewHTTP creates new company http service
+func NewHTTP(svc company.Service, er *echo.Group) {
 	h := HTTP{svc}
-	sr := er.Group("/slices")
+	sr := er.Group("/companies")
 	sr.POST("", h.create)
 	sr.GET("", h.list)
 	sr.GET("/:id", h.view)
@@ -35,43 +33,35 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 
 // Custom errors
 var (
-	// ErrInvalidSliceUUID indicates a malformed uuid
-	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "invalid slice uuid")
+	// ErrInvalidCompanyUUID indicates a malformed uuid
+	ErrInvalidCompanyUUID = echo.NewHTTPError(http.StatusBadRequest, "invalid company uuid")
 )
 
-// Slice create request
+// Company create request
 type createReq struct {
-	Name         string    `json:"name" validate:"required,min=3"`
-	ContentHash  string    `json:"content_hash"`
-	ContentCount uint      `json:"content_count"`
-	LastUpdate   time.Time `json:"last_update"`
+	Name   string `json:"name" validate:"required,min=3"`
+	Active bool   `json:"active"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
 	r := new(createReq)
-
 	if err := c.Bind(r); err != nil {
 		return err
 	}
-
-	usr, err := h.svc.Create(c, sandpiper.Slice{
-		ID:           uuid.NewV4(),
-		Name:         r.Name,
-		ContentHash:  r.ContentHash,
-		ContentCount: r.ContentCount,
-		LastUpdate:   r.LastUpdate,
+	usr, err := h.svc.Create(c, sandpiper.Company{
+		ID:     uuid.NewV4(),
+		Name:   r.Name,
+		Active: r.Active,
 	})
-
 	if err != nil {
 		return err
 	}
-
 	return c.JSON(http.StatusOK, usr)
 }
 
 type listResponse struct {
-	Slices []sandpiper.Slice `json:"slices"`
-	Page   int               `json:"page"`
+	Companies []sandpiper.Company `json:"companies"`
+	Page      int                 `json:"page"`
 }
 
 func (h *HTTP) list(c echo.Context) error {
@@ -79,74 +69,59 @@ func (h *HTTP) list(c echo.Context) error {
 	if err := c.Bind(p); err != nil {
 		return err
 	}
-
 	result, err := h.svc.List(c, p.Transform())
-
 	if err != nil {
 		return err
 	}
-
 	return c.JSON(http.StatusOK, listResponse{result, p.Page})
 }
 
 func (h *HTTP) view(c echo.Context) error {
 	id, err := uuid.FromString(c.Param("id"))
 	if err != nil {
-		return ErrInvalidSliceUUID
+		return ErrInvalidCompanyUUID
 	}
-
 	result, err := h.svc.View(c, id)
 	if err != nil {
 		return err
 	}
-
 	return c.JSON(http.StatusOK, result)
 }
 
-// Slice update request
+// Company update request
 type updateReq struct {
-	ID           uuid.UUID `json:"-"`
-	Name         string    `json:"name,omitempty" validate:"omitempty,min=3"`
-	ContentHash  string    `json:"content_hash,omitempty" validate:"omitempty,min=2"`
-	ContentCount uint      `json:"content_count,omitempty"`
-	LastUpdate   time.Time `json:"last_update,omitempty"`
+	ID     uuid.UUID `json:"-"`
+	Name   string    `json:"name,omitempty" validate:"omitempty,min=3"`
+	Active bool      `json:"active,omitempty" validate:"omitempty"`
 }
 
 func (h *HTTP) update(c echo.Context) error {
 	id, err := uuid.FromString(c.Param("id"))
 	if err != nil {
-		return ErrInvalidSliceUUID
+		return ErrInvalidCompanyUUID
 	}
-
 	req := new(updateReq)
 	if err := c.Bind(req); err != nil {
 		return err
 	}
-
-	usr, err := h.svc.Update(c, &slice.Update{
-		ID:           id,
-		Name:         req.Name,
-		ContentHash:  req.ContentHash,
-		ContentCount: req.ContentCount,
-		LastUpdate:   req.LastUpdate,
+	usr, err := h.svc.Update(c, &company.Update{
+		ID:     id,
+		Name:   req.Name,
+		Active: req.Active,
 	})
-
 	if err != nil {
 		return err
 	}
-
 	return c.JSON(http.StatusOK, usr)
 }
 
 func (h *HTTP) delete(c echo.Context) error {
 	id, err := uuid.FromString(c.Param("id"))
 	if err != nil {
-		return ErrInvalidSliceUUID
+		return ErrInvalidCompanyUUID
 	}
-
 	if err := h.svc.Delete(c, id); err != nil {
 		return err
 	}
-
 	return c.NoContent(http.StatusOK)
 }

@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package slice
 
 import (
@@ -42,7 +46,7 @@ type Securer interface {
 	Hash(string) string
 }
 
-// Repository represents Slice repository-pattern interface
+// Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
 	Create(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
 	View(orm.DB, uuid.UUID) (*sandpiper.Slice, error)

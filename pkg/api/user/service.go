@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package user
 
 import (
@@ -22,13 +26,13 @@ type Service interface {
 // User represents user application service
 type User struct {
 	db   *pg.DB
-	udb  UDB
+	udb  Repository
 	rbac RBAC
 	sec  Securer
 }
 
 // New creates new user application service
-func New(db *pg.DB, udb UDB, rbac RBAC, sec Securer) *User {
+func New(db *pg.DB, udb Repository, rbac RBAC, sec Securer) *User {
 	return &User{db: db, udb: udb, rbac: rbac, sec: sec}
 }
 
@@ -42,8 +46,8 @@ type Securer interface {
 	Hash(string) string
 }
 
-// UDB represents user repository interface
-type UDB interface {
+// Repository represents available resource actions using a repository-abstraction-pattern interface.
+type Repository interface {
 	Create(orm.DB, sandpiper.User) (*sandpiper.User, error)
 	View(orm.DB, int) (*sandpiper.User, error)
 	List(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.User, error)
