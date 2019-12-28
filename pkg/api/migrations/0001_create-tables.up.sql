@@ -67,12 +67,6 @@ CREATE TABLE IF NOT EXISTS "data_objects" (
   "payload"      text
 ); 
 
-CREATE TABLE IF NOT EXISTS roles(
-  "id"           serial PRIMARY KEY,
-  "access_level" integer,
-  "name"         text
-);
-
 CREATE TABLE IF NOT EXISTS users (
   "id"                   serial PRIMARY KEY,
   "first_name"           text,
@@ -80,18 +74,15 @@ CREATE TABLE IF NOT EXISTS users (
   "username"             text,
   "password"             text,
   "email"                text,
-  "mobile"               text,
   "phone"                text,
-  "address"              text,
   "active"               boolean,
   "last_login"           timestamp,
-  "last_password_change" timestamp,
+  "password_changed"     timestamp,
   "token"                text,
-  "role_id"              integer REFERENCES "roles" ("id"),
+  "role"                 integer,
   "company_id"           uuid REFERENCES "companies" ("id"),
   "created_at"           timestamp,
-  "updated_at"           timestamp,
-  "deleted_at"           timestamp
+  "updated_at"           timestamp
 );
 
 COMMIT;

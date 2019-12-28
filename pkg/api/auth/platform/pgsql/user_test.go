@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/api/auth/platform/pgsql"
 	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/api/auth/platform/pgsql"
 	"autocare.org/sandpiper/test/mock"
 )
 
@@ -26,21 +26,14 @@ func TestView(t *testing.T) {
 			name: "Success",
 			id:   2,
 			wantData: &sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Tom",
-				LastName:   "Jones",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "newPass",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
-				Role: &sandpiper.Role{
-					ID:          1,
-					AccessLevel: 1,
-					Name:        "SUPER_ADMIN",
-				},
+				ID:        2,
+				Email:     "tomjones@mail.com",
+				FirstName: "Tom",
+				LastName:  "Jones",
+				Username:  "tomjones",
+				Role:      sandpiper.SuperAdminRole,
+				CompanyID: mock.TestUUID(1),
+				Password:  "newPass",
 			},
 		},
 	}
@@ -48,14 +41,7 @@ func TestView(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
-
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, cases[1].wantData); err != nil {
-		t.Error(err)
-	}
+	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
 	udb := pgsql.NewUser()
 
@@ -92,21 +78,14 @@ func TestFindByUsername(t *testing.T) {
 			name:     "Success",
 			username: "tomjones",
 			wantData: &sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Tom",
-				LastName:   "Jones",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "newPass",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
-				Role: &sandpiper.Role{
-					ID:          1,
-					AccessLevel: 1,
-					Name:        "SUPER_ADMIN",
-				},
+				ID:        2,
+				Email:     "tomjones@mail.com",
+				FirstName: "Tom",
+				LastName:  "Jones",
+				Username:  "tomjones",
+				Role:      sandpiper.SuperAdminRole,
+				CompanyID: mock.TestUUID(1),
+				Password:  "newPass",
 			},
 		},
 	}
@@ -114,14 +93,7 @@ func TestFindByUsername(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
-
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, cases[1].wantData); err != nil {
-		t.Error(err)
-	}
+	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
 	udb := pgsql.NewUser()
 
@@ -156,22 +128,15 @@ func TestFindByToken(t *testing.T) {
 			name:  "Success",
 			token: "loginrefresh",
 			wantData: &sandpiper.User{
-				Email:      "johndoe@mail.com",
-				FirstName:  "John",
-				LastName:   "Doe",
-				Username:   "johndoe",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "hunter2",
-				Base: sandpiper.Base{
-					ID: 1,
-				},
-				Role: &sandpiper.Role{
-					ID:          1,
-					AccessLevel: 1,
-					Name:        "SUPER_ADMIN",
-				},
-				Token: "loginrefresh",
+				ID:        1,
+				Email:     "johndoe@mail.com",
+				FirstName: "John",
+				LastName:  "Doe",
+				Username:  "johndoe",
+				Role:      sandpiper.SuperAdminRole,
+				CompanyID: mock.TestUUID(1),
+				Password:  "hunter2",
+				Token:     "loginrefresh",
 			},
 		},
 	}
@@ -179,14 +144,7 @@ func TestFindByToken(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
-
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, cases[1].wantData); err != nil {
-		t.Error(err)
-	}
+	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
 	udb := pgsql.NewUser()
 
@@ -215,30 +173,21 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "Success",
 			usr: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+				ID:        2,
 				FirstName: "Z",
 				LastName:  "Freak",
-				Address:   "Address",
 				Phone:     "123456",
-				Mobile:    "345678",
 				Username:  "newUsername",
 			},
 			wantData: &sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Z",
-				LastName:   "Freak",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "newPass",
-				Address:    "Address",
-				Phone:      "123456",
-				Mobile:     "345678",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+				Email:     "tomjones@mail.com",
+				FirstName: "Z",
+				LastName:  "Freak",
+				Username:  "tomjones",
+				Role:      sandpiper.SuperAdminRole,
+				CompanyID: mock.TestUUID(1),
+				Password:  "newPass",
+				Phone:     "123456",
 			},
 		},
 	}
@@ -246,14 +195,7 @@ func TestUpdate(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
-
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, cases[0].usr); err != nil {
-		t.Error(err)
-	}
+	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
 	udb := pgsql.NewUser()
 
@@ -263,9 +205,7 @@ func TestUpdate(t *testing.T) {
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
 				user := &sandpiper.User{
-					Base: sandpiper.Base{
-						ID: tt.usr.ID,
-					},
+					ID: tt.usr.ID,
 				}
 				if err := db.Select(user); err != nil {
 					t.Error(err)
@@ -273,7 +213,6 @@ func TestUpdate(t *testing.T) {
 				tt.wantData.UpdatedAt = user.UpdatedAt
 				tt.wantData.CreatedAt = user.CreatedAt
 				tt.wantData.LastLogin = user.LastLogin
-				tt.wantData.DeletedAt = user.DeletedAt
 				assert.Equal(t, tt.wantData, user)
 			}
 		})

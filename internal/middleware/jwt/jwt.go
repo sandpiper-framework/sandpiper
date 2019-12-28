@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
@@ -62,7 +62,7 @@ func (j *Service) MWFunc() echo.MiddlewareFunc {
 			// get the JWT claims
 			claims := token.Claims.(jwt.MapClaims)
 			id := int(claims["id"].(float64))
-			companyID, _ := uuid.FromString(claims["c"].(string))
+			companyID, _ := uuid.Parse(claims["c"].(string))
 			username := claims["u"].(string)
 			email := claims["e"].(string)
 			role := sandpiper.AccessRole(claims["r"].(float64))
@@ -107,7 +107,7 @@ func (j *Service) GenerateToken(u *sandpiper.User) (string, string, error) {
 		"id":  u.ID,
 		"u":   u.Username,
 		"e":   u.Email,
-		"r":   u.Role.AccessLevel,
+		"r":   u.Role,
 		"c":   u.CompanyID,
 		"exp": expire.Unix(),
 	})

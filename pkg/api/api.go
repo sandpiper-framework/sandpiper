@@ -39,7 +39,7 @@ import (
 // Start configures and launches the API services
 func Start(cfg *config.Configuration) error {
 
-	// setup database connection with optional query logging (using standard "log")
+	// setup database connection (with optional query logging using standard "log")
 	db, err := database.New(cfg.DB.URL(), cfg.DB.Timeout, cfg.DB.LogQueries)
 	if err != nil {
 		return err

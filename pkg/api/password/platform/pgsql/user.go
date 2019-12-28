@@ -22,7 +22,7 @@ func NewUser() *User {
 
 // View returns single user by ID
 func (u *User) View(db orm.DB, id int) (*sandpiper.User, error) {
-	user := &sandpiper.User{Base: sandpiper.Base{ID: id}}
+	user := &sandpiper.User{ID: id}
 	err := db.Select(user)
 	if err != nil {
 		return nil, err

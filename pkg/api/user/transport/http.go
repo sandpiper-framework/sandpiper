@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/user"
@@ -36,21 +36,20 @@ func NewHTTP(svc user.Service, er *echo.Group) {
 // Custom errors
 var (
 	ErrPasswordsNotMatching = echo.NewHTTPError(http.StatusBadRequest, "passwords do not match")
-	ErrUnknownRoleID        = echo.NewHTTPError(http.StatusBadRequest, "unknown access role")
+	ErrUnknownRole          = echo.NewHTTPError(http.StatusBadRequest, "unknown access role")
 	ErrNonNumericUserID     = echo.NewHTTPError(http.StatusBadRequest, "numeric user id expected")
 )
 
 // User create request
 type createReq struct {
-	FirstName       string `json:"first_name" validate:"required"`
-	LastName        string `json:"last_name" validate:"required"`
-	Username        string `json:"username" validate:"required,min=3,alphanum"`
-	Password        string `json:"password" validate:"required,min=8"`
-	PasswordConfirm string `json:"password_confirm" validate:"required"`
-	Email           string `json:"email" validate:"required,email"`
-
-	CompanyID uuid.UUID            `json:"company_id" validate:"required"`
-	RoleID    sandpiper.AccessRole `json:"role_id" validate:"required"`
+	FirstName       string               `json:"first_name" validate:"required"`
+	LastName        string               `json:"last_name" validate:"required"`
+	Username        string               `json:"username" validate:"required,min=3,alphanum"`
+	Password        string               `json:"password" validate:"required,min=8"`
+	PasswordConfirm string               `json:"password_confirm" validate:"required"`
+	Email           string               `json:"email" validate:"required,email"`
+	CompanyID       uuid.UUID            `json:"company_id" validate:"required"`
+	Role            sandpiper.AccessRole `json:"role" validate:"required"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -64,8 +63,8 @@ func (h *HTTP) create(c echo.Context) error {
 		return ErrPasswordsNotMatching
 	}
 
-	if r.RoleID < sandpiper.SuperAdminRole || r.RoleID > sandpiper.UserRole {
-		return ErrUnknownRoleID
+	if r.Role < sandpiper.SuperAdminRole || r.Role > sandpiper.UserRole {
+		return ErrUnknownRole
 	}
 
 	usr, err := h.svc.Create(c, sandpiper.User{
@@ -75,7 +74,7 @@ func (h *HTTP) create(c echo.Context) error {
 		FirstName: r.FirstName,
 		LastName:  r.LastName,
 		CompanyID: r.CompanyID,
-		RoleID:    r.RoleID,
+		Role:    r.Role,
 	})
 
 	if err != nil {
@@ -124,9 +123,8 @@ type updateReq struct {
 	ID        int    `json:"-"`
 	FirstName string `json:"first_name,omitempty" validate:"omitempty,min=2"`
 	LastName  string `json:"last_name,omitempty" validate:"omitempty,min=2"`
-	Mobile    string `json:"mobile,omitempty"`
+	Email     string `json:"email,omitempty"`
 	Phone     string `json:"phone,omitempty"`
-	Address   string `json:"address,omitempty"`
 }
 
 func (h *HTTP) update(c echo.Context) error {
@@ -144,9 +142,8 @@ func (h *HTTP) update(c echo.Context) error {
 		ID:        id,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
-		Mobile:    req.Mobile,
+		Email:     req.Email,
 		Phone:     req.Phone,
-		Address:   req.Address,
 	})
 
 	if err != nil {

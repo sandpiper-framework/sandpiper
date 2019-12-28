@@ -5,8 +5,8 @@
 package sandpiper
 
 import (
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
 )
 
 // AuthToken holds authentication token details with refresh token

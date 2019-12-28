@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"autocare.org/sandpiper/internal/model"
-
 	"autocare.org/sandpiper/internal/rbac"
 	"autocare.org/sandpiper/test/mock"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,14 +17,14 @@ func TestUser(t *testing.T) {
 		"id", "company_id", "username", "email", "role"},
 		9, 15, "ribice", "ribice@gmail.com", sandpiper.SuperAdminRole)
 	wantUser := &sandpiper.AuthUser{
-		ID:         9,
-		Username:   "ribice",
-		CompanyID:  15,
-		Email:      "ribice@gmail.com",
-		Role:       sandpiper.SuperAdminRole,
+		ID:        9,
+		Username:  "ribice",
+		CompanyID: mock.TestUUID(1),
+		Email:     "ribice@gmail.com",
+		Role:      sandpiper.SuperAdminRole,
 	}
 	rbacSvc := rbac.New()
-	assert.Equal(t, wantUser, rbacSvc.User(ctx))
+	assert.Equal(t, wantUser, rbacSvc.CurrentUser(ctx))
 }
 
 func TestEnforceRole(t *testing.T) {
@@ -70,7 +69,7 @@ func TestEnforceUser(t *testing.T) {
 	}{
 		{
 			name:    "Not same user, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"id", "role"}, 15, sandpiper.LocationAdminRole), id: 122},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"id", "role"}, 15, sandpiper.UserRole), id: 122},
 			wantErr: true,
 		},
 		{
@@ -96,7 +95,7 @@ func TestEnforceUser(t *testing.T) {
 func TestEnforceCompany(t *testing.T) {
 	type args struct {
 		ctx echo.Context
-		id  int
+		id  uuid.UUID
 	}
 	cases := []struct {
 		name    string
@@ -105,22 +104,22 @@ func TestEnforceCompany(t *testing.T) {
 	}{
 		{
 			name:    "Not same company, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 7, sandpiper.UserRole), id: 9},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.UserRole), id: mock.TestUUID(2)},
 			wantErr: true,
 		},
 		{
 			name:    "Same company, not company admin or admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 22, sandpiper.UserRole), id: 22},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.UserRole), id: mock.TestUUID(1)},
 			wantErr: true,
 		},
 		{
 			name:    "Same company, company admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 5, sandpiper.CompanyAdminRole), id: 5},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.CompanyAdminRole), id: mock.TestUUID(1)},
 			wantErr: false,
 		},
 		{
 			name:    "Not same company but admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 8, sandpiper.AdminRole), id: 9},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.AdminRole), id: mock.TestUUID(2)},
 			wantErr: false,
 		},
 	}
@@ -135,50 +134,46 @@ func TestEnforceCompany(t *testing.T) {
 
 func TestAccountCreate(t *testing.T) {
 	type args struct {
-		ctx         echo.Context
-		roleID      sandpiper.AccessRole
-		company_id  int
+		ctx        echo.Context
+		role       sandpiper.AccessRole
+		company_id uuid.UUID
 	}
 	cases := []struct {
 		name    string
 		args    args
 		wantErr bool
 	}{
+		// todo: fix the "role:" numbers below!!!
 		{
 			name:    "Different company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.UserRole), roleID: 500, company_id: 7},
-			wantErr: true,
-		},
-		{
-			name:    "Same location, not company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.UserRole), roleID: 500, company_id: 2},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.UserRole), role: 500, company_id: mock.TestUUID(2)},
 			wantErr: true,
 		},
 		{
 			name:    "Different company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 400, company_id: 2},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.CompanyAdminRole), role: 400, company_id: mock.TestUUID(2)},
 			wantErr: false,
 		},
 		{
 			name:    "Same company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 500, company_id: 2},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.CompanyAdminRole), role: 500, company_id: mock.TestUUID(1)},
 			wantErr: false,
 		},
 		{
 			name:    "Same company, creating user role, admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.CompanyAdminRole), roleID: 500, company_id: 2},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.CompanyAdminRole), role: 500, company_id: mock.TestUUID(1)},
 			wantErr: false,
 		},
 		{
 			name:    "Different everything, admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, 2, 3, sandpiper.AdminRole), roleID: 200, company_id: 7},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.AdminRole), role: 200, company_id: mock.TestUUID(2)},
 			wantErr: false,
 		},
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			rbacSvc := rbac.New()
-			res := rbacSvc.AccountCreate(tt.args.ctx, tt.args.roleID, tt.args.company_id)
+			res := rbacSvc.AccountCreate(tt.args.ctx, tt.args.role, tt.args.company_id)
 			assert.Equal(t, tt.wantErr, res == echo.ErrForbidden)
 		})
 	}
@@ -187,9 +182,6 @@ func TestAccountCreate(t *testing.T) {
 func TestIsLowerRole(t *testing.T) {
 	ctx := mock.EchoCtxWithKeys([]string{"role"}, sandpiper.CompanyAdminRole)
 	rbacSvc := rbac.New()
-	if rbacSvc.IsLowerRole(ctx, sandpiper.LocationAdminRole) != nil {
-		t.Error("The requested user is higher role than the user requesting it")
-	}
 	if rbacSvc.IsLowerRole(ctx, sandpiper.AdminRole) == nil {
 		t.Error("The requested user is lower role than the user requesting it")
 	}

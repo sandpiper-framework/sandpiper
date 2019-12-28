@@ -7,7 +7,7 @@ package slice
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"time"
 
 	"autocare.org/sandpiper/internal/model"

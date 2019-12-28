@@ -17,9 +17,6 @@ const (
 	// CompanyAdminRole can edit company specific things
 	CompanyAdminRole AccessRole = 120
 
-	// LocationAdminRole can edit location specific things
-	LocationAdminRole AccessRole = 130
-
 	// UserRole is a standard user
 	UserRole AccessRole = 200
 )

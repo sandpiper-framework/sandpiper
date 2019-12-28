@@ -2,10 +2,18 @@ package mock
 
 import (
 	"net/http/httptest"
+	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
+
+// TestUUID returns a valid test uuid starting with the supplied number (1-9)
+func TestUUID(n int) uuid.UUID {
+	s := strconv.Itoa(n)
+	return uuid.MustParse(s[0:1] + "0000000-0000-0000-0000-000000000000")
+}
 
 // TestTime is used for testing time fields
 func TestTime(year int) time.Time {

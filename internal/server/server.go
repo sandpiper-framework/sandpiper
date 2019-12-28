@@ -8,6 +8,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"os"
 	"os/signal"
@@ -37,10 +38,6 @@ func New() *echo.Echo {
 	return e
 }
 
-func healthCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, "Sandpiper API OK")
-}
-
 // Config represents server specific config.
 type Config struct {
 	Port                string
@@ -59,6 +56,10 @@ func Start(srv *echo.Echo, cfg *Config) {
 	srv.Debug = cfg.Debug
 	srv.HideBanner = true
 
+	if srv.Debug {
+		srv.GET("/routes", listRoutes)
+	}
+
 	// Start server
 	go func() {
 		if err := srv.StartServer(httpServer); err != nil {
@@ -76,4 +77,14 @@ func Start(srv *echo.Echo, cfg *Config) {
 	if err := srv.Shutdown(ctx); err != nil {
 		srv.Logger.Fatal(err)
 	}
+}
+
+func healthCheck(c echo.Context) error {
+	return c.JSON(http.StatusOK, "Sandpiper API OK")
+}
+
+// listRoutes uses an echo built-in function to return all registered routes.
+func listRoutes(c echo.Context) error {
+	r, _ := json.Marshal(c.Echo().Routes())
+	return c.String(http.StatusOK, string(r))
 }

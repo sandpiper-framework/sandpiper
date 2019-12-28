@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/slice"
@@ -54,8 +54,8 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	usr, err := h.svc.Create(c, sandpiper.Slice{
-		ID:           uuid.NewV4(),
+	result, err := h.svc.Create(c, sandpiper.Slice{
+		ID:           uuid.New(),
 		Name:         r.Name,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
@@ -66,7 +66,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusOK, result)
 }
 
 type listResponse struct {
@@ -90,7 +90,7 @@ func (h *HTTP) list(c echo.Context) error {
 }
 
 func (h *HTTP) view(c echo.Context) error {
-	id, err := uuid.FromString(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return ErrInvalidSliceUUID
 	}
@@ -113,7 +113,7 @@ type updateReq struct {
 }
 
 func (h *HTTP) update(c echo.Context) error {
-	id, err := uuid.FromString(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return ErrInvalidSliceUUID
 	}
@@ -123,7 +123,7 @@ func (h *HTTP) update(c echo.Context) error {
 		return err
 	}
 
-	usr, err := h.svc.Update(c, &slice.Update{
+	result, err := h.svc.Update(c, &slice.Update{
 		ID:           id,
 		Name:         req.Name,
 		ContentHash:  req.ContentHash,
@@ -135,11 +135,11 @@ func (h *HTTP) update(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusOK, result)
 }
 
 func (h *HTTP) delete(c echo.Context) error {
-	id, err := uuid.FromString(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return ErrInvalidSliceUUID
 	}

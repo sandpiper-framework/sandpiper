@@ -18,7 +18,7 @@ func TestChangePassword(t *testing.T) {
 	hashedPassword := "h4$h3D"
 
 	user.ChangePassword(hashedPassword)
-	if user.LastPasswordChange.IsZero() {
+	if user.PasswordChanged.IsZero() {
 		t.Errorf("Last password change was not changed")
 	}
 

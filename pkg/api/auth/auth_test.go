@@ -275,30 +275,22 @@ func TestMe(t *testing.T) {
 			udb: &mockdb.User{
 				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
 					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        id,
-							CreatedAt: mock.TestTime(1999),
-							UpdatedAt: mock.TestTime(2000),
-						},
+						ID:        id,
+						CreatedAt: mock.TestTime(1999),
+						UpdatedAt: mock.TestTime(2000),
 						FirstName: "John",
 						LastName:  "Doe",
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.UserRole,
-						},
+						Role:      sandpiper.UserRole,
 					}, nil
 				},
 			},
 			wantData: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        9,
-					CreatedAt: mock.TestTime(1999),
-					UpdatedAt: mock.TestTime(2000),
-				},
+				ID:        9,
+				CreatedAt: mock.TestTime(1999),
+				UpdatedAt: mock.TestTime(2000),
 				FirstName: "John",
 				LastName:  "Doe",
-				Role: &sandpiper.Role{
-					AccessLevel: sandpiper.UserRole,
-				},
+				Role:      sandpiper.UserRole,
 			},
 		},
 	}

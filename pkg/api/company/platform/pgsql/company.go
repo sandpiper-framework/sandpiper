@@ -13,7 +13,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
@@ -34,15 +34,8 @@ var (
 
 // Create creates a new company in database (assumes allowed to do this)
 func (s *Company) Create(db orm.DB, company sandpiper.Company) (*sandpiper.Company, error) {
-
-	// isDuplicate checks if company name already exists in database
-	var isDuplicate = func(name string) bool {
-		m := new(sandpiper.Company)
-		err := db.Model(m).Where("lower(name) = ?", strings.ToLower(name)).Select()
-		return err == pg.ErrNoRows
-	}
-
-	if isDuplicate(company.Name) {
+	// don't add if the name already exists
+	if nameExists(db, company.Name) {
 		return nil, ErrAlreadyExists
 	}
 	if err := db.Insert(&company); err != nil {
@@ -85,4 +78,11 @@ func (s *Company) List(db orm.DB, qp *sandpiper.ListQuery, p *sandpiper.Paginati
 // Delete sets deleted_at for a company
 func (s *Company) Delete(db orm.DB, company *sandpiper.Company) error {
 	return db.Delete(company)
+}
+
+// nameExists returns true if name found in database
+func nameExists(db orm.DB, name string) bool {
+	m := new(sandpiper.Company)
+	err := db.Model(m).Where("lower(name) = ?", strings.ToLower(name)).Select()
+	return err == pg.ErrNoRows
 }

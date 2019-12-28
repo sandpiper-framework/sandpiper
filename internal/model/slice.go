@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/go-pg/pg/v9/orm"
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
 // Slice represents a single slice container

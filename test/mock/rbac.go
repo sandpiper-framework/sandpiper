@@ -1,15 +1,15 @@
 package mock
 
 import (
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
 
 // RBAC Mock
 type RBAC struct {
-	UserFn            func(echo.Context) *sandpiper.AuthUser
+	CurrentUserFn     func(echo.Context) *sandpiper.AuthUser
 	EnforceRoleFn     func(echo.Context, sandpiper.AccessRole) error
 	EnforceUserFn     func(echo.Context, int) error
 	EnforceCompanyFn  func(echo.Context, uuid.UUID) error
@@ -17,9 +17,9 @@ type RBAC struct {
 	IsLowerRoleFn     func(echo.Context, sandpiper.AccessRole) error
 }
 
-// User mock
-func (a *RBAC) User(c echo.Context) *sandpiper.AuthUser {
-	return a.UserFn(c)
+// CurrentUser mock
+func (a *RBAC) CurrentUser(c echo.Context) *sandpiper.AuthUser {
+	return a.CurrentUserFn(c)
 }
 
 // EnforceRole mock

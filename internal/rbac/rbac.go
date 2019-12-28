@@ -6,8 +6,8 @@
 package rbac
 
 import (
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
@@ -69,11 +69,11 @@ func (s *Service) isCompanyAdmin(c echo.Context) bool {
 }
 
 // AccountCreate performs auth check when creating a new account
-func (s *Service) AccountCreate(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
+func (s *Service) AccountCreate(c echo.Context, role sandpiper.AccessRole, companyID uuid.UUID) error {
 	if err := s.EnforceCompany(c, companyID); err != nil {
 		return err
 	}
-	return s.IsLowerRole(c, roleID)
+	return s.IsLowerRole(c, role)
 }
 
 // IsLowerRole checks whether the requesting user has higher role than the user it wants to change

@@ -10,13 +10,13 @@ require (
 	github.com/go-playground/universal-translator v0.16.0 // indirect
 	github.com/go-playground/validator v9.21.1+incompatible
 	github.com/golang-migrate/migrate/v4 v4.7.0
+	github.com/google/uuid v1.1.1
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/lib/pq v1.2.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20171102151520-eafdab6b0663
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/rs/zerolog v1.10.3
-	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20191029031824-8986dd9e96cf
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect

@@ -13,7 +13,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
@@ -34,12 +34,8 @@ var (
 
 // Create creates a new slice in database (assumes allowed to do this)
 func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
-	var dummy = new(sandpiper.Slice)
-
 	// don't add if the name already exists
-	sliceName := strings.ToLower(slice.Name)
-	err := db.Model(dummy).Where("lower(name) = ? and deleted_at is null", sliceName).Select()
-	if err != nil && err != pg.ErrNoRows {
+	if nameExists(db, slice.Name) {
 		return nil, ErrAlreadyExists
 	}
 
@@ -100,4 +96,11 @@ func (s *Slice) List(db orm.DB, qp *sandpiper.ListQuery, p *sandpiper.Pagination
 // Delete sets deleted_at for a slice
 func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
 	return db.Delete(slice)
+}
+
+// nameExists returns true if name found in database
+func nameExists(db orm.DB, name string) bool {
+	m := new(sandpiper.Slice)
+	err := db.Model(m).Where("lower(name) = ? and deleted_at is null", strings.ToLower(name)).Select()
+	return err == pg.ErrNoRows
 }

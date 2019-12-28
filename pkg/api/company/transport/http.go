@@ -7,9 +7,10 @@ package transport
 // company routing functions
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/satori/go.uuid"
 	"net/http"
+
+	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/pkg/api/company"
@@ -48,15 +49,15 @@ func (h *HTTP) create(c echo.Context) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}
-	usr, err := h.svc.Create(c, sandpiper.Company{
-		ID:     uuid.NewV4(),
+	result, err := h.svc.Create(c, sandpiper.Company{
+		ID:     uuid.New(),
 		Name:   r.Name,
 		Active: r.Active,
 	})
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusOK, result)
 }
 
 type listResponse struct {
@@ -77,7 +78,7 @@ func (h *HTTP) list(c echo.Context) error {
 }
 
 func (h *HTTP) view(c echo.Context) error {
-	id, err := uuid.FromString(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return ErrInvalidCompanyUUID
 	}
@@ -96,7 +97,7 @@ type updateReq struct {
 }
 
 func (h *HTTP) update(c echo.Context) error {
-	id, err := uuid.FromString(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return ErrInvalidCompanyUUID
 	}
@@ -104,7 +105,7 @@ func (h *HTTP) update(c echo.Context) error {
 	if err := c.Bind(req); err != nil {
 		return err
 	}
-	usr, err := h.svc.Update(c, &company.Update{
+	result, err := h.svc.Update(c, &company.Update{
 		ID:     id,
 		Name:   req.Name,
 		Active: req.Active,
@@ -112,11 +113,11 @@ func (h *HTTP) update(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusOK, result)
 }
 
 func (h *HTTP) delete(c echo.Context) error {
-	id, err := uuid.FromString(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return ErrInvalidCompanyUUID
 	}

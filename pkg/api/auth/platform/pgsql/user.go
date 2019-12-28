@@ -22,11 +22,9 @@ func NewUser() *User {
 
 // View returns single user by ID
 func (u *User) View(db orm.DB, id int) (*sandpiper.User, error) {
-	var user = new(sandpiper.User)
-	sql := `SELECT "user".*, "role"."id" AS "role__id", "role"."access_level" AS "role__access_level", "role"."name" AS "role__name" 
-	FROM "users" AS "user" LEFT JOIN "roles" AS "role" ON "role"."id" = "user"."role_id" 
-	WHERE ("user"."id" = ? and deleted_at is null)`
-	_, err := db.QueryOne(user, sql, id)
+	var user = &sandpiper.User{ID: id}
+
+	err := db.Select(user)
 	if err != nil {
 		return nil, err
 	}
