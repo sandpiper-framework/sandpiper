@@ -14,6 +14,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+	"github.com/satori/go.uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
@@ -61,7 +62,7 @@ func (j *Service) MWFunc() echo.MiddlewareFunc {
 			// get the JWT claims
 			claims := token.Claims.(jwt.MapClaims)
 			id := int(claims["id"].(float64))
-			companyID := int(claims["c"].(float64))
+			companyID, _ := uuid.FromString(claims["c"].(string))
 			username := claims["u"].(string)
 			email := claims["e"].(string)
 			role := sandpiper.AccessRole(claims["r"].(float64))
