@@ -13,6 +13,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// TestHash returns an sha-1 hash
+func TestHash(n int) string {
+	s := strconv.Itoa(n)
+	return s[0:1] + "a804c61e1a70ab37b912792ee846de7378c4a36"
+}
+
 // TestUUID returns a valid test uuid starting with the supplied number (1-9)
 func TestUUID(n int) uuid.UUID {
 	s := strconv.Itoa(n)
@@ -32,7 +38,8 @@ func TestTimePtr(year int) *time.Time {
 
 // HeaderValid is used for jwt testing
 func HeaderValid() string {
-	return "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidSI6ImpvaG5kb2UiLCJlIjoiam9obmRvZUBtYWlsLmNvbSIsInIiOjEsImMiOjEsImwiOjEsImV4cCI6NDEwOTMyMDg5NCwiaWF0IjoxNTE2MjM5MDIyfQ.8Fa8mhshx3tiQVzS5FoUXte5lHHC4cvaa_tzvcel38I"
+	// time elapsing??? maybe must generate a new one instead of static??
+	return "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjIjoiOWFkMDcyMzQtMjc0Mi00MGViLTllZjEtODAwYzJmMTE2NGNlIiwiZSI6ImpvaG5kb2VAbWFpbC5jb20iLCJleHAiOjE1Nzc2MzQ4NzksImlkIjoxLCJyIjoxMDAsInUiOiJhZG1pbiJ9.1i-Jwoent1Oyx0IAx4Ass7lBAjgf3O3RvxihwKCu2g4"
 }
 
 // HeaderInvalid is used for jwt testing

@@ -32,7 +32,7 @@ func TestCreate(t *testing.T) {
 		mdb      *mockdb.Company
 		rbac     *mock.RBAC
 	}{{
-		name: "CREATE Fails as Standard User",
+		name: "Fails as Standard User",
 		rbac: &mock.RBAC{
 			EnforceRoleFn: func(echo.Context, sandpiper.AccessRole) error {
 				return errors.New("forbidden error")
@@ -46,8 +46,11 @@ func TestCreate(t *testing.T) {
 			}},
 	},
 		{
-			name: "CREATE Succeeds as Company Admin",
-			args: args{req: sandpiper.Company{
+			name: "Succeeds as Company Admin",
+			wantErr: false,
+			args: args{
+				ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.CompanyAdminRole),
+				req: sandpiper.Company{
 				Name:   "Acme Brakes",
 				Active: true,
 			}},
@@ -96,7 +99,7 @@ func TestView(t *testing.T) {
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "VIEW Fails with User Permissions",
+			name: "Fails with User Permissions",
 			args: args{
 				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
 				mock.TestUUID(1),
@@ -163,7 +166,7 @@ func TestList(t *testing.T) {
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "LIST Failed on query List",
+			name: "Failed on query List",
 			args: args{c: nil, pgn: &sandpiper.Pagination{
 				Limit:  100,
 				Offset: 200,
@@ -178,7 +181,7 @@ func TestList(t *testing.T) {
 					}
 				}}},
 		{
-			name: "LIST Succeeded",
+			name: "Succeeded",
 			args: args{c: nil, pgn: &sandpiper.Pagination{
 				Limit:  100,
 				Offset: 200,
@@ -251,7 +254,7 @@ func TestDelete(t *testing.T) {
 		rbac    *mock.RBAC
 	}{
 		{
-			name:    "DELETE Fail on ViewUser",
+			name:    "Fail on ViewUser",
 			args:    args{id: mock.TestUUID(1)},
 			wantErr: errors.New("generic error"),
 			mdb: &mockdb.Company{
@@ -264,7 +267,7 @@ func TestDelete(t *testing.T) {
 			},
 		},
 		{
-			name: "DELETE Fail on RBAC",
+			name: "Fail on RBAC",
 			args: args{id: mock.TestUUID(1)},
 			mdb: &mockdb.Company{
 				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
@@ -284,7 +287,7 @@ func TestDelete(t *testing.T) {
 			wantErr: errors.New("generic error"),
 		},
 		{
-			name: "DELETE Successful",
+			name: "Successful",
 			args: args{id: mock.TestUUID(1)},
 			mdb: &mockdb.Company{
 				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
@@ -331,7 +334,7 @@ func TestUpdate(t *testing.T) {
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "UPDATE Fail on RBAC",
+			name: "Fail on RBAC",
 			args: args{upd: &company.Update{
 				ID: mock.TestUUID(1),
 			}},
@@ -342,7 +345,7 @@ func TestUpdate(t *testing.T) {
 			wantErr: errors.New("generic error"),
 		},
 		{
-			name: "UPDATE Fail on Update",
+			name: "Fail on Update",
 			args: args{upd: &company.Update{
 				ID: mock.TestUUID(1),
 			}},
@@ -367,7 +370,7 @@ func TestUpdate(t *testing.T) {
 			},
 		},
 		{
-			name: "UPDATE Success",
+			name: "Success",
 			args: args{upd: &company.Update{
 				ID:     mock.TestUUID(1),
 				Name:   "Acme Brakes",

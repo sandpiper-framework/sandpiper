@@ -59,8 +59,9 @@ To run Sandpiper in a production environment, simply download the correct binary
 
 These instructions will help you get up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-The following software must exist on your target development machine.
+The following software must be installed on your target development machine.
 
+* [git](https://git-scm.com/downloads) 
 * [Go](https://golang.org/)
 * [PostgreSQL](https://www.postgresql.org/)
 * [Task](https://taskfile.dev/)
@@ -72,8 +73,6 @@ A step by step series of examples that tell you how to get a development env run
 ```
 Give the example
 ```
-
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Endpoints
 
@@ -165,6 +164,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 9. zxcvbn-go - Password strength checker
 10. DockerTest - Testing database queries
 11. Testify/Assert - Asserting test results
-12. uuid - generate and manipulate uuid values
+12. uuid - Google's library to generate and manipulate uuid values
 
-Most of these can easily be replaced with your own choices since their usage is abstracted and localized.
+Efforts were made to abstract and localize these dependencies.

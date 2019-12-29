@@ -34,10 +34,8 @@ func (u *User) View(db orm.DB, id int) (*sandpiper.User, error) {
 // FindByUsername queries for single user by username
 func (u *User) FindByUsername(db orm.DB, uname string) (*sandpiper.User, error) {
 	var user = new(sandpiper.User)
-	sql := `SELECT "user".*, "role"."id" AS "role__id", "role"."access_level" AS "role__access_level", "role"."name" AS "role__name" 
-	FROM "users" AS "user" LEFT JOIN "roles" AS "role" ON "role"."id" = "user"."role_id" 
-	WHERE ("user"."username" = ? and deleted_at is null)`
-	_, err := db.QueryOne(user, sql, uname)
+
+	err := db.Model(user).Where("username = ?", uname).Select()
 	if err != nil {
 		return nil, err
 	}
@@ -47,11 +45,10 @@ func (u *User) FindByUsername(db orm.DB, uname string) (*sandpiper.User, error) 
 // FindByToken queries for single user by token
 func (u *User) FindByToken(db orm.DB, token string) (*sandpiper.User, error) {
 	var user = new(sandpiper.User)
-	sql := `SELECT "user".*, "role"."id" AS "role__id", "role"."access_level" AS "role__access_level", "role"."name" AS "role__name" 
-	FROM "users" AS "user" LEFT JOIN "roles" AS "role" ON "role"."id" = "user"."role_id" 
-	WHERE ("user"."token" = ? and deleted_at is null)`
-	_, err := db.QueryOne(user, sql, token)
+
+	err := db.Model(user).Where("token = ?", token).Select()
 	if err != nil {
+		return nil, err
 	}
 	return user, err
 }

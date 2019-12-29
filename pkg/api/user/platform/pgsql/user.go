@@ -34,14 +34,13 @@ var (
 // Create creates a new user in database
 func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
 	var user = new(sandpiper.User)
-	
-	err := db.Model(user).Where("lower(username) = ? or lower(email) = ? and deleted_at is null",
+
+	err := db.Model(user).Where("lower(username) = ? or lower(email) = ?",
 		strings.ToLower(usr.Username), strings.ToLower(usr.Email)).Select()
 
 	if err != nil && err != pg.ErrNoRows {
 		return nil, ErrAlreadyExists
 	}
-
 	if err := db.Insert(&usr); err != nil {
 		return nil, err
 	}
@@ -50,17 +49,12 @@ func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
 
 // View returns single user by ID
 func (u *User) View(db orm.DB, id int) (*sandpiper.User, error) {
-	var user = new(sandpiper.User)
+	var user = &sandpiper.User{ID: id}
 
-	sql := `SELECT "user".*, "role"."id" AS "role__id", "role"."access_level" AS "role__access_level", "role"."name" AS "role__name"
-	FROM "users" AS "user" LEFT JOIN "roles" AS "role" ON "role"."id" = "user"."role_id"
-	WHERE ("user"."id" = ? and deleted_at is null)`
-	_, err := db.QueryOne(user, sql, id)
-
+	err := db.Select(user)
 	if err != nil {
 		return nil, err
 	}
-
 	return user, nil
 }
 
@@ -73,7 +67,8 @@ func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 // List returns list of all users retrievable for the current user, depending on role
 func (u *User) List(db orm.DB, qp *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.User, error) {
 	var users []sandpiper.User
-	q := db.Model(&users).Column("user.*").Relation("Role").Limit(p.Limit).Offset(p.Offset).Where("deleted_at is null").Order("user.id desc")
+
+	q := db.Model(&users).Limit(p.Limit).Offset(p.Offset).Order("user.id desc")
 	if qp != nil {
 		q.Where(qp.Query, qp.ID)
 	}
@@ -83,7 +78,7 @@ func (u *User) List(db orm.DB, qp *sandpiper.ListQuery, p *sandpiper.Pagination)
 	return users, nil
 }
 
-// Delete sets deleted_at for a user
+// Delete permanently removes a user record from the database (not just making inactive)
 func (u *User) Delete(db orm.DB, user *sandpiper.User) error {
 	return db.Delete(user)
 }

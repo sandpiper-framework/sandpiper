@@ -57,6 +57,9 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
   "company_id"   uuid REFERENCES "companies" ("id"),
   "name"         text,
   "description"  text,
+  "active"       boolean,
+  "created_at"   timestamp,
+  "updated_at"   timestamp,
   PRIMARY KEY ("slice_id", "company_id")
 );
 

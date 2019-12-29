@@ -7,89 +7,82 @@ package slice_test
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/pkg/api/user"
+	"autocare.org/sandpiper/pkg/api/slice"
 	"autocare.org/sandpiper/test/mock"
 	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestCreate(t *testing.T) {
 	type args struct {
-		c   echo.Context
-		req sandpiper.User
+		ctx echo.Context
+		req sandpiper.Slice
 	}
 	cases := []struct {
 		name     string
 		args     args
 		wantErr  bool
-		wantData *sandpiper.User
-		udb      *mockdb.User
+		wantData *sandpiper.Slice
+		mdb      *mockdb.Slice
 		rbac     *mock.RBAC
-		sec      *mock.Secure
 	}{{
-		name: "Fail on is lower role",
+		name: "CREATE Fails as Standard User",
 		rbac: &mock.RBAC{
-			AccountCreateFn: func(echo.Context, sandpiper.AccessRole, int, int) error {
-				return errors.New("generic error")
+			EnforceRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				return errors.New("forbidden error")
 			}},
 		wantErr: true,
-		args: args{req: sandpiper.User{
-			FirstName: "John",
-			LastName:  "Doe",
-			Username:  "JohnDoe",
-			RoleID:    1,
-			Password:  "Thranduil8822",
-		}},
+		args: args{
+			ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
+			req: sandpiper.Slice{
+				Name:   "AAP Brake Friction",
+				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ContentCount: 1,
+				LastUpdate: time.Now(),
+			}},
 	},
 		{
-			name: "Success",
-			args: args{req: sandpiper.User{
-				FirstName: "John",
-				LastName:  "Doe",
-				Username:  "JohnDoe",
-				RoleID:    1,
-				Password:  "Thranduil8822",
+			name: "CREATE Succeeds as Company Admin",
+			args: args{req: sandpiper.Slice{
+				Name:   "AAP Brake Friction",
+				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ContentCount: 1,
+				LastUpdate: time.Now(),
 			}},
-			udb: &mockdb.User{
-				CreateFn: func(db orm.DB, u sandpiper.User) (*sandpiper.User, error) {
+			mdb: &mockdb.Slice{
+				CreateFn: func(db orm.DB, u sandpiper.Slice) (*sandpiper.Slice, error) {
 					u.CreatedAt = mock.TestTime(2000)
 					u.UpdatedAt = mock.TestTime(2000)
-					u.Base.ID = 1
+					u.ID = mock.TestUUID(1)
 					return &u, nil
 				},
 			},
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(echo.Context, sandpiper.AccessRole, int, int) error {
-					return nil
+				EnforceRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+					return errors.New("forbidden error")
 				}},
-			sec: &mock.Secure{
-				HashFn: func(string) string {
-					return "h4$h3d"
-				},
+			wantData: &sandpiper.Slice{
+				ID:        mock.TestUUID(1),
+				Name:   "AAP Brake Friction",
+				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ContentCount: 1,
+				LastUpdate: time.Now(),
 			},
-			wantData: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2000),
-					UpdatedAt: mock.TestTime(2000),
-				},
-				FirstName: "John",
-				LastName:  "Doe",
-				Username:  "JohnDoe",
-				RoleID:    1,
-				Password:  "h4$h3d",
-			}}}
+		},
+	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, tt.sec)
-			usr, err := s.Create(tt.args.c, tt.args.req)
+			s := slice.New(nil, tt.mdb, tt.rbac, nil)
+			res, err := s.Create(tt.args.ctx, tt.args.req)
 			assert.Equal(t, tt.wantErr, err != nil)
-			assert.Equal(t, tt.wantData, usr)
+			assert.Equal(t, tt.wantData, res)
 		})
 	}
 }
@@ -97,54 +90,58 @@ func TestCreate(t *testing.T) {
 func TestView(t *testing.T) {
 	type args struct {
 		c  echo.Context
-		id int
+		id uuid.UUID
 	}
 	cases := []struct {
 		name     string
 		args     args
-		wantData *sandpiper.User
+		wantData *sandpiper.Slice
 		wantErr  error
-		udb      *mockdb.User
+		mdb      *mockdb.Slice
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "Fail on RBAC",
-			args: args{id: 5},
-			rbac: &mock.RBAC{
-				EnforceUserFn: func(c echo.Context, id int) error {
-					return errors.New("generic error")
-				}},
-			wantErr: errors.New("generic error"),
-		},
-		{
-			name: "Success",
-			args: args{id: 1},
-			wantData: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2000),
-					UpdatedAt: mock.TestTime(2000),
-				},
-				FirstName: "John",
-				LastName:  "Doe",
-				Username:  "JohnDoe",
+			name: "VIEW Fails with User Permissions",
+			args: args{
+				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
+				mock.TestUUID(1),
 			},
 			rbac: &mock.RBAC{
-				EnforceUserFn: func(c echo.Context, id int) error {
+				EnforceCompanyFn: func(c echo.Context, id uuid.UUID) error {
+					return errors.New("forbidden error")
+				}},
+			wantErr: errors.New("forbidden error"),
+		},
+		{
+			name: "VIEW Success",
+			args: args{
+				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.CompanyAdminRole),
+				mock.TestUUID(1),
+			},
+			wantData: &sandpiper.Slice{
+				ID:        mock.TestUUID(1),
+				CreatedAt: mock.TestTime(2000),
+				UpdatedAt: mock.TestTime(2000),
+				Name:   "AAP Brake Friction",
+				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ContentCount: 1,
+				LastUpdate: time.Now(),
+			},
+			rbac: &mock.RBAC{
+				EnforceCompanyFn: func(c echo.Context, id uuid.UUID) error {
 					return nil
 				}},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					if id == 1 {
-						return &sandpiper.User{
-							Base: sandpiper.Base{
-								ID:        1,
-								CreatedAt: mock.TestTime(2000),
-								UpdatedAt: mock.TestTime(2000),
-							},
-							FirstName: "John",
-							LastName:  "Doe",
-							Username:  "JohnDoe",
+			mdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
+					if id == mock.TestUUID(1) {
+						return &sandpiper.Slice{
+							ID:        mock.TestUUID(1),
+							CreatedAt: mock.TestTime(2000),
+							UpdatedAt: mock.TestTime(2000),
+							Name:   "AAP Brake Friction",
+							ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+							ContentCount: 1,
+							LastUpdate: time.Now(),
 						}, nil
 					}
 					return nil, nil
@@ -153,9 +150,9 @@ func TestView(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, nil)
-			usr, err := s.View(tt.args.c, tt.args.id)
-			assert.Equal(t, tt.wantData, usr)
+			s := slice.New(nil, tt.mdb, tt.rbac, nil)
+			res, err := s.View(tt.args.c, tt.args.id)
+			assert.Equal(t, tt.wantData, res)
 			assert.Equal(t, tt.wantErr, err)
 		})
 	}
@@ -169,97 +166,88 @@ func TestList(t *testing.T) {
 	cases := []struct {
 		name     string
 		args     args
-		wantData []sandpiper.User
+		wantData []sandpiper.Slice
 		wantErr  bool
-		udb      *mockdb.User
+		mdb      *mockdb.Slice
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "Fail on query List",
+			name: "LIST Failed on query List",
 			args: args{c: nil, pgn: &sandpiper.Pagination{
 				Limit:  100,
 				Offset: 200,
 			}},
 			wantErr: true,
 			rbac: &mock.RBAC{
-				UserFn: func(c echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(c echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{
-						ID:         1,
-						CompanyID:  2,
-						Role:       sandpiper.UserRole,
+						ID:        1,
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.CompanyAdminRole,
 					}
 				}}},
 		{
-			name: "Success",
+			name: "LIST Succeeded",
 			args: args{c: nil, pgn: &sandpiper.Pagination{
 				Limit:  100,
 				Offset: 200,
 			}},
 			rbac: &mock.RBAC{
-				UserFn: func(c echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(c echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{
-						ID:         1,
-						CompanyID:  2,
-						Role:       sandpiper.AdminRole,
+						ID:        1,
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.AdminRole,
 					}
 				}},
-			udb: &mockdb.User{
-				ListFn: func(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.User, error) {
-					return []sandpiper.User{
+			mdb: &mockdb.Slice{
+				ListFn: func(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+					return []sandpiper.Slice{
 						{
-							Base: sandpiper.Base{
-								ID:        1,
-								CreatedAt: mock.TestTime(1999),
-								UpdatedAt: mock.TestTime(2000),
-							},
-							FirstName: "John",
-							LastName:  "Doe",
-							Email:     "johndoe@gmail.com",
-							Username:  "johndoe",
+							ID:        mock.TestUUID(1),
+							CreatedAt: mock.TestTime(1999),
+							UpdatedAt: mock.TestTime(2000),
+							Name:   "AAP Brake Friction",
+							ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+							ContentCount: 1,
+							LastUpdate: time.Now(),
 						},
 						{
-							Base: sandpiper.Base{
-								ID:        2,
-								CreatedAt: mock.TestTime(2001),
-								UpdatedAt: mock.TestTime(2002),
-							},
-							FirstName: "Hunter",
-							LastName:  "Logan",
-							Email:     "logan@aol.com",
-							Username:  "hunterlogan",
+							ID:        mock.TestUUID(2),
+							CreatedAt: mock.TestTime(2001),
+							UpdatedAt: mock.TestTime(2002),
+							Name:   "AAP Premium Wipers",
+							ContentHash: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+							ContentCount: 1,
+							LastUpdate: time.Now(),
 						},
 					}, nil
 				}},
-			wantData: []sandpiper.User{
+			wantData: []sandpiper.Slice{
 				{
-					Base: sandpiper.Base{
-						ID:        1,
-						CreatedAt: mock.TestTime(1999),
-						UpdatedAt: mock.TestTime(2000),
-					},
-					FirstName: "John",
-					LastName:  "Doe",
-					Email:     "johndoe@gmail.com",
-					Username:  "johndoe",
+					ID:        mock.TestUUID(1),
+					CreatedAt: mock.TestTime(1999),
+					UpdatedAt: mock.TestTime(2000),
+					ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+					ContentCount: 1,
+					LastUpdate: time.Now(),
 				},
 				{
-					Base: sandpiper.Base{
-						ID:        2,
-						CreatedAt: mock.TestTime(2001),
-						UpdatedAt: mock.TestTime(2002),
-					},
-					FirstName: "Hunter",
-					LastName:  "Logan",
-					Email:     "logan@aol.com",
-					Username:  "hunterlogan",
+					ID:        mock.TestUUID(2),
+					CreatedAt: mock.TestTime(2001),
+					UpdatedAt: mock.TestTime(2002),
+					Name:   "AAP Premium Wipers",
+					ContentHash: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+					ContentCount: 1,
+					LastUpdate: time.Now(),
 				}},
 		},
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, nil)
-			usrs, err := s.List(tt.args.c, tt.args.pgn)
-			assert.Equal(t, tt.wantData, usrs)
+			s := slice.New(nil, tt.mdb, tt.rbac, nil)
+			res, err := s.List(tt.args.c, tt.args.pgn)
+			assert.Equal(t, tt.wantData, res)
 			assert.Equal(t, tt.wantErr, err != nil)
 		})
 	}
@@ -269,22 +257,22 @@ func TestList(t *testing.T) {
 func TestDelete(t *testing.T) {
 	type args struct {
 		c  echo.Context
-		id int
+		id uuid.UUID
 	}
 	cases := []struct {
 		name    string
 		args    args
 		wantErr error
-		udb     *mockdb.User
+		mdb     *mockdb.Slice
 		rbac    *mock.RBAC
 	}{
 		{
-			name:    "Fail on ViewUser",
-			args:    args{id: 1},
+			name:    "DELETE Fail on ViewUser",
+			args:    args{id: mock.TestUUID(1)},
 			wantErr: errors.New("generic error"),
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					if id != 1 {
+			mdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
+					if id != mock.TestUUID(1) {
 						return nil, nil
 					}
 					return nil, errors.New("generic error")
@@ -292,21 +280,18 @@ func TestDelete(t *testing.T) {
 			},
 		},
 		{
-			name: "Fail on RBAC",
-			args: args{id: 1},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        id,
-							CreatedAt: mock.TestTime(1999),
-							UpdatedAt: mock.TestTime(2000),
-						},
-						FirstName: "John",
-						LastName:  "Doe",
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.UserRole,
-						},
+			name: "DELETE Fail on RBAC",
+			args: args{id: mock.TestUUID(1)},
+			mdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
+					return &sandpiper.Slice{
+						ID:        mock.TestUUID(1),
+						CreatedAt: mock.TestTime(1999),
+						UpdatedAt: mock.TestTime(2000),
+						Name:   "AAP Brake Friction",
+						ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+						ContentCount: 1,
+						LastUpdate: time.Now(),
 					}, nil
 				},
 			},
@@ -317,26 +302,21 @@ func TestDelete(t *testing.T) {
 			wantErr: errors.New("generic error"),
 		},
 		{
-			name: "Success",
-			args: args{id: 1},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        id,
-							CreatedAt: mock.TestTime(1999),
-							UpdatedAt: mock.TestTime(2000),
-						},
-						FirstName: "John",
-						LastName:  "Doe",
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.AdminRole,
-							ID:          2,
-							Name:        "Admin",
-						},
+			name: "DELETE Successful",
+			args: args{id: mock.TestUUID(1)},
+			mdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
+					return &sandpiper.Slice{
+						ID:        mock.TestUUID(1),
+						CreatedAt: mock.TestTime(1999),
+						UpdatedAt: mock.TestTime(2000),
+						Name:   "AAP Brake Friction",
+						ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+						ContentCount: 1,
+						LastUpdate: time.Now(),
 					}, nil
 				},
-				DeleteFn: func(db orm.DB, usr *sandpiper.User) error {
+				DeleteFn: func(db orm.DB, usr *sandpiper.Slice) error {
 					return nil
 				},
 			},
@@ -348,7 +328,7 @@ func TestDelete(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, nil)
+			s := slice.New(nil, tt.mdb, tt.rbac, nil)
 			err := s.Delete(tt.args.c, tt.args.id)
 			if err != tt.wantErr {
 				t.Errorf("Expected error %v, received %v", tt.wantErr, err)
@@ -360,20 +340,20 @@ func TestDelete(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	type args struct {
 		c   echo.Context
-		upd *user.Update
+		upd *slice.Update
 	}
 	cases := []struct {
 		name     string
 		args     args
-		wantData *sandpiper.User
+		wantData *sandpiper.Slice
 		wantErr  error
-		udb      *mockdb.User
+		mdb      *mockdb.Slice
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "Fail on RBAC",
-			args: args{upd: &user.Update{
-				ID: 1,
+			name: "UPDATE Fail on RBAC",
+			args: args{upd: &slice.Update{
+				ID: mock.TestUUID(1),
 			}},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
@@ -382,86 +362,68 @@ func TestUpdate(t *testing.T) {
 			wantErr: errors.New("generic error"),
 		},
 		{
-			name: "Fail on Update",
-			args: args{upd: &user.Update{
-				ID: 1,
+			name: "UPDATE Fail on Update",
+			args: args{upd: &slice.Update{
+				ID: mock.TestUUID(1),
 			}},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
 					return nil
 				}},
 			wantErr: errors.New("generic error"),
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        1,
-							CreatedAt: mock.TestTime(1990),
-							UpdatedAt: mock.TestTime(1991),
-						},
-						CompanyID:  1,
-						RoleID:     3,
-						FirstName:  "John",
-						LastName:   "Doe",
-						Mobile:     "123456",
-						Phone:      "234567",
-						Address:    "Work Address",
-						Email:      "golang@go.org",
+			mdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
+					return &sandpiper.Slice{
+						ID:        mock.TestUUID(1),
+						CreatedAt: mock.TestTime(1990),
+						UpdatedAt: mock.TestTime(1991),
+						Name:   "AAP Brake Friction",
+						ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+						ContentCount: 1,
+						LastUpdate: time.Now(),
 					}, nil
 				},
-				UpdateFn: func(db orm.DB, usr *sandpiper.User) error {
+				UpdateFn: func(db orm.DB, usr *sandpiper.Slice) error {
 					return errors.New("generic error")
 				},
 			},
 		},
 		{
-			name: "Success",
-			args: args{upd: &user.Update{
-				ID:        1,
-				FirstName: "John",
-				LastName:  "Doe",
-				Mobile:    "123456",
-				Phone:     "234567",
+			name: "UPDATE Success",
+			args: args{upd: &slice.Update{
+				ID:     mock.TestUUID(1),
+				Name:   "AAP Brake Friction",
+				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ContentCount: 1,
+				LastUpdate: time.Now(),
 			}},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
 					return nil
 				}},
-			wantData: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(1990),
-					UpdatedAt: mock.TestTime(2000),
-				},
-				CompanyID:  1,
-				RoleID:     3,
-				FirstName:  "John",
-				LastName:   "Doe",
-				Mobile:     "123456",
-				Phone:      "234567",
-				Address:    "Work Address",
-				Email:      "golang@go.org",
+			wantData: &sandpiper.Slice{
+				ID:        mock.TestUUID(1),
+				CreatedAt: mock.TestTime(1990),
+				UpdatedAt: mock.TestTime(2000),
+				Name:   "AAP Brake Friction",
+				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ContentCount: 1,
+				LastUpdate: time.Now(),
 			},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        1,
-							CreatedAt: mock.TestTime(1990),
-							UpdatedAt: mock.TestTime(2000),
-						},
-						CompanyID:  1,
-						RoleID:     3,
-						FirstName:  "John",
-						LastName:   "Doe",
-						Mobile:     "123456",
-						Phone:      "234567",
-						Address:    "Work Address",
-						Email:      "golang@go.org",
+			mdb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
+					return &sandpiper.Slice{
+						ID:        mock.TestUUID(1),
+						CreatedAt: mock.TestTime(1990),
+						UpdatedAt: mock.TestTime(2000),
+						Name:   "AAP Brake Friction",
+						ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+						ContentCount: 1,
+						LastUpdate: time.Now(),
 					}, nil
 				},
-				UpdateFn: func(db orm.DB, usr *sandpiper.User) error {
-					usr.UpdatedAt = mock.TestTime(2000)
+				UpdateFn: func(db orm.DB, slice *sandpiper.Slice) error {
+					slice.UpdatedAt = mock.TestTime(2000)
 					return nil
 				},
 			},
@@ -469,7 +431,7 @@ func TestUpdate(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, nil)
+			s := slice.New(nil, tt.mdb, tt.rbac, nil)
 			usr, err := s.Update(tt.args.c, tt.args.upd)
 			assert.Equal(t, tt.wantData, usr)
 			assert.Equal(t, tt.wantErr, err)
@@ -478,8 +440,8 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestInitialize(t *testing.T) {
-	u := user.Initialize(nil, nil, nil)
-	if u == nil {
-		t.Error("User service not initialized")
+	s := slice.Initialize(nil, nil, nil)
+	if s == nil {
+		t.Error("Slice service not initialized")
 	}
 }

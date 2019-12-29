@@ -45,15 +45,23 @@ tasks:
       - echo '{{.GO_PACKAGES}}'
     silent: true
 
+  go-bindata:
+    desc: Add go-bindata dependency and install it if necessary
+    cmds:
+      - go get -u github.com/go-bindata/go-bindata/...
+    silent: true
+
   bindata-server:
     desc: Use go-bindata to encode file migrations in a go source file
     dir: pkg/api/migrations
+    deps: [go-bindata]
     cmds:
       - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
 
   bindata-client:
     desc: Use go-bindata to encode file migrations in a go source file
     dir: pkg/client/migrations
+    deps: [go-bindata]
     cmds:
       - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
 
@@ -82,7 +90,7 @@ tasks:
     deps: [build-server, build-client]
 
   test:
-    desc: Run test suite (currently doesn't work with tests using dockertest under windows!)
+    desc: Run test suite
     cmds:
       - echo " *** Running Coverage Tests ***"
       - go test -v -race -coverprofile=profile.out -covermode=atomic ./...

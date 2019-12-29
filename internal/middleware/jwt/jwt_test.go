@@ -49,7 +49,7 @@ func TestMWFunc(t *testing.T) {
 			wantStatus: http.StatusUnauthorized,
 		},
 		{
-			name:       "Success",
+			name:       "Header Success",
 			header:     mock.HeaderValid(),
 			wantStatus: http.StatusOK,
 		},

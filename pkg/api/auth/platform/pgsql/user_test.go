@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package pgsql_test
 
 import (
@@ -23,10 +27,11 @@ func TestView(t *testing.T) {
 			id:      1000,
 		},
 		{
-			name: "Success",
-			id:   2,
+			name:    "Success",
+			wantErr: false,
+			id:      1,
 			wantData: &sandpiper.User{
-				ID:        2,
+				ID:        1,
 				Email:     "tomjones@mail.com",
 				FirstName: "Tom",
 				LastName:  "Jones",
@@ -43,6 +48,11 @@ func TestView(t *testing.T) {
 
 	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
+	// seed with what we want to find
+	if err := mock.InsertMultiple(db, cases[1].wantData); err != nil {
+		t.Error(err)
+	}
+
 	udb := pgsql.NewUser()
 
 	for _, tt := range cases {
@@ -53,8 +63,8 @@ func TestView(t *testing.T) {
 				if user == nil {
 					t.Errorf("response was nil due to: %v", err)
 				} else {
-					tt.wantData.CreatedAt = user.CreatedAt
-					tt.wantData.UpdatedAt = user.UpdatedAt
+					tt.wantData.CreatedAt = user.CreatedAt // should be set by the insert
+					tt.wantData.UpdatedAt = user.UpdatedAt // should be set by the insert
 					assert.Equal(t, tt.wantData, user)
 				}
 			}
@@ -76,6 +86,7 @@ func TestFindByUsername(t *testing.T) {
 		},
 		{
 			name:     "Success",
+			wantErr:  false,
 			username: "tomjones",
 			wantData: &sandpiper.User{
 				ID:        2,
@@ -95,18 +106,21 @@ func TestFindByUsername(t *testing.T) {
 
 	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
+	// seed with what we want to find
+	if err := mock.InsertMultiple(db, cases[1].wantData); err != nil {
+		t.Error(err)
+	}
+
 	udb := pgsql.NewUser()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			user, err := udb.FindByUsername(db, tt.username)
 			assert.Equal(t, tt.wantErr, err != nil)
-
 			if tt.wantData != nil {
-				tt.wantData.CreatedAt = user.CreatedAt
-				tt.wantData.UpdatedAt = user.UpdatedAt
+				tt.wantData.CreatedAt = user.CreatedAt // should be set by the insert
+				tt.wantData.UpdatedAt = user.UpdatedAt // should be set by the insert
 				assert.Equal(t, tt.wantData, user)
-
 			}
 		})
 	}
@@ -146,6 +160,11 @@ func TestFindByToken(t *testing.T) {
 
 	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
+	// seed with what we want to find
+	if err := mock.InsertMultiple(db, cases[1].wantData); err != nil {
+		t.Error(err)
+	}
+
 	udb := pgsql.NewUser()
 
 	for _, tt := range cases {
@@ -154,8 +173,8 @@ func TestFindByToken(t *testing.T) {
 			assert.Equal(t, tt.wantErr, err != nil)
 
 			if tt.wantData != nil {
-				tt.wantData.CreatedAt = user.CreatedAt
-				tt.wantData.UpdatedAt = user.UpdatedAt
+				tt.wantData.CreatedAt = user.CreatedAt // should be set by the insert
+				tt.wantData.UpdatedAt = user.UpdatedAt // should be set by the insert
 				assert.Equal(t, tt.wantData, user)
 
 			}
@@ -173,7 +192,7 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "Success",
 			usr: &sandpiper.User{
-				ID:        2,
+				ID:        1,
 				FirstName: "Z",
 				LastName:  "Freak",
 				Phone:     "123456",
@@ -197,6 +216,11 @@ func TestUpdate(t *testing.T) {
 
 	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
+	// seed with original values before update
+	if err := mock.InsertMultiple(db, cases[0].usr); err != nil {
+		t.Error(err)
+	}
+
 	udb := pgsql.NewUser()
 
 	for _, tt := range cases {
@@ -204,15 +228,13 @@ func TestUpdate(t *testing.T) {
 			err := udb.Update(db, tt.wantData)
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
-				user := &sandpiper.User{
-					ID: tt.usr.ID,
-				}
+				user := &sandpiper.User{ID: tt.usr.ID}
 				if err := db.Select(user); err != nil {
 					t.Error(err)
 				}
-				tt.wantData.UpdatedAt = user.UpdatedAt
-				tt.wantData.CreatedAt = user.CreatedAt
-				tt.wantData.LastLogin = user.LastLogin
+				tt.wantData.UpdatedAt = user.UpdatedAt // should be set by the update
+				tt.wantData.CreatedAt = user.CreatedAt // should be set by the update
+				tt.wantData.LastLogin = user.LastLogin // should be set by the update (??)
 				assert.Equal(t, tt.wantData, user)
 			}
 		})

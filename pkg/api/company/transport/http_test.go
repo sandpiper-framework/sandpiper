@@ -325,13 +325,13 @@ func TestUpdate(t *testing.T) {
 		{
 			name:       "Fail on validation",
 			id:         `1`,
-			req:        `{"first_name":"j","last_name":"okocha","mobile":"123456","phone":"321321","address":"home"}`,
+			req:        `{"first_name":"john","last_name":"doe","phone":"321321"}`,
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Fail on RBAC",
 			id:   `1`,
-			req:  `{"first_name":"jj","last_name":"okocha","mobile":"123456","phone":"321321","address":"home"}`,
+			req:  `{"first_name":"john","last_name":"doe","phone":"321321"}`,
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(echo.Context, int) error {
 					return echo.ErrForbidden
@@ -342,7 +342,7 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "Success",
 			id:   `1`,
-			req:  `{"first_name":"jj","last_name":"okocha","phone":"321321","address":"home"}`,
+			req:  `{"first_name":"john","last_name":"doe","phone":"321321"}`,
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(echo.Context, int) error {
 					return nil

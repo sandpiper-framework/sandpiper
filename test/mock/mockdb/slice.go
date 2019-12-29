@@ -2,46 +2,47 @@ package mockdb
 
 import (
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/internal/model"
 )
 
 // Slice database mock
 type Slice struct {
-	CreateFn         func(orm.DB, sandpiper.User) (*sandpiper.User, error)
-	ViewFn           func(orm.DB, int) (*sandpiper.User, error)
-	FindByNameFn     func(orm.DB, string) (*sandpiper.User, error)
-	ListFn           func(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.User, error)
-	DeleteFn         func(orm.DB, *sandpiper.User) error
-	UpdateFn         func(orm.DB, *sandpiper.User) error
+	CreateFn         func(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
+	ViewFn           func(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
+	ViewByCompanyFn  func(orm.DB, uuid.UUID, uuid.UUID) (*sandpiper.Slice, error)
+	ListFn           func(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.Slice, error)
+	DeleteFn         func(orm.DB, *sandpiper.Slice) error
+	UpdateFn         func(orm.DB, *sandpiper.Slice) error
 }
 
 // Create mock
-func (s *Slice) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
-	return s.CreateFn(db, usr)
+func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
+	return s.CreateFn(db, slice)
 }
 
 // View mock
-func (s *Slice) View(db orm.DB, id int) (*sandpiper.User, error) {
+func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 	return s.ViewFn(db, id)
 }
 
-// FindByName mock
-func (s *Slice) FindByUsername(db orm.DB, uname string) (*sandpiper.User, error) {
-	return s.FindByNameFn(db, uname)
+// ViewByCompany mock
+func (s *Slice) ViewByCompany(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
+	return s.ViewByCompanyFn(db, companyID, sliceID)
 }
 
 // List mock
-func (s *Slice) List(db orm.DB, lq *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.User, error) {
+func (s *Slice) List(db orm.DB, lq *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	return s.ListFn(db, lq, p)
 }
 
 // Delete mock
-func (s *Slice) Delete(db orm.DB, usr *sandpiper.User) error {
-	return s.DeleteFn(db, usr)
+func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
+	return s.DeleteFn(db, slice)
 }
 
 // Update mock
-func (s *Slice) Update(db orm.DB, usr *sandpiper.User) error {
-	return s.UpdateFn(db, usr)
+func (s *Slice) Update(db orm.DB, slice *sandpiper.Slice) error {
+	return s.UpdateFn(db, slice)
 }

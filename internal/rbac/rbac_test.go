@@ -15,12 +15,12 @@ import (
 func TestUser(t *testing.T) {
 	ctx := mock.EchoCtxWithKeys([]string{
 		"id", "company_id", "username", "email", "role"},
-		9, 15, "ribice", "ribice@gmail.com", sandpiper.SuperAdminRole)
+		9, mock.TestUUID(1), "sandy", "sandy@gmail.com", sandpiper.SuperAdminRole)
 	wantUser := &sandpiper.AuthUser{
 		ID:        9,
-		Username:  "ribice",
+		Username:  "sandy",
 		CompanyID: mock.TestUUID(1),
-		Email:     "ribice@gmail.com",
+		Email:     "sandy@gmail.com",
 		Role:      sandpiper.SuperAdminRole,
 	}
 	rbacSvc := rbac.New()
@@ -143,30 +143,29 @@ func TestAccountCreate(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// todo: fix the "role:" numbers below!!!
 		{
 			name:    "Different company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.UserRole), role: 500, company_id: mock.TestUUID(2)},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.UserRole), role: 200, company_id: mock.TestUUID(2)},
 			wantErr: true,
 		},
 		{
 			name:    "Different company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.CompanyAdminRole), role: 400, company_id: mock.TestUUID(2)},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.CompanyAdminRole), role: 120, company_id: mock.TestUUID(2)},
 			wantErr: false,
 		},
 		{
 			name:    "Same company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.CompanyAdminRole), role: 500, company_id: mock.TestUUID(1)},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.CompanyAdminRole), role: 120, company_id: mock.TestUUID(1)},
 			wantErr: false,
 		},
 		{
 			name:    "Same company, creating user role, admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.CompanyAdminRole), role: 500, company_id: mock.TestUUID(1)},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.CompanyAdminRole), role: 120, company_id: mock.TestUUID(1)},
 			wantErr: false,
 		},
 		{
 			name:    "Different everything, admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), 3, sandpiper.AdminRole), role: 200, company_id: mock.TestUUID(2)},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.AdminRole), role: 110, company_id: mock.TestUUID(2)},
 			wantErr: false,
 		},
 	}
