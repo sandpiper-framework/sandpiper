@@ -30,16 +30,14 @@ func TestView(t *testing.T) {
 			name: "Success",
 			id:   2,
 			wantData: &sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Tom",
-				LastName:   "Jones",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "newPass",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+				ID:        2,
+				Email:     "tomjones@mail.com",
+				FirstName: "Tom",
+				LastName:  "Jones",
+				Username:  "tomjones",
+				Role:      sandpiper.SuperAdminRole,
+				CompanyID: mock.TestUUID(1),
+				Password:  "newPass",
 			},
 		},
 	}
@@ -85,30 +83,22 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "Success",
 			usr: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+				ID:        2,
 				FirstName: "Z",
 				LastName:  "Freak",
-				Address:   "Address",
 				Phone:     "123456",
-				Mobile:    "345678",
 				Username:  "newUsername",
 			},
 			wantData: &sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Z",
-				LastName:   "Freak",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "newPass",
-				Address:    "Address",
-				Phone:      "123456",
-				Mobile:     "345678",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+				ID:        2,
+				Email:     "tomjones@mail.com",
+				FirstName: "Z",
+				LastName:  "Freak",
+				Username:  "tomjones",
+				Role:      sandpiper.SuperAdminRole,
+				CompanyID: mock.TestUUID(1),
+				Password:  "newPass",
+				Phone:     "123456",
 			},
 		},
 	}
@@ -133,9 +123,7 @@ func TestUpdate(t *testing.T) {
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
 				user := &sandpiper.User{
-					Base: sandpiper.Base{
-						ID: tt.usr.ID,
-					},
+					ID: tt.usr.ID,
 				}
 				if err := db.Select(user); err != nil {
 					t.Error(err)
@@ -143,7 +131,6 @@ func TestUpdate(t *testing.T) {
 				tt.wantData.UpdatedAt = user.UpdatedAt
 				tt.wantData.CreatedAt = user.CreatedAt
 				tt.wantData.LastLogin = user.LastLogin
-				tt.wantData.DeletedAt = user.DeletedAt
 				assert.Equal(t, tt.wantData, user)
 			}
 		})

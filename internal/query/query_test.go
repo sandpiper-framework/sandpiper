@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/query"
+	"autocare.org/sandpiper/test/mock"
 )
 
 func TestList(t *testing.T) {
@@ -29,11 +31,11 @@ func TestList(t *testing.T) {
 			name: "Company admin user",
 			args: args{user: &sandpiper.AuthUser{
 				Role:      sandpiper.CompanyAdminRole,
-				CompanyID: 1,
+				CompanyID: mock.TestUUID(1),
 			}},
 			wantData: &sandpiper.ListQuery{
 				Query: "company_id = ?",
-				ID:    1},
+				ID:    mock.TestUUID(1)},
 		},
 		{
 			name: "Normal user",
@@ -45,9 +47,10 @@ func TestList(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			q, err := List(tt.args.user)
+			q, err := query.List(tt.args.user)
 			assert.Equal(t, tt.wantData, q)
 			assert.Equal(t, tt.wantErr, err)
 		})
 	}
 }
+

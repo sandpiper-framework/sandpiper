@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package company_test
 
 import (
@@ -5,87 +9,75 @@ import (
 	"testing"
 
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/pkg/api/user"
+	"autocare.org/sandpiper/pkg/api/company"
 	"autocare.org/sandpiper/test/mock"
 	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestCreate(t *testing.T) {
 	type args struct {
-		c   echo.Context
-		req sandpiper.User
+		ctx echo.Context
+		req sandpiper.Company
 	}
 	cases := []struct {
 		name     string
 		args     args
 		wantErr  bool
-		wantData *sandpiper.User
-		udb      *mockdb.User
+		wantData *sandpiper.Company
+		mdb      *mockdb.Company
 		rbac     *mock.RBAC
-		sec      *mock.Secure
 	}{{
-		name: "Fail on is lower role",
+		name: "CREATE Fails as Standard User",
 		rbac: &mock.RBAC{
-			AccountCreateFn: func(echo.Context, sandpiper.AccessRole, int, int) error {
-				return errors.New("generic error")
+			EnforceRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				return errors.New("forbidden error")
 			}},
 		wantErr: true,
-		args: args{req: sandpiper.User{
-			FirstName: "John",
-			LastName:  "Doe",
-			Username:  "JohnDoe",
-			RoleID:    1,
-			Password:  "Thranduil8822",
-		}},
+		args: args{
+			ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
+			req: sandpiper.Company{
+				Name:   "Acme Brakes",
+				Active: true,
+			}},
 	},
 		{
-			name: "Success",
-			args: args{req: sandpiper.User{
-				FirstName: "John",
-				LastName:  "Doe",
-				Username:  "JohnDoe",
-				RoleID:    1,
-				Password:  "Thranduil8822",
+			name: "CREATE Succeeds as Company Admin",
+			args: args{req: sandpiper.Company{
+				Name:   "Acme Brakes",
+				Active: true,
 			}},
-			udb: &mockdb.User{
-				CreateFn: func(db orm.DB, u sandpiper.User) (*sandpiper.User, error) {
+			mdb: &mockdb.Company{
+				CreateFn: func(db orm.DB, u sandpiper.Company) (*sandpiper.Company, error) {
 					u.CreatedAt = mock.TestTime(2000)
 					u.UpdatedAt = mock.TestTime(2000)
-					u.Base.ID = 1
+					u.ID = mock.TestUUID(1)
 					return &u, nil
 				},
 			},
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(echo.Context, sandpiper.AccessRole, int, int) error {
-					return nil
+				EnforceRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+					return errors.New("forbidden error")
 				}},
-			sec: &mock.Secure{
-				HashFn: func(string) string {
-					return "h4$h3d"
-				},
+			wantData: &sandpiper.Company{
+				ID:        mock.TestUUID(1),
+				CreatedAt: mock.TestTime(2000),
+				UpdatedAt: mock.TestTime(2000),
+				Name:      "Acme Brakes",
+				Active:    true,
 			},
-			wantData: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2000),
-					UpdatedAt: mock.TestTime(2000),
-				},
-				FirstName: "John",
-				LastName:  "Doe",
-				Username:  "JohnDoe",
-				RoleID:    1,
-				Password:  "h4$h3d",
-			}}}
+		},
+	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, tt.sec)
-			usr, err := s.Create(tt.args.c, tt.args.req)
+			s := company.New(nil, tt.mdb, tt.rbac, nil)
+			res, err := s.Create(tt.args.ctx, tt.args.req)
 			assert.Equal(t, tt.wantErr, err != nil)
-			assert.Equal(t, tt.wantData, usr)
+			assert.Equal(t, tt.wantData, res)
 		})
 	}
 }
@@ -93,54 +85,54 @@ func TestCreate(t *testing.T) {
 func TestView(t *testing.T) {
 	type args struct {
 		c  echo.Context
-		id int
+		id uuid.UUID
 	}
 	cases := []struct {
 		name     string
 		args     args
-		wantData *sandpiper.User
+		wantData *sandpiper.Company
 		wantErr  error
-		udb      *mockdb.User
+		mdb      *mockdb.Company
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "Fail on RBAC",
-			args: args{id: 5},
-			rbac: &mock.RBAC{
-				EnforceUserFn: func(c echo.Context, id int) error {
-					return errors.New("generic error")
-				}},
-			wantErr: errors.New("generic error"),
-		},
-		{
-			name: "Success",
-			args: args{id: 1},
-			wantData: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2000),
-					UpdatedAt: mock.TestTime(2000),
-				},
-				FirstName: "John",
-				LastName:  "Doe",
-				Username:  "JohnDoe",
+			name: "VIEW Fails with User Permissions",
+			args: args{
+				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
+				mock.TestUUID(1),
 			},
 			rbac: &mock.RBAC{
-				EnforceUserFn: func(c echo.Context, id int) error {
+				EnforceCompanyFn: func(c echo.Context, id uuid.UUID) error {
+					return errors.New("forbidden error")
+				}},
+			wantErr: errors.New("forbidden error"),
+		},
+		{
+			name: "VIEW Success",
+			args: args{
+				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.CompanyAdminRole),
+				mock.TestUUID(1),
+			},
+			wantData: &sandpiper.Company{
+				ID:        mock.TestUUID(1),
+				CreatedAt: mock.TestTime(2000),
+				UpdatedAt: mock.TestTime(2000),
+				Name:      "Acme Brakes",
+				Active:    true,
+			},
+			rbac: &mock.RBAC{
+				EnforceCompanyFn: func(c echo.Context, id uuid.UUID) error {
 					return nil
 				}},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					if id == 1 {
-						return &sandpiper.User{
-							Base: sandpiper.Base{
-								ID:        1,
-								CreatedAt: mock.TestTime(2000),
-								UpdatedAt: mock.TestTime(2000),
-							},
-							FirstName: "John",
-							LastName:  "Doe",
-							Username:  "JohnDoe",
+			mdb: &mockdb.Company{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
+					if id == mock.TestUUID(1) {
+						return &sandpiper.Company{
+							ID:        mock.TestUUID(1),
+							CreatedAt: mock.TestTime(2000),
+							UpdatedAt: mock.TestTime(2000),
+							Name:      "Acme Brakes",
+							Active:    true,
 						}, nil
 					}
 					return nil, nil
@@ -149,9 +141,9 @@ func TestView(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, nil)
-			usr, err := s.View(tt.args.c, tt.args.id)
-			assert.Equal(t, tt.wantData, usr)
+			s := company.New(nil, tt.mdb, tt.rbac, nil)
+			res, err := s.View(tt.args.c, tt.args.id)
+			assert.Equal(t, tt.wantData, res)
 			assert.Equal(t, tt.wantErr, err)
 		})
 	}
@@ -165,97 +157,81 @@ func TestList(t *testing.T) {
 	cases := []struct {
 		name     string
 		args     args
-		wantData []sandpiper.User
+		wantData []sandpiper.Company
 		wantErr  bool
-		udb      *mockdb.User
+		mdb      *mockdb.Company
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "Fail on query List",
+			name: "LIST Failed on query List",
 			args: args{c: nil, pgn: &sandpiper.Pagination{
 				Limit:  100,
 				Offset: 200,
 			}},
 			wantErr: true,
 			rbac: &mock.RBAC{
-				UserFn: func(c echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(c echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{
-						ID:         1,
-						CompanyID:  2,
-						Role:       sandpiper.UserRole,
+						ID:        1,
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.CompanyAdminRole,
 					}
 				}}},
 		{
-			name: "Success",
+			name: "LIST Succeeded",
 			args: args{c: nil, pgn: &sandpiper.Pagination{
 				Limit:  100,
 				Offset: 200,
 			}},
 			rbac: &mock.RBAC{
-				UserFn: func(c echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(c echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{
-						ID:         1,
-						CompanyID:  2,
-						Role:       sandpiper.AdminRole,
+						ID:        1,
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.AdminRole,
 					}
 				}},
-			udb: &mockdb.User{
-				ListFn: func(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.User, error) {
-					return []sandpiper.User{
+			mdb: &mockdb.Company{
+				ListFn: func(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.Company, error) {
+					return []sandpiper.Company{
 						{
-							Base: sandpiper.Base{
-								ID:        1,
-								CreatedAt: mock.TestTime(1999),
-								UpdatedAt: mock.TestTime(2000),
-							},
-							FirstName: "John",
-							LastName:  "Doe",
-							Email:     "johndoe@gmail.com",
-							Username:  "johndoe",
+							ID:        mock.TestUUID(1),
+							CreatedAt: mock.TestTime(1999),
+							UpdatedAt: mock.TestTime(2000),
+							Name:      "Acme Brakes",
+							Active:    true,
 						},
 						{
-							Base: sandpiper.Base{
-								ID:        2,
-								CreatedAt: mock.TestTime(2001),
-								UpdatedAt: mock.TestTime(2002),
-							},
-							FirstName: "Hunter",
-							LastName:  "Logan",
-							Email:     "logan@aol.com",
-							Username:  "hunterlogan",
+							ID:        mock.TestUUID(2),
+							CreatedAt: mock.TestTime(2001),
+							UpdatedAt: mock.TestTime(2002),
+							Name:      "Acme Wipers",
+							Active:    true,
 						},
 					}, nil
 				}},
-			wantData: []sandpiper.User{
+			wantData: []sandpiper.Company{
 				{
-					Base: sandpiper.Base{
-						ID:        1,
-						CreatedAt: mock.TestTime(1999),
-						UpdatedAt: mock.TestTime(2000),
-					},
-					FirstName: "John",
-					LastName:  "Doe",
-					Email:     "johndoe@gmail.com",
-					Username:  "johndoe",
+					ID:        mock.TestUUID(1),
+					CreatedAt: mock.TestTime(1999),
+					UpdatedAt: mock.TestTime(2000),
+					Name:      "Acme Brakes",
+					Active:    true,
 				},
 				{
-					Base: sandpiper.Base{
-						ID:        2,
-						CreatedAt: mock.TestTime(2001),
-						UpdatedAt: mock.TestTime(2002),
-					},
-					FirstName: "Hunter",
-					LastName:  "Logan",
-					Email:     "logan@aol.com",
-					Username:  "hunterlogan",
+					ID:        mock.TestUUID(2),
+					CreatedAt: mock.TestTime(2001),
+					UpdatedAt: mock.TestTime(2002),
+					Name:      "Acme Wipers",
+					Active:    true,
 				}},
 		},
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, nil)
-			usrs, err := s.List(tt.args.c, tt.args.pgn)
-			assert.Equal(t, tt.wantData, usrs)
+			s := company.New(nil, tt.mdb, tt.rbac, nil)
+			res, err := s.List(tt.args.c, tt.args.pgn)
+			assert.Equal(t, tt.wantData, res)
 			assert.Equal(t, tt.wantErr, err != nil)
 		})
 	}
@@ -265,22 +241,22 @@ func TestList(t *testing.T) {
 func TestDelete(t *testing.T) {
 	type args struct {
 		c  echo.Context
-		id int
+		id uuid.UUID
 	}
 	cases := []struct {
 		name    string
 		args    args
 		wantErr error
-		udb     *mockdb.User
+		mdb     *mockdb.Company
 		rbac    *mock.RBAC
 	}{
 		{
-			name:    "Fail on ViewUser",
-			args:    args{id: 1},
+			name:    "DELETE Fail on ViewUser",
+			args:    args{id: mock.TestUUID(1)},
 			wantErr: errors.New("generic error"),
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					if id != 1 {
+			mdb: &mockdb.Company{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
+					if id != mock.TestUUID(1) {
 						return nil, nil
 					}
 					return nil, errors.New("generic error")
@@ -288,21 +264,16 @@ func TestDelete(t *testing.T) {
 			},
 		},
 		{
-			name: "Fail on RBAC",
-			args: args{id: 1},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        id,
-							CreatedAt: mock.TestTime(1999),
-							UpdatedAt: mock.TestTime(2000),
-						},
-						FirstName: "John",
-						LastName:  "Doe",
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.UserRole,
-						},
+			name: "DELETE Fail on RBAC",
+			args: args{id: mock.TestUUID(1)},
+			mdb: &mockdb.Company{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
+					return &sandpiper.Company{
+						ID:        mock.TestUUID(1),
+						CreatedAt: mock.TestTime(1999),
+						UpdatedAt: mock.TestTime(2000),
+						Name:      "Acme Brakes",
+						Active:    true,
 					}, nil
 				},
 			},
@@ -313,26 +284,19 @@ func TestDelete(t *testing.T) {
 			wantErr: errors.New("generic error"),
 		},
 		{
-			name: "Success",
-			args: args{id: 1},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        id,
-							CreatedAt: mock.TestTime(1999),
-							UpdatedAt: mock.TestTime(2000),
-						},
-						FirstName: "John",
-						LastName:  "Doe",
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.AdminRole,
-							ID:          2,
-							Name:        "Admin",
-						},
+			name: "DELETE Successful",
+			args: args{id: mock.TestUUID(1)},
+			mdb: &mockdb.Company{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
+					return &sandpiper.Company{
+						ID:        mock.TestUUID(1),
+						CreatedAt: mock.TestTime(1999),
+						UpdatedAt: mock.TestTime(2000),
+						Name:      "Acme Brakes",
+						Active:    true,
 					}, nil
 				},
-				DeleteFn: func(db orm.DB, usr *sandpiper.User) error {
+				DeleteFn: func(db orm.DB, usr *sandpiper.Company) error {
 					return nil
 				},
 			},
@@ -344,7 +308,7 @@ func TestDelete(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, nil)
+			s := company.New(nil, tt.mdb, tt.rbac, nil)
 			err := s.Delete(tt.args.c, tt.args.id)
 			if err != tt.wantErr {
 				t.Errorf("Expected error %v, received %v", tt.wantErr, err)
@@ -356,20 +320,20 @@ func TestDelete(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	type args struct {
 		c   echo.Context
-		upd *user.Update
+		upd *company.Update
 	}
 	cases := []struct {
 		name     string
 		args     args
-		wantData *sandpiper.User
+		wantData *sandpiper.Company
 		wantErr  error
-		udb      *mockdb.User
+		mdb      *mockdb.Company
 		rbac     *mock.RBAC
 	}{
 		{
-			name: "Fail on RBAC",
-			args: args{upd: &user.Update{
-				ID: 1,
+			name: "UPDATE Fail on RBAC",
+			args: args{upd: &company.Update{
+				ID: mock.TestUUID(1),
 			}},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
@@ -378,85 +342,59 @@ func TestUpdate(t *testing.T) {
 			wantErr: errors.New("generic error"),
 		},
 		{
-			name: "Fail on Update",
-			args: args{upd: &user.Update{
-				ID: 1,
+			name: "UPDATE Fail on Update",
+			args: args{upd: &company.Update{
+				ID: mock.TestUUID(1),
 			}},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
 					return nil
 				}},
 			wantErr: errors.New("generic error"),
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        1,
-							CreatedAt: mock.TestTime(1990),
-							UpdatedAt: mock.TestTime(1991),
-						},
-						CompanyID:  1,
-						RoleID:     3,
-						FirstName:  "John",
-						LastName:   "Doe",
-						Mobile:     "123456",
-						Phone:      "234567",
-						Address:    "Work Address",
-						Email:      "golang@go.org",
+			mdb: &mockdb.Company{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
+					return &sandpiper.Company{
+						ID:        mock.TestUUID(1),
+						CreatedAt: mock.TestTime(1990),
+						UpdatedAt: mock.TestTime(1991),
+						Name:      "Acme Brakes",
+						Active:    true,
 					}, nil
 				},
-				UpdateFn: func(db orm.DB, usr *sandpiper.User) error {
+				UpdateFn: func(db orm.DB, usr *sandpiper.Company) error {
 					return errors.New("generic error")
 				},
 			},
 		},
 		{
-			name: "Success",
-			args: args{upd: &user.Update{
-				ID:        1,
-				FirstName: "John",
-				LastName:  "Doe",
-				Mobile:    "123456",
-				Phone:     "234567",
+			name: "UPDATE Success",
+			args: args{upd: &company.Update{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			}},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
 					return nil
 				}},
-			wantData: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(1990),
-					UpdatedAt: mock.TestTime(2000),
-				},
-				CompanyID:  1,
-				RoleID:     3,
-				FirstName:  "John",
-				LastName:   "Doe",
-				Mobile:     "123456",
-				Phone:      "234567",
-				Address:    "Work Address",
-				Email:      "golang@go.org",
+			wantData: &sandpiper.Company{
+				ID:        mock.TestUUID(1),
+				CreatedAt: mock.TestTime(1990),
+				UpdatedAt: mock.TestTime(2000),
+				Name:      "Acme Brakes",
+				Active:    true,
 			},
-			udb: &mockdb.User{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
-					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        1,
-							CreatedAt: mock.TestTime(1990),
-							UpdatedAt: mock.TestTime(2000),
-						},
-						CompanyID:  1,
-						RoleID:     3,
-						FirstName:  "John",
-						LastName:   "Doe",
-						Mobile:     "123456",
-						Phone:      "234567",
-						Address:    "Work Address",
-						Email:      "golang@go.org",
+			mdb: &mockdb.Company{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
+					return &sandpiper.Company{
+						ID:        mock.TestUUID(1),
+						CreatedAt: mock.TestTime(1990),
+						UpdatedAt: mock.TestTime(2000),
+						Name:      "Acme Brakes",
+						Active:    true,
 					}, nil
 				},
-				UpdateFn: func(db orm.DB, usr *sandpiper.User) error {
+				UpdateFn: func(db orm.DB, usr *sandpiper.Company) error {
 					usr.UpdatedAt = mock.TestTime(2000)
 					return nil
 				},
@@ -465,7 +403,7 @@ func TestUpdate(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := user.New(nil, tt.udb, tt.rbac, nil)
+			s := company.New(nil, tt.mdb, tt.rbac, nil)
 			usr, err := s.Update(tt.args.c, tt.args.upd)
 			assert.Equal(t, tt.wantData, usr)
 			assert.Equal(t, tt.wantErr, err)
@@ -474,8 +412,8 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestInitialize(t *testing.T) {
-	u := user.Initialize(nil, nil, nil)
-	if u == nil {
+	s := company.Initialize(nil, nil, nil)
+	if s == nil {
 		t.Error("User service not initialized")
 	}
 }

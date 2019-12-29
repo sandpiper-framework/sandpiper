@@ -186,7 +186,7 @@ func TestMe(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				UserFn: func(echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{ID: 1}
 				},
 			},
@@ -198,30 +198,26 @@ func TestMe(t *testing.T) {
 			udb: &mockdb.User{
 				ViewFn: func(db orm.DB, i int) (*sandpiper.User, error) {
 					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID: i,
-						},
-						CompanyID:  2,
-						Email:      "john@mail.com",
-						FirstName:  "John",
-						LastName:   "Doe",
+						ID:        i,
+						CompanyID: mock.TestUUID(1),
+						Email:     "john@mail.com",
+						FirstName: "John",
+						LastName:  "Doe",
 					}, nil
 				},
 			},
 			rbac: &mock.RBAC{
-				UserFn: func(echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{ID: 1}
 				},
 			},
 			header: mock.HeaderValid(),
 			wantResp: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID: 1,
-				},
-				CompanyID:  2,
-				Email:      "john@mail.com",
-				FirstName:  "John",
-				LastName:   "Doe",
+				ID:        1,
+				CompanyID: mock.TestUUID(1),
+				Email:     "john@mail.com",
+				FirstName: "John",
+				LastName:  "Doe",
 			},
 		},
 	}

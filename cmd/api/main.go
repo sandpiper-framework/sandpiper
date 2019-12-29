@@ -42,7 +42,7 @@ func main() {
 }
 
 // embeddedFiles returns a pointer to the structure that manages access to embedded database migration files.
-// It uses a "migrations" import specific to the pkg we are building (so it must be local for each executable).
+// It uses an "import" specific to the pkg we are building (so this function must be local for each executable).
 func embeddedFiles() *bindata.AssetSource {
 	r := bindata.Resource(migrations.AssetNames(),
 		func(name string) ([]byte, error) {

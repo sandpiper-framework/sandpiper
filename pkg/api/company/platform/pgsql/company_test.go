@@ -5,12 +5,13 @@
 package pgsql_test
 
 import (
+	"github.com/google/uuid"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
+	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
 	"autocare.org/sandpiper/test/mock"
 )
 
@@ -18,58 +19,38 @@ func TestCreate(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		req      sandpiper.User
-		wantData *sandpiper.User
+		req      sandpiper.Company
+		wantData *sandpiper.Company
 	}{
 		{
-			name:    "User already exists",
+			name:    "CREATE Company Name already exists",
 			wantErr: true,
-			req: sandpiper.User{
-				Email:    "johndoe@mail.com",
-				Username: "johndoe",
+			req: sandpiper.Company{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 		{
-			name:    "Fail on insert duplicate ID",
+			name:    "CREATE Fail on insert duplicate ID",
 			wantErr: true,
-			req: sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Tom",
-				LastName:   "Jones",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "pass",
-				Base: sandpiper.Base{
-					ID: 1,
-				},
+			req: sandpiper.Company{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 		{
-			name: "Success",
-			req: sandpiper.User{
-				Email:      "newtomjones@mail.com",
-				FirstName:  "Tom",
-				LastName:   "Jones",
-				Username:   "newtomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "pass",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+			name: "CREATE Success",
+			req: sandpiper.Company{
+				ID:     mock.TestUUID(2),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
-			wantData: &sandpiper.User{
-				Email:      "newtomjones@mail.com",
-				FirstName:  "Tom",
-				LastName:   "Jones",
-				Username:   "newtomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "pass",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+			wantData: &sandpiper.Company{
+				ID:     mock.TestUUID(2),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 	}
@@ -77,20 +58,20 @@ func TestCreate(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Company{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, &cases[1].req); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Company{
+		ID:     mock.TestUUID(1),
+		Name:   "Acme Brakes",
+		Active: true}, &cases[1].req); err != nil {
 		t.Error(err)
 	}
 
-	udb := pgsql.NewUser()
+	mdb := pgsql.NewCompany()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := udb.Create(db, tt.req)
+			resp, err := mdb.Create(db, tt.req)
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
 				if resp == nil {
@@ -109,33 +90,21 @@ func TestView(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		id       int
-		wantData *sandpiper.User
+		id       uuid.UUID
+		wantData *sandpiper.Company
 	}{
 		{
-			name:    "User does not exist",
+			name:    "VIEW Company does not exist",
 			wantErr: true,
-			id:      1000,
+			id:      mock.TestUUID(2),
 		},
 		{
-			name: "Success",
-			id:   2,
-			wantData: &sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Tom",
-				LastName:   "Jones",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "newPass",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
-				Role: &sandpiper.Role{
-					ID:          1,
-					AccessLevel: 1,
-					Name:        "SUPER_ADMIN",
-				},
+			name: "VIEW Success",
+			id:   mock.TestUUID(1),
+			wantData: &sandpiper.Company{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 	}
@@ -143,16 +112,16 @@ func TestView(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Company{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, cases[1].wantData); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Company{
+		ID:     mock.TestUUID(1),
+		Name:   "Acme Brakes",
+		Active: true}, cases[1].wantData); err != nil {
 		t.Error(err)
 	}
 
-	udb := pgsql.NewUser()
+	udb := pgsql.NewCompany()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -175,36 +144,20 @@ func TestUpdate(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		usr      *sandpiper.User
-		wantData *sandpiper.User
+		data     *sandpiper.Company
+		wantData *sandpiper.Company
 	}{
 		{
-			name: "Success",
-			usr: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID: 2,
-				},
-				FirstName: "Z",
-				LastName:  "Freak",
-				Address:   "Address",
-				Phone:     "123456",
-				Mobile:    "345678",
-				Username:  "newUsername",
+			name: "UPDATE Success",
+			data: &sandpiper.Company{
+				ID:     mock.TestUUID(1),
+				Name:   "Before Update",
+				Active: false,
 			},
-			wantData: &sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Z",
-				LastName:   "Freak",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "newPass",
-				Address:    "Address",
-				Phone:      "123456",
-				Mobile:     "345678",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+			wantData: &sandpiper.Company{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 	}
@@ -212,35 +165,30 @@ func TestUpdate(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Company{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, cases[0].usr); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Company{
+		ID:     mock.TestUUID(1),
+		Name:   "Acme Brakes",
+		Active: true}, cases[0].data); err != nil {
 		t.Error(err)
 	}
 
-	udb := pgsql.NewUser()
+	mdb := pgsql.NewCompany()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			err := udb.Update(db, tt.wantData)
+			err := mdb.Update(db, tt.wantData)
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
-				user := &sandpiper.User{
-					Base: sandpiper.Base{
-						ID: tt.usr.ID,
-					},
-				}
-				if err := db.Select(user); err != nil {
+				comp := &sandpiper.Company{ID: tt.data.ID}
+				if err := db.Select(comp); err != nil {
 					t.Error(err)
 				}
-				tt.wantData.UpdatedAt = user.UpdatedAt
-				tt.wantData.CreatedAt = user.CreatedAt
-				tt.wantData.LastLogin = user.LastLogin
-				tt.wantData.DeletedAt = user.DeletedAt
-				assert.Equal(t, tt.wantData, user)
+				tt.wantData.UpdatedAt = comp.UpdatedAt
+				tt.wantData.CreatedAt = comp.CreatedAt
+				tt.wantData.DeletedAt = comp.DeletedAt
+				assert.Equal(t, tt.wantData, comp)
 			}
 		})
 	}
@@ -252,7 +200,7 @@ func TestList(t *testing.T) {
 		wantErr  bool
 		qp       *sandpiper.ListQuery
 		pg       *sandpiper.Pagination
-		wantData []sandpiper.User
+		wantData []sandpiper.Company
 	}{
 		{
 			name:    "Invalid pagination values",
@@ -268,44 +216,19 @@ func TestList(t *testing.T) {
 				Offset: 0,
 			},
 			qp: &sandpiper.ListQuery{
-				ID:    1,
+				ID:    mock.TestUUID(1),
 				Query: "company_id = ?",
 			},
-			wantData: []sandpiper.User{
+			wantData: []sandpiper.Company{
 				{
-					Email:      "tomjones@mail.com",
-					FirstName:  "Tom",
-					LastName:   "Jones",
-					Username:   "tomjones",
-					RoleID:     1,
-					CompanyID:  1,
-					Password:   "newPass",
-					Base: sandpiper.Base{
-						ID: 2,
-					},
-					Role: &sandpiper.Role{
-						ID:          1,
-						AccessLevel: 1,
-						Name:        "SUPER_ADMIN",
-					},
+					ID:     mock.TestUUID(1),
+					Name:   "Acme Brakes",
+					Active: true,
 				},
 				{
-					Email:      "johndoe@mail.com",
-					FirstName:  "John",
-					LastName:   "Doe",
-					Username:   "johndoe",
-					RoleID:     1,
-					CompanyID:  1,
-					Password:   "hunter2",
-					Base: sandpiper.Base{
-						ID: 1,
-					},
-					Role: &sandpiper.Role{
-						ID:          1,
-						AccessLevel: 1,
-						Name:        "SUPER_ADMIN",
-					},
-					Token: "loginrefresh",
+					ID:     mock.TestUUID(2),
+					Name:   "Acme Wipers",
+					Active: true,
 				},
 			},
 		},
@@ -314,20 +237,13 @@ func TestList(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Company{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, &cases[1].wantData); err != nil {
-		t.Error(err)
-	}
-
-	udb := pgsql.NewUser()
+	mdb := pgsql.NewCompany()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			users, err := udb.List(db, tt.qp, tt.pg)
+			users, err := mdb.List(db, tt.qp, tt.pg)
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
 				for i, v := range users {
@@ -344,28 +260,19 @@ func TestDelete(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		usr      *sandpiper.User
-		wantData *sandpiper.User
+		usr      *sandpiper.Company
+		wantData *sandpiper.Company
 	}{
 		{
-			name: "Success",
-			usr: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        2,
-					DeletedAt: mock.TestTime(2018),
-				},
+			name: "DELETE Success",
+			usr: &sandpiper.Company{
+				ID:        mock.TestUUID(1),
+				DeletedAt: mock.TestTime(2018),
 			},
-			wantData: &sandpiper.User{
-				Email:      "tomjones@mail.com",
-				FirstName:  "Tom",
-				LastName:   "Jones",
-				Username:   "tomjones",
-				RoleID:     1,
-				CompanyID:  1,
-				Password:   "newPass",
-				Base: sandpiper.Base{
-					ID: 2,
-				},
+			wantData: &sandpiper.Company{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 	}
@@ -373,21 +280,21 @@ func TestDelete(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Company{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, cases[0].wantData); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Company{
+		ID:     mock.TestUUID(1),
+		Name:   "Acme Brakes",
+		Active: true}, cases[0].wantData); err != nil {
 		t.Error(err)
 	}
 
-	udb := pgsql.NewUser()
+	mdb := pgsql.NewCompany()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 
-			err := udb.Delete(db, tt.usr)
+			err := mdb.Delete(db, tt.usr)
 			assert.Equal(t, tt.wantErr, err != nil)
 
 			// Check if the deleted_at was set

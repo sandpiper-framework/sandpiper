@@ -88,15 +88,11 @@ func TestGenerateToken(t *testing.T) {
 			name: "Success",
 			algo: "HS256",
 			req: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID: 1,
-				},
-				Username: "johndoe",
-				Email:    "johndoe@mail.com",
-				Role: &sandpiper.Role{
-					AccessLevel: sandpiper.SuperAdminRole,
-				},
-				CompanyID:  1,
+				ID:        1,
+				Username:  "johndoe",
+				Email:     "johndoe@mail.com",
+				Role:      sandpiper.SuperAdminRole,
+				CompanyID: mock.TestUUID(1),
 			},
 			wantToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
 		},

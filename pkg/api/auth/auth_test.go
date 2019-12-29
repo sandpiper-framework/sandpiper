@@ -268,7 +268,7 @@ func TestMe(t *testing.T) {
 		{
 			name: "Success",
 			rbac: &mock.RBAC{
-				UserFn: func(echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{ID: 9}
 				},
 			},

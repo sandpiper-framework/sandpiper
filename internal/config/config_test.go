@@ -8,7 +8,7 @@ import (
 	"autocare.org/sandpiper/internal/config"
 )
 
-func TestLoad(t *testing.T) {
+func TestLoadConfig(t *testing.T) {
 	cases := []struct {
 		name     string
 		path     string
@@ -26,12 +26,12 @@ func TestLoad(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Success",
+			name: "Match from config",
 			path: "testdata/config.testdata.yaml",
 			wantData: &config.Configuration{
 				DB: &config.Database{
 					LogQueries: true,
-					Timeout:    20,
+					Timeout:    5,
 					Dialect:    "postgres",
 					Database:   "sandpiper",
 					User:       "admin",
@@ -43,15 +43,15 @@ func TestLoad(t *testing.T) {
 				Server: &config.Server{
 					Port:         ":8080",
 					Debug:        true,
-					ReadTimeout:  15,
-					WriteTimeout: 20,
+					ReadTimeout:  10,
+					WriteTimeout: 5,
 				},
 				JWT: &config.JWT{
-					Secret:           "testing",
-					Duration:         10,
-					RefreshDuration:  10,
-					MaxRefresh:       144,
-					SigningAlgorithm: "HS384",
+					Secret:           "jwtrealm",
+					Duration:         15,
+					RefreshDuration:  20,
+					MaxRefresh:       1440,
+					SigningAlgorithm: "HS256",
 				},
 				App: &config.Application{
 					MinPasswordStr: 3,

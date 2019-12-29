@@ -1,7 +1,6 @@
 package secure_test
 
 import (
-	"crypto/sha1"
 	"testing"
 
 	"autocare.org/sandpiper/internal/secure"
@@ -35,7 +34,7 @@ func TestPassword(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := secure.New(1, nil)
+			s := secure.New(1)
 			got := s.Password(tt.pass, tt.inputs...)
 			assert.Equal(t, tt.want, got)
 		})
@@ -56,7 +55,7 @@ func TestHashAndMatch(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			s := secure.New(1, nil)
+			s := secure.New(1)
 			hash := s.Hash(tt.pass)
 			assert.Equal(t, tt.want, s.HashMatchesPassword(hash, tt.pass))
 		})
@@ -64,7 +63,7 @@ func TestHashAndMatch(t *testing.T) {
 }
 
 func TestToken(t *testing.T) {
-	s := secure.New(1, sha1.New())
+	s := secure.New(1)
 	token := "token"
 	tokenized := s.Token(token)
 	assert.NotEqual(t, tokenized, token)
