@@ -7,6 +7,7 @@ package pgsql
 // slice service database access
 
 import (
+	"autocare.org/sandpiper/internal/scope"
 	"net/http"
 	"strings"
 
@@ -74,12 +75,12 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 }
 
 // List returns list of all slices
-func (s *Slice) List(db orm.DB, qp *sandpiper.Scoped, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices []sandpiper.Slice
 
 	q := db.Model(&slices).Limit(p.Limit).Offset(p.Offset).Where("deleted_at is null").Order("slice_name")
-	if qp != nil {
-		q.Where(qp.Query, qp.ID)
+	if sc != nil {
+		q.Where(sc.Condition, sc.ID)
 	}
 	if err := q.Select(); err != nil {
 		return nil, err

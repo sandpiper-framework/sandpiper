@@ -12,7 +12,7 @@ type Slice struct {
 	CreateFn    func(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
 	ViewFn      func(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
 	ViewBySubFn func(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error)
-	ListFn      func(orm.DB, *sandpiper.Scoped, *sandpiper.Pagination) ([]sandpiper.Slice, error)
+	ListFn      func(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Slice, error)
 	DeleteFn    func(orm.DB, *sandpiper.Slice) error
 	UpdateFn    func(orm.DB, *sandpiper.Slice) error
 }
@@ -33,7 +33,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 }
 
 // List mock
-func (s *Slice) List(db orm.DB, lq *sandpiper.Scoped, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(db orm.DB, lq *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	return s.ListFn(db, lq, p)
 }
 

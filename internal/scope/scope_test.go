@@ -22,7 +22,7 @@ func TestList(t *testing.T) {
 	cases := []struct {
 		name     string
 		args     args
-		wantData *sandpiper.Scoped
+		wantData *scope.Clause
 		wantErr  error
 	}{
 		{
@@ -37,7 +37,7 @@ func TestList(t *testing.T) {
 				Role:      sandpiper.CompanyAdminRole,
 				CompanyID: mock.TestUUID(1),
 			}},
-			wantData: &sandpiper.Scoped{
+			wantData: &scope.Clause{
 				Query: "company_id = ?",
 				ID:    mock.TestUUID(1)},
 		},

@@ -199,7 +199,7 @@ func TestList(t *testing.T) {
 					}
 				}},
 			udb: &mockdb.User{
-				ListFn: func(orm.DB, *sandpiper.Scoped, *sandpiper.Pagination) ([]sandpiper.User, error) {
+				ListFn: func(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.User, error) {
 					return []sandpiper.User{
 						{
 							ID:        1,

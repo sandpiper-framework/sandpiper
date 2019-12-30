@@ -5,12 +5,14 @@
 package company
 
 import (
+
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/scope"
 	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
 )
 
@@ -50,7 +52,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.Company) (*sandpiper.Company, error)
 	View(orm.DB, uuid.UUID) (*sandpiper.Company, error)
-	List(orm.DB, *sandpiper.Scoped, *sandpiper.Pagination) ([]sandpiper.Company, error)
+	List(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Company, error)
 	Update(orm.DB, *sandpiper.Company) error
 	Delete(orm.DB, *sandpiper.Company) error
 }

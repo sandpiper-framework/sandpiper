@@ -7,6 +7,7 @@ package pgsql
 // user service database access
 
 import (
+	"autocare.org/sandpiper/internal/scope"
 	"net/http"
 	"strings"
 
@@ -65,12 +66,12 @@ func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 }
 
 // List returns list of all users retrievable for the current user, depending on role
-func (u *User) List(db orm.DB, qp *sandpiper.Scoped, p *sandpiper.Pagination) ([]sandpiper.User, error) {
+func (u *User) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.User, error) {
 	var users []sandpiper.User
 
 	q := db.Model(&users).Limit(p.Limit).Offset(p.Offset).Order("user.id desc")
-	if qp != nil {
-		q.Where(qp.Query, qp.ID)
+	if sc != nil {
+		q.Where(sc.Condition, sc.ID)
 	}
 	if err := q.Select(); err != nil {
 		return nil, err

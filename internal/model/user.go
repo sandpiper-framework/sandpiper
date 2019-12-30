@@ -61,11 +61,3 @@ func (u *User) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-// AuthUser represents data stored in JWT token for the current user
-type AuthUser struct {
-	ID        int
-	CompanyID uuid.UUID
-	Username  string
-	Email     string
-	Role      AccessRole
-}

@@ -7,10 +7,11 @@ package slice
 import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
-	"github.com/labstack/echo/v4"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/scope"
 	"autocare.org/sandpiper/pkg/api/slice/platform/pgsql"
 )
 
@@ -51,7 +52,7 @@ type Repository interface {
 	Create(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
 	View(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error)
-	List(orm.DB, *sandpiper.Scoped, *sandpiper.Pagination) ([]sandpiper.Slice, error)
+	List(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Slice, error)
 	Update(orm.DB, *sandpiper.Slice) error
 	Delete(orm.DB, *sandpiper.Slice) error
 }

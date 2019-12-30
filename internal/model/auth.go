@@ -31,3 +31,26 @@ type RBACService interface {
 	AccountCreate(echo.Context, AccessRole, int, int) error
 	IsLowerRole(echo.Context, AccessRole) error
 }
+
+// AccessRole represents access role type
+type AccessRole int
+
+const (
+	// SuperAdminRole has all permissions
+	SuperAdminRole AccessRole = 100
+	// AdminRole has admin specific permissions
+	AdminRole AccessRole = 110
+	// CompanyAdminRole can edit company specific things
+	CompanyAdminRole AccessRole = 120
+	// UserRole is a standard user
+	UserRole AccessRole = 200
+)
+
+// AuthUser represents data stored in JWT token for the current user
+type AuthUser struct {
+	ID        int
+	CompanyID uuid.UUID
+	Username  string
+	Email     string
+	Role      AccessRole
+}

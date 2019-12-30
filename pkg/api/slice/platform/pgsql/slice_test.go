@@ -209,7 +209,7 @@ func TestList(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		qp       *sandpiper.Scoped
+		qp       *scope.Clause
 		pg       *sandpiper.Pagination
 		wantData []sandpiper.Slice
 	}{
@@ -226,7 +226,7 @@ func TestList(t *testing.T) {
 				Limit:  100,
 				Offset: 0,
 			},
-			qp: &sandpiper.Scoped{
+			qp: &scope.Clause{
 				ID:    mock.TestUUID(1),
 				Query: "id = ?",
 			},

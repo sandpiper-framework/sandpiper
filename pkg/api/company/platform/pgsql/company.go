@@ -7,6 +7,7 @@ package pgsql
 // company service database access
 
 import (
+	"autocare.org/sandpiper/internal/scope"
 	"net/http"
 	"strings"
 
@@ -62,12 +63,12 @@ func (s *Company) Update(db orm.DB, company *sandpiper.Company) error {
 }
 
 // List returns list of all companies
-func (s *Company) List(db orm.DB, qp *sandpiper.Scoped, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
+func (s *Company) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
 	var companies []sandpiper.Company
 
 	q := db.Model(&companies).Limit(p.Limit).Offset(p.Offset).Where("deleted_at is null").Order("name")
-	if qp != nil {
-		q.Where(qp.Query, qp.ID)
+	if sc != nil {
+		q.Where(sc.Condition, sc.ID)
 	}
 	if err := q.Select(); err != nil {
 		return nil, err
