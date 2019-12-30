@@ -158,7 +158,7 @@ func TestList(t *testing.T) {
 					}
 				}},
 			sdb: &mockdb.Company{
-				ListFn: func(db orm.DB, q *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
+				ListFn: func(db orm.DB, q *sandpiper.Scoped, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
 					if p.Limit == 100 && p.Offset == 100 {
 						return []sandpiper.Company{
 							{

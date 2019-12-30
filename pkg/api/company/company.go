@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/query"
+	"autocare.org/sandpiper/internal/scope"
 )
 
 // Create creates a new company if allowed
@@ -24,7 +24,7 @@ func (s *Company) Create(c echo.Context, req sandpiper.Company) (*sandpiper.Comp
 // List returns list of companies that you can view
 func (s *Company) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
 	au := s.rbac.CurrentUser(c)
-	q, err := query.List(au)
+	q, err := scope.Limit(au)
 	if err != nil {
 		return nil, err
 	}

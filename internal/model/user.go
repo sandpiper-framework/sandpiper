@@ -31,15 +31,6 @@ type User struct {
 	UpdatedAt       time.Time  `json:"updated_at"`
 }
 
-// AuthUser represents data stored in JWT token for the current user
-type AuthUser struct {
-	ID        int
-	CompanyID uuid.UUID
-	Username  string
-	Email     string
-	Role      AccessRole
-}
-
 // ChangePassword updates user's password related fields
 func (u *User) ChangePassword(hash string) {
 	u.Password = hash
@@ -68,4 +59,13 @@ func (u *User) BeforeInsert(ctx context.Context) (context.Context, error) {
 func (u *User) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	u.UpdatedAt = time.Now()
 	return ctx, nil
+}
+
+// AuthUser represents data stored in JWT token for the current user
+type AuthUser struct {
+	ID        int
+	CompanyID uuid.UUID
+	Username  string
+	Email     string
+	Role      AccessRole
 }

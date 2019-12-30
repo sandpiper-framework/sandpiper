@@ -1,4 +1,8 @@
-package query_test
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
+package scope_test
 
 import (
 	"testing"
@@ -7,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/query"
+	"autocare.org/sandpiper/internal/scope"
 	"autocare.org/sandpiper/test/mock"
 )
 
@@ -18,7 +22,7 @@ func TestList(t *testing.T) {
 	cases := []struct {
 		name     string
 		args     args
-		wantData *sandpiper.ListQuery
+		wantData *sandpiper.Scoped
 		wantErr  error
 	}{
 		{
@@ -33,7 +37,7 @@ func TestList(t *testing.T) {
 				Role:      sandpiper.CompanyAdminRole,
 				CompanyID: mock.TestUUID(1),
 			}},
-			wantData: &sandpiper.ListQuery{
+			wantData: &sandpiper.Scoped{
 				Query: "company_id = ?",
 				ID:    mock.TestUUID(1)},
 		},
@@ -47,7 +51,7 @@ func TestList(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			q, err := query.List(tt.args.user)
+			q, err := scope.Limit(tt.args.user)
 			assert.Equal(t, tt.wantData, q)
 			assert.Equal(t, tt.wantErr, err)
 		})

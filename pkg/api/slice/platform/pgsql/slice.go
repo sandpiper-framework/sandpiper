@@ -74,7 +74,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 }
 
 // List returns list of all slices
-func (s *Slice) List(db orm.DB, qp *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(db orm.DB, qp *sandpiper.Scoped, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices []sandpiper.Slice
 
 	q := db.Model(&slices).Limit(p.Limit).Offset(p.Offset).Where("deleted_at is null").Order("slice_name")

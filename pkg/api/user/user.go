@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/query"
+	"autocare.org/sandpiper/internal/scope"
 )
 
 // Create creates a new user account
@@ -24,7 +24,7 @@ func (u *User) Create(c echo.Context, req sandpiper.User) (*sandpiper.User, erro
 // List returns list of users
 func (u *User) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.User, error) {
 	au := u.rbac.CurrentUser(c)
-	q, err := query.List(au)
+	q, err := scope.Limit(au)
 	if err != nil {
 		return nil, err
 	}

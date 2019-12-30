@@ -4,6 +4,10 @@
 
 package sandpiper
 
+import (
+	"github.com/google/uuid"
+)
+
 // AccessRole represents access role type
 type AccessRole int
 
@@ -21,9 +25,9 @@ const (
 	UserRole AccessRole = 200
 )
 
-// Role model
-type Role struct {
-	ID          AccessRole `json:"id"`
-	AccessLevel AccessRole `json:"access_level"`
-	Name        string     `json:"name"`
+// Scoped adds additional restrictions for scoping list queries based on roles
+type Scoped struct {
+	Query string
+	ID    uuid.UUID  // usually a companyID
 }
+

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/query"
+	"autocare.org/sandpiper/internal/scope"
 )
 
 // Create creates a new slice to hold data-objects
@@ -25,7 +25,7 @@ func (s *Slice) Create(c echo.Context, req sandpiper.Slice) (*sandpiper.Slice, e
 // List returns list of slices
 func (s *Slice) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	au := s.rbac.CurrentUser(c)
-	q, err := query.List(au)
+	q, err := scope.Limit(au)
 	if err != nil {
 		return nil, err
 	}

@@ -51,7 +51,7 @@ type Repository interface {
 	Create(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
 	View(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error)
-	List(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.Slice, error)
+	List(orm.DB, *sandpiper.Scoped, *sandpiper.Pagination) ([]sandpiper.Slice, error)
 	Update(orm.DB, *sandpiper.Slice) error
 	Delete(orm.DB, *sandpiper.Slice) error
 }

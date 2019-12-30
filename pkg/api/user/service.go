@@ -50,7 +50,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.User) (*sandpiper.User, error)
 	View(orm.DB, int) (*sandpiper.User, error)
-	List(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.User, error)
+	List(orm.DB, *sandpiper.Scoped, *sandpiper.Pagination) ([]sandpiper.User, error)
 	Update(orm.DB, *sandpiper.User) error
 	Delete(orm.DB, *sandpiper.User) error
 }
