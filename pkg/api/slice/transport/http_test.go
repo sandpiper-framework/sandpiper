@@ -12,16 +12,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/server"
-	"autocare.org/sandpiper/pkg/api/user"
-	"autocare.org/sandpiper/pkg/api/user/transport"
-	"autocare.org/sandpiper/test/mock"
-	"autocare.org/sandpiper/test/mock/mockdb"
-
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+
+	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/server"
+	"autocare.org/sandpiper/pkg/api/slice"
+	"autocare.org/sandpiper/pkg/api/slice/transport"
+	"autocare.org/sandpiper/test/mock"
+	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestCreate(t *testing.T) {
@@ -30,25 +31,24 @@ func TestCreate(t *testing.T) {
 		req        string
 		wantStatus int
 		wantResp   *sandpiper.Slice
-		sdb        *mockdb.Slice
+		udb        *mockdb.Slice
 		rbac       *mock.RBAC
-		sec        *mock.Secure
 	}{
 		{
 			name:       "Fail on validation",
-			req:        `{"first_name":"John","last_name":"Doe","username":"ju","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":300}`,
+			req:        `{"first_name":"John","last_name":"Doe","username":"ju","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id": "10000000-0000-0000-0000-000000000000","role":300}`,
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name:       "Fail on non-matching passwords",
-			req:        `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter1234","email":"johndoe@gmail.com","company_id":1,"role_id":300}`,
+			req:        `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter1234","email":"johndoe@gmail.com","company_id": "10000000-0000-0000-0000-000000000000","role":300}`,
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Fail on invalid role",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":50}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id": "10000000-0000-0000-0000-000000000000","role":50}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -56,9 +56,9 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "Fail on RBAC",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":200}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":"10000000-0000-0000-0000-000000000000","role":200}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -67,36 +67,25 @@ func TestCreate(t *testing.T) {
 
 		{
 			name: "Success",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":200}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":"10000000-0000-0000-0000-000000000000","role":200}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
 					return nil
 				},
 			},
-			sdb: &mockdb.Slice{
-				CreateFn: func(db orm.DB, usr sandpiper.Slice) (*sandpiper.Slice, error) {
-					usr.ID = 1
-					usr.CreatedAt = mock.TestTime(2018)
-					usr.UpdatedAt = mock.TestTime(2018)
-					return &usr, nil
-				},
-			},
-			sec: &mock.Secure{
-				HashFn: func(string) string {
-					return "h4$h3d"
+			udb: &mockdb.Slice{
+				CreateFn: func(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
+					slice.ID = mock.TestUUID(1)
+					slice.CreatedAt = mock.TestTime(2018)
+					slice.UpdatedAt = mock.TestTime(2018)
+					return &slice, nil
 				},
 			},
 			wantResp: &sandpiper.Slice{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2018),
-					UpdatedAt: mock.TestTime(2018),
-				},
-				FirstName:  "John",
-				LastName:   "Doe",
-				Username:   "juzernejm",
-				Email:      "johndoe@gmail.com",
-				CompanyID:  1,
+				ID:        mock.TestUUID(1),
+				Name:      "AAP Brakes",
+				CreatedAt: mock.TestTime(2018),
+				UpdatedAt: mock.TestTime(2018),
 			},
 			wantStatus: http.StatusOK,
 		},
@@ -106,10 +95,10 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(slice.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/users"
+			path := ts.URL + "/slices"
 			res, err := http.Post(path, "application/json", bytes.NewBufferString(tt.req))
 			if err != nil {
 				t.Fatal(err)
@@ -129,17 +118,16 @@ func TestCreate(t *testing.T) {
 
 func TestList(t *testing.T) {
 	type listResponse struct {
-		Users []sandpiper.Slice `json:"users"`
-		Page  int              `json:"page"`
+		Slices []sandpiper.Slice `json:"slices"`
+		Page   int               `json:"page"`
 	}
 	cases := []struct {
 		name       string
 		req        string
 		wantStatus int
 		wantResp   *listResponse
-		sdb        *mockdb.Slice
+		udb        *mockdb.Slice
 		rbac       *mock.RBAC
-		sec        *mock.Secure
 	}{
 		{
 			name:       "Invalid request",
@@ -150,12 +138,12 @@ func TestList(t *testing.T) {
 			name: "Fail on query list",
 			req:  `?limit=100&page=1`,
 			rbac: &mock.RBAC{
-				UserFn: func(c echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(c echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{
-						ID:         1,
-						CompanyID:  2,
-						Role:       sandpiper.SliceRole,
-						Email:      "john@mail.com",
+						ID:        1,
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.CompanyAdminRole,
+						Email:     "john@mail.com",
 					}
 				}},
 			wantStatus: http.StatusForbidden,
@@ -164,49 +152,29 @@ func TestList(t *testing.T) {
 			name: "Success",
 			req:  `?limit=100&page=1`,
 			rbac: &mock.RBAC{
-				UserFn: func(c echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(c echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{
-						ID:         1,
-						CompanyID:  2,
-						Role:       sandpiper.SuperAdminRole,
-						Email:      "john@mail.com",
+						ID:        1,
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.SuperAdminRole,
+						Email:     "john@mail.com",
 					}
 				}},
-			sdb: &mockdb.Slice{
+			udb: &mockdb.Slice{
 				ListFn: func(db orm.DB, q *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 					if p.Limit == 100 && p.Offset == 100 {
 						return []sandpiper.Slice{
 							{
-								Base: sandpiper.Base{
-									ID:        10,
-									CreatedAt: mock.TestTime(2001),
-									UpdatedAt: mock.TestTime(2002),
-								},
-								FirstName:  "John",
-								LastName:   "Doe",
-								Email:      "john@mail.com",
-								CompanyID:  2,
-								Role: &sandpiper.Role{
-									ID:          1,
-									AccessLevel: 1,
-									Name:        "SUPER_ADMIN",
-								},
+								ID:        mock.TestUUID(1),
+								Name:      "AAP Brakes",
+								CreatedAt: mock.TestTime(2001),
+								UpdatedAt: mock.TestTime(2002),
 							},
 							{
-								Base: sandpiper.Base{
-									ID:        11,
-									CreatedAt: mock.TestTime(2004),
-									UpdatedAt: mock.TestTime(2005),
-								},
-								FirstName:  "Joanna",
-								LastName:   "Dye",
-								Email:      "joanna@mail.com",
-								CompanyID:  1,
-								Role: &sandpiper.Role{
-									ID:          2,
-									AccessLevel: 2,
-									Name:        "ADMIN",
-								},
+								ID:        mock.TestUUID(2),
+								Name:      "AAP Wipers",
+								CreatedAt: mock.TestTime(2004),
+								UpdatedAt: mock.TestTime(2005),
 							},
 						}, nil
 					}
@@ -215,38 +183,18 @@ func TestList(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &listResponse{
-				Users: []sandpiper.Slice{
+				Slices: []sandpiper.Slice{
 					{
-						Base: sandpiper.Base{
-							ID:        10,
-							CreatedAt: mock.TestTime(2001),
-							UpdatedAt: mock.TestTime(2002),
-						},
-						FirstName:  "John",
-						LastName:   "Doe",
-						Email:      "john@mail.com",
-						CompanyID:  2,
-						Role: &sandpiper.Role{
-							ID:          1,
-							AccessLevel: 1,
-							Name:        "SUPER_ADMIN",
-						},
+						ID:        mock.TestUUID(1),
+						Name:      "AAP Brakes",
+						CreatedAt: mock.TestTime(2001),
+						UpdatedAt: mock.TestTime(2002),
 					},
 					{
-						Base: sandpiper.Base{
-							ID:        11,
-							CreatedAt: mock.TestTime(2004),
-							UpdatedAt: mock.TestTime(2005),
-						},
-						FirstName:  "Joanna",
-						LastName:   "Dye",
-						Email:      "joanna@mail.com",
-						CompanyID:  1,
-						Role: &sandpiper.Role{
-							ID:          2,
-							AccessLevel: 2,
-							Name:        "ADMIN",
-						},
+						ID:        mock.TestUUID(2),
+						Name:      "AAP Wipers",
+						CreatedAt: mock.TestTime(2004),
+						UpdatedAt: mock.TestTime(2005),
 					},
 				}, Page: 1},
 		},
@@ -256,10 +204,10 @@ func TestList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(slice.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/users" + tt.req
+			path := ts.URL + "/slices" + tt.req
 			res, err := http.Get(path)
 			if err != nil {
 				t.Fatal(err)
@@ -283,9 +231,8 @@ func TestView(t *testing.T) {
 		req        string
 		wantStatus int
 		wantResp   *sandpiper.Slice
-		sdb        *mockdb.Slice
+		udb        *mockdb.Slice
 		rbac       *mock.RBAC
-		sec        *mock.Secure
 	}{
 		{
 			name:       "Invalid request",
@@ -310,30 +257,22 @@ func TestView(t *testing.T) {
 					return nil
 				},
 			},
-			sdb: &mockdb.Slice{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.Slice, error) {
+			udb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{
-						Base: sandpiper.Base{
-							ID:        1,
-							CreatedAt: mock.TestTime(2000),
-							UpdatedAt: mock.TestTime(2000),
-						},
-						FirstName: "John",
-						LastName:  "Doe",
-						Username:  "JohnDoe",
+						ID:        mock.TestUUID(1),
+						Name:      "AAP Brakes",
+						CreatedAt: mock.TestTime(2000),
+						UpdatedAt: mock.TestTime(2000),
 					}, nil
 				},
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &sandpiper.Slice{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2000),
-					UpdatedAt: mock.TestTime(2000),
-				},
-				FirstName: "John",
-				LastName:  "Doe",
-				Username:  "JohnDoe",
+				ID:        mock.TestUUID(1),
+				Name:      "AAP Brakes",
+				CreatedAt: mock.TestTime(2000),
+				UpdatedAt: mock.TestTime(2000),
 			},
 		},
 	}
@@ -342,10 +281,10 @@ func TestView(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(slice.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/users/" + tt.req
+			path := ts.URL + "/slices/" + tt.req
 			res, err := http.Get(path)
 			if err != nil {
 				t.Fatal(err)
@@ -370,9 +309,8 @@ func TestUpdate(t *testing.T) {
 		id         string
 		wantStatus int
 		wantResp   *sandpiper.Slice
-		sdb        *mockdb.Slice
+		udb        *mockdb.Slice
 		rbac       *mock.RBAC
-		sec        *mock.Secure
 	}{
 		{
 			name:       "Invalid request",
@@ -382,13 +320,13 @@ func TestUpdate(t *testing.T) {
 		{
 			name:       "Fail on validation",
 			id:         `1`,
-			req:        `{"first_name":"john","last_name":"doe","phone":"321321"}`,
+			req:        `{"first_name":"j","last_name":"okocha","mobile":"123456","phone":"321321","address":"home"}`,
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Fail on RBAC",
 			id:   `1`,
-			req:  `{"first_name":"john","last_name":"doe","phone":"321321"}`,
+			req:  `{"first_name":"jj","last_name":"okocha","mobile":"123456","phone":"321321","address":"home"}`,
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(echo.Context, int) error {
 					return echo.ErrForbidden
@@ -399,47 +337,35 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "Success",
 			id:   `1`,
-			req:  `{"first_name":"john","last_name":"doe","phone":"321321","address":"home"}`,
+			req:  `{"first_name":"jj","last_name":"okocha","phone":"321321","address":"home"}`,
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(echo.Context, int) error {
 					return nil
 				},
 			},
-			sdb: &mockdb.Slice{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.Slice, error) {
+			udb: &mockdb.Slice{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{
-						Base: sandpiper.Base{
-							ID:        1,
-							CreatedAt: mock.TestTime(2000),
-							UpdatedAt: mock.TestTime(2000),
-						},
-						FirstName: "John",
-						LastName:  "Doe",
-						Username:  "JohnDoe",
-						Address:   "Work",
-						Phone:     "332223",
-						Mobile:    "991991",
+						ID:           mock.TestUUID(1),
+						Name:         "AAP Brakes",
+						ContentCount: 1,
+						CreatedAt:    mock.TestTime(2000),
+						UpdatedAt:    mock.TestTime(2000),
 					}, nil
 				},
-				UpdateFn: func(db orm.DB, usr *sandpiper.Slice) error {
-					usr.UpdatedAt = mock.TestTime(2010)
-					usr.Mobile = "991991"
+				UpdateFn: func(db orm.DB, slice *sandpiper.Slice) error {
+					slice.UpdatedAt = mock.TestTime(2010)
+					slice.ContentCount = 2
 					return nil
 				},
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &sandpiper.Slice{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2000),
-					UpdatedAt: mock.TestTime(2000),
-				},
-				FirstName: "John",
-				LastName:  "Doe",
-				Username:  "JohnDoe",
-				Phone:     "332223",
-				Address:   "Work",
-				Mobile:    "991991",
+				ID:           mock.TestUUID(1),
+				Name:         "AAP Brakes",
+				ContentCount: 1,
+				CreatedAt:    mock.TestTime(2000),
+				UpdatedAt:    mock.TestTime(2000),
 			},
 		},
 	}
@@ -450,10 +376,10 @@ func TestUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(slice.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/users/" + tt.id
+			path := ts.URL + "/slices/" + tt.id
 			req, _ := http.NewRequest("PATCH", path, bytes.NewBufferString(tt.req))
 			req.Header.Set("Content-Type", "application/json")
 			res, err := client.Do(req)
@@ -476,26 +402,25 @@ func TestUpdate(t *testing.T) {
 func TestDelete(t *testing.T) {
 	cases := []struct {
 		name       string
-		id         string
+		id         string // to allow testing a bad request
+		cid        uuid.UUID
 		wantStatus int
-		sdb        *mockdb.Slice
+		mdb        *mockdb.Slice
 		rbac       *mock.RBAC
-		sec        *mock.Secure
 	}{
 		{
 			name:       "Invalid request",
-			id:         `a`,
+			id:         "123",
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Fail on RBAC",
-			id:   `1`,
-			sdb: &mockdb.Slice{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.Slice, error) {
+			id:  mock.TestUUID(1).String(),
+			cid: mock.TestUUID(1),
+			mdb: &mockdb.Slice{
+				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.CompanyAdminRole,
-						},
+						Name: "AAP Brakes",
 					}, nil
 				},
 			},
@@ -506,15 +431,14 @@ func TestDelete(t *testing.T) {
 			},
 			wantStatus: http.StatusForbidden,
 		},
-		{
+		{ // todo: this test looks wrong... (should allow sysadmin or company-admin of subscribed companies)
 			name: "Success",
-			id:   `1`,
-			sdb: &mockdb.Slice{
-				ViewFn: func(db orm.DB, id int) (*sandpiper.Slice, error) {
+			id:   mock.TestUUID(1).String(),
+			cid:  mock.TestUUID(1),
+			mdb: &mockdb.Slice{
+				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.CompanyAdminRole,
-						},
+						Name: "AAP Brakes",
 					}, nil
 				},
 				DeleteFn: func(orm.DB, *sandpiper.Slice) error {
@@ -536,10 +460,10 @@ func TestDelete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(user.New(nil, tt.sdb, tt.rbac, tt.sec), rg)
+			transport.NewHTTP(slice.New(nil, tt.mdb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/users/" + tt.id
+			path := ts.URL + "/slices/" + tt.id
 			req, _ := http.NewRequest("DELETE", path, nil)
 			res, err := client.Do(req)
 			if err != nil {

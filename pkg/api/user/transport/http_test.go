@@ -12,16 +12,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
+
 	"autocare.org/sandpiper/internal/model"
 	"autocare.org/sandpiper/internal/server"
 	"autocare.org/sandpiper/pkg/api/user"
 	"autocare.org/sandpiper/pkg/api/user/transport"
 	"autocare.org/sandpiper/test/mock"
 	"autocare.org/sandpiper/test/mock/mockdb"
-
-	"github.com/go-pg/pg/v9/orm"
-	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCreate(t *testing.T) {
@@ -36,19 +37,19 @@ func TestCreate(t *testing.T) {
 	}{
 		{
 			name:       "Fail on validation",
-			req:        `{"first_name":"John","last_name":"Doe","username":"ju","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":300}`,
+			req:        `{"first_name":"John","last_name":"Doe","username":"ju","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id": "10000000-0000-0000-0000-000000000000","role":300}`,
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name:       "Fail on non-matching passwords",
-			req:        `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter1234","email":"johndoe@gmail.com","company_id":1,"role_id":300}`,
+			req:        `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter1234","email":"johndoe@gmail.com","company_id": "10000000-0000-0000-0000-000000000000","role":300}`,
 			wantStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Fail on invalid role",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":50}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id": "10000000-0000-0000-0000-000000000000","role":50}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -56,9 +57,9 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "Fail on RBAC",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":200}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":"10000000-0000-0000-0000-000000000000","role":200}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -67,9 +68,9 @@ func TestCreate(t *testing.T) {
 
 		{
 			name: "Success",
-			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":200}`,
+			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":"10000000-0000-0000-0000-000000000000","role":200}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID int) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
 					return nil
 				},
 			},
@@ -87,16 +88,14 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			wantResp: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2018),
-					UpdatedAt: mock.TestTime(2018),
-				},
-				FirstName:  "John",
-				LastName:   "Doe",
-				Username:   "juzernejm",
-				Email:      "johndoe@gmail.com",
-				CompanyID:  1,
+				ID:        1,
+				CreatedAt: mock.TestTime(2018),
+				UpdatedAt: mock.TestTime(2018),
+				FirstName: "John",
+				LastName:  "Doe",
+				Username:  "juzernejm",
+				Email:     "johndoe@gmail.com",
+				CompanyID: mock.TestUUID(1),
 			},
 			wantStatus: http.StatusOK,
 		},
@@ -150,12 +149,12 @@ func TestList(t *testing.T) {
 			name: "Fail on query list",
 			req:  `?limit=100&page=1`,
 			rbac: &mock.RBAC{
-				UserFn: func(c echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(c echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{
-						ID:         1,
-						CompanyID:  2,
-						Role:       sandpiper.UserRole,
-						Email:      "john@mail.com",
+						ID:        1,
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.UserRole,
+						Email:     "john@mail.com",
 					}
 				}},
 			wantStatus: http.StatusForbidden,
@@ -164,12 +163,12 @@ func TestList(t *testing.T) {
 			name: "Success",
 			req:  `?limit=100&page=1`,
 			rbac: &mock.RBAC{
-				UserFn: func(c echo.Context) *sandpiper.AuthUser {
+				CurrentUserFn: func(c echo.Context) *sandpiper.AuthUser {
 					return &sandpiper.AuthUser{
-						ID:         1,
-						CompanyID:  2,
-						Role:       sandpiper.SuperAdminRole,
-						Email:      "john@mail.com",
+						ID:        1,
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.SuperAdminRole,
+						Email:     "john@mail.com",
 					}
 				}},
 			udb: &mockdb.User{
@@ -177,36 +176,24 @@ func TestList(t *testing.T) {
 					if p.Limit == 100 && p.Offset == 100 {
 						return []sandpiper.User{
 							{
-								Base: sandpiper.Base{
-									ID:        10,
-									CreatedAt: mock.TestTime(2001),
-									UpdatedAt: mock.TestTime(2002),
-								},
-								FirstName:  "John",
-								LastName:   "Doe",
-								Email:      "john@mail.com",
-								CompanyID:  2,
-								Role: &sandpiper.Role{
-									ID:          1,
-									AccessLevel: 1,
-									Name:        "SUPER_ADMIN",
-								},
+								ID:        10,
+								CreatedAt: mock.TestTime(2001),
+								UpdatedAt: mock.TestTime(2002),
+								FirstName: "John",
+								LastName:  "Doe",
+								Email:     "john@mail.com",
+								CompanyID: mock.TestUUID(2),
+								Role:      sandpiper.SuperAdminRole,
 							},
 							{
-								Base: sandpiper.Base{
-									ID:        11,
-									CreatedAt: mock.TestTime(2004),
-									UpdatedAt: mock.TestTime(2005),
-								},
-								FirstName:  "Joanna",
-								LastName:   "Dye",
-								Email:      "joanna@mail.com",
-								CompanyID:  1,
-								Role: &sandpiper.Role{
-									ID:          2,
-									AccessLevel: 2,
-									Name:        "ADMIN",
-								},
+								ID:        11,
+								CreatedAt: mock.TestTime(2004),
+								UpdatedAt: mock.TestTime(2005),
+								FirstName: "Joanna",
+								LastName:  "Dye",
+								Email:     "joanna@mail.com",
+								CompanyID: mock.TestUUID(1),
+								Role:      sandpiper.SuperAdminRole,
 							},
 						}, nil
 					}
@@ -217,36 +204,24 @@ func TestList(t *testing.T) {
 			wantResp: &listResponse{
 				Users: []sandpiper.User{
 					{
-						Base: sandpiper.Base{
-							ID:        10,
-							CreatedAt: mock.TestTime(2001),
-							UpdatedAt: mock.TestTime(2002),
-						},
-						FirstName:  "John",
-						LastName:   "Doe",
-						Email:      "john@mail.com",
-						CompanyID:  2,
-						Role: &sandpiper.Role{
-							ID:          1,
-							AccessLevel: 1,
-							Name:        "SUPER_ADMIN",
-						},
+						ID:        10,
+						CreatedAt: mock.TestTime(2001),
+						UpdatedAt: mock.TestTime(2002),
+						FirstName: "John",
+						LastName:  "Doe",
+						Email:     "john@mail.com",
+						CompanyID: mock.TestUUID(2),
+						Role:      sandpiper.SuperAdminRole,
 					},
 					{
-						Base: sandpiper.Base{
-							ID:        11,
-							CreatedAt: mock.TestTime(2004),
-							UpdatedAt: mock.TestTime(2005),
-						},
-						FirstName:  "Joanna",
-						LastName:   "Dye",
-						Email:      "joanna@mail.com",
-						CompanyID:  1,
-						Role: &sandpiper.Role{
-							ID:          2,
-							AccessLevel: 2,
-							Name:        "ADMIN",
-						},
+						ID:        11,
+						CreatedAt: mock.TestTime(2004),
+						UpdatedAt: mock.TestTime(2005),
+						FirstName: "Joanna",
+						LastName:  "Dye",
+						Email:     "joanna@mail.com",
+						CompanyID: mock.TestUUID(1),
+						Role:      sandpiper.AdminRole,
 					},
 				}, Page: 1},
 		},
@@ -313,11 +288,9 @@ func TestView(t *testing.T) {
 			udb: &mockdb.User{
 				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
 					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        1,
-							CreatedAt: mock.TestTime(2000),
-							UpdatedAt: mock.TestTime(2000),
-						},
+						ID:        1,
+						CreatedAt: mock.TestTime(2000),
+						UpdatedAt: mock.TestTime(2000),
 						FirstName: "John",
 						LastName:  "Doe",
 						Username:  "JohnDoe",
@@ -326,11 +299,9 @@ func TestView(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2000),
-					UpdatedAt: mock.TestTime(2000),
-				},
+				ID:        1,
+				CreatedAt: mock.TestTime(2000),
+				UpdatedAt: mock.TestTime(2000),
 				FirstName: "John",
 				LastName:  "Doe",
 				Username:  "JohnDoe",
@@ -408,38 +379,30 @@ func TestUpdate(t *testing.T) {
 			udb: &mockdb.User{
 				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
 					return &sandpiper.User{
-						Base: sandpiper.Base{
-							ID:        1,
-							CreatedAt: mock.TestTime(2000),
-							UpdatedAt: mock.TestTime(2000),
-						},
+						ID:        1,
+						CreatedAt: mock.TestTime(2000),
+						UpdatedAt: mock.TestTime(2000),
 						FirstName: "John",
 						LastName:  "Doe",
 						Username:  "JohnDoe",
-						Address:   "Work",
 						Phone:     "332223",
-						Mobile:    "991991",
 					}, nil
 				},
 				UpdateFn: func(db orm.DB, usr *sandpiper.User) error {
 					usr.UpdatedAt = mock.TestTime(2010)
-					usr.Mobile = "991991"
+					usr.Phone = "991991"
 					return nil
 				},
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &sandpiper.User{
-				Base: sandpiper.Base{
-					ID:        1,
-					CreatedAt: mock.TestTime(2000),
-					UpdatedAt: mock.TestTime(2000),
-				},
+				ID:        1,
+				CreatedAt: mock.TestTime(2000),
+				UpdatedAt: mock.TestTime(2000),
 				FirstName: "John",
 				LastName:  "Doe",
 				Username:  "JohnDoe",
-				Phone:     "332223",
-				Address:   "Work",
-				Mobile:    "991991",
+				Phone:     "991991",
 			},
 		},
 	}
@@ -493,9 +456,7 @@ func TestDelete(t *testing.T) {
 			udb: &mockdb.User{
 				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
 					return &sandpiper.User{
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.CompanyAdminRole,
-						},
+						Role: sandpiper.CompanyAdminRole,
 					}, nil
 				},
 			},
@@ -512,9 +473,7 @@ func TestDelete(t *testing.T) {
 			udb: &mockdb.User{
 				ViewFn: func(db orm.DB, id int) (*sandpiper.User, error) {
 					return &sandpiper.User{
-						Role: &sandpiper.Role{
-							AccessLevel: sandpiper.CompanyAdminRole,
-						},
+						Role: sandpiper.CompanyAdminRole,
 					}, nil
 				},
 				DeleteFn: func(orm.DB, *sandpiper.User) error {

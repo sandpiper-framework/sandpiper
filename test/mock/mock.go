@@ -38,7 +38,6 @@ func TestTimePtr(year int) *time.Time {
 
 // HeaderValid is used for jwt testing
 func HeaderValid() string {
-	// time elapsing??? maybe must generate a new one instead of static??
 	return "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjIjoiOWFkMDcyMzQtMjc0Mi00MGViLTllZjEtODAwYzJmMTE2NGNlIiwiZSI6ImpvaG5kb2VAbWFpbC5jb20iLCJleHAiOjE1Nzc2MzQ4NzksImlkIjoxLCJyIjoxMDAsInUiOiJhZG1pbiJ9.1i-Jwoent1Oyx0IAx4Ass7lBAjgf3O3RvxihwKCu2g4"
 }
 

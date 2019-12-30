@@ -6,29 +6,29 @@ package sandpiper
 
 import (
 	"context"
+	"github.com/go-pg/pg/v9/orm"
 	"time"
 
-	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 )
 
 // User represents user domain model
 type User struct {
-	ID                 int       `json:"id"`
-	FirstName          string    `json:"first_name"`
-	LastName           string    `json:"last_name"`
-	Username           string    `json:"username"`
-	Password           string    `json:"-"`
-	Email              string    `json:"email"`
-	Phone              string    `json:"phone,omitempty"`
-	Active             bool      `json:"active"`
-	LastLogin          time.Time `json:"last_login,omitempty"`
-	PasswordChanged    time.Time `json:"last_password_change,omitempty"`
-	Token              string    `json:"-"`
-	Role               AccessRole `json:"role,omitempty"`
-	CompanyID          uuid.UUID `json:"company_id"`  // belongs-to company
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID              int        `json:"id"`
+	FirstName       string     `json:"first_name"`
+	LastName        string     `json:"last_name"`
+	Username        string     `json:"username"`
+	Password        string     `json:"-"`
+	Email           string     `json:"email"`
+	Phone           string     `json:"phone,omitempty"`
+	Active          bool       `json:"active"`
+	LastLogin       time.Time  `json:"last_login,omitempty"`
+	PasswordChanged time.Time  `json:"last_password_change,omitempty"`
+	Token           string     `json:"-"`
+	Role            AccessRole `json:"role,omitempty"`
+	CompanyID       uuid.UUID  `json:"company_id"` // belongs-to company
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
 }
 
 // AuthUser represents data stored in JWT token for the current user
@@ -52,10 +52,9 @@ func (u *User) UpdateLastLogin(token string) {
 	u.LastLogin = time.Now()
 }
 
-
 // compile-time check variables for model hooks (which take no memory)
-var _ orm.BeforeInsertHook = (*Base)(nil)
-var _ orm.BeforeUpdateHook = (*Base)(nil)
+var _ orm.BeforeInsertHook = (*User)(nil)
+var _ orm.BeforeUpdateHook = (*User)(nil)
 
 // BeforeInsert hooks into insert operations, setting createdAt and updatedAt to current time
 func (u *User) BeforeInsert(ctx context.Context) (context.Context, error) {

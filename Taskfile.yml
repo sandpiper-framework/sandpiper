@@ -119,5 +119,7 @@ tasks:
   clean-docker:
     desc: Remove any unused docker images (FIX THIS!!!)
     cmds:
-      - docker ps -a -q -f status=exited | xargs docker rm
-      - docker images --no-trunc=true --filter dangling=true --quiet | xargs docker rmi
+      # docker ps -a -q -f status=exited | xargs docker rm
+      # docker images --no-trunc=true --filter dangling=true --quiet | xargs docker rmi
+      - sh: docker stop $(docker ps -a -q)
+      - sh: docker rm $(docker ps -a -q)

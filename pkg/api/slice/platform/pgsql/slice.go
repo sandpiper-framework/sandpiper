@@ -57,8 +57,8 @@ func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 	return slice, nil
 }
 
-// ViewByCompany returns a single slice by ID joined through subscriptions to company
-func (s *Slice) ViewByCompany(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
+// ViewBySub returns a single slice by ID if included in company subscriptions.
+func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: sliceID}
 
 	err := db.Model(slice).
@@ -73,12 +73,6 @@ func (s *Slice) ViewByCompany(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID)
 	return slice, nil
 }
 
-// Update updates slice info by primary key (assumes allowed to do this)
-func (s *Slice) Update(db orm.DB, slice *sandpiper.Slice) error {
-	_, err := db.Model(slice).Update()
-	return err
-}
-
 // List returns list of all slices
 func (s *Slice) List(db orm.DB, qp *sandpiper.ListQuery, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices []sandpiper.Slice
@@ -91,6 +85,12 @@ func (s *Slice) List(db orm.DB, qp *sandpiper.ListQuery, p *sandpiper.Pagination
 		return nil, err
 	}
 	return slices, nil
+}
+
+// Update updates slice info by primary key (assumes allowed to do this)
+func (s *Slice) Update(db orm.DB, slice *sandpiper.Slice) error {
+	_, err := db.Model(slice).Update()
+	return err
 }
 
 // Delete sets deleted_at for a slice

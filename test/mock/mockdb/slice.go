@@ -9,12 +9,12 @@ import (
 
 // Slice database mock
 type Slice struct {
-	CreateFn         func(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
-	ViewFn           func(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
-	ViewByCompanyFn  func(orm.DB, uuid.UUID, uuid.UUID) (*sandpiper.Slice, error)
-	ListFn           func(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.Slice, error)
-	DeleteFn         func(orm.DB, *sandpiper.Slice) error
-	UpdateFn         func(orm.DB, *sandpiper.Slice) error
+	CreateFn    func(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
+	ViewFn      func(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
+	ViewBySubFn func(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error)
+	ListFn      func(orm.DB, *sandpiper.ListQuery, *sandpiper.Pagination) ([]sandpiper.Slice, error)
+	DeleteFn    func(orm.DB, *sandpiper.Slice) error
+	UpdateFn    func(orm.DB, *sandpiper.Slice) error
 }
 
 // Create mock
@@ -27,9 +27,9 @@ func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 	return s.ViewFn(db, id)
 }
 
-// ViewByCompany mock
-func (s *Slice) ViewByCompany(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
-	return s.ViewByCompanyFn(db, companyID, sliceID)
+// ViewBySub mock
+func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
+	return s.ViewBySubFn(db, companyID, sliceID)
 }
 
 // List mock
