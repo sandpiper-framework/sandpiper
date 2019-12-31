@@ -65,7 +65,7 @@ func (j *Service) MWFunc() echo.MiddlewareFunc {
 			companyID, _ := uuid.Parse(claims["c"].(string))
 			username := claims["u"].(string)
 			email := claims["e"].(string)
-			role := sandpiper.AccessRole(claims["r"].(float64))
+			role := sandpiper.AccessLevel(claims["r"].(float64))
 
 			// add claims to context
 			c.Set("id", id)

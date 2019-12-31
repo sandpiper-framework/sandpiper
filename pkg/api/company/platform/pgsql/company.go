@@ -7,16 +7,16 @@ package pgsql
 // company service database access
 
 import (
-	"autocare.org/sandpiper/internal/scope"
 	"net/http"
 	"strings"
 
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
-	"github.com/labstack/echo/v4"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/scope"
 )
 
 // Company represents the client for company table

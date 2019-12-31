@@ -7,7 +7,6 @@ package pgsql
 // user service database access
 
 import (
-	"autocare.org/sandpiper/internal/scope"
 	"net/http"
 	"strings"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/internal/scope"
 )
 
 // User represents the client for user table

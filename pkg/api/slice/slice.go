@@ -6,8 +6,8 @@
 package slice
 
 import (
-	"github.com/labstack/echo/v4"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"time"
 
 	"autocare.org/sandpiper/internal/model"

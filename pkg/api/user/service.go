@@ -60,6 +60,6 @@ type Repository interface {
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceUser(echo.Context, int) error
-	AccountCreate(echo.Context, sandpiper.AccessRole, uuid.UUID) error
-	IsLowerRole(echo.Context, sandpiper.AccessRole) error
+	AccountCreate(echo.Context, sandpiper.AccessLevel, uuid.UUID) error
+	IsLowerRole(echo.Context, sandpiper.AccessLevel) error
 }

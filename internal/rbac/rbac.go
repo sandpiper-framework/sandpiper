@@ -27,13 +27,13 @@ func (s *Service) CurrentUser(c echo.Context) *sandpiper.AuthUser {
 		Username:   c.Get("username").(string),
 		CompanyID:  c.Get("company_id").(uuid.UUID),
 		Email:      c.Get("email").(string),
-		Role:       c.Get("role").(sandpiper.AccessRole),
+		Role:       c.Get("role").(sandpiper.AccessLevel),
 	}
 }
 
-// EnforceRole authorizes request by AccessRole
-func (s *Service) EnforceRole(c echo.Context, r sandpiper.AccessRole) error {
-	return checkBool(!(c.Get("role").(sandpiper.AccessRole) > r))
+// EnforceRole authorizes request by AccessLevel
+func (s *Service) EnforceRole(c echo.Context, r sandpiper.AccessLevel) error {
+	return checkBool(!(c.Get("role").(sandpiper.AccessLevel) > r))
 }
 
 // EnforceUser checks whether the request to change user data is done by the same user
@@ -60,16 +60,16 @@ func (s *Service) EnforceCompany(c echo.Context, ID uuid.UUID) error {
 }
 
 func (s *Service) isAdmin(c echo.Context) bool {
-	return !(c.Get("role").(sandpiper.AccessRole) > sandpiper.AdminRole)
+	return !(c.Get("role").(sandpiper.AccessLevel) > sandpiper.AdminRole)
 }
 
 func (s *Service) isCompanyAdmin(c echo.Context) bool {
 	// Must query company ID in database for the given user
-	return !(c.Get("role").(sandpiper.AccessRole) > sandpiper.CompanyAdminRole)
+	return !(c.Get("role").(sandpiper.AccessLevel) > sandpiper.CompanyAdminRole)
 }
 
 // AccountCreate performs auth check when creating a new account
-func (s *Service) AccountCreate(c echo.Context, role sandpiper.AccessRole, companyID uuid.UUID) error {
+func (s *Service) AccountCreate(c echo.Context, role sandpiper.AccessLevel, companyID uuid.UUID) error {
 	if err := s.EnforceCompany(c, companyID); err != nil {
 		return err
 	}
@@ -78,8 +78,8 @@ func (s *Service) AccountCreate(c echo.Context, role sandpiper.AccessRole, compa
 
 // IsLowerRole checks whether the requesting user has higher role than the user it wants to change
 // Used for account creation/deletion
-func (s *Service) IsLowerRole(c echo.Context, r sandpiper.AccessRole) error {
-	return checkBool(c.Get("role").(sandpiper.AccessRole) < r)
+func (s *Service) IsLowerRole(c echo.Context, r sandpiper.AccessLevel) error {
+	return checkBool(c.Get("role").(sandpiper.AccessLevel) < r)
 }
 
 func checkBool(b bool) error {

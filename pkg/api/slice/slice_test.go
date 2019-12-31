@@ -35,7 +35,7 @@ func TestCreate(t *testing.T) {
 	}{{
 		name: "CREATE Fails as Standard User",
 		rbac: &mock.RBAC{
-			EnforceRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+			EnforceRoleFn: func(echo.Context, sandpiper.AccessLevel) error {
 				return errors.New("forbidden error")
 			}},
 		wantErr: true,
@@ -65,7 +65,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				EnforceRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				EnforceRoleFn: func(echo.Context, sandpiper.AccessLevel) error {
 					return errors.New("forbidden error")
 				}},
 			wantData: &sandpiper.Slice{
@@ -296,7 +296,7 @@ func TestDelete(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				IsLowerRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				IsLowerRoleFn: func(echo.Context, sandpiper.AccessLevel) error {
 					return errors.New("generic error")
 				}},
 			wantErr: errors.New("generic error"),
@@ -321,7 +321,7 @@ func TestDelete(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				IsLowerRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				IsLowerRoleFn: func(echo.Context, sandpiper.AccessLevel) error {
 					return nil
 				}},
 		},

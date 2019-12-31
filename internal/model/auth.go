@@ -22,35 +22,21 @@ type RefreshToken struct {
 	Expires string `json:"expires"`
 }
 
-// RBACService represents role-based access control service interface
-type RBACService interface {
-	CurrentUser(echo.Context) *AuthUser
-	EnforceRole(echo.Context, AccessRole) error
-	EnforceUser(echo.Context, int) error
-	EnforceCompany(echo.Context, uuid.UUID) error
-	AccountCreate(echo.Context, AccessRole, int, int) error
-	IsLowerRole(echo.Context, AccessRole) error
-}
-
-// AccessRole represents access role type
-type AccessRole int
-
-const (
-	// SuperAdminRole has all permissions
-	SuperAdminRole AccessRole = 100
-	// AdminRole has admin specific permissions
-	AdminRole AccessRole = 110
-	// CompanyAdminRole can edit company specific things
-	CompanyAdminRole AccessRole = 120
-	// UserRole is a standard user
-	UserRole AccessRole = 200
-)
-
-// AuthUser represents data stored in JWT token for the current user
+// AuthUser represents data ("claims") stored in JWT token for the current user
 type AuthUser struct {
 	ID        int
 	CompanyID uuid.UUID
 	Username  string
 	Email     string
-	Role      AccessRole
+	Role      AccessLevel
+}
+
+// RBACService represents role-based access control service interface
+type RBACService interface {
+	CurrentUser(echo.Context) *AuthUser
+	EnforceRole(echo.Context, AccessLevel) error
+	EnforceUser(echo.Context, int) error
+	EnforceCompany(echo.Context, uuid.UUID) error
+	AccountCreate(echo.Context, AccessLevel, int, int) error
+	IsLowerRole(echo.Context, AccessLevel) error
 }

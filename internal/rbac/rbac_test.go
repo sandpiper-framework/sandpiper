@@ -30,7 +30,7 @@ func TestUser(t *testing.T) {
 func TestEnforceRole(t *testing.T) {
 	type args struct {
 		ctx  echo.Context
-		role sandpiper.AccessRole
+		role sandpiper.AccessLevel
 	}
 	cases := []struct {
 		name    string
@@ -135,7 +135,7 @@ func TestEnforceCompany(t *testing.T) {
 func TestAccountCreate(t *testing.T) {
 	type args struct {
 		ctx        echo.Context
-		role       sandpiper.AccessRole
+		role       sandpiper.AccessLevel
 		company_id uuid.UUID
 	}
 	cases := []struct {

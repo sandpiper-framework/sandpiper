@@ -217,7 +217,7 @@ func TestList(t *testing.T) {
 			},
 			qp: &scope.Clause{
 				ID:    mock.TestUUID(1),
-				Query: "company_id = ?",
+				Condition: "company_id = ?",
 			},
 			wantData: []sandpiper.Company{
 				{

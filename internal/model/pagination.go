@@ -12,8 +12,8 @@ const (
 
 // PaginationReq holds pagination http fields and tags
 type PaginationReq struct {
-	Limit int `query:"limit"`
-	Page  int `query:"page" validate:"min=0"`
+	Limit int `Condition:"limit"`
+	Page  int `Condition:"page" validate:"min=0"`
 }
 
 // Transform checks and converts http pagination into database pagination model

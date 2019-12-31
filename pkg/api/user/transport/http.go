@@ -49,7 +49,7 @@ type createReq struct {
 	PasswordConfirm string               `json:"password_confirm" validate:"required"`
 	Email           string               `json:"email" validate:"required,email"`
 	CompanyID       uuid.UUID            `json:"company_id" validate:"required"`
-	Role            sandpiper.AccessRole `json:"role" validate:"required"`
+	Role            sandpiper.AccessLevel `json:"role" validate:"required"`
 }
 
 func (h *HTTP) create(c echo.Context) error {

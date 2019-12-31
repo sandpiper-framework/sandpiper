@@ -35,7 +35,7 @@ func TestCreate(t *testing.T) {
 	}{{
 		name: "Fail on is lower role",
 		rbac: &mock.RBAC{
-			AccountCreateFn: func(echo.Context, sandpiper.AccessRole, uuid.UUID) error {
+			AccountCreateFn: func(echo.Context, sandpiper.AccessLevel, uuid.UUID) error {
 				return errors.New("generic error")
 			}},
 		wantErr: true,
@@ -65,7 +65,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(echo.Context, sandpiper.AccessRole, uuid.UUID) error {
+				AccountCreateFn: func(echo.Context, sandpiper.AccessLevel, uuid.UUID) error {
 					return nil
 				}},
 			sec: &mock.Secure{
@@ -294,7 +294,7 @@ func TestDelete(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				IsLowerRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				IsLowerRoleFn: func(echo.Context, sandpiper.AccessLevel) error {
 					return errors.New("generic error")
 				}},
 			wantErr: errors.New("generic error"),
@@ -318,7 +318,7 @@ func TestDelete(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				IsLowerRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				IsLowerRoleFn: func(echo.Context, sandpiper.AccessLevel) error {
 					return nil
 				}},
 		},

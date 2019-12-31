@@ -38,7 +38,7 @@ func TestList(t *testing.T) {
 				CompanyID: mock.TestUUID(1),
 			}},
 			wantData: &scope.Clause{
-				Query: "company_id = ?",
+				Condition: "company_id = ?",
 				ID:    mock.TestUUID(1)},
 		},
 		{

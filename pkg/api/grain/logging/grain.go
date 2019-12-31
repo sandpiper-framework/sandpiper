@@ -2,9 +2,9 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-package slice
+package grain
 
-// slice service logger
+// grain service logger
 
 import (
 	"time"
@@ -13,31 +13,31 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/pkg/api/slice"
+	"autocare.org/sandpiper/pkg/api/grain"
 )
 
-// New creates new slice logging service
-func New(svc slice.Service, logger sandpiper.Logger) *LogService {
+// New creates new grain logging service
+func New(svc grain.Service, logger sandpiper.Logger) *LogService {
 	return &LogService{
 		Service: svc,
 		logger:  logger,
 	}
 }
 
-// LogService represents slice logging service
+// LogService represents grain logging service
 type LogService struct {
-	slice.Service
+	grain.Service
 	logger sandpiper.Logger
 }
 
-const source = "slice"
+const source = "grain"
 
 // Create logging
-func (ls *LogService) Create(c echo.Context, req sandpiper.Slice) (resp *sandpiper.Slice, err error) {
+func (ls *LogService) Create(c echo.Context, req sandpiper.Grain) (resp *sandpiper.Grain, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "Create slice request", err,
+			source, "Create grain request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -49,11 +49,11 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Slice) (resp *sandpip
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Slice, err error) {
+func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Grain, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "List slice request", err,
+			source, "List grain request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -65,11 +65,11 @@ func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sa
 }
 
 // View logging
-func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Slice, err error) {
+func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Grain, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "View slice request", err,
+			source, "View grain request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -85,7 +85,7 @@ func (ls *LogService) Delete(c echo.Context, req uuid.UUID) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "Delete slice request", err,
+			source, "Delete grain request", err,
 			map[string]interface{}{
 				"req":  req,
 				"took": time.Since(begin),
@@ -93,20 +93,4 @@ func (ls *LogService) Delete(c echo.Context, req uuid.UUID) (err error) {
 		)
 	}(time.Now())
 	return ls.Service.Delete(c, req)
-}
-
-// Update logging
-func (ls *LogService) Update(c echo.Context, req *slice.Update) (resp *sandpiper.Slice, err error) {
-	defer func(begin time.Time) {
-		ls.logger.Log(
-			c,
-			source, "Update slice request", err,
-			map[string]interface{}{
-				"req":  req,
-				"resp": resp,
-				"took": time.Since(begin),
-			},
-		)
-	}(time.Now())
-	return ls.Service.Update(c, req)
 }

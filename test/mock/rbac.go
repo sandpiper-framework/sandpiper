@@ -10,11 +10,11 @@ import (
 // RBAC Mock
 type RBAC struct {
 	CurrentUserFn     func(echo.Context) *sandpiper.AuthUser
-	EnforceRoleFn     func(echo.Context, sandpiper.AccessRole) error
+	EnforceRoleFn     func(echo.Context, sandpiper.AccessLevel) error
 	EnforceUserFn     func(echo.Context, int) error
 	EnforceCompanyFn  func(echo.Context, uuid.UUID) error
-	AccountCreateFn   func(echo.Context, sandpiper.AccessRole, uuid.UUID) error
-	IsLowerRoleFn     func(echo.Context, sandpiper.AccessRole) error
+	AccountCreateFn   func(echo.Context, sandpiper.AccessLevel, uuid.UUID) error
+	IsLowerRoleFn     func(echo.Context, sandpiper.AccessLevel) error
 }
 
 // CurrentUser mock
@@ -23,7 +23,7 @@ func (a *RBAC) CurrentUser(c echo.Context) *sandpiper.AuthUser {
 }
 
 // EnforceRole mock
-func (a *RBAC) EnforceRole(c echo.Context, role sandpiper.AccessRole) error {
+func (a *RBAC) EnforceRole(c echo.Context, role sandpiper.AccessLevel) error {
 	return a.EnforceRoleFn(c, role)
 }
 
@@ -38,11 +38,11 @@ func (a *RBAC) EnforceCompany(c echo.Context, id uuid.UUID) error {
 }
 
 // AccountCreate mock
-func (a *RBAC) AccountCreate(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
+func (a *RBAC) AccountCreate(c echo.Context, roleID sandpiper.AccessLevel, companyID uuid.UUID) error {
 	return a.AccountCreateFn(c, roleID, companyID)
 }
 
 // IsLowerRole mock
-func (a *RBAC) IsLowerRole(c echo.Context, role sandpiper.AccessRole) error {
+func (a *RBAC) IsLowerRole(c echo.Context, role sandpiper.AccessLevel) error {
 	return a.IsLowerRoleFn(c, role)
 }

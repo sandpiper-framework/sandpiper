@@ -7,18 +7,6 @@
  
 BEGIN;
 
-CREATE TYPE "payloadtype" AS ENUM (
-  'aces-file',
-  'aces-item',
-  'asset-file',
-  'partspro-file',
-  'partspro-item',
-  'pies-file',
-  'pies-item',
-  'pies-marketcopy',
-  'pies-pricesheet'
-);
-
 CREATE TABLE IF NOT EXISTS "settings" (
   "id"    SERIAL PRIMARY KEY,
   "key"   text UNIQUE NOT NULL,
@@ -63,11 +51,12 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
   PRIMARY KEY ("slice_id", "company_id")
 );
 
-CREATE TABLE IF NOT EXISTS "data_objects" (
+CREATE TABLE IF NOT EXISTS "grains" (
   "id"           uuid PRIMARY KEY,
   "slice_id"     uuid,
-  "payload_type" payloadtype,
-  "payload"      text
+  "grain_type"   smallint,
+  "payload"      text,
+  "created_at"   timestamp
 ); 
 
 CREATE TABLE IF NOT EXISTS users (

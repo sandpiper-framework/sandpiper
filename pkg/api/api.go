@@ -27,6 +27,10 @@ import (
 	sl "autocare.org/sandpiper/pkg/api/slice/logging"
 	st "autocare.org/sandpiper/pkg/api/slice/transport"
 
+	"autocare.org/sandpiper/pkg/api/grain"
+	gl "autocare.org/sandpiper/pkg/api/grain/logging"
+	gt "autocare.org/sandpiper/pkg/api/grain/transport"
+
 	"autocare.org/sandpiper/internal/config"
 	"autocare.org/sandpiper/internal/database"
 	"autocare.org/sandpiper/internal/middleware/jwt"
@@ -65,6 +69,7 @@ func Start(cfg *config.Configuration) error {
 	pt.NewHTTP(pl.New(password.Initialize(db, rba, sec), log), v1) // password service
 	ct.NewHTTP(cl.New(company.Initialize(db, rba, sec), log), v1)  // company service
 	st.NewHTTP(sl.New(slice.Initialize(db, rba, sec), log), v1)    // slice service
+	gt.NewHTTP(gl.New(grain.Initialize(db, rba, sec), log), v1)    // grain service
 
 	// start the server listening
 	server.Start(srv, &server.Config{

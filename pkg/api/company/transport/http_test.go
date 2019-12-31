@@ -45,7 +45,7 @@ func TestCreate(t *testing.T) {
 			name: "CREATE Fail on invalid role",
 			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":50}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessLevel, companyID uuid.UUID) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -55,7 +55,7 @@ func TestCreate(t *testing.T) {
 			name: "CREATE Fail on RBAC",
 			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":200}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessLevel, companyID uuid.UUID) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -65,7 +65,7 @@ func TestCreate(t *testing.T) {
 			name: "CREATE Success",
 			req:  `{"first_name":"John","last_name":"Doe","username":"juzernejm","password":"hunter123","password_confirm":"hunter123","email":"johndoe@gmail.com","company_id":1,"role_id":200}`,
 			rbac: &mock.RBAC{
-				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessRole, companyID uuid.UUID) error {
+				AccountCreateFn: func(c echo.Context, roleID sandpiper.AccessLevel, companyID uuid.UUID) error {
 					return nil
 				},
 			},
@@ -427,7 +427,7 @@ func TestDelete(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				IsLowerRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				IsLowerRoleFn: func(echo.Context, sandpiper.AccessLevel) error {
 					return echo.ErrForbidden
 				},
 			},
@@ -445,7 +445,7 @@ func TestDelete(t *testing.T) {
 				},
 			},
 			rbac: &mock.RBAC{
-				IsLowerRoleFn: func(echo.Context, sandpiper.AccessRole) error {
+				IsLowerRoleFn: func(echo.Context, sandpiper.AccessLevel) error {
 					return nil
 				},
 			},
