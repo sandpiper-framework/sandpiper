@@ -123,6 +123,47 @@ Give an example
 
 Add additional notes about how to deploy this on a live system
 
+### Implementing CRUD of another table
+
+Let's say you have a table named 'cars' that handles employee's cars. To implement CRUD on this table you need:
+
+1. Inside `pkg/utl/model` create a new file named `car.go`. Inside put your entity (struct), and methods on the struct if you need them.
+
+2. Create a new `car` folder in the (micro)service where your service will be located, most probably inside `api`. Inside create a file/service named car.go and test file for it (`car/car.go` and `car/car_test.go`). You can test your code without writing a single query by mocking the database logic inside /mock/mockdb folder. If you have complex queries interfering with other entities, you can create in this folder other files such as car_users.go or car_templates.go for example.
+
+3. Inside car folder, create folders named `platform`, `transport` and `logging`.
+
+4. Code for interacting with a platform like database (postgresql) should be placed under `car/platform/pgsql`. (`pkg/api/car/platform/pgsql/car.go`)
+
+5. In `pkg/api/car/transport` create a new file named `http.go`. This is where your handlers are located. Under the same location create http_test.go to test your API.
+
+6. In logging directory create a file named `car.go` and copy the logic from another service. This serves as request/response logging.
+
+6. In `pkg/api/api.go` wire up all the logic, by instantiating car service, passing it to the logging and transport service afterwards.
+
+### Implementing other platforms
+
+Similarly to implementing APIs relying only on a database, you can implement other platforms by:
+
+1. In the service package, in car.go add interface that corresponds to the platform, for example, Indexer or Reporter.
+
+2. Rest of the procedure is same, except that in `/platform` you would create a new folder for your platform, for example, `elastic`.
+
+3. Once the new platform logic is implemented, create an instance of it in main.go (for example `elastic.Client`) and pass it as an argument to car service (`pkg/api/car/car.go`).
+
+### Running database queries in transaction
+
+To use a transaction, before interacting with db create a new transaction:
+
+```go
+err := s.db.RunInTransaction(func (tx *pg.Tx) error{
+    // Application service here
+})
+````
+
+Instead of passing database client as `s.db` , inside this function pass it as `tx`. Handle the error accordingly.
+
+
 ## Built With
 
 * [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used

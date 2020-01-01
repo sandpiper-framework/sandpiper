@@ -16,8 +16,8 @@ import (
 	"autocare.org/sandpiper/pkg/api/company"
 )
 
-// New creates new company logging service
-func New(svc company.Service, logger sandpiper.Logger) *LogService {
+// ServiceLogger creates new logger wrapping the company service
+func ServiceLogger(svc company.Service, logger sandpiper.Logger) *LogService {
 	return &LogService{
 		Service: svc,
 		logger:  logger,

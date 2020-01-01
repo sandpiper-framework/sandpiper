@@ -16,8 +16,8 @@ import (
 	"autocare.org/sandpiper/pkg/api/grain"
 )
 
-// New creates new grain logging service
-func New(svc grain.Service, logger sandpiper.Logger) *LogService {
+// ServiceLogger creates new logger wrapping the grain service
+func ServiceLogger(svc grain.Service, logger sandpiper.Logger) *LogService {
 	return &LogService{
 		Service: svc,
 		logger:  logger,

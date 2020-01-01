@@ -7,29 +7,13 @@
 package api
 
 import (
-	"autocare.org/sandpiper/pkg/api/auth"
-	al "autocare.org/sandpiper/pkg/api/auth/logging"
-	at "autocare.org/sandpiper/pkg/api/auth/transport"
-
-	"autocare.org/sandpiper/pkg/api/password"
-	pl "autocare.org/sandpiper/pkg/api/password/logging"
-	pt "autocare.org/sandpiper/pkg/api/password/transport"
-
-	"autocare.org/sandpiper/pkg/api/user"
-	ul "autocare.org/sandpiper/pkg/api/user/logging"
-	ut "autocare.org/sandpiper/pkg/api/user/transport"
-
-	"autocare.org/sandpiper/pkg/api/company"
-	cl "autocare.org/sandpiper/pkg/api/company/logging"
-	ct "autocare.org/sandpiper/pkg/api/company/transport"
-
-	"autocare.org/sandpiper/pkg/api/slice"
-	sl "autocare.org/sandpiper/pkg/api/slice/logging"
-	st "autocare.org/sandpiper/pkg/api/slice/transport"
-
-	"autocare.org/sandpiper/pkg/api/grain"
-	gl "autocare.org/sandpiper/pkg/api/grain/logging"
-	gt "autocare.org/sandpiper/pkg/api/grain/transport"
+	// one import for each service to register (with unique alias)
+	ar "autocare.org/sandpiper/pkg/api/auth/register"
+	cr "autocare.org/sandpiper/pkg/api/company/register"
+	gr "autocare.org/sandpiper/pkg/api/grain/register"
+	pr "autocare.org/sandpiper/pkg/api/password/register"
+	sr "autocare.org/sandpiper/pkg/api/slice/register"
+	ur "autocare.org/sandpiper/pkg/api/user/register"
 
 	"autocare.org/sandpiper/internal/config"
 	"autocare.org/sandpiper/internal/database"
@@ -49,7 +33,7 @@ func Start(cfg *config.Configuration) error {
 		return err
 	}
 
-	// setup middleware and logging services
+	// setup token, security and logging available for all services
 	sec := secure.New(cfg.App.MinPasswordStr)
 	rba := rbac.New()
 	tok := jwt.New(cfg.JWT.Secret, cfg.JWT.SigningAlgorithm, cfg.JWT.Duration)
@@ -58,18 +42,17 @@ func Start(cfg *config.Configuration) error {
 	// setup echo server (singleton)
 	srv := server.New()
 
-	// auth service is special (doesn't include api version)
-	at.NewHTTP(al.New(auth.Initialize(db, tok, sec, rba), log), srv, tok.MWFunc())
-
+	// create version group using token middleware
 	v1 := srv.Group("/v1")
 	v1.Use(tok.MWFunc())
 
-	// register each service (using proper import aliases)
-	ut.NewHTTP(ul.New(user.Initialize(db, rba, sec), log), v1)     // user service
-	pt.NewHTTP(pl.New(password.Initialize(db, rba, sec), log), v1) // password service
-	ct.NewHTTP(cl.New(company.Initialize(db, rba, sec), log), v1)  // company service
-	st.NewHTTP(sl.New(slice.Initialize(db, rba, sec), log), v1)    // slice service
-	gt.NewHTTP(gl.New(grain.Initialize(db, rba, sec), log), v1)    // grain service
+	// register each service (using proper import alias)
+	ar.Register(db, rba, sec, log, srv, tok, tok.MWFunc())  // auth service (no version group)
+	pr.Register(db, rba, sec, log, v1)  // user service
+	ur.Register(db, rba, sec, log, v1)  // password service
+	cr.Register(db, rba, sec, log, v1)  // company service
+	sr.Register(db, rba, sec, log, v1)  // slice service
+	gr.Register(db, rba, sec, log, v1)  // grain service
 
 	// start the server listening
 	server.Start(srv, &server.Config{

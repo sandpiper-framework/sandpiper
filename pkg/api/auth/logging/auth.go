@@ -15,8 +15,8 @@ import (
 	"autocare.org/sandpiper/pkg/api/auth"
 )
 
-// New creates new auth logging service
-func New(svc auth.Service, logger sandpiper.Logger) *LogService {
+// ServiceLogger creates new logger wrapping the auth service
+func ServiceLogger(svc auth.Service, logger sandpiper.Logger) *LogService {
 	return &LogService{
 		Service: svc,
 		logger:  logger,

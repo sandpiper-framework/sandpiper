@@ -16,8 +16,8 @@ import (
 	"autocare.org/sandpiper/pkg/api/slice"
 )
 
-// New creates new slice logging service
-func New(svc slice.Service, logger sandpiper.Logger) *LogService {
+// ServiceLogger creates new logger wrapping the slice service
+func ServiceLogger(svc slice.Service, logger sandpiper.Logger) *LogService {
 	return &LogService{
 		Service: svc,
 		logger:  logger,

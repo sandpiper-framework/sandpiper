@@ -15,8 +15,8 @@ import (
 	"autocare.org/sandpiper/pkg/api/password"
 )
 
-// New creates new password logging service
-func New(svc password.Service, logger sandpiper.Logger) *LogService {
+// ServiceLogger creates new logger wrapping the password service
+func ServiceLogger(svc password.Service, logger sandpiper.Logger) *LogService {
 	return &LogService{
 		Service: svc,
 		logger:  logger,
