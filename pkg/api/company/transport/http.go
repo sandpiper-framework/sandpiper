@@ -12,8 +12,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/company"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // HTTP represents user http service
@@ -40,8 +40,9 @@ var (
 
 // Company create request
 type createReq struct {
-	Name   string `json:"name" validate:"required,min=3"`
-	Active bool   `json:"active"`
+	Name     string `json:"name" validate:"required,min=3"`
+	SyncAddr string `json:"sync_addr"`
+	Active   bool   `json:"active"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -91,9 +92,10 @@ func (h *HTTP) view(c echo.Context) error {
 
 // Company update request
 type updateReq struct {
-	ID     uuid.UUID `json:"-"`
-	Name   string    `json:"name,omitempty" validate:"omitempty,min=3"`
-	Active bool      `json:"active,omitempty" validate:"omitempty"`
+	ID       uuid.UUID `json:"-"`
+	Name     string    `json:"name,omitempty" validate:"omitempty,min=3"`
+	SyncAddr string    `json:"sync_addr"`
+	Active   bool      `json:"active,omitempty" validate:"omitempty"`
 }
 
 func (h *HTTP) update(c echo.Context) error {

@@ -1,6 +1,7 @@
 /*
+ * Project: sandpiper
  * Database: sandpiper
- * Migration: Create initial database tables in an empty database
+ * Migration: Create initial database tables for server in an empty database
  * Direction: Up
  * Date: 2019-11-16
  */
@@ -14,12 +15,13 @@ CREATE TABLE IF NOT EXISTS "settings" (
 );
 
 CREATE TABLE IF NOT EXISTS companies (
-  "id"          uuid PRIMARY KEY,
-  "name"        text NOT NULL,
-  "active"      boolean,
-  "created_at"  timestamp,
-  "updated_at"  timestamp,
-  "deleted_at"  timestamp
+  "id"         uuid PRIMARY KEY,
+  "name"       text NOT NULL,
+  "sync_addr"  text,
+  "active"     boolean,
+  "created_at" timestamp,
+  "updated_at" timestamp,
+  "deleted_at" timestamp
 );
 
 CREATE TABLE IF NOT EXISTS "slices" (
@@ -60,21 +62,21 @@ CREATE TABLE IF NOT EXISTS "grains" (
 ); 
 
 CREATE TABLE IF NOT EXISTS users (
-  "id"                   serial PRIMARY KEY,
-  "first_name"           text,
-  "last_name"            text,
-  "username"             text,
-  "password"             text,
-  "email"                text,
-  "phone"                text,
-  "active"               boolean,
-  "last_login"           timestamp,
-  "password_changed"     timestamp,
-  "token"                text,
-  "role"                 integer,
-  "company_id"           uuid REFERENCES "companies" ("id"),
-  "created_at"           timestamp,
-  "updated_at"           timestamp
+  "id"               serial PRIMARY KEY,
+  "first_name"       text,
+  "last_name"        text,
+  "username"         text,
+  "password"         text,
+  "email"            text,
+  "phone"            text,
+  "active"           boolean,
+  "last_login"       timestamp,
+  "password_changed" timestamp,
+  "token"            text,
+  "role"             integer,
+  "company_id"       uuid REFERENCES "companies" ("id"),
+  "created_at"       timestamp,
+  "updated_at"       timestamp
 );
 
 COMMIT;

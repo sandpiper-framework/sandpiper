@@ -51,11 +51,12 @@ func (s *Company) Delete(c echo.Context, id uuid.UUID) error {
 	return s.sdb.Delete(s.db, company)
 }
 
-// Update contains company's information used for updating
+// Update contains company field request used for updating
 type Update struct {
-	ID     uuid.UUID
-	Name   string
-	Active bool
+	ID       uuid.UUID
+	Name     string
+	SyncAddr string
+	Active   bool
 }
 
 // Update updates company information
@@ -66,9 +67,10 @@ func (s *Company) Update(c echo.Context, r *Update) (*sandpiper.Company, error) 
 	}
 
 	company := &sandpiper.Company{
-		ID:     r.ID,
-		Name:   r.Name,
-		Active: r.Active,
+		ID:       r.ID,
+		Name:     r.Name,
+		SyncAddr: r.SyncAddr,
+		Active:   r.Active,
 	}
 	err := s.sdb.Update(s.db, company)
 	if err != nil {

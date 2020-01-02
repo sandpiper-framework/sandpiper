@@ -16,12 +16,12 @@ import (
 	"autocare.org/sandpiper/pkg/shared/config"
 
 	// one import for each service to register (with identifying alias)
-	ar "autocare.org/sandpiper/pkg/api/auth/register"
-	cr "autocare.org/sandpiper/pkg/api/company/register"
+	au "autocare.org/sandpiper/pkg/api/auth/register"
+	co "autocare.org/sandpiper/pkg/api/company/register"
 	gr "autocare.org/sandpiper/pkg/api/grain/register"
-	pr "autocare.org/sandpiper/pkg/api/password/register"
-	sr "autocare.org/sandpiper/pkg/api/slice/register"
-	ur "autocare.org/sandpiper/pkg/api/user/register"
+	pa "autocare.org/sandpiper/pkg/api/password/register"
+	sl "autocare.org/sandpiper/pkg/api/slice/register"
+	us "autocare.org/sandpiper/pkg/api/user/register"
 )
 
 // Start configures and launches the API services
@@ -47,14 +47,14 @@ func Start(cfg *config.Configuration) error {
 	v1.Use(tok.MWFunc())
 
 	// register each service (using proper import alias)
-	ar.Register(db, rba, sec, log, srv, tok, tok.MWFunc()) // auth service (no version group)
-	pr.Register(db, rba, sec, log, v1)                     // password service
-	ur.Register(db, rba, sec, log, v1)                     // user service
-	cr.Register(db, rba, sec, log, v1)                     // company service
-	sr.Register(db, rba, sec, log, v1)                     // slice service
+	au.Register(db, rba, sec, log, srv, tok, tok.MWFunc()) // auth service (no version group)
+	pa.Register(db, rba, sec, log, v1)                     // password service
+	us.Register(db, rba, sec, log, v1)                     // user service
+	co.Register(db, rba, sec, log, v1)                     // company service
+	sl.Register(db, rba, sec, log, v1)                     // slice service
 	gr.Register(db, rba, sec, log, v1)                     // grain service
-	// rr.Register(db, rba, sec, log, v1)  // subscription service
-	// xr.Register(db, rba, sec, log, v1)  // sync (exchange) service
+	// su.Register(db, rba, sec, log, v1)  // subscription service
+	// sy.Register(db, rba, sec, log, v1)  // sync (exchange) service
 
 	// listen for requests
 	server.Start(srv, &server.Config{

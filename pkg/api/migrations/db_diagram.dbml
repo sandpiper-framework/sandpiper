@@ -1,0 +1,69 @@
+// Sandpiper database diagram
+// https://www.dbml.org/
+// https://dbdiagram.io/
+
+Table settings  [headercolor: #8e44ad] {
+  id integer [pk, increment]
+  key varchar [unique, not null]
+  value varchar
+}
+
+Table users {
+  id int [pk]
+  name varchar
+  email varchar
+  password varchar
+  company_id uuid [ref: > companies.id]
+}
+
+Table companies {
+  id uuid [pk]
+  name varchar
+  contact varchar
+  email varchar
+  status statustype
+}
+
+Table subscriptions  [headercolor: #8e44ad] {
+  slice_id uuid [pk, ref: > slices.id]
+  subscriber_id uuid [pk, ref: > companies.id]
+  name varchar
+  description varchar
+}
+
+Table slices {
+  id uuid [pk]
+  name varchar
+  content_hash string [note: 'code representing all slice ids']
+  content_count integer
+  last_update datetime [note: 'when data in slice was updated']
+}
+
+Table slice_metadata {
+  slice_id uuid [pk, ref: > slices.id]
+  key string [pk]
+  value string
+}
+
+Table grains {
+  id uuid [pk]
+  slice_id uuid [ref: > slices.id]
+  payload_type payloadtype
+  payload string
+}
+
+Enum statustype {
+  active
+  inactive
+}
+
+Enum payloadtype {
+  "aces-file"        // level 1
+  "pies-file"        // level 1
+  "partspro-file"    // level 1
+  "aces-item"
+  "pies-item"
+  "pies-marketcopy"
+  "pies-pricesheet"
+  "partspro-item"
+}
