@@ -13,10 +13,10 @@ import (
 
 	"github.com/golang-migrate/migrate/v4/source/go_bindata"
 
-	"autocare.org/sandpiper/internal/config"
-	"autocare.org/sandpiper/internal/database"
 	"autocare.org/sandpiper/pkg/client/migrations"
 	"autocare.org/sandpiper/pkg/client/version"
+	"autocare.org/sandpiper/pkg/shared/config"
+	"autocare.org/sandpiper/pkg/shared/migrate"
 )
 
 func main() {

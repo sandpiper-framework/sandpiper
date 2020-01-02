@@ -4,7 +4,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // Slice database mock

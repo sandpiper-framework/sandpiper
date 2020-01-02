@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/password/platform/pgsql"
 	"autocare.org/sandpiper/test/mock"
 )

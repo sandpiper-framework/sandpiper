@@ -10,13 +10,13 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // Custom errors
 var (
 	ErrInvalidCredentials = echo.NewHTTPError(http.StatusUnauthorized, "Username or password does not exist")
-	ErrNotAuthorized = echo.NewHTTPError(http.StatusUnauthorized, "User is not authorized")
+	ErrNotAuthorized      = echo.NewHTTPError(http.StatusUnauthorized, "User is not authorized")
 )
 
 // Authenticate tries to authenticate the user provided by username and password

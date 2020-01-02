@@ -14,7 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/slice"
 	"autocare.org/sandpiper/test/mock"
 	"autocare.org/sandpiper/test/mock/mockdb"
@@ -42,19 +42,19 @@ func TestCreate(t *testing.T) {
 		args: args{
 			ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
 			req: sandpiper.Slice{
-				Name:   "AAP Brake Friction",
-				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				Name:         "AAP Brake Friction",
+				ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 				ContentCount: 1,
-				LastUpdate: time.Now(),
+				LastUpdate:   time.Now(),
 			}},
 	},
 		{
 			name: "CREATE Succeeds as Company Admin",
 			args: args{req: sandpiper.Slice{
-				Name:   "AAP Brake Friction",
-				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				Name:         "AAP Brake Friction",
+				ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 				ContentCount: 1,
-				LastUpdate: time.Now(),
+				LastUpdate:   time.Now(),
 			}},
 			mdb: &mockdb.Slice{
 				CreateFn: func(db orm.DB, u sandpiper.Slice) (*sandpiper.Slice, error) {
@@ -69,11 +69,11 @@ func TestCreate(t *testing.T) {
 					return errors.New("forbidden error")
 				}},
 			wantData: &sandpiper.Slice{
-				ID:        mock.TestUUID(1),
-				Name:   "AAP Brake Friction",
-				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ID:           mock.TestUUID(1),
+				Name:         "AAP Brake Friction",
+				ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 				ContentCount: 1,
-				LastUpdate: time.Now(),
+				LastUpdate:   time.Now(),
 			},
 		},
 	}
@@ -119,13 +119,13 @@ func TestView(t *testing.T) {
 				mock.TestUUID(1),
 			},
 			wantData: &sandpiper.Slice{
-				ID:        mock.TestUUID(1),
-				CreatedAt: mock.TestTime(2000),
-				UpdatedAt: mock.TestTime(2000),
-				Name:   "AAP Brake Friction",
-				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ID:           mock.TestUUID(1),
+				CreatedAt:    mock.TestTime(2000),
+				UpdatedAt:    mock.TestTime(2000),
+				Name:         "AAP Brake Friction",
+				ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 				ContentCount: 1,
-				LastUpdate: time.Now(),
+				LastUpdate:   time.Now(),
 			},
 			rbac: &mock.RBAC{
 				EnforceCompanyFn: func(c echo.Context, id uuid.UUID) error {
@@ -135,13 +135,13 @@ func TestView(t *testing.T) {
 				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 					if id == mock.TestUUID(1) {
 						return &sandpiper.Slice{
-							ID:        mock.TestUUID(1),
-							CreatedAt: mock.TestTime(2000),
-							UpdatedAt: mock.TestTime(2000),
-							Name:   "AAP Brake Friction",
-							ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+							ID:           mock.TestUUID(1),
+							CreatedAt:    mock.TestTime(2000),
+							UpdatedAt:    mock.TestTime(2000),
+							Name:         "AAP Brake Friction",
+							ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 							ContentCount: 1,
-							LastUpdate: time.Now(),
+							LastUpdate:   time.Now(),
 						}, nil
 					}
 					return nil, nil
@@ -204,42 +204,42 @@ func TestList(t *testing.T) {
 				ListFn: func(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 					return []sandpiper.Slice{
 						{
-							ID:        mock.TestUUID(1),
-							CreatedAt: mock.TestTime(1999),
-							UpdatedAt: mock.TestTime(2000),
-							Name:   "AAP Brake Friction",
-							ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+							ID:           mock.TestUUID(1),
+							CreatedAt:    mock.TestTime(1999),
+							UpdatedAt:    mock.TestTime(2000),
+							Name:         "AAP Brake Friction",
+							ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 							ContentCount: 1,
-							LastUpdate: time.Now(),
+							LastUpdate:   time.Now(),
 						},
 						{
-							ID:        mock.TestUUID(2),
-							CreatedAt: mock.TestTime(2001),
-							UpdatedAt: mock.TestTime(2002),
-							Name:   "AAP Premium Wipers",
-							ContentHash: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+							ID:           mock.TestUUID(2),
+							CreatedAt:    mock.TestTime(2001),
+							UpdatedAt:    mock.TestTime(2002),
+							Name:         "AAP Premium Wipers",
+							ContentHash:  "da39a3ee5e6b4b0d3255bfef95601890afd80709",
 							ContentCount: 1,
-							LastUpdate: time.Now(),
+							LastUpdate:   time.Now(),
 						},
 					}, nil
 				}},
 			wantData: []sandpiper.Slice{
 				{
-					ID:        mock.TestUUID(1),
-					CreatedAt: mock.TestTime(1999),
-					UpdatedAt: mock.TestTime(2000),
-					ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+					ID:           mock.TestUUID(1),
+					CreatedAt:    mock.TestTime(1999),
+					UpdatedAt:    mock.TestTime(2000),
+					ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 					ContentCount: 1,
-					LastUpdate: time.Now(),
+					LastUpdate:   time.Now(),
 				},
 				{
-					ID:        mock.TestUUID(2),
-					CreatedAt: mock.TestTime(2001),
-					UpdatedAt: mock.TestTime(2002),
-					Name:   "AAP Premium Wipers",
-					ContentHash: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+					ID:           mock.TestUUID(2),
+					CreatedAt:    mock.TestTime(2001),
+					UpdatedAt:    mock.TestTime(2002),
+					Name:         "AAP Premium Wipers",
+					ContentHash:  "da39a3ee5e6b4b0d3255bfef95601890afd80709",
 					ContentCount: 1,
-					LastUpdate: time.Now(),
+					LastUpdate:   time.Now(),
 				}},
 		},
 	}
@@ -285,13 +285,13 @@ func TestDelete(t *testing.T) {
 			mdb: &mockdb.Slice{
 				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{
-						ID:        mock.TestUUID(1),
-						CreatedAt: mock.TestTime(1999),
-						UpdatedAt: mock.TestTime(2000),
-						Name:   "AAP Brake Friction",
-						ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+						ID:           mock.TestUUID(1),
+						CreatedAt:    mock.TestTime(1999),
+						UpdatedAt:    mock.TestTime(2000),
+						Name:         "AAP Brake Friction",
+						ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 						ContentCount: 1,
-						LastUpdate: time.Now(),
+						LastUpdate:   time.Now(),
 					}, nil
 				},
 			},
@@ -307,13 +307,13 @@ func TestDelete(t *testing.T) {
 			mdb: &mockdb.Slice{
 				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{
-						ID:        mock.TestUUID(1),
-						CreatedAt: mock.TestTime(1999),
-						UpdatedAt: mock.TestTime(2000),
-						Name:   "AAP Brake Friction",
-						ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+						ID:           mock.TestUUID(1),
+						CreatedAt:    mock.TestTime(1999),
+						UpdatedAt:    mock.TestTime(2000),
+						Name:         "AAP Brake Friction",
+						ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 						ContentCount: 1,
-						LastUpdate: time.Now(),
+						LastUpdate:   time.Now(),
 					}, nil
 				},
 				DeleteFn: func(db orm.DB, usr *sandpiper.Slice) error {
@@ -374,13 +374,13 @@ func TestUpdate(t *testing.T) {
 			mdb: &mockdb.Slice{
 				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{
-						ID:        mock.TestUUID(1),
-						CreatedAt: mock.TestTime(1990),
-						UpdatedAt: mock.TestTime(1991),
-						Name:   "AAP Brake Friction",
-						ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+						ID:           mock.TestUUID(1),
+						CreatedAt:    mock.TestTime(1990),
+						UpdatedAt:    mock.TestTime(1991),
+						Name:         "AAP Brake Friction",
+						ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 						ContentCount: 1,
-						LastUpdate: time.Now(),
+						LastUpdate:   time.Now(),
 					}, nil
 				},
 				UpdateFn: func(db orm.DB, usr *sandpiper.Slice) error {
@@ -391,35 +391,35 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "UPDATE Success",
 			args: args{upd: &slice.Update{
-				ID:     mock.TestUUID(1),
-				Name:   "AAP Brake Friction",
-				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ID:           mock.TestUUID(1),
+				Name:         "AAP Brake Friction",
+				ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 				ContentCount: 1,
-				LastUpdate: time.Now(),
+				LastUpdate:   time.Now(),
 			}},
 			rbac: &mock.RBAC{
 				EnforceUserFn: func(c echo.Context, id int) error {
 					return nil
 				}},
 			wantData: &sandpiper.Slice{
-				ID:        mock.TestUUID(1),
-				CreatedAt: mock.TestTime(1990),
-				UpdatedAt: mock.TestTime(2000),
-				Name:   "AAP Brake Friction",
-				ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+				ID:           mock.TestUUID(1),
+				CreatedAt:    mock.TestTime(1990),
+				UpdatedAt:    mock.TestTime(2000),
+				Name:         "AAP Brake Friction",
+				ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 				ContentCount: 1,
-				LastUpdate: time.Now(),
+				LastUpdate:   time.Now(),
 			},
 			mdb: &mockdb.Slice{
 				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{
-						ID:        mock.TestUUID(1),
-						CreatedAt: mock.TestTime(1990),
-						UpdatedAt: mock.TestTime(2000),
-						Name:   "AAP Brake Friction",
-						ContentHash: "4468e5deabf5e6d0740cd1a77df56f67093ec943",
+						ID:           mock.TestUUID(1),
+						CreatedAt:    mock.TestTime(1990),
+						UpdatedAt:    mock.TestTime(2000),
+						Name:         "AAP Brake Friction",
+						ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
 						ContentCount: 1,
-						LastUpdate: time.Now(),
+						LastUpdate:   time.Now(),
 					}, nil
 				},
 				UpdateFn: func(db orm.DB, slice *sandpiper.Slice) error {

@@ -7,6 +7,14 @@
 package api
 
 import (
+	"autocare.org/sandpiper/pkg/internal/database"
+	"autocare.org/sandpiper/pkg/internal/middleware/jwt"
+	"autocare.org/sandpiper/pkg/internal/rbac"
+	"autocare.org/sandpiper/pkg/internal/secure"
+	"autocare.org/sandpiper/pkg/internal/server"
+	"autocare.org/sandpiper/pkg/internal/zlog"
+	"autocare.org/sandpiper/pkg/shared/config"
+
 	// one import for each service to register (with identifying alias)
 	ar "autocare.org/sandpiper/pkg/api/auth/register"
 	cr "autocare.org/sandpiper/pkg/api/company/register"
@@ -14,14 +22,6 @@ import (
 	pr "autocare.org/sandpiper/pkg/api/password/register"
 	sr "autocare.org/sandpiper/pkg/api/slice/register"
 	ur "autocare.org/sandpiper/pkg/api/user/register"
-
-	"autocare.org/sandpiper/internal/config"
-	"autocare.org/sandpiper/internal/database"
-	"autocare.org/sandpiper/internal/middleware/jwt"
-	"autocare.org/sandpiper/internal/rbac"
-	"autocare.org/sandpiper/internal/secure"
-	"autocare.org/sandpiper/internal/server"
-	"autocare.org/sandpiper/internal/zlog"
 )
 
 // Start configures and launches the API services
@@ -47,16 +47,16 @@ func Start(cfg *config.Configuration) error {
 	v1.Use(tok.MWFunc())
 
 	// register each service (using proper import alias)
-	ar.Register(db, rba, sec, log, srv, tok, tok.MWFunc())  // auth service (no version group)
-	pr.Register(db, rba, sec, log, v1)  // password service
-	ur.Register(db, rba, sec, log, v1)  // user service
-	cr.Register(db, rba, sec, log, v1)  // company service
-	sr.Register(db, rba, sec, log, v1)  // slice service
-	gr.Register(db, rba, sec, log, v1)  // grain service
+	ar.Register(db, rba, sec, log, srv, tok, tok.MWFunc()) // auth service (no version group)
+	pr.Register(db, rba, sec, log, v1)                     // password service
+	ur.Register(db, rba, sec, log, v1)                     // user service
+	cr.Register(db, rba, sec, log, v1)                     // company service
+	sr.Register(db, rba, sec, log, v1)                     // slice service
+	gr.Register(db, rba, sec, log, v1)                     // grain service
 	// rr.Register(db, rba, sec, log, v1)  // subscription service
 	// xr.Register(db, rba, sec, log, v1)  // sync (exchange) service
 
-	// start the server listening
+	// listen for requests
 	server.Start(srv, &server.Config{
 		Port:                cfg.Server.Port,
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,

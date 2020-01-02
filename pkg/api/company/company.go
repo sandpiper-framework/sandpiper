@@ -6,11 +6,11 @@
 package company
 
 import (
-	"github.com/labstack/echo/v4"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/scope"
+	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
 // Create creates a new company if allowed

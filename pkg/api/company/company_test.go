@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/company"
 	"autocare.org/sandpiper/test/mock"
 	"autocare.org/sandpiper/test/mock/mockdb"
@@ -46,14 +46,14 @@ func TestCreate(t *testing.T) {
 			}},
 	},
 		{
-			name: "Succeeds as Company Admin",
+			name:    "Succeeds as Company Admin",
 			wantErr: false,
 			args: args{
 				ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.CompanyAdminRole),
 				req: sandpiper.Company{
-				Name:   "Acme Brakes",
-				Active: true,
-			}},
+					Name:   "Acme Brakes",
+					Active: true,
+				}},
 			mdb: &mockdb.Company{
 				CreateFn: func(db orm.DB, u sandpiper.Company) (*sandpiper.Company, error) {
 					u.CreatedAt = mock.TestTime(2000)

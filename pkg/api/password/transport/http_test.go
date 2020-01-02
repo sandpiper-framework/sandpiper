@@ -14,8 +14,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/server"
+	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/internal/server"
 	"autocare.org/sandpiper/pkg/api/password"
 	"autocare.org/sandpiper/pkg/api/password/transport"
 	"autocare.org/sandpiper/test/mock"

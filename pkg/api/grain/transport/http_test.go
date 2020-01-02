@@ -5,7 +5,7 @@
 package transport_test
 
 import (
-	"autocare.org/sandpiper/internal/scope"
+	"autocare.org/sandpiper/pkg/internal/scope"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -18,8 +18,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/server"
+	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/internal/server"
 	"autocare.org/sandpiper/pkg/api/slice"
 	"autocare.org/sandpiper/pkg/api/slice/transport"
 	"autocare.org/sandpiper/test/mock"
@@ -416,8 +416,8 @@ func TestDelete(t *testing.T) {
 		},
 		{
 			name: "Fail on RBAC",
-			id:  mock.TestUUID(1).String(),
-			cid: mock.TestUUID(1),
+			id:   mock.TestUUID(1).String(),
+			cid:  mock.TestUUID(1),
 			mdb: &mockdb.Slice{
 				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Slice, error) {
 					return &sandpiper.Slice{

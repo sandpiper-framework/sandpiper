@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // JWT mock

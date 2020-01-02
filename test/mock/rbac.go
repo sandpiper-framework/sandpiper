@@ -4,17 +4,17 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // RBAC Mock
 type RBAC struct {
-	CurrentUserFn     func(echo.Context) *sandpiper.AuthUser
-	EnforceRoleFn     func(echo.Context, sandpiper.AccessLevel) error
-	EnforceUserFn     func(echo.Context, int) error
-	EnforceCompanyFn  func(echo.Context, uuid.UUID) error
-	AccountCreateFn   func(echo.Context, sandpiper.AccessLevel, uuid.UUID) error
-	IsLowerRoleFn     func(echo.Context, sandpiper.AccessLevel) error
+	CurrentUserFn    func(echo.Context) *sandpiper.AuthUser
+	EnforceRoleFn    func(echo.Context, sandpiper.AccessLevel) error
+	EnforceUserFn    func(echo.Context, int) error
+	EnforceCompanyFn func(echo.Context, uuid.UUID) error
+	AccountCreateFn  func(echo.Context, sandpiper.AccessLevel, uuid.UUID) error
+	IsLowerRoleFn    func(echo.Context, sandpiper.AccessLevel) error
 }
 
 // CurrentUser mock

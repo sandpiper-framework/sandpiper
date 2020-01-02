@@ -5,14 +5,13 @@
 package company
 
 import (
-
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/scope"
+	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/internal/scope"
 	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
 )
 
@@ -60,6 +59,6 @@ type Repository interface {
 // RBAC represents role-based-access-control interface
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
-  EnforceCompany(echo.Context, uuid.UUID) error
+	EnforceCompany(echo.Context, uuid.UUID) error
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
 }

@@ -14,7 +14,7 @@ import (
 	"net/url"
 	"time"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 type Client struct {
@@ -30,7 +30,7 @@ func New(baseURL *url.URL) *Client {
 
 	c := &Client{
 		BaseURL:    baseURL,
-		UserAgent: "Sandpiper",
+		UserAgent:  "Sandpiper",
 		httpClient: netClient,
 	}
 	return c

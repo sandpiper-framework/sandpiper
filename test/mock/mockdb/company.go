@@ -4,16 +4,16 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // Company database mock
 type Company struct {
-	CreateFn         func(orm.DB, sandpiper.Company) (*sandpiper.Company, error)
-	ListFn           func(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Company, error)
-	ViewFn           func(orm.DB, uuid.UUID) (*sandpiper.Company, error)
-	DeleteFn         func(orm.DB, *sandpiper.Company) error
-	UpdateFn         func(orm.DB, *sandpiper.Company) error
+	CreateFn func(orm.DB, sandpiper.Company) (*sandpiper.Company, error)
+	ListFn   func(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Company, error)
+	ViewFn   func(orm.DB, uuid.UUID) (*sandpiper.Company, error)
+	DeleteFn func(orm.DB, *sandpiper.Company) error
+	UpdateFn func(orm.DB, *sandpiper.Company) error
 }
 
 // Create mock

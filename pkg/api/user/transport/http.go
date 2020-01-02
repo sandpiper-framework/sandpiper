@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/user"
 )
 
@@ -42,13 +42,13 @@ var (
 
 // User create request
 type createReq struct {
-	FirstName       string               `json:"first_name" validate:"required"`
-	LastName        string               `json:"last_name" validate:"required"`
-	Username        string               `json:"username" validate:"required,min=3,alphanum"`
-	Password        string               `json:"password" validate:"required,min=8"`
-	PasswordConfirm string               `json:"password_confirm" validate:"required"`
-	Email           string               `json:"email" validate:"required,email"`
-	CompanyID       uuid.UUID            `json:"company_id" validate:"required"`
+	FirstName       string                `json:"first_name" validate:"required"`
+	LastName        string                `json:"last_name" validate:"required"`
+	Username        string                `json:"username" validate:"required,min=3,alphanum"`
+	Password        string                `json:"password" validate:"required,min=8"`
+	PasswordConfirm string                `json:"password_confirm" validate:"required"`
+	Email           string                `json:"email" validate:"required,email"`
+	CompanyID       uuid.UUID             `json:"company_id" validate:"required"`
 	Role            sandpiper.AccessLevel `json:"role" validate:"required"`
 }
 
@@ -74,7 +74,7 @@ func (h *HTTP) create(c echo.Context) error {
 		FirstName: r.FirstName,
 		LastName:  r.LastName,
 		CompanyID: r.CompanyID,
-		Role:    r.Role,
+		Role:      r.Role,
 	})
 
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/auth"
 	al "autocare.org/sandpiper/pkg/api/auth/logging"
 	at "autocare.org/sandpiper/pkg/api/auth/transport"

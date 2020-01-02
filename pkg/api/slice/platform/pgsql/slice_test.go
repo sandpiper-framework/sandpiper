@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/slice/platform/pgsql"
 	"autocare.org/sandpiper/test/mock"
 )
@@ -69,8 +69,8 @@ func TestCreate(t *testing.T) {
 	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
 
 	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:     mock.TestUUID(1),
-		Name:   "Acme Brakes"}, &cases[1].req); err != nil {
+		ID:   mock.TestUUID(1),
+		Name: "Acme Brakes"}, &cases[1].req); err != nil {
 		t.Error(err)
 	}
 
@@ -124,8 +124,8 @@ func TestView(t *testing.T) {
 	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
 
 	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:     mock.TestUUID(1),
-		Name:   "Acme Brakes"}, cases[1].wantData); err != nil {
+		ID:   mock.TestUUID(1),
+		Name: "Acme Brakes"}, cases[1].wantData); err != nil {
 		t.Error(err)
 	}
 
@@ -180,8 +180,8 @@ func TestUpdate(t *testing.T) {
 	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
 
 	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:     mock.TestUUID(1),
-		Name:   "Acme Brakes"}, cases[0].data); err != nil {
+		ID:   mock.TestUUID(1),
+		Name: "Acme Brakes"}, cases[0].data); err != nil {
 		t.Error(err)
 	}
 
@@ -227,7 +227,7 @@ func TestList(t *testing.T) {
 				Offset: 0,
 			},
 			qp: &scope.Clause{
-				ID:    mock.TestUUID(1),
+				ID:        mock.TestUUID(1),
 				Condition: "id = ?",
 			},
 			wantData: []sandpiper.Slice{
@@ -300,8 +300,8 @@ func TestDelete(t *testing.T) {
 	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
 
 	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:     mock.TestUUID(1),
-		Name:   "Acme Brakes"}, cases[0].wantData); err != nil {
+		ID:   mock.TestUUID(1),
+		Name: "Acme Brakes"}, cases[0].wantData); err != nil {
 		t.Error(err)
 	}
 

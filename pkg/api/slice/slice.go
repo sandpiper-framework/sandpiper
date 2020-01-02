@@ -10,8 +10,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"time"
 
-	"autocare.org/sandpiper/internal/model"
-	"autocare.org/sandpiper/internal/scope"
+	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
 // Create creates a new slice to hold data-objects
@@ -37,7 +37,7 @@ func (s *Slice) View(c echo.Context, sliceID uuid.UUID) (*sandpiper.Slice, error
 	au := s.rbac.CurrentUser(c)
 	if au.Role != sandpiper.AdminRole {
 		// make sure the slice is subscribed to this user's company
-    return s.sdb.ViewBySub(s.db, au.CompanyID, sliceID)
+		return s.sdb.ViewBySub(s.db, au.CompanyID, sliceID)
 	}
 	return s.sdb.View(s.db, sliceID)
 }

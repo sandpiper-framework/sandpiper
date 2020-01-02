@@ -8,7 +8,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 
 	"autocare.org/sandpiper/pkg/api/password"
 	pl "autocare.org/sandpiper/pkg/api/password/logging"

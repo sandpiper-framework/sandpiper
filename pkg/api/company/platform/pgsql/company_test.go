@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/internal/model"
+	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
 	"autocare.org/sandpiper/test/mock"
 )
@@ -216,7 +216,7 @@ func TestList(t *testing.T) {
 				Offset: 0,
 			},
 			qp: &scope.Clause{
-				ID:    mock.TestUUID(1),
+				ID:        mock.TestUUID(1),
 				Condition: "company_id = ?",
 			},
 			wantData: []sandpiper.Company{
