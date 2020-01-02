@@ -16,9 +16,17 @@ type Log struct {
 	logger *zerolog.Logger
 }
 
-// New instantiates new zero logger
-func New() *Log {
-	z := zerolog.New(os.Stdout)
+// New instantiates new zero logger with "Info" Level default messaging.
+// Set log level to "warn" (and above) if `logInfoLevel` is false.
+func New(logInfoLevel bool) *Log {
+	var lvl zerolog.Level = zerolog.InfoLevel  // default
+
+	if !logInfoLevel {
+		lvl = zerolog.WarnLevel
+	}
+
+	z := zerolog.New(os.Stdout).Level(lvl)
+
 	return &Log{
 		logger: &z,
 	}

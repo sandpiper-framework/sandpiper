@@ -63,7 +63,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	var slice = &sandpiper.Slice{ID: sliceID}
 
 	err := db.Model(slice).
-		Relation("subscriptions").
+		Relation("subscriptions._").
 		Where("slice_id = ? and subscriber_id = ?", sliceID, companyID).
 		Select()
 

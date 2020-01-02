@@ -18,6 +18,6 @@ import (
 // Register ties the company service to its logger and transport mechanisms
 func Register(db *pg.DB, rbac grain.RBAC, sec grain.Securer, log sandpiper.Logger, v1 *echo.Group) {
 	svc := grain.Initialize(db, rbac, sec)
-  ls := gl.ServiceLogger(svc, log)
+	ls := gl.ServiceLogger(svc, log)
 	gt.NewHTTP(ls, v1)
 }

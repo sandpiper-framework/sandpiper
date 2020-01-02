@@ -7,7 +7,7 @@
 package api
 
 import (
-	// one import for each service to register (with unique alias)
+	// one import for each service to register (with identifying alias)
 	ar "autocare.org/sandpiper/pkg/api/auth/register"
 	cr "autocare.org/sandpiper/pkg/api/company/register"
 	gr "autocare.org/sandpiper/pkg/api/grain/register"
@@ -37,7 +37,7 @@ func Start(cfg *config.Configuration) error {
 	sec := secure.New(cfg.App.MinPasswordStr)
 	rba := rbac.New()
 	tok := jwt.New(cfg.JWT.Secret, cfg.JWT.SigningAlgorithm, cfg.JWT.Duration)
-	log := zlog.New()
+	log := zlog.New(cfg.App.ServiceLogging)
 
 	// setup echo server (singleton)
 	srv := server.New()
@@ -48,11 +48,13 @@ func Start(cfg *config.Configuration) error {
 
 	// register each service (using proper import alias)
 	ar.Register(db, rba, sec, log, srv, tok, tok.MWFunc())  // auth service (no version group)
-	pr.Register(db, rba, sec, log, v1)  // user service
-	ur.Register(db, rba, sec, log, v1)  // password service
+	pr.Register(db, rba, sec, log, v1)  // password service
+	ur.Register(db, rba, sec, log, v1)  // user service
 	cr.Register(db, rba, sec, log, v1)  // company service
 	sr.Register(db, rba, sec, log, v1)  // slice service
 	gr.Register(db, rba, sec, log, v1)  // grain service
+	// rr.Register(db, rba, sec, log, v1)  // subscription service
+	// xr.Register(db, rba, sec, log, v1)  // sync (exchange) service
 
 	// start the server listening
 	server.Start(srv, &server.Config{

@@ -18,6 +18,6 @@ import (
 // Register ties the company service to its logger and transport mechanisms
 func Register(db *pg.DB, rbac user.RBAC, sec user.Securer, log sandpiper.Logger, v1 *echo.Group) {
 	svc := user.Initialize(db, rbac, sec)
-  ls := ul.ServiceLogger(svc, log)
+	ls := ul.ServiceLogger(svc, log)
 	ut.NewHTTP(ls, v1)
 }

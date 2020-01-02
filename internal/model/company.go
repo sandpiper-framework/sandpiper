@@ -14,12 +14,14 @@ import (
 
 // Company represents company model
 type Company struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	Active    bool      `json:"active"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	DeletedAt time.Time `json:"deleted_at,omitempty" pg:",soft_delete"`
+	ID            uuid.UUID       `json:"id"`
+	Name          string          `json:"name"`
+	Active        bool            `json:"active"`
+	CreatedAt     time.Time       `json:"created_at"`
+	UpdatedAt     time.Time       `json:"updated_at"`
+	DeletedAt     time.Time       `json:"deleted_at,omitempty" pg:",soft_delete"`
+	Users         []*User         // has many relation
+	Subscriptions []*Subscription `pg:"many2many:subscriptions"`
 }
 
 // compile-time check variables for model hooks (which take no memory)

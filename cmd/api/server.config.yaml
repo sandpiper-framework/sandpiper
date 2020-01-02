@@ -26,3 +26,4 @@ jwt:
 
 application:
   min_password_strength: 1  # 0,1,2,3,4
+  service_logging: true

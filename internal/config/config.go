@@ -53,8 +53,8 @@ func (d *Database) URL() string {
 	// postgres://username:password@host:port/database?sslmode=disable
 	return fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=%s",
 		d.Dialect,
-		env("DB_USER", "sandpiper"),
-		env("DB_PASSWORD", "autocare"),
+		env("DB_USER", d.User),
+		env("DB_PASSWORD", d.Password),
 		d.Host,
 		d.Port,
 		d.Database,
@@ -81,7 +81,8 @@ type JWT struct {
 
 // Application holds application configuration details
 type Application struct {
-	MinPasswordStr int `yaml:"min_password_strength,omitempty"`
+	MinPasswordStr int  `yaml:"min_password_strength,omitempty"`
+	ServiceLogging bool `yaml:"service_logging,omitempty"`
 }
 
 func env(key, defValue string) string {

@@ -33,10 +33,6 @@ var (
 
 // Create creates a new grain in database (assumes allowed to do this)
 func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, error) {
-	// don't add if the name already exists
-	//if nameExists(db, grain.Name) {
-	//	return nil, ErrAlreadyExists
-	//}
 
 	if err := db.Insert(&grain); err != nil {
 		return nil, err
@@ -48,15 +44,15 @@ func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, erro
 func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	var grain = &sandpiper.Grain{ID: id}
 
-	err := db.Select(grain)
-	if err != nil {
+	if err := db.Select(grain); err != nil {
 		return nil, err
 	}
 
 	return grain, nil
 }
 
-func (s *Grain) ViewBySlice(orm.DB, uuid.UUID) (*sandpiper.Grain, error) {
+// ViewBySlice returns a single grain by ID if included in the supplied slice.
+func (s *Grain) ViewBySlice(db orm.DB, grainID uuid.UUID) (*sandpiper.Grain, error) {
 	// todo: implement this
 	panic("implement me")
 }
@@ -66,7 +62,8 @@ func (s *Grain) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	var grain = &sandpiper.Grain{ID: sliceID}
 
 	err := db.Model(grain).
-		Relation("subscriptions").
+		Relation("slices._").
+		Relation("subscriptions._").
 		Where("slice_id = ? and subscriber_id = ?", sliceID, companyID).
 		Select()
 
@@ -76,11 +73,13 @@ func (s *Grain) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	return grain, nil
 }
 
-// List returns list of all slices
+// List returns a list of all grains with scoping and pagination
 func (s *Grain) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
 
-	q := db.Model(&grains).Limit(p.Limit).Offset(p.Offset)
+	q := db.Model(&grains).
+		Relation("slices._").
+		Limit(p.Limit).Offset(p.Offset)
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
@@ -90,8 +89,7 @@ func (s *Grain) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sa
 	return grains, nil
 }
 
-// Delete sets deleted_at for a grain
+// Delete permanently removes a grain
 func (s *Grain) Delete(db orm.DB, grain *sandpiper.Grain) error {
 	return db.Delete(grain)
 }
-
