@@ -2,7 +2,9 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package company contains services for the companies resource
+// Package company contains services for the companies resource. Companies have
+// users and subscriptions to slices. Users must be a "company admin" to make changes
+// to their company information. Companies use the "soft delete" feature.
 package company
 
 import (
@@ -13,7 +15,7 @@ import (
 	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
-// Create creates a new company if allowed
+// Create adds a new company if administrator
 func (s *Company) Create(c echo.Context, req sandpiper.Company) (*sandpiper.Company, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
@@ -39,7 +41,7 @@ func (s *Company) View(c echo.Context, companyID uuid.UUID) (*sandpiper.Company,
 	return s.sdb.View(s.db, companyID)
 }
 
-// Delete deletes a company if allowed
+// Delete deletes a company if administrator
 func (s *Company) Delete(c echo.Context, id uuid.UUID) error {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return err
@@ -61,11 +63,9 @@ type Update struct {
 
 // Update updates company information
 func (s *Company) Update(c echo.Context, r *Update) (*sandpiper.Company, error) {
-
 	if err := s.rbac.EnforceCompany(c, r.ID); err != nil {
 		return nil, err
 	}
-
 	company := &sandpiper.Company{
 		ID:       r.ID,
 		Name:     r.Name,
@@ -76,6 +76,5 @@ func (s *Company) Update(c echo.Context, r *Update) (*sandpiper.Company, error) 
 	if err != nil {
 		return nil, err
 	}
-
 	return s.sdb.View(s.db, r.ID)
 }

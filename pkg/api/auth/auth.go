@@ -21,7 +21,7 @@ var (
 
 // Authenticate tries to authenticate the user provided by username and password
 func (a *Auth) Authenticate(c echo.Context, user, pass string) (*sandpiper.AuthToken, error) {
-	u, err := a.udb.FindByUsername(a.db, user)
+	u, err := a.sdb.FindByUsername(a.db, user)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (a *Auth) Authenticate(c echo.Context, user, pass string) (*sandpiper.AuthT
 
 	u.UpdateLastLogin(a.sec.Token(token))
 
-	if err := a.udb.Update(a.db, u); err != nil {
+	if err := a.sdb.Update(a.db, u); err != nil {
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func (a *Auth) Authenticate(c echo.Context, user, pass string) (*sandpiper.AuthT
 
 // Refresh refreshes jwt token and puts new claims inside
 func (a *Auth) Refresh(c echo.Context, token string) (*sandpiper.RefreshToken, error) {
-	user, err := a.udb.FindByToken(a.db, token)
+	user, err := a.sdb.FindByToken(a.db, token)
 	if err != nil {
 		return nil, err
 	}
@@ -64,5 +64,5 @@ func (a *Auth) Refresh(c echo.Context, token string) (*sandpiper.RefreshToken, e
 // Me returns info about currently logged in user
 func (a *Auth) Me(c echo.Context) (*sandpiper.User, error) {
 	au := a.rbac.CurrentUser(c)
-	return a.udb.View(a.db, au.ID)
+	return a.sdb.View(a.db, au.ID)
 }

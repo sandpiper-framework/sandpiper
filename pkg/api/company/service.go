@@ -4,15 +4,17 @@
 
 package company
 
+// company service
+
 import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
+	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
 	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/internal/scope"
-	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
 )
 
 // Service represents company application interface
@@ -37,7 +39,7 @@ func Initialize(db *pg.DB, rbac RBAC, sec Securer) *Company {
 // Company represents company application service
 type Company struct {
 	db   *pg.DB
-	sdb  Repository
+	sdb  Repository // service repository database interface
 	rbac RBAC
 	sec  Securer
 }

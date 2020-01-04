@@ -10,9 +10,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
+	"autocare.org/sandpiper/pkg/api/slice/platform/pgsql"
 	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/internal/scope"
-	"autocare.org/sandpiper/pkg/api/slice/platform/pgsql"
 )
 
 // Service represents slice application interface

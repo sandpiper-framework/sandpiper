@@ -13,11 +13,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
+	"autocare.org/sandpiper/pkg/api/auth"
+	"autocare.org/sandpiper/pkg/api/auth/transport"
 	"autocare.org/sandpiper/pkg/internal/middleware/jwt"
 	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/internal/server"
-	"autocare.org/sandpiper/pkg/api/auth"
-	"autocare.org/sandpiper/pkg/api/auth/transport"
 	"autocare.org/sandpiper/test/mock"
 	"autocare.org/sandpiper/test/mock/mockdb"
 )

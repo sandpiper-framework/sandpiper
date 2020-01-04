@@ -18,7 +18,7 @@ func (u *User) Create(c echo.Context, req sandpiper.User) (*sandpiper.User, erro
 		return nil, err
 	}
 	req.Password = u.sec.Hash(req.Password)
-	return u.udb.Create(u.db, req)
+	return u.sdb.Create(u.db, req)
 }
 
 // List returns list of users
@@ -28,7 +28,7 @@ func (u *User) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.User, 
 	if err != nil {
 		return nil, err
 	}
-	return u.udb.List(u.db, q, p)
+	return u.sdb.List(u.db, q, p)
 }
 
 // View returns a single user if allowed
@@ -36,19 +36,19 @@ func (u *User) View(c echo.Context, id int) (*sandpiper.User, error) {
 	if err := u.rbac.EnforceUser(c, id); err != nil {
 		return nil, err
 	}
-	return u.udb.View(u.db, id)
+	return u.sdb.View(u.db, id)
 }
 
 // Delete deletes a user
 func (u *User) Delete(c echo.Context, id int) error {
-	user, err := u.udb.View(u.db, id)
+	user, err := u.sdb.View(u.db, id)
 	if err != nil {
 		return err
 	}
 	if err := u.rbac.IsLowerRole(c, user.Role); err != nil {
 		return err
 	}
-	return u.udb.Delete(u.db, user)
+	return u.sdb.Delete(u.db, user)
 }
 
 // Update contains user's information used for updating
@@ -66,7 +66,7 @@ func (u *User) Update(c echo.Context, r *Update) (*sandpiper.User, error) {
 		return nil, err
 	}
 
-	if err := u.udb.Update(u.db, &sandpiper.User{
+	if err := u.sdb.Update(u.db, &sandpiper.User{
 		ID:        r.ID,
 		FirstName: r.FirstName,
 		LastName:  r.LastName,
@@ -76,5 +76,5 @@ func (u *User) Update(c echo.Context, r *Update) (*sandpiper.User, error) {
 		return nil, err
 	}
 
-	return u.udb.View(u.db, r.ID)
+	return u.sdb.View(u.db, r.ID)
 }

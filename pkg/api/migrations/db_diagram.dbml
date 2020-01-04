@@ -26,7 +26,7 @@ Table companies {
 
 Table subscriptions  [headercolor: #8e44ad] {
   slice_id uuid [pk, ref: > slices.id]
-  subscriber_id uuid [pk, ref: > companies.id]
+  company_id uuid [pk, ref: > companies.id]
   name varchar
   description varchar
 }

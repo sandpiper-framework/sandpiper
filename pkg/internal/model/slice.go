@@ -12,6 +12,8 @@ import (
 	"github.com/google/uuid"
 )
 
+type MetaMap map[string]string
+
 // Slice represents a single slice container
 type Slice struct {
 	ID           uuid.UUID `json:"id"`
@@ -21,9 +23,16 @@ type Slice struct {
 	LastUpdate   time.Time `json:"last_update"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
-	DeletedAt    time.Time `json:"deleted_at,omitempty" pg:",soft_delete"`
-	Grains       []*Grain  // has-many relation
-	Companies    []Company `pg:"many2many:subscriptions"`
+	MetaData     MetaMap   `json:"metadata"`
+	//Grains       []*Grain  // has-many relation
+	//Companies    []Company `pg:"many2many:subscriptions"`
+}
+
+// SliceMetaData contains information about a slice
+type SliceMetaData struct {
+	SliceID uuid.UUID `json:"slice_id" pg:",pk"`
+	Key     string    `json:"key" pg:",pk"`
+	Value   string    `json:"value"`
 }
 
 // compile-time check variables for model hooks (which take no memory)

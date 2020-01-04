@@ -36,7 +36,7 @@ func (s *Slice) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Slice
 func (s *Slice) View(c echo.Context, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	au := s.rbac.CurrentUser(c)
 	if au.Role != sandpiper.AdminRole {
-		// make sure the slice is subscribed to this user's company
+		// make sure the slice is subscribed to the user's company
 		return s.sdb.ViewBySub(s.db, au.CompanyID, sliceID)
 	}
 	return s.sdb.View(s.db, sliceID)

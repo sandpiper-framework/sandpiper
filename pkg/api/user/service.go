@@ -10,9 +10,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
+	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
 	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/internal/scope"
-	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
 )
 
 // Service represents user application interface
@@ -27,14 +27,14 @@ type Service interface {
 // User represents user application service
 type User struct {
 	db   *pg.DB
-	udb  Repository
+	sdb  Repository
 	rbac RBAC
 	sec  Securer
 }
 
 // New creates new user application service
-func New(db *pg.DB, udb Repository, rbac RBAC, sec Securer) *User {
-	return &User{db: db, udb: udb, rbac: rbac, sec: sec}
+func New(db *pg.DB, sdb Repository, rbac RBAC, sec Securer) *User {
+	return &User{db: db, sdb: sdb, rbac: rbac, sec: sec}
 }
 
 // Initialize initializes User application service with defaults

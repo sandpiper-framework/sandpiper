@@ -13,8 +13,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/slice"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // HTTP represents user http service
@@ -41,10 +41,11 @@ var (
 
 // Slice create request
 type createReq struct {
-	Name         string    `json:"name" validate:"required,min=3"`
-	ContentHash  string    `json:"content_hash"`
-	ContentCount uint      `json:"content_count"`
-	LastUpdate   time.Time `json:"last_update"`
+	Name         string            `json:"name" validate:"required,min=3"`
+	ContentHash  string            `json:"content_hash"`
+	ContentCount uint              `json:"content_count"`
+	LastUpdate   time.Time         `json:"last_update"`
+	MetaData     sandpiper.MetaMap `json:"metadata"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -60,6 +61,7 @@ func (h *HTTP) create(c echo.Context) error {
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
 		LastUpdate:   r.LastUpdate,
+		MetaData:     r.MetaData,
 	})
 
 	if err != nil {

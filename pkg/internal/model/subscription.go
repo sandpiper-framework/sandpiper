@@ -12,16 +12,16 @@ import (
 	"github.com/google/uuid"
 )
 
-// Subscription represents subscription model (m2m join table)
+// Subscription represents subscription model (m2m join table between companies and slices)
 type Subscription struct {
-	tableName    struct{}  `pg:"alias:sub"` // custom table alias for orm
-	SliceID      uuid.UUID `json:"slice_id" pg:",pk"`
-	SubscriberID uuid.UUID `json:"subscriber_id" pg:",pk"`
-	Name         string    `json:"name"`
-	Active       bool      `json:"active"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	DeletedAt    time.Time `json:"deleted_at,omitempty" pg:",soft_delete"`
+	tableName   struct{}  `pg:"alias:sub"` // custom table alias for orm
+	SliceID     uuid.UUID `json:"slice_id" pg:",pk"`
+	CompanyID   uuid.UUID `json:"company_id" pg:",pk"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Active      bool      `json:"active"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // compile-time check variables for model hooks (which take no memory)

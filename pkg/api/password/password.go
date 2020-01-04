@@ -24,7 +24,7 @@ func (p *Password) Change(c echo.Context, userID int, oldPass, newPass string) e
 		return err
 	}
 
-	u, err := p.udb.View(p.db, userID)
+	u, err := p.sdb.View(p.db, userID)
 	if err != nil {
 		return err
 	}
@@ -39,5 +39,5 @@ func (p *Password) Change(c echo.Context, userID int, oldPass, newPass string) e
 
 	u.ChangePassword(p.sec.Hash(newPass))
 
-	return p.udb.Update(p.db, u)
+	return p.sdb.Update(p.db, u)
 }

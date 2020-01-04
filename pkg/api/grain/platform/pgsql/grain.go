@@ -62,9 +62,9 @@ func (s *Grain) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	var grain = &sandpiper.Grain{ID: sliceID}
 
 	err := db.Model(grain).
-		Relation("slices._").
-		Relation("subscriptions._").
-		Where("slice_id = ? and subscriber_id = ?", sliceID, companyID).
+		Relation("slices").
+		Relation("subscriptions.company_id").
+		Where("slice_id = ? and company_id = ?", sliceID, companyID).
 		Select()
 
 	if err != nil {
@@ -78,9 +78,10 @@ func (s *Grain) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sa
 	var grains []sandpiper.Grain
 
 	q := db.Model(&grains).
-		Relation("slices._").
+		Relation("slices").
 		Limit(p.Limit).Offset(p.Offset)
 	if sc != nil {
+		q.Relation("subscriptions.company_id")
 		q.Where(sc.Condition, sc.ID)
 	}
 	if err := q.Select(); err != nil {

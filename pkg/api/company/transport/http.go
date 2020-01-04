@@ -4,7 +4,7 @@
 
 package transport
 
-// company routing functions
+// company service routing functions
 
 import (
 	"net/http"
@@ -51,9 +51,10 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 	result, err := h.svc.Create(c, sandpiper.Company{
-		ID:     uuid.New(),
-		Name:   r.Name,
-		Active: r.Active,
+		ID:       uuid.New(),
+		Name:     r.Name,
+		SyncAddr: r.SyncAddr,
+		Active:   r.Active,
 	})
 	if err != nil {
 		return err
@@ -108,9 +109,10 @@ func (h *HTTP) update(c echo.Context) error {
 		return err
 	}
 	result, err := h.svc.Update(c, &company.Update{
-		ID:     id,
-		Name:   req.Name,
-		Active: req.Active,
+		ID:       id,
+		Name:     req.Name,
+		SyncAddr: req.SyncAddr,
+		Active:   req.Active,
 	})
 	if err != nil {
 		return err

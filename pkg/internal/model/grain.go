@@ -33,6 +33,7 @@ type Grain struct {
 	Type      GrainType `json:"grain_type"`
 	Payload   string    `json:"payload"`
 	CreatedAt time.Time `json:"created_at"`
+	Slice     *Slice    `json:"slice"` // has-one relation
 }
 
 // compile-time check variables for model hooks (which take no memory)

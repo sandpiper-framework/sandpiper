@@ -10,9 +10,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
+	"autocare.org/sandpiper/pkg/api/grain/platform/pgsql"
 	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/internal/scope"
-	"autocare.org/sandpiper/pkg/api/grain/platform/pgsql"
 )
 
 // Service represents grain application interface
@@ -24,8 +24,8 @@ type Service interface {
 }
 
 // New creates new grain application service
-func New(db *pg.DB, gdb Repository, rbac RBAC, sec Securer) *Grain {
-	return &Grain{db: db, gdb: gdb, rbac: rbac, sec: sec}
+func New(db *pg.DB, sdb Repository, rbac RBAC, sec Securer) *Grain {
+	return &Grain{db: db, sdb: sdb, rbac: rbac, sec: sec}
 }
 
 // Initialize initializes Grain application service with defaults
@@ -36,7 +36,7 @@ func Initialize(db *pg.DB, rbac RBAC, sec Securer) *Grain {
 // Grain represents grain application service
 type Grain struct {
 	db   *pg.DB
-	gdb  Repository
+	sdb  Repository
 	rbac RBAC
 	sec  Securer
 }

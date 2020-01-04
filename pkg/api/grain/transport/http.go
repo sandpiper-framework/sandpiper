@@ -12,8 +12,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/grain"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // HTTP represents user http service
@@ -24,7 +24,7 @@ type HTTP struct {
 // NewHTTP creates new grain http service
 func NewHTTP(svc grain.Service, er *echo.Group) {
 	h := HTTP{svc}
-	sr := er.Group("/slices")
+	sr := er.Group("/grains")
 	sr.POST("", h.create)
 	sr.GET("", h.list)
 	sr.GET("/:id", h.view)

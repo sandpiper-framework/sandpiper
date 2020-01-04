@@ -9,24 +9,24 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/auth/platform/pgsql"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // Auth represents auth application service
 type Auth struct {
 	db   *pg.DB
-	udb  Repository
+	sdb  Repository
 	tg   TokenGenerator
 	sec  Securer
 	rbac RBAC
 }
 
 // New creates a new auth service
-func New(db *pg.DB, udb Repository, j TokenGenerator, sec Securer, rbac RBAC) *Auth {
+func New(db *pg.DB, sdb Repository, j TokenGenerator, sec Securer, rbac RBAC) *Auth {
 	return &Auth{
 		db:   db,
-		udb:  udb,
+		sdb:  sdb,
 		tg:   j,
 		sec:  sec,
 		rbac: rbac,

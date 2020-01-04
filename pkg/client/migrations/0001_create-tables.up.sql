@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS "settings" (
 
 CREATE TABLE IF NOT EXISTS companies (
   "id"         uuid PRIMARY KEY,
-  "name"       text NOT NULL,
+  "name"       text UNIQUE NOT NULL,
   "sync_addr"  text,
   "active"     boolean,
   "created_at" timestamp,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS companies (
 
 CREATE TABLE IF NOT EXISTS "slices" (
   "id"            uuid PRIMARY KEY,
-  "name"          text,
+  "name"          text UNIQUE NOT NULL,
   "content_hash"  text,
   "content_count" integer,
   "last_update"   timestamp,
@@ -36,16 +36,16 @@ CREATE TABLE IF NOT EXISTS "slices" (
 );
 
 CREATE TABLE IF NOT EXISTS "slice_metadata" (
-  "slice_id" uuid,
+  "slice_id" uuid REFERENCES "slices",
   "key"      text,
   "value"    text,
   PRIMARY KEY ("slice_id", "key")
 );
 
 CREATE TABLE IF NOT EXISTS "subscriptions" (
-  "slice_id"     uuid REFERENCES "slices" ("id"),
-  "company_id"   uuid REFERENCES "companies" ("id"),
-  "name"         text,
+  "slice_id"     uuid REFERENCES "slices",
+  "company_id"   uuid REFERENCES "companies",
+  "name"         text UNIQUE NOT NULL,
   "description"  text,
   "active"       boolean,
   "created_at"   timestamp,
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 
 CREATE TABLE IF NOT EXISTS "grains" (
   "id"           uuid PRIMARY KEY,
-  "slice_id"     uuid REFERENCES "slices" ("id"),
+  "slice_id"     uuid REFERENCES "slices",
   "grain_type"   smallint,
   "payload"      text,
   "created_at"   timestamp
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS users (
   "id"               serial PRIMARY KEY,
   "first_name"       text,
   "last_name"        text,
-  "username"         text,
+  "username"         text UNIQUE NOT NULL,
   "password"         text,
   "email"            text,
   "phone"            text,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS users (
   "password_changed" timestamp,
   "token"            text,
   "role"             integer,
-  "company_id"       uuid REFERENCES "companies" ("id"),
+  "company_id"       uuid REFERENCES "companies",
   "created_at"       timestamp,
   "updated_at"       timestamp
 );

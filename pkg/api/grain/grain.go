@@ -18,17 +18,17 @@ func (s *Grain) Create(c echo.Context, req sandpiper.Grain) (*sandpiper.Grain, e
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}
-	return s.gdb.Create(s.db, req)
+	return s.sdb.Create(s.db, req)
 }
 
-// List returns list of grains
+// List returns list of grains scoped by user
 func (s *Grain) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	au := s.rbac.CurrentUser(c)
 	q, err := scope.Limit(au)
 	if err != nil {
 		return nil, err
 	}
-	return s.gdb.List(s.db, q, p)
+	return s.sdb.List(s.db, q, p)
 }
 
 // View returns a single grain if allowed
@@ -36,9 +36,9 @@ func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error
 	au := s.rbac.CurrentUser(c)
 	if au.Role != sandpiper.AdminRole {
 		// make sure the grain is subscribed to this user's company
-		return s.gdb.ViewBySub(s.db, au.CompanyID, grainID)
+		return s.sdb.ViewBySub(s.db, au.CompanyID, grainID)
 	}
-	return s.gdb.View(s.db, grainID)
+	return s.sdb.View(s.db, grainID)
 }
 
 // Delete deletes a grain if allowed
@@ -46,9 +46,9 @@ func (s *Grain) Delete(c echo.Context, id uuid.UUID) error {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return err
 	}
-	grain, err := s.gdb.View(s.db, id)
+	grain, err := s.sdb.View(s.db, id)
 	if err != nil {
 		return err
 	}
-	return s.gdb.Delete(s.db, grain)
+	return s.sdb.Delete(s.db, grain)
 }

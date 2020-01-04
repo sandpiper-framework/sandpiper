@@ -9,8 +9,8 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/api/password/platform/pgsql"
+	"autocare.org/sandpiper/pkg/internal/model"
 )
 
 // Service represents password application interface
@@ -21,16 +21,16 @@ type Service interface {
 // Password represents password application service
 type Password struct {
 	db   *pg.DB
-	udb  Repository
+	sdb  Repository
 	rbac RBAC
 	sec  Securer
 }
 
 // New creates new password application service
-func New(db *pg.DB, udb Repository, rbac RBAC, sec Securer) *Password {
+func New(db *pg.DB, sdb Repository, rbac RBAC, sec Securer) *Password {
 	return &Password{
 		db:   db,
-		udb:  udb,
+		sdb:  sdb,
 		rbac: rbac,
 		sec:  sec,
 	}

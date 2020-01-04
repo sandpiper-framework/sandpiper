@@ -29,6 +29,10 @@ To start/stop service, run `pg_ctl start`, `pg_ctl stop`.
 *todo:* this process is automated with 'task', but we don't want that dependency. Create .bat and .sh files to handle this for those not running from source.
 
 ```
+task create-pub-db | create-sub-db | create-both-db
+```
+
+```
 win64: psql --username=postgres --file=db_create.sql
 linux: sudo -u postgres psql --username=postgres --file=db_create.sql
 ```
