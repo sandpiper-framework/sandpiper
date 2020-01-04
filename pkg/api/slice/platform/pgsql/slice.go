@@ -35,19 +35,23 @@ var (
 
 // Create creates a new slice in database (assumes allowed to do this)
 func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
-	// don't add if the name already exists
+
+	// don't add if it would create a duplicate name
 	if nameExists(db, slice.Name) {
 		return nil, ErrAlreadyExists
 	}
+
+	// insert supplied slice data ("id" already assigned by create service)
 	if err := db.Insert(&slice); err != nil {
 		return nil, err
 	}
 
-	// insert any meta data
-	meta := sandpiper.SliceMetaData{SliceID: slice.ID}
-	for k, v := range slice.MetaData {
-		meta.Key = k
-		meta.Value = v
+	// insert any supplied meta data
+	// todo: change to map instead of []struct ???
+	meta := &sandpiper.SliceMetadata{SliceID: slice.ID}
+	for _, m := range slice.Metadata {
+		meta.Key = m.Key
+		meta.Value = m.Value
 		if err := db.Insert(meta); err != nil {
 			return nil, err
 		}
@@ -60,15 +64,12 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: id}
 
-	/*	err := db.Model(company).
-		ColumnExpr("company.*").
-		ColumnExpr("users.*").
-		Join("LEFT JOIN users").
-		JoinOn("company.id = users.company_id").
-		WherePK().First()
-	*/
-
 	err := db.Select(slice)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Model(&slice.Metadata).Where("slice_id = ?", id).Select()
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +80,14 @@ func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 // ViewBySub returns a single slice by ID if included in company subscriptions.
 func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: sliceID}
+
+	/*	err := db.Model(company).
+		ColumnExpr("company.*").
+		ColumnExpr("users.*").
+		Join("LEFT JOIN users").
+		JoinOn("company.id = users.company_id").
+		WherePK().First()
+	*/
 
 	err := db.Model(slice).
 		Relation("subscriptions._").
@@ -121,7 +130,7 @@ func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
 func nameExists(db orm.DB, name string) bool {
 	m := new(sandpiper.Slice)
 	err := db.Model(m).
-		Column("id","name").
+		Column("id", "name").
 		Where("lower(name) = ?", strings.ToLower(name)).
 		Select()
 	return err != pg.ErrNoRows

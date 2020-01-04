@@ -31,6 +31,12 @@ type AuthUser struct {
 	Role      AccessLevel
 }
 
+// AtLeast checks user's access level
+func (u *AuthUser) AtLeast(lvl AccessLevel) bool {
+	// roles go from low to high (lower numbers are better)
+	return u.Role <= lvl
+}
+
 // RBACService represents role-based access control service interface
 type RBACService interface {
 	CurrentUser(echo.Context) *AuthUser

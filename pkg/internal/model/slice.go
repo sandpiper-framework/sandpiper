@@ -12,27 +12,25 @@ import (
 	"github.com/google/uuid"
 )
 
-type MetaMap map[string]string
-
 // Slice represents a single slice container
 type Slice struct {
-	ID           uuid.UUID `json:"id"`
-	Name         string    `json:"slice_name"`
-	ContentHash  string    `json:"content_hash"`
-	ContentCount uint      `json:"content_count"`
-	LastUpdate   time.Time `json:"last_update"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	MetaData     MetaMap   `json:"metadata"`
+	ID           uuid.UUID        `json:"id"`
+	Name         string           `json:"slice_name"`
+	ContentHash  string           `json:"content_hash"`
+	ContentCount uint             `json:"content_count"`
+	LastUpdate   time.Time        `json:"last_update"`
+	CreatedAt    time.Time        `json:"created_at"`
+	UpdatedAt    time.Time        `json:"updated_at"`
+	Metadata     []*SliceMetadata `json:"metadata" pg:"-"`
 	//Grains       []*Grain  // has-many relation
 	//Companies    []Company `pg:"many2many:subscriptions"`
 }
 
-// SliceMetaData contains information about a slice
-type SliceMetaData struct {
-	SliceID uuid.UUID `json:"slice_id" pg:",pk"`
+// SliceMetadata contains information about a slice
+type SliceMetadata struct {
+	SliceID uuid.UUID `json:"-" pg:",pk"`
 	Key     string    `json:"key" pg:",pk"`
-	Value   string    `json:"value"`
+	Value   string    `json:"val"`
 }
 
 // compile-time check variables for model hooks (which take no memory)

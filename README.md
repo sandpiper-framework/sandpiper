@@ -74,8 +74,10 @@ The following software must be installed on your target development machine.
 
 A step by step series of examples that tell you how to get a development env running
 
+1. Clone the project under the current directory (e.g. $HOME/source/)
+
 ```
-Give the example
+git clone https://github.com/dougwinsby/sandpiper.git
 ```
 
 ## Endpoints
