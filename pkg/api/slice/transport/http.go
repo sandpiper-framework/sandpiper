@@ -44,7 +44,7 @@ type createReq struct {
 	Name         string                     `json:"name" validate:"required,min=3"`
 	ContentHash  string                     `json:"content_hash"`
 	ContentCount uint                       `json:"content_count"`
-	LastUpdate   time.Time                  `json:"last_update"`
+	ContentDate   time.Time                  `json:"content_date"`
 	Metadata     []*sandpiper.SliceMetadata `json:"metadata"`
 }
 
@@ -60,7 +60,7 @@ func (h *HTTP) create(c echo.Context) error {
 		Name:         r.Name,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
-		LastUpdate:   r.LastUpdate,
+		ContentDate:  r.ContentDate,
 		Metadata:     r.Metadata,
 	})
 
@@ -111,7 +111,7 @@ type updateReq struct {
 	Name         string    `json:"name,omitempty" validate:"omitempty,min=3"`
 	ContentHash  string    `json:"content_hash,omitempty" validate:"omitempty,min=2"`
 	ContentCount uint      `json:"content_count,omitempty"`
-	LastUpdate   time.Time `json:"last_update,omitempty"`
+	ContentDate  time.Time `json:"content_date,omitempty"`
 }
 
 func (h *HTTP) update(c echo.Context) error {
@@ -130,7 +130,7 @@ func (h *HTTP) update(c echo.Context) error {
 		Name:         req.Name,
 		ContentHash:  req.ContentHash,
 		ContentCount: req.ContentCount,
-		LastUpdate:   req.LastUpdate,
+		ContentDate:  req.ContentDate,
 	})
 
 	if err != nil {

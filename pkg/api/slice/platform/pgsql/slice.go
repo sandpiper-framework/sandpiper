@@ -47,7 +47,7 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 	}
 
 	// insert any supplied meta data
-	// todo: change to map instead of []struct ???
+	// todo: change to map instead of []struct
 	meta := &sandpiper.SliceMetadata{SliceID: slice.ID}
 	for _, m := range slice.Metadata {
 		meta.Key = m.Key

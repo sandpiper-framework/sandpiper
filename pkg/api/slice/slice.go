@@ -48,7 +48,7 @@ type Update struct {
 	Name         string
 	ContentHash  string
 	ContentCount uint
-	LastUpdate   time.Time
+	ContentDate  time.Time
 }
 
 // Update updates slice information
@@ -61,7 +61,7 @@ func (s *Slice) Update(c echo.Context, r *Update) (*sandpiper.Slice, error) {
 		Name:         r.Name,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
-		LastUpdate:   r.LastUpdate,
+		ContentDate:  r.ContentDate,
 	}
 	err := s.sdb.Update(s.db, slice)
 	if err != nil {

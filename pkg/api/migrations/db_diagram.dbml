@@ -29,6 +29,7 @@ Table subscriptions  [headercolor: #8e44ad] {
   company_id uuid [pk, ref: > companies.id]
   name varchar
   description varchar
+  active boolean
 }
 
 Table slices {
@@ -36,7 +37,7 @@ Table slices {
   name varchar
   content_hash string [note: 'code representing all slice ids']
   content_count integer
-  last_update datetime [note: 'when data in slice was updated']
+  content_date datetime [note: 'when data in slice was updated']
 }
 
 Table slice_metadata {
@@ -48,7 +49,8 @@ Table slice_metadata {
 Table grains {
   id uuid [pk]
   slice_id uuid [ref: > slices.id]
-  payload_type payloadtype
+  grain_type payloadtype
+  grain_key string
   payload string
 }
 

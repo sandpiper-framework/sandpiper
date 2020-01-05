@@ -58,13 +58,6 @@ tasks:
     cmds:
       - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
 
-  bindata-client:
-    desc: Use go-bindata to encode file migrations in a go source file
-    dir: pkg/client/migrations
-    deps: [go-bindata]
-    cmds:
-      - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
-
   build-server:
     desc: Build sandpiper server
     dir: cmd/api
@@ -74,6 +67,13 @@ tasks:
     vars:
       EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
+
+  bindata-client:
+    desc: Use go-bindata to encode file migrations in a go source file
+    dir: pkg/client/migrations
+    deps: [go-bindata]
+    cmds:
+      - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
 
   build-client:
     desc: Build sandpiper client

@@ -18,7 +18,7 @@ type Slice struct {
 	Name         string           `json:"slice_name"`
 	ContentHash  string           `json:"content_hash"`
 	ContentCount uint             `json:"content_count"`
-	LastUpdate   time.Time        `json:"last_update"`
+	ContentDate  time.Time        `json:"content_date"`
 	CreatedAt    time.Time        `json:"created_at"`
 	UpdatedAt    time.Time        `json:"updated_at"`
 	Metadata     []*SliceMetadata `json:"metadata" pg:"-"`
