@@ -48,7 +48,7 @@ type Database struct {
 	SSLMode    string `yaml:"sslmode,omitempty"`
 }
 
-// URL formats a URL string from the Database structure overriding User/Password from env vars
+// URL creates a connection URL from a `database` section overriding User/Password with env vars if found
 func (d *Database) URL() string {
 	// postgres://username:password@host:port/database?sslmode=disable
 	return fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=%s",

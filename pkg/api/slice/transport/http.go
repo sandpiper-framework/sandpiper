@@ -41,11 +41,11 @@ var (
 
 // Slice create request
 type createReq struct {
-	Name         string                     `json:"name" validate:"required,min=3"`
-	ContentHash  string                     `json:"content_hash"`
-	ContentCount uint                       `json:"content_count"`
-	ContentDate   time.Time                  `json:"content_date"`
-	Metadata     []*sandpiper.SliceMetadata `json:"metadata"`
+	Name         string            `json:"name" validate:"required,min=3"`
+	ContentHash  string            `json:"content_hash"`
+	ContentCount uint              `json:"content_count"`
+	ContentDate  time.Time         `json:"content_date"`
+	Metadata     sandpiper.MetaMap `json:"metadata"`
 }
 
 func (h *HTTP) create(c echo.Context) error {

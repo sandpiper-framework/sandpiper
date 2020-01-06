@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS companies (
   "sync_addr"  text,
   "active"     boolean,
   "created_at" timestamp,
-  "updated_at" timestamp,
-  "deleted_at" timestamp
+  "updated_at" timestamp
 );
 
 CREATE TABLE IF NOT EXISTS "slices" (
@@ -35,15 +34,15 @@ CREATE TABLE IF NOT EXISTS "slices" (
 );
 
 CREATE TABLE IF NOT EXISTS "slice_metadata" (
-  "slice_id" uuid REFERENCES "slices",
+  "slice_id" uuid REFERENCES "slices" ON DELETE CASCADE,
   "key"      text,
   "value"    text,
   PRIMARY KEY ("slice_id", "key")
 );
 
 CREATE TABLE IF NOT EXISTS "subscriptions" (
-  "slice_id"     uuid REFERENCES "slices",
-  "company_id"   uuid REFERENCES "companies",
+  "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
+  "company_id"   uuid REFERENCES "companies" ON DELETE CASCADE,
   "name"         text UNIQUE NOT NULL,
   "description"  text,
   "active"       boolean,
@@ -54,7 +53,7 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 
 CREATE TABLE IF NOT EXISTS "grains" (
   "id"           uuid PRIMARY KEY,
-  "slice_id"     uuid REFERENCES "slices",
+  "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
   "grain_type"   smallint,
   "grain_key"    text,
   "payload"      text,

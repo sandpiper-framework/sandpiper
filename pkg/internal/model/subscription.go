@@ -14,7 +14,6 @@ import (
 
 // Subscription represents subscription model (m2m join table between companies and slices)
 type Subscription struct {
-	tableName   struct{}  `pg:"alias:sub"` // custom table alias for orm
 	SliceID     uuid.UUID `json:"slice_id" pg:",pk"`
 	CompanyID   uuid.UUID `json:"company_id" pg:",pk"`
 	Name        string    `json:"name"`

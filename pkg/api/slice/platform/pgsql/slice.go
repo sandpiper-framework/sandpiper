@@ -47,11 +47,10 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 	}
 
 	// insert any supplied meta data
-	// todo: change to map instead of []struct
 	meta := &sandpiper.SliceMetadata{SliceID: slice.ID}
-	for _, m := range slice.Metadata {
-		meta.Key = m.Key
-		meta.Value = m.Value
+	for k, v := range slice.Metadata {
+		meta.Key = k
+		meta.Value = v
 		if err := db.Insert(meta); err != nil {
 			return nil, err
 		}
@@ -64,15 +63,21 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: id}
 
-	err := db.Select(slice)
+	// get slice by primary key with subscribed companies
+	err := db.Model(slice).
+		Column("slice.*").
+		Relation("Companies").WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
 
-	err = db.Model(&slice.Metadata).Where("slice_id = ?", id).Select()
+	// insert any slice metadata into response
+	var meta sandpiper.MetaArray
+	err = db.Model(&meta).Where("slice_id = ?", id).Select()
 	if err != nil {
 		return nil, err
 	}
+	slice.Metadata = meta.ToMap()
 
 	return slice, nil
 }
@@ -90,7 +95,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	*/
 
 	err := db.Model(slice).
-		Relation("subscriptions._").
+		Relation("Subscriptions._").
 		Where("slice_id = ? and subscriber_id = ?", sliceID, companyID).
 		Select()
 
@@ -101,7 +106,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	return slice, nil
 }
 
-// List returns list of all slices
+// List returns a list of all slices limited by scope and paginated
 func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices []sandpiper.Slice
 
@@ -123,6 +128,7 @@ func (s *Slice) Update(db orm.DB, slice *sandpiper.Slice) error {
 
 // Delete a slice
 func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
+	// WARNING: Foreign key constraints remove related metadata and grains too!
 	return db.Delete(slice)
 }
 
