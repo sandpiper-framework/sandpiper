@@ -1,4 +1,4 @@
-# Sandpiper cross-platform build/test/deploy file (using https:\\taskfile.dev)
+# Sandpiper cross-platform build/test/deploy file (using https://taskfile.dev)
 
 # Copyright Auto Care Association. All rights reserved.
 # Use of this source code is governed by an MIT-style license that can
@@ -8,7 +8,7 @@ version: '2'
 
 vars:
   REPO:
-    github.com/dougwinsby/sp-srv
+    github.com/dougwinsby/sandpiper
   GO_PACKAGES:
     sh: go list ./...
 
@@ -90,7 +90,7 @@ tasks:
     deps: [build-server, build-client]
 
   test:
-    desc: Run test suite
+    desc: Run test suite (having trouble with dockertesting under Windows!)
     cmds:
       - echo " *** Running Coverage Tests ***"
       - go test -v -race -coverprofile=profile.out -covermode=atomic ./...

@@ -36,7 +36,7 @@ var (
 // Create creates a new slice in database (assumes allowed to do this)
 func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
 
-	// don't add if it would create a duplicate name
+	// don't add if would create a duplicate name
 	if nameExists(db, slice.Name) {
 		return nil, ErrAlreadyExists
 	}
@@ -59,62 +59,59 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 	return &slice, nil
 }
 
-// View returns a single slice with metadata by ID (assumes allowed to do this)
-func (s *Slice) View(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
-	var slice = &sandpiper.Slice{ID: id}
+// View returns a single slice by ID with metadata and subscribed companies
+// (optionally limited to a company)
+func (s *Slice) View(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
+	var slice = &sandpiper.Slice{ID: sliceID}
 
 	// get slice by primary key with subscribed companies
-	err := db.Model(slice).
-		Column("slice.*").
-		Relation("Companies").WherePK().Select()
+	err := db.Model(slice).Column("slice.*").Relation("Companies").WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
 
-	// insert any slice metadata into response
-	var meta sandpiper.MetaArray
-	err = db.Model(&meta).Where("slice_id = ?", id).Select()
-	if err != nil {
-		return nil, err
-	}
-	slice.Metadata = meta.ToMap()
+	// insert any metadata via a map
+	slice.Metadata, err = metaDataMap(db, slice)
 
 	return slice, nil
 }
 
-// ViewBySub returns a single slice by ID if included in company subscriptions.
+// ViewBySub returns a single slice by ID if included in provided company subscriptions.
 func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: sliceID}
 
-	/*	err := db.Model(company).
-		ColumnExpr("company.*").
-		ColumnExpr("users.*").
-		Join("LEFT JOIN users").
-		JoinOn("company.id = users.company_id").
-		WherePK().First()
-	*/
+	// this filter function adds a condition to the companies relationship
+	var filterFn = func(q *orm.Query) (*orm.Query, error) {
+		return q.Where("company_id = ?", companyID), nil
+	}
 
-	err := db.Model(slice).
-		Relation("Subscriptions._").
-		Where("slice_id = ? and subscriber_id = ?", sliceID, companyID).
-		Select()
-
+	// get slice with subscribed companies
+	err := db.Model(slice).Column("slice.*").Relation("Companies", filterFn).WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
 
-	return slice, nil
+	// insert any metadata via a map
+	slice.Metadata, err = metaDataMap(db, slice)
+
+	return slice, err
 }
 
 // List returns a list of all slices limited by scope and paginated
 func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices []sandpiper.Slice
 
-	q := db.Model(&slices).Limit(p.Limit).Offset(p.Offset).Order("slice_name")
-	if sc != nil {
-		q.Where(sc.Condition, sc.ID)
+	// this filter function adds a condition to the companies relationship
+	var filterFn = func(q *orm.Query) (*orm.Query, error) {
+		if sc != nil {
+			return q.Where(sc.Condition, sc.ID), nil
+		}
+		return q, nil
 	}
-	if err := q.Select(); err != nil {
+
+	err := db.Model(&slices).Column("slice.*").Relation("Companies", filterFn).
+		Limit(p.Limit).Offset(p.Offset).Order("name").Select()
+	if err != nil {
 		return nil, err
 	}
 	return slices, nil
@@ -122,14 +119,27 @@ func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sa
 
 // Update updates slice info by primary key (assumes allowed to do this)
 func (s *Slice) Update(db orm.DB, slice *sandpiper.Slice) error {
+	// todo: should we delete all metadata and re-add from the map?
 	_, err := db.Model(slice).Update()
 	return err
 }
 
 // Delete a slice
 func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
-	// WARNING: Foreign key constraints remove related metadata and grains too!
+	// WARNING: Foreign key constraints remove related metadata and grains!
 	return db.Delete(slice)
+}
+
+// metaDataMap returns a map of slice metadata. We use this separate query instead of
+// an orm relationship because we don't want array of structs in json. Maps will marshal
+// as {"key1": "value1", "key2": "value2", ...}
+func metaDataMap(db orm.DB, slice *sandpiper.Slice) (sandpiper.MetaMap, error) {
+	var meta sandpiper.MetaArray
+	err := db.Model(&meta).Where("slice_id = ?", slice.ID).Select()
+	if err != nil {
+		return nil, err
+	}
+	return meta.ToMap(), nil
 }
 
 // nameExists returns true if name found in database

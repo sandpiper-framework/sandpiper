@@ -161,11 +161,11 @@ Similarly to implementing APIs relying only on a database, you can implement oth
 
 To use a transaction, before interacting with db create a new transaction:
 
-```go
+```
 err := s.db.RunInTransaction(func (tx *pg.Tx) error{
     // Application service here
 })
-````
+```
 
 Instead of passing database client as `s.db` , inside this function pass it as `tx`. Handle the error accordingly.
 
@@ -195,10 +195,6 @@ See also the list of [contributors](https://github.com/your/project/contributors
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
 
 1. Echo - HTTP 'framework'.
 2. Go-Pg - PostgreSQL ORM
