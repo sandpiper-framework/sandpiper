@@ -35,7 +35,7 @@ var (
 
 // Create creates a new company in database (assumes allowed to do this)
 func (s *Company) Create(db orm.DB, company sandpiper.Company) (*sandpiper.Company, error) {
-	// don't add if the name already exists
+	// don't add if duplicate name
 	if nameExists(db, company.Name) {
 		return nil, ErrAlreadyExists
 	}
@@ -85,5 +85,5 @@ func (s *Company) Delete(db orm.DB, company *sandpiper.Company) error {
 func nameExists(db orm.DB, name string) bool {
 	m := new(sandpiper.Company)
 	err := db.Model(m).Where("lower(name) = ?", strings.ToLower(name)).Select()
-	return err == pg.ErrNoRows
+	return err != pg.ErrNoRows
 }

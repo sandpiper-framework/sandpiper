@@ -34,14 +34,11 @@ var (
 
 // Create creates a new user in database
 func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
-	var user = new(sandpiper.User)
 
-	err := db.Model(user).Where("lower(username) = ? or lower(email) = ?",
-		strings.ToLower(usr.Username), strings.ToLower(usr.Email)).Select()
-
-	if err != nil && err != pg.ErrNoRows {
+	if duplicate(db, usr.Username, usr.Email) {
 		return nil, ErrAlreadyExists
 	}
+
 	if err := db.Insert(&usr); err != nil {
 		return nil, err
 	}
@@ -82,4 +79,12 @@ func (u *User) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]san
 // Delete permanently removes a user record from the database (not just making inactive)
 func (u *User) Delete(db orm.DB, user *sandpiper.User) error {
 	return db.Delete(user)
+}
+
+// duplicate returns true if name found in database
+func duplicate(db orm.DB, name, email string) bool {
+	m := new(sandpiper.User)
+	err := db.Model(m).Where("lower(username) = ? or lower(email) = ?", strings.ToLower(name), strings.ToLower(email)).
+		Select()
+	return err != pg.ErrNoRows
 }

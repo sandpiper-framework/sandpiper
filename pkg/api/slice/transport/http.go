@@ -41,6 +41,7 @@ var (
 
 // Slice create request
 type createReq struct {
+	ID           uuid.UUID         `json:"id"` // optional
 	Name         string            `json:"name" validate:"required,min=3"`
 	ContentHash  string            `json:"content_hash"`
 	ContentCount uint              `json:"content_count"`
@@ -48,6 +49,15 @@ type createReq struct {
 	Metadata     sandpiper.MetaMap `json:"metadata"`
 }
 
+func (r createReq) id() uuid.UUID {
+	var nilUUID = uuid.UUID{}
+	if r.ID == nilUUID {
+		return uuid.New()
+	}
+	return r.ID
+}
+
+// create populates createReq from body json adding UUID if not provided
 func (h *HTTP) create(c echo.Context) error {
 	r := new(createReq)
 
@@ -56,7 +66,7 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	result, err := h.svc.Create(c, sandpiper.Slice{
-		ID:           uuid.New(),
+		ID:           r.id(),
 		Name:         r.Name,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,

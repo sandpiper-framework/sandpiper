@@ -30,25 +30,6 @@ type Slice struct {
 
 }
 
-// SliceMetadata contains information about a slice
-type SliceMetadata struct {
-	SliceID uuid.UUID `json:"-" pg:",pk"`
-	Key     string    `json:"key" pg:",pk"`
-	Value   string    `json:"val"`
-}
-
-// MetaArray is an array of slice metadata
-type MetaArray []SliceMetadata
-
-// ToMap converts array of metadata key/value structs to a map
-func (a MetaArray) ToMap() MetaMap {
-	mm := make(MetaMap)
-	for _, meta := range a {
-		mm[meta.Key] = meta.Value
-	}
-	return mm
-}
-
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*Slice)(nil)
 var _ orm.BeforeUpdateHook = (*Slice)(nil)
@@ -65,4 +46,38 @@ func (b *Slice) BeforeInsert(ctx context.Context) (context.Context, error) {
 func (b *Slice) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	b.UpdatedAt = time.Now()
 	return ctx, nil
+}
+
+// SliceArray is an array of slices
+type SliceArray []Slice
+
+// The SliceIDs method creates an array of slice_ids
+func (a SliceArray) SliceIDs() []uuid.UUID {
+	var ids = make([]uuid.UUID, 0, len(a))
+
+	for _, slice := range a {
+		ids = append(ids, slice.ID)
+	}
+	return ids
+}
+
+// SliceMetadata contains information about a slice
+type SliceMetadata struct {
+	SliceID uuid.UUID `json:"-" pg:",pk"`
+	Key     string    `json:"key" pg:",pk"`
+	Value   string    `json:"val"`
+}
+
+// MetaArray is an array of slice metadata
+type MetaArray []SliceMetadata
+
+// The ToMap method converts array of metadata key/value structs to a map
+func (a MetaArray) ToMap(sliceID uuid.UUID) MetaMap {
+	mm := make(MetaMap)
+	for _, meta := range a {
+		if meta.SliceID == sliceID {
+			mm[meta.Key] = meta.Value
+		}
+	}
+	return mm
 }

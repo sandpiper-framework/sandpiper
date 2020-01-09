@@ -40,18 +40,28 @@ var (
 
 // Company create request
 type createReq struct {
-	Name     string `json:"name" validate:"required,min=3"`
-	SyncAddr string `json:"sync_addr"`
-	Active   bool   `json:"active"`
+	ID       uuid.UUID `json:"id"` // optional
+	Name     string    `json:"name" validate:"required,min=3"`
+	SyncAddr string    `json:"sync_addr"`
+	Active   bool      `json:"active"`
 }
 
+func (r createReq) id() uuid.UUID {
+	var nilUUID = uuid.UUID{}
+	if r.ID == nilUUID {
+		return uuid.New()
+	}
+	return r.ID
+}
+
+// create populates createReq from body json adding UUID if not provided
 func (h *HTTP) create(c echo.Context) error {
 	r := new(createReq)
 	if err := c.Bind(r); err != nil {
 		return err
 	}
 	result, err := h.svc.Create(c, sandpiper.Company{
-		ID:       uuid.New(),
+		ID:       r.id(),
 		Name:     r.Name,
 		SyncAddr: r.SyncAddr,
 		Active:   r.Active,

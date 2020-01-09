@@ -40,7 +40,7 @@ var (
 	ErrNonNumericUserID     = echo.NewHTTPError(http.StatusBadRequest, "numeric user id expected")
 )
 
-// User create request
+// User create request (id is assigned by database)
 type createReq struct {
 	FirstName       string                `json:"first_name" validate:"required"`
 	LastName        string                `json:"last_name" validate:"required"`
@@ -63,7 +63,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return ErrPasswordsNotMatching
 	}
 
-	if r.Role < sandpiper.SuperAdminRole || r.Role > sandpiper.UserRole {
+	if !sandpiper.RoleIsValid(r.Role) {
 		return ErrUnknownRole
 	}
 

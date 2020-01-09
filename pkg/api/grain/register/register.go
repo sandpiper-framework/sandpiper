@@ -15,7 +15,7 @@ import (
 	gt "autocare.org/sandpiper/pkg/api/grain/transport"
 )
 
-// Register ties the company service to its logger and transport mechanisms
+// Register ties the grain service to its logger and transport mechanisms
 func Register(db *pg.DB, rbac grain.RBAC, sec grain.Securer, log sandpiper.Logger, v1 *echo.Group) {
 	svc := grain.Initialize(db, rbac, sec)
 	ls := gl.ServiceLogger(svc, log)

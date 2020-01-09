@@ -20,3 +20,8 @@ const (
 	// UserRole is a standard user
 	UserRole AccessLevel = 200
 )
+
+// RoleIsValid validates against available access levels
+func RoleIsValid(role AccessLevel) bool {
+	return role >= SuperAdminRole && role <= UserRole
+}

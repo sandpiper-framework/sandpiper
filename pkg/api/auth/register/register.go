@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package auth
 
 import (
@@ -10,7 +14,7 @@ import (
 	"autocare.org/sandpiper/pkg/internal/model"
 )
 
-// Register ties the company service to its logger and transport mechanisms
+// Register ties the auth service to its logger and transport mechanisms
 func Register(db *pg.DB, rbac auth.RBAC, sec auth.Securer, log sandpiper.Logger, srv *echo.Echo, tgen auth.TokenGenerator, mwFunc echo.MiddlewareFunc) {
 	svc := auth.Initialize(db, tgen, sec, rbac)
 	ls := al.ServiceLogger(svc, log)

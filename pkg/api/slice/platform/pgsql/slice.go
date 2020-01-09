@@ -65,7 +65,7 @@ func (s *Slice) View(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: sliceID}
 
 	// get slice by primary key with subscribed companies
-	err := db.Model(slice).Column("slice.*").Relation("Companies").WherePK().Select()
+	err := db.Model(slice).Relation("Companies").WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +99,9 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 
 // List returns a list of all slices limited by scope and paginated
 func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
-	var slices []sandpiper.Slice
+	var slices sandpiper.SliceArray
 
-	// this filter function adds a condition to the companies relationship
+	// this filter function adds an optional condition to the companies relationship
 	var filterFn = func(q *orm.Query) (*orm.Query, error) {
 		if sc != nil {
 			return q.Where(sc.Condition, sc.ID), nil
@@ -109,11 +109,26 @@ func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sa
 		return q, nil
 	}
 
-	err := db.Model(&slices).Column("slice.*").Relation("Companies", filterFn).
+	err := db.Model(&slices).Relation("Companies", filterFn).
 		Limit(p.Limit).Offset(p.Offset).Order("name").Select()
 	if err != nil {
 		return nil, err
 	}
+
+	// look up metadata for all slices returned above (using an "in" list)
+	var meta sandpiper.MetaArray
+	ids := slices.SliceIDs()
+
+	err = db.Model(&meta).Where("slice_id in (?)", pg.In(ids)).Select()
+	if err != nil {
+		return nil, err
+	}
+
+	// insert metadata for each slice into response
+	for i, slice := range slices {
+		slices[i].Metadata = meta.ToMap(slice.ID)
+	}
+
 	return slices, nil
 }
 
@@ -139,7 +154,7 @@ func metaDataMap(db orm.DB, slice *sandpiper.Slice) (sandpiper.MetaMap, error) {
 	if err != nil {
 		return nil, err
 	}
-	return meta.ToMap(), nil
+	return meta.ToMap(slice.ID), nil
 }
 
 // nameExists returns true if name found in database
