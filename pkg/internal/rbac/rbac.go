@@ -64,7 +64,6 @@ func (s *Service) isAdmin(c echo.Context) bool {
 }
 
 func (s *Service) isCompanyAdmin(c echo.Context) bool {
-	// Must query company ID in database for the given user
 	return !(c.Get("role").(sandpiper.AccessLevel) > sandpiper.CompanyAdminRole)
 }
 

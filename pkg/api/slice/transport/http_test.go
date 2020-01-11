@@ -20,10 +20,10 @@ import (
 
 	"autocare.org/sandpiper/pkg/api/slice"
 	"autocare.org/sandpiper/pkg/api/slice/transport"
+	"autocare.org/sandpiper/pkg/internal/mock"
+	"autocare.org/sandpiper/pkg/internal/mock/mockdb"
 	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/internal/server"
-	"autocare.org/sandpiper/test/mock"
-	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestCreate(t *testing.T) {

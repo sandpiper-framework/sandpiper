@@ -59,6 +59,10 @@ To run Sandpiper in a production environment, simply download the correct binary
 
 [Downloads](https://sandpiper.org/downloads)
 
+```
+./api [-config= "path/to/config.yaml"]
+```
+
 ### Source Code
 
 These instructions will help you get up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.

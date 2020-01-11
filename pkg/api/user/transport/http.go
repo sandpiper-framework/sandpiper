@@ -35,9 +35,9 @@ func NewHTTP(svc user.Service, er *echo.Group) {
 
 // Custom errors
 var (
-	ErrPasswordsNotMatching = echo.NewHTTPError(http.StatusBadRequest, "passwords do not match")
-	ErrUnknownRole          = echo.NewHTTPError(http.StatusBadRequest, "unknown access role")
-	ErrNonNumericUserID     = echo.NewHTTPError(http.StatusBadRequest, "numeric user id expected")
+	ErrPasswordsNotMatching = echo.NewHTTPError(http.StatusBadRequest, "Passwords do not match")
+	ErrUnknownRole          = echo.NewHTTPError(http.StatusBadRequest, "Unknown access role")
+	ErrNonNumericUserID     = echo.NewHTTPError(http.StatusBadRequest, "Numeric user id expected")
 )
 
 // User create request (id is assigned by database)
@@ -50,6 +50,7 @@ type createReq struct {
 	Email           string                `json:"email" validate:"required,email"`
 	CompanyID       uuid.UUID             `json:"company_id" validate:"required"`
 	Role            sandpiper.AccessLevel `json:"role" validate:"required"`
+	Active          bool                  `json:"active"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -68,13 +69,14 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	usr, err := h.svc.Create(c, sandpiper.User{
+		FirstName: r.FirstName,
+		LastName:  r.LastName,
 		Username:  r.Username,
 		Password:  r.Password,
 		Email:     r.Email,
-		FirstName: r.FirstName,
-		LastName:  r.LastName,
 		CompanyID: r.CompanyID,
 		Role:      r.Role,
+		Active:    r.Active,
 	})
 
 	if err != nil {
@@ -118,13 +120,14 @@ func (h *HTTP) view(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// User update request
+// User update request (only things they can change here)
 type updateReq struct {
 	ID        int    `json:"-"`
 	FirstName string `json:"first_name,omitempty" validate:"omitempty,min=2"`
 	LastName  string `json:"last_name,omitempty" validate:"omitempty,min=2"`
 	Email     string `json:"email,omitempty"`
 	Phone     string `json:"phone,omitempty"`
+	Active    bool   `json:"active,omitempty"`
 }
 
 func (h *HTTP) update(c echo.Context) error {

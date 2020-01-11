@@ -76,7 +76,8 @@ func (s *Company) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]
 	return companies, nil
 }
 
-// Delete sets deleted_at for a company
+// Delete removes the company (and any related subscriptions)
+// All related users must be deleted elsewhere first
 func (s *Company) Delete(db orm.DB, company *sandpiper.Company) error {
 	return db.Delete(company)
 }

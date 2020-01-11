@@ -34,14 +34,24 @@ func NewHTTP(svc grain.Service, er *echo.Group) {
 // Custom errors
 var (
 	// ErrInvalidSliceUUID indicates a malformed uuid
-	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "invalid grain uuid")
+	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "Invalid grain uuid")
 )
 
 // Grain create request
 type createReq struct {
-	SliceID uuid.UUID           `json:"slice_id" validate:"required,min=3"`
-	Type    sandpiper.GrainType `json:"grain_type"`
-	Payload string              `json:"payload"`
+	ID      uuid.UUID           `json:"id"` // optional
+	SliceID uuid.UUID           `json:"slice_id" validate:"required"`
+	Type    sandpiper.GrainType `json:"grain_type" validate:"required"`
+	Key     string              `json:"grain_key" validate:"required"`
+	Payload string              `json:"payload" validate:"required"`
+}
+
+func (r createReq) id() uuid.UUID {
+	var nilUUID = uuid.UUID{}
+	if r.ID == nilUUID {
+		return uuid.New()
+	}
+	return r.ID
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -51,10 +61,11 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	result, err := h.svc.Create(c, sandpiper.Grain{
-		ID:      uuid.New(),
+	result, err := h.svc.Create(c, &sandpiper.Grain{
+		ID:      r.id(),
 		SliceID: r.SliceID,
 		Type:    r.Type,
+		Key:     r.Key,
 		Payload: r.Payload,
 	})
 

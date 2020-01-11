@@ -17,7 +17,7 @@ import (
 func Load(path string) (*Configuration, error) {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("error reading config file (use -p flag), %s", err)
+		return nil, fmt.Errorf("error reading config file (use -config flag), %s", err)
 	}
 	var cfg = new(Configuration)
 

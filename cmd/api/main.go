@@ -23,7 +23,7 @@ import (
 func main() {
 	fmt.Println(version.Banner())
 
-	cfgPath := flag.String("p", "./server.config.yaml", "Path to config file")
+	cfgPath := flag.String("config", "./server.config.yaml", "Path to config file")
 	flag.Parse()
 
 	cfg, err := config.Load(*cfgPath)
@@ -31,7 +31,7 @@ func main() {
 		log.Fatal("ERROR: ", err)
 	}
 
-	// Update the database if necessary
+	// Update the database if necessary (from bindata embedded files)
 	msg := database.Migrate(cfg.DB.URL(), embeddedFiles())
 	fmt.Println(msg)
 

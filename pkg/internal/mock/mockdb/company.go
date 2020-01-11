@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
 // Company database mock

@@ -49,8 +49,7 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 	// insert any supplied meta data
 	meta := &sandpiper.SliceMetadata{SliceID: slice.ID}
 	for k, v := range slice.Metadata {
-		meta.Key = k
-		meta.Value = v
+		meta.Key, meta.Value = k, v
 		if err := db.Insert(meta); err != nil {
 			return nil, err
 		}
@@ -70,8 +69,8 @@ func (s *Slice) View(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 		return nil, err
 	}
 
-	// insert any metadata via a map
-	slice.Metadata, err = metaDataMap(db, slice)
+	// insert any metadata for the slice as a map
+	slice.Metadata, err = metaDataMap(db, sliceID)
 
 	return slice, nil
 }
@@ -91,8 +90,8 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 		return nil, err
 	}
 
-	// insert any metadata via a map
-	slice.Metadata, err = metaDataMap(db, slice)
+	// insert any metadata for the slice as a map
+	slice.Metadata, err = metaDataMap(db, sliceID)
 
 	return slice, err
 }
@@ -146,15 +145,15 @@ func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
 }
 
 // metaDataMap returns a map of slice metadata. We use this separate query instead of
-// an orm relationship because we don't want array of structs in json. Maps will marshal
-// as {"key1": "value1", "key2": "value2", ...}
-func metaDataMap(db orm.DB, slice *sandpiper.Slice) (sandpiper.MetaMap, error) {
+// an orm relationship because we don't want array of structs in json in this case.
+// Maps marshal as {"key1": "value1", "key2": "value2", ...}
+func metaDataMap(db orm.DB, sliceID uuid.UUID) (sandpiper.MetaMap, error) {
 	var meta sandpiper.MetaArray
-	err := db.Model(&meta).Where("slice_id = ?", slice.ID).Select()
+	err := db.Model(&meta).Where("slice_id = ?", sliceID).Select()
 	if err != nil {
 		return nil, err
 	}
-	return meta.ToMap(slice.ID), nil
+	return meta.ToMap(sliceID), nil
 }
 
 // nameExists returns true if name found in database

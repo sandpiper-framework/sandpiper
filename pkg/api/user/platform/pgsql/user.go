@@ -32,7 +32,7 @@ var (
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Username or email already exists.")
 )
 
-// Create creates a new user in database
+// Create creates a new user in the database (id is serially assigned)
 func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
 
 	if duplicate(db, usr.Username, usr.Email) {

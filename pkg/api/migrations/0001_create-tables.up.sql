@@ -58,16 +58,16 @@ CREATE TABLE IF NOT EXISTS "grains" (
   "grain_key"    text,
   "payload"      text,
   "created_at"   timestamp,
-  CONSTRAINT "grain_type_key" UNIQUE("grain_type", "grain_key")
+  CONSTRAINT "grain_type_key" UNIQUE("slice_id", "grain_type", "grain_key")
 ); 
 
 CREATE TABLE IF NOT EXISTS users (
   "id"               serial PRIMARY KEY,
-  "first_name"       text,
-  "last_name"        text,
   "username"         text UNIQUE NOT NULL,
   "password"         text,
   "email"            text,
+  "first_name"       text,
+  "last_name"        text,
   "phone"            text,
   "active"           boolean,
   "last_login"       timestamp,

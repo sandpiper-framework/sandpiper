@@ -1,15 +1,19 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package rbac_test
 
 import (
 	"testing"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/rbac"
-	"autocare.org/sandpiper/test/mock"
-
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+
+	"autocare.org/sandpiper/pkg/internal/mock"
+	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/internal/rbac"
 )
 
 func TestUser(t *testing.T) {

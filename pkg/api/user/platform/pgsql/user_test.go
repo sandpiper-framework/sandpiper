@@ -10,8 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
+	"autocare.org/sandpiper/pkg/internal/mock"
 	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/test/mock"
+	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
 func TestCreate(t *testing.T) {
@@ -255,12 +256,9 @@ func TestList(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
+	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, &cases[1].wantData); err != nil {
+	if err := mock.InsertMultiple(db, &cases[1].wantData); err != nil {
 		t.Error(err)
 	}
 
@@ -309,12 +307,9 @@ func TestDelete(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Role{}, &sandpiper.User{})
+	db := mock.NewDB(t, dbCon, &sandpiper.User{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Role{
-		ID:          1,
-		AccessLevel: 1,
-		Name:        "SUPER_ADMIN"}, cases[0].wantData); err != nil {
+	if err := mock.InsertMultiple(db, cases[0].wantData); err != nil {
 		t.Error(err)
 	}
 
@@ -326,7 +321,6 @@ func TestDelete(t *testing.T) {
 			err := udb.Delete(db, tt.usr)
 			assert.Equal(t, tt.wantErr, err != nil)
 
-			// Check if the deleted_at was set
 		})
 	}
 }

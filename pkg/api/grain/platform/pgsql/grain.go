@@ -7,7 +7,9 @@ package pgsql
 // grain service database access
 
 import (
+	"github.com/go-pg/pg/v9"
 	"net/http"
+	"strings"
 
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
@@ -27,17 +29,24 @@ func NewGrain() *Grain {
 
 // Custom errors
 var (
-	// ErrAlreadyExists indicates the grain name is already used
-	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain name already exists.")
+	// ErrAlreadyExists indicates the grain-type-key constraint would fail
+	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain type/key already exists for this Slice.")
 )
 
 // Create creates a new grain in database (assumes allowed to do this)
-func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, error) {
+func (s *Grain) Create(db orm.DB, grain *sandpiper.Grain) (*sandpiper.Grain, error) {
+
+	// key is always lowercase to allow faster lookups
+	grain.Key = strings.ToLower(grain.Key)
+
+	if duplicate(db, grain.SliceID, grain.Type, grain.Key) {
+		return nil, ErrAlreadyExists
+	}
 
 	if err := db.Insert(&grain); err != nil {
 		return nil, err
 	}
-	return &grain, nil
+	return grain, nil
 }
 
 // View returns a single grain by ID (assumes allowed to do this)
@@ -93,4 +102,12 @@ func (s *Grain) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sa
 // Delete permanently removes a grain
 func (s *Grain) Delete(db orm.DB, grain *sandpiper.Grain) error {
 	return db.Delete(grain)
+}
+
+// duplicate returns true if grain type/key found in database for a slice
+func duplicate(db orm.DB, sliceID uuid.UUID, grainType sandpiper.GrainType, grainKey string) bool {
+	m := new(sandpiper.Grain)
+	err := db.Model(m).Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, strings.ToLower(grainKey)).
+		Select()
+	return err != pg.ErrNoRows
 }

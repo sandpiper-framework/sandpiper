@@ -14,10 +14,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/pkg/api/user"
+	"autocare.org/sandpiper/pkg/internal/mock"
+	"autocare.org/sandpiper/pkg/internal/mock/mockdb"
 	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/internal/scope"
-	"autocare.org/sandpiper/test/mock"
-	"autocare.org/sandpiper/test/mock/mockdb"
 )
 
 func TestCreate(t *testing.T) {

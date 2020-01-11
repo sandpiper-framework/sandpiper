@@ -5,14 +5,15 @@
 package pgsql_test
 
 import (
-	"github.com/google/uuid"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
+	"autocare.org/sandpiper/pkg/internal/mock"
 	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/test/mock"
+	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
 func TestCreate(t *testing.T) {
@@ -23,7 +24,7 @@ func TestCreate(t *testing.T) {
 		wantData *sandpiper.Company
 	}{
 		{
-			name:    "CREATE Company Name already exists",
+			name:    "Company Name already exists",
 			wantErr: true,
 			req: sandpiper.Company{
 				ID:     mock.TestUUID(1),
@@ -32,7 +33,7 @@ func TestCreate(t *testing.T) {
 			},
 		},
 		{
-			name:    "CREATE Fail on insert duplicate ID",
+			name:    "Fail on insert duplicate ID",
 			wantErr: true,
 			req: sandpiper.Company{
 				ID:     mock.TestUUID(1),
@@ -41,7 +42,7 @@ func TestCreate(t *testing.T) {
 			},
 		},
 		{
-			name: "CREATE Success",
+			name: "Success",
 			req: sandpiper.Company{
 				ID:     mock.TestUUID(2),
 				Name:   "Acme Brakes",
@@ -94,12 +95,12 @@ func TestView(t *testing.T) {
 		wantData *sandpiper.Company
 	}{
 		{
-			name:    "VIEW Company does not exist",
+			name:    "Company does not exist",
 			wantErr: true,
 			id:      mock.TestUUID(2),
 		},
 		{
-			name: "VIEW Success",
+			name: "Success",
 			id:   mock.TestUUID(1),
 			wantData: &sandpiper.Company{
 				ID:     mock.TestUUID(1),
@@ -148,7 +149,7 @@ func TestUpdate(t *testing.T) {
 		wantData *sandpiper.Company
 	}{
 		{
-			name: "UPDATE Success",
+			name: "Success",
 			data: &sandpiper.Company{
 				ID:     mock.TestUUID(1),
 				Name:   "Before Update",
@@ -187,7 +188,6 @@ func TestUpdate(t *testing.T) {
 				}
 				tt.wantData.UpdatedAt = comp.UpdatedAt
 				tt.wantData.CreatedAt = comp.CreatedAt
-				tt.wantData.DeletedAt = comp.DeletedAt
 				assert.Equal(t, tt.wantData, comp)
 			}
 		})
@@ -264,10 +264,9 @@ func TestDelete(t *testing.T) {
 		wantData *sandpiper.Company
 	}{
 		{
-			name: "DELETE Success",
+			name: "Success",
 			usr: &sandpiper.Company{
-				ID:        mock.TestUUID(1),
-				DeletedAt: mock.TestTime(2018),
+				ID: mock.TestUUID(1),
 			},
 			wantData: &sandpiper.Company{
 				ID:     mock.TestUUID(1),
@@ -297,7 +296,6 @@ func TestDelete(t *testing.T) {
 			err := mdb.Delete(db, tt.usr)
 			assert.Equal(t, tt.wantErr, err != nil)
 
-			// Check if the deleted_at was set
 		})
 	}
 }

@@ -23,5 +23,10 @@ const (
 
 // RoleIsValid validates against available access levels
 func RoleIsValid(role AccessLevel) bool {
-	return role >= SuperAdminRole && role <= UserRole
+	switch role {
+	case SuperAdminRole, AdminRole, CompanyAdminRole, UserRole:
+		return true
+	default:
+		return false
+	}
 }

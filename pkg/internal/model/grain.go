@@ -12,9 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
+//GrainType is an enum defining grain content
 type GrainType int16
 
-const (
+const ( // Never change this ordering!
 	aces_file GrainType = iota
 	aces_item
 	asset_file
@@ -31,6 +32,7 @@ type Grain struct {
 	ID        uuid.UUID `json:"id"`
 	SliceID   uuid.UUID `json:"slice_id"`
 	Type      GrainType `json:"grain_type"`
+	Key       string    `json:"grain_key"`
 	Payload   string    `json:"payload"`
 	CreatedAt time.Time `json:"created_at"`
 	Slice     *Slice    `json:"slice"` // has-one relation

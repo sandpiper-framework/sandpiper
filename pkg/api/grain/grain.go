@@ -2,7 +2,8 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package grain contains services for grains
+// Package grain contains services for grains. Grains must belong to a slice
+// and do not have an update method (use add/delete).
 package grain
 
 import (
@@ -13,8 +14,9 @@ import (
 	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
-// Create creates a new grain to hold data-objects
-func (s *Grain) Create(c echo.Context, req sandpiper.Grain) (*sandpiper.Grain, error) {
+// Create creates a new grain to hold data-objects (we pass request as a pointer
+// for this service because it can be very big).
+func (s *Grain) Create(c echo.Context, req *sandpiper.Grain) (*sandpiper.Grain, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}

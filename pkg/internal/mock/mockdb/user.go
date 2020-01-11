@@ -4,6 +4,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 
 	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
 // User database mock

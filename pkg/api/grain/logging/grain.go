@@ -33,7 +33,7 @@ type LogService struct {
 const source = "grain"
 
 // Create logging
-func (ls *LogService) Create(c echo.Context, req sandpiper.Grain) (resp *sandpiper.Grain, err error) {
+func (ls *LogService) Create(c echo.Context, req *sandpiper.Grain) (resp *sandpiper.Grain, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,

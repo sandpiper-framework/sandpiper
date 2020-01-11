@@ -1,3 +1,7 @@
+// Copyright Auto Care Association. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.md file.
+
 package config_test
 
 import (
@@ -5,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/internal/config"
+	"autocare.org/sandpiper/pkg/shared/config"
 )
 
 func TestLoadConfig(t *testing.T) {
