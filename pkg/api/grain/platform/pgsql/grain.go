@@ -34,7 +34,7 @@ var (
 )
 
 // Create creates a new grain in database (assumes allowed to do this)
-func (s *Grain) Create(db orm.DB, grain *sandpiper.Grain) (*sandpiper.Grain, error) {
+func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, error) {
 
 	// key is always lowercase to allow faster lookups
 	grain.Key = strings.ToLower(grain.Key)
@@ -46,7 +46,7 @@ func (s *Grain) Create(db orm.DB, grain *sandpiper.Grain) (*sandpiper.Grain, err
 	if err := db.Insert(&grain); err != nil {
 		return nil, err
 	}
-	return grain, nil
+	return &grain, nil
 }
 
 // View returns a single grain by ID (assumes allowed to do this)

@@ -15,7 +15,8 @@ import (
 	"autocare.org/sandpiper/pkg/internal/zlog"
 	"autocare.org/sandpiper/pkg/shared/config"
 
-	// one import for each service to register (with identifying alias)
+	// One import for each service to register (with identifying alias).
+	// Must use a register subdirectory to avoid "import cycle" errors.
 	au "autocare.org/sandpiper/pkg/api/auth/register"
 	co "autocare.org/sandpiper/pkg/api/company/register"
 	gr "autocare.org/sandpiper/pkg/api/grain/register"

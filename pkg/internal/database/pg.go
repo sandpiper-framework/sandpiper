@@ -4,7 +4,7 @@
 
 // Package database creates a pooled connection to the database. We use a
 // lightweight ORM (with deep support for postgresql). This ORM only supports
-// postgresql. We might consider switching if need more supported dbms.
+// postgresql. We might consider switching if require support for other dbms.
 package database
 
 import (

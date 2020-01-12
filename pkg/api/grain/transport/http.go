@@ -43,7 +43,7 @@ type createReq struct {
 	SliceID uuid.UUID           `json:"slice_id" validate:"required"`
 	Type    sandpiper.GrainType `json:"grain_type" validate:"required"`
 	Key     string              `json:"grain_key" validate:"required"`
-	Payload string              `json:"payload" validate:"required"`
+	Payload []byte              `json:"payload" validate:"required"`
 }
 
 func (r createReq) id() uuid.UUID {
@@ -61,7 +61,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	result, err := h.svc.Create(c, &sandpiper.Grain{
+	result, err := h.svc.Create(c, sandpiper.Grain{
 		ID:      r.id(),
 		SliceID: r.SliceID,
 		Type:    r.Type,

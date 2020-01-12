@@ -16,7 +16,7 @@ import (
 
 // Create creates a new grain to hold data-objects (we pass request as a pointer
 // for this service because it can be very big).
-func (s *Grain) Create(c echo.Context, req *sandpiper.Grain) (*sandpiper.Grain, error) {
+func (s *Grain) Create(c echo.Context, req sandpiper.Grain) (*sandpiper.Grain, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}

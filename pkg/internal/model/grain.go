@@ -29,13 +29,13 @@ const ( // Never change this ordering!
 
 // Grain represents the sandpiper syncable-object
 type Grain struct {
-	ID        uuid.UUID `json:"id"`
-	SliceID   uuid.UUID `json:"slice_id"`
-	Type      GrainType `json:"grain_type"`
-	Key       string    `json:"grain_key"`
-	Payload   string    `json:"payload"`
-	CreatedAt time.Time `json:"created_at"`
-	Slice     *Slice    `json:"slice"` // has-one relation
+	ID        uuid.UUID   `json:"id"`
+	SliceID   uuid.UUID   `json:"slice_id"`
+	Type      GrainType   `json:"grain_type"`
+	Key       string      `json:"grain_key"`
+	Payload   PayloadType `json:"payload"`
+	CreatedAt time.Time   `json:"created_at"`
+	Slice     *Slice      `json:"slice"` // has-one relation
 }
 
 // compile-time check variables for model hooks (which take no memory)

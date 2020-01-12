@@ -4,7 +4,8 @@
 
 package pgsql
 
-// slice service database access
+// slice service database access.
+// Manage slices and related metadata, but not which companies subscribe to the slice.
 
 import (
 	"net/http"
@@ -33,7 +34,7 @@ var (
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Slice name already exists.")
 )
 
-// Create creates a new slice in database (assumes allowed to do this)
+// Create adds a new slice with optional metadata (assumes allowed to do this)
 func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
 
 	// don't add if would create a duplicate name
@@ -100,7 +101,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices sandpiper.SliceArray
 
-	// this filter function adds an optional condition to the companies relationship
+	// filter function adds optional condition to "Companies" relationship
 	var filterFn = func(q *orm.Query) (*orm.Query, error) {
 		if sc != nil {
 			return q.Where(sc.Condition, sc.ID), nil
@@ -108,8 +109,8 @@ func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sa
 		return q, nil
 	}
 
-	err := db.Model(&slices).Relation("Companies", filterFn).
-		Limit(p.Limit).Offset(p.Offset).Order("name").Select()
+	err := db.Model(&slices).Relation("Companies", filterFn).Limit(p.Limit).Offset(p.Offset).
+		Order("name").Select()
 	if err != nil {
 		return nil, err
 	}
