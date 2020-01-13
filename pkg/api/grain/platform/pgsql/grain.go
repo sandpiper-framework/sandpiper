@@ -6,6 +6,10 @@ package pgsql
 
 // grain service database access
 
+// The `grain` contains the actual data `payload` that is exchanged between trading partners.
+// The payload is transferred (and stored) as a binary object that has been gzipped and then
+// translated to base64 for easy delivery via json.
+
 import (
 	"github.com/go-pg/pg/v9"
 	"net/http"

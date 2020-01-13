@@ -33,7 +33,7 @@ type Grain struct {
 	SliceID   uuid.UUID   `json:"slice_id"`
 	Type      GrainType   `json:"grain_type"`
 	Key       string      `json:"grain_key"`
-	Payload   PayloadType `json:"payload"`
+	Payload   PayloadData `json:"payload"`
 	CreatedAt time.Time   `json:"created_at"`
 	Slice     *Slice      `json:"slice"` // has-one relation
 }

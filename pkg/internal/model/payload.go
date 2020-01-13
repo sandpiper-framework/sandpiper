@@ -5,58 +5,63 @@
 package sandpiper
 
 import (
-	//"encoding/base64"
 	"bytes"
 	"compress/gzip"
-	"database/sql/driver"
-	"errors"
+	"encoding/base64"
 	"io/ioutil"
-
-	//"github.com/go-pg/pg/v9"
-	// DB adapter
-	_ "github.com/lib/pq"
 )
 
-// PayloadType is a custom data type for payload data to make encoding/decoding
-// the payload data automatic.
-type PayloadType []byte
+/*
+ * Usage:
+ *   import "autocare.org/sandpiper/pkg/internal/payload"
+ *
+ *   rawBytes := []byte("payload data to store")
+ *   payloadData, err := sandpiper.Encode(rawBytes)
+ *
+ *   rawBytes, err := payloadData.Decode()
+ */
 
-// Value implements driver.Valuer
-// Processes data into the database
-func (p PayloadType) Value() (driver.Value, error) {
-	b := make([]byte, 0, len(p))
-	buf := bytes.NewBuffer(b)
-	w, _ := gzip.NewWriterLevel(buf, gzip.BestCompression)
-	_, err := w.Write(p)
-	if err != nil {
+// PayloadData is the data type for encoded payload data.
+type PayloadData []byte
+
+// Encode payload data for transmission and storage
+func Encode(b []byte) (PayloadData, error) {
+	var zipped bytes.Buffer
+
+	// zip source data into local buffer
+	gz, _ := gzip.NewWriterLevel(&zipped, gzip.BestCompression)
+	if _, err := gz.Write(b); err != nil {
 		return nil, err
 	}
-	if err := w.Close(); err != nil {
+	if err := gz.Flush(); err != nil {
 		return nil, err
 	}
-	return driver.Value(buf.Bytes()), nil
+	if err := gz.Close(); err != nil {
+		return nil, err
+	}
+
+	// convert to base64 using a new byte slice
+	b64 := make([]byte, base64.StdEncoding.EncodedLen(zipped.Len()))
+	base64.StdEncoding.Encode(b64, zipped.Bytes())
+
+	return PayloadData(b64), nil
 }
 
-// Scan implements sql.Scanner. Only handles string and []byte
-// Processes data from the database
-func (p *PayloadType) Scan(src interface{}) error {
-	var b []byte
+// Decode method converts base64 compressed payload to byte slice
+func (p PayloadData) Decode() ([]byte, error) {
 
-	switch src.(type) {
-	case string:
-		b = []byte(src.(string))
-	case []byte:
-		b = src.([]byte)
-	default:
-		return errors.New("PayloadType must be 'string' or '[]byte'")
-	}
-
-	reader, _ := gzip.NewReader(bytes.NewReader(b))
-	defer reader.Close()
-	b, err := ioutil.ReadAll(reader)
+	// convert base64 to compressed binary
+	zipped := make([]byte, base64.StdEncoding.DecodedLen(len(p)))
+	_, err := base64.StdEncoding.Decode(zipped, p)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	*p = PayloadType(b)
-	return nil
+
+	// convert compressed binary to original text
+	reader, err := gzip.NewReader(bytes.NewReader(zipped))
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+	return ioutil.ReadAll(reader)
 }
