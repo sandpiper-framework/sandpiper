@@ -1,0 +1,13 @@
+# sample unit file for sandpiper service running under linux systemd
+# this file would be copied to /etc/systemd/system/
+
+[Unit]
+Description=Sandpiper Server
+
+[Service]
+ExecStart=/home/ubuntu/sandpiper/api
+WorkingDirectory=/home/ubuntu/sandpiper
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

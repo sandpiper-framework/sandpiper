@@ -12,30 +12,40 @@ import (
 	"github.com/google/uuid"
 )
 
-//GrainType is an enum defining grain content
+// GrainType is an enum defining grain content
 type GrainType int16
 
-const ( // Never change this ordering!
-	aces_file GrainType = iota
-	aces_item
-	asset_file
-	partspro_file
-	partspro_item
-	pies_file
-	pies_item
-	pies_marketcopy
-	pies_pricesheet
+const ( // Never change these values, only add to list
+	Grain_aces_file       GrainType = 1
+	Grain_aces_item       GrainType = 2
+	Grain_asset_file      GrainType = 3
+	Grain_partspro_file   GrainType = 4
+	Grain_partspro_item   GrainType = 5
+	Grain_pies_file       GrainType = 6
+	Grain_pies_item       GrainType = 7
+	Grain_pies_marketcopy GrainType = 8
+	Grain_pies_pricesheet GrainType = 9
+)
+
+// EncodingMethod is an enum describing how the payload is encoded
+type EncodingMethod int16
+
+const ( // Never change these values, only add to list
+	EncRaw     EncodingMethod = 1
+	EncB64     EncodingMethod = 2
+	EncGzipB64 EncodingMethod = 3
 )
 
 // Grain represents the sandpiper syncable-object
 type Grain struct {
-	ID        uuid.UUID   `json:"id"`
-	SliceID   uuid.UUID   `json:"slice_id"`
-	Type      GrainType   `json:"grain_type"`
-	Key       string      `json:"grain_key"`
-	Payload   PayloadData `json:"payload"`
-	CreatedAt time.Time   `json:"created_at"`
-	Slice     *Slice      `json:"slice"` // has-one relation
+	ID        uuid.UUID      `json:"id"`
+	SliceID   uuid.UUID      `json:"slice_id"`
+	Type      GrainType      `json:"grain_type"`
+	Key       string         `json:"grain_key"`
+	Payload   PayloadData    `json:"payload"`
+	Encoding  EncodingMethod `json:"payload"`
+	CreatedAt time.Time      `json:"created_at"`
+	Slice     *Slice         `json:"slice"` // has-one relation
 }
 
 // compile-time check variables for model hooks (which take no memory)

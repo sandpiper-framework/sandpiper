@@ -11,9 +11,9 @@ import (
 
 func TestEncode(t *testing.T) {
 	tests := []struct {
-		name string
-		src []byte
-		want string
+		name    string
+		src     []byte
+		want    string
 		wantErr bool
 	}{
 		{"Good Conversion", []byte("sandpiper rocks!"), "H4sIAAAAAAAC/ypOzEspyCxILVIoyk/OLlYEAAAA//8BAAD//451mN4QAAAA", false},
@@ -34,9 +34,9 @@ func TestEncode(t *testing.T) {
 
 func TestDecode(t *testing.T) {
 	tests := []struct {
-		name string
-		data sandpiper.PayloadData
-		want string
+		name    string
+		data    sandpiper.PayloadData
+		want    string
 		wantErr bool
 	}{
 		{"Good Conversion", []byte("H4sIAAAAAAAC/ypOzEspyCxILVIoyk/OLlYEAAAA//8BAAD//451mN4QAAAA"), "sandpiper rocks!", false},
@@ -75,3 +75,14 @@ func TestPayloadData(t *testing.T) {
 		}
 	})
 }
+
+/*
+func main() {
+	s := []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+
+	for i := 10; i <= 440; i = i + 10 {
+		s2, _ := encode(s[:i])
+		fmt.Printf("input: %d, output %d\n", i, len(s2))
+	}
+}
+ */

@@ -15,7 +15,7 @@ import (
 	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
-// Service represents grain application interface
+// Service represents grain application interface (note no update!)
 type Service interface {
 	Create(echo.Context, sandpiper.Grain) (*sandpiper.Grain, error)
 	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Grain, error)
@@ -53,7 +53,7 @@ type Repository interface {
 	ViewBySlice(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Grain, error)
 	List(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Grain, error)
-	Delete(orm.DB, *sandpiper.Grain) error
+	Delete(orm.DB, uuid.UUID) error
 }
 
 // RBAC represents role-based-access-control interface

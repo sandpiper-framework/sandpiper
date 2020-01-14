@@ -11,10 +11,10 @@ package pgsql
 // translated to base64 for easy delivery via json.
 
 import (
-	"github.com/go-pg/pg/v9"
 	"net/http"
 	"strings"
 
+	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -43,7 +43,7 @@ func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, erro
 	// key is always lowercase to allow faster lookups
 	grain.Key = strings.ToLower(grain.Key)
 
-	if duplicate(db, grain.SliceID, grain.Type, grain.Key) {
+	if isDuplicate(db, grain.SliceID, grain.Type, grain.Key) {
 		return nil, ErrAlreadyExists
 	}
 
@@ -103,13 +103,14 @@ func (s *Grain) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sa
 	return grains, nil
 }
 
-// Delete permanently removes a grain
-func (s *Grain) Delete(db orm.DB, grain *sandpiper.Grain) error {
+// Delete permanently removes a grain by primary key (id)
+func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
+	grain := sandpiper.Grain{ID: id}
 	return db.Delete(grain)
 }
 
-// duplicate returns true if grain type/key found in database for a slice
-func duplicate(db orm.DB, sliceID uuid.UUID, grainType sandpiper.GrainType, grainKey string) bool {
+// isDuplicate returns true if grain type/key found in database for a slice
+func isDuplicate(db orm.DB, sliceID uuid.UUID, grainType sandpiper.GrainType, grainKey string) bool {
 	m := new(sandpiper.Grain)
 	err := db.Model(m).Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, strings.ToLower(grainKey)).
 		Select()

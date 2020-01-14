@@ -14,8 +14,7 @@ import (
 	"autocare.org/sandpiper/pkg/internal/scope"
 )
 
-// Create creates a new grain to hold data-objects (we pass request as a pointer
-// for this service because it can be very big).
+// Create makes a new grain to hold data-objects
 func (s *Grain) Create(c echo.Context, req sandpiper.Grain) (*sandpiper.Grain, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
@@ -43,14 +42,10 @@ func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error
 	return s.sdb.View(s.db, grainID)
 }
 
-// Delete deletes a grain if allowed
+// Delete deletes a grain by id, if allowed
 func (s *Grain) Delete(c echo.Context, id uuid.UUID) error {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return err
 	}
-	grain, err := s.sdb.View(s.db, id)
-	if err != nil {
-		return err
-	}
-	return s.sdb.Delete(s.db, grain)
+	return s.sdb.Delete(s.db, id)
 }

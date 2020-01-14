@@ -1,7 +1,7 @@
 # Sandpiper
 
 The Sandpiper framework provides a standard decentralized model to classify, distribute, and synchronize shared product
-data sets between an originating sender (the "publisher") and a derivative receiver (the "subscriber").
+data sets between an originating sender (the "publisher") and a secondary receiver (the "subscriber").
 
 ## Getting Started
 
@@ -26,7 +26,7 @@ To start/stop service, run `pg_ctl start`, `pg_ctl stop`.
 
 ##### Create Database (for each desired role)
 
-*todo:* this process is automated with 'task', but we don't want that dependency. Create .bat and .sh files to handle this for those not running from source.
+*todo:* Database creation is automated with 'task', but we don't want that dependency for standard production installations. Create .bat and .sh files to handle this for those not running from source.
 
 ```
 task create-pub-db | create-sub-db | create-both-db
@@ -55,13 +55,34 @@ GRANT ALL PRIVILEGES ON DATABASE tidepool TO admin;
 
 ### Running in Production
 
-To run Sandpiper in a production environment, simply download the correct binary from the Sandpiper web site and follow the installation instructions:
+To run Sandpiper in a production environment, simply download the correct binary from the Sandpiper web site and follow the deployment instructions:
 
 [Downloads](https://sandpiper.org/downloads)
 
 ```
 ./api [-config= "path/to/config.yaml"]
 ```
+## Deployment
+
+Add additional notes about how to deploy this on a live system
+
+### Linux (the `systemd` init system)
+
+A sample systemd "unit" file (sandpiper.service) is included with the executable. Make any required changes and copy to `/etc/systemd/system/`.
+
+Once you enable the service with the following command. It will start automatically on boot, after that.
+```
+$ sudo systemctl enable sandpiper.service
+```
+Check status/start/stop/restart
+```
+$ sudo systemctl {status|start|stop|restart} sandpiper
+```
+Display all services
+```
+$ service --status-all
+```
+https://www.digitalocean.com/community/tutorials/understanding-systemd-units-and-unit-files
 
 ### Source Code
 
@@ -129,9 +150,9 @@ Explain what these tests test and why
 Give an example
 ```
 
-## Deployment
+## Development
 
-Add additional notes about how to deploy this on a live system
+This section highlights areas helpful for continued development of the project.
 
 ### Implementing CRUD of another table
 
