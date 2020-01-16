@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS "slice_metadata" (
 );
 
 CREATE TABLE IF NOT EXISTS "subscriptions" (
+  "id"           serial PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
   "company_id"   uuid REFERENCES "companies" ON DELETE CASCADE,
   "name"         text UNIQUE NOT NULL,
@@ -48,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
   "active"       boolean,
   "created_at"   timestamp,
   "updated_at"   timestamp,
-  PRIMARY KEY ("slice_id", "company_id")
+  CONSTRAINT "sub_alt_key" UNIQUE("slice_id", "company_id")
 );
 
 CREATE TABLE IF NOT EXISTS "grains" (

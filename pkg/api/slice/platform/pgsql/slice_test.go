@@ -5,6 +5,7 @@
 package pgsql_test
 
 import (
+	"autocare.org/sandpiper/pkg/internal/scope"
 	"github.com/google/uuid"
 	"testing"
 
@@ -313,7 +314,6 @@ func TestDelete(t *testing.T) {
 			err := mdb.Delete(db, tt.usr)
 			assert.Equal(t, tt.wantErr, err != nil)
 
-			// Check if the deleted_at was set
 		})
 	}
 }

@@ -22,6 +22,7 @@ import (
 	gr "autocare.org/sandpiper/pkg/api/grain/register"
 	pa "autocare.org/sandpiper/pkg/api/password/register"
 	sl "autocare.org/sandpiper/pkg/api/slice/register"
+	su "autocare.org/sandpiper/pkg/api/subscription/register"
 	us "autocare.org/sandpiper/pkg/api/user/register"
 )
 
@@ -54,7 +55,7 @@ func Start(cfg *config.Configuration) error {
 	co.Register(db, rba, sec, log, v1)                     // company service
 	sl.Register(db, rba, sec, log, v1)                     // slice service
 	gr.Register(db, rba, sec, log, v1)                     // grain service
-	// su.Register(db, rba, sec, log, v1)  // subscription service
+	su.Register(db, rba, sec, log, v1)                     // subscription service
 	// sy.Register(db, rba, sec, log, v1)  // sync (exchange) service
 
 	// listen for requests

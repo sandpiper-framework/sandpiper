@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS companies (
   "sync_addr"  text,
   "active"     boolean,
   "created_at" timestamp,
-  "updated_at" timestamp,
-  "deleted_at" timestamp
+  "updated_at" timestamp
 );
 
 CREATE TABLE IF NOT EXISTS "slices" (
@@ -31,8 +30,7 @@ CREATE TABLE IF NOT EXISTS "slices" (
   "content_count" integer,
   "content_date"  timestamp,
   "created_at"    timestamp,
-  "updated_at"    timestamp,
-  "deleted_at"    timestamp
+  "updated_at"    timestamp
 );
 
 CREATE TABLE IF NOT EXISTS "slice_metadata" (

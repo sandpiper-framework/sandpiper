@@ -5,12 +5,12 @@
 package pgsql_test
 
 import (
-	"github.com/google/uuid"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/api/slice/platform/pgsql"
+	"autocare.org/sandpiper/pkg/api/subscription/platform/pgsql"
 	"autocare.org/sandpiper/pkg/internal/mock"
 	"autocare.org/sandpiper/pkg/internal/model"
 	"autocare.org/sandpiper/pkg/internal/scope"
@@ -20,46 +20,38 @@ func TestCreate(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		req      sandpiper.Slice
-		wantData *sandpiper.Slice
+		req      sandpiper.Subscription
+		wantData *sandpiper.Subscription
 	}{
 		{
-			name:    "Slice Name already exists",
+			name:    "Subscription Name already exists",
 			wantErr: true,
-			req: sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+			req: sandpiper.Subscription{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 		{
 			name:    "Fail on insert duplicate ID",
 			wantErr: true,
-			req: sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+			req: sandpiper.Subscription{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 		{
 			name: "Success",
-			req: sandpiper.Slice{
-				ID:           mock.TestUUID(2),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+			req: sandpiper.Subscription{
+				ID:     mock.TestUUID(2),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
-			wantData: &sandpiper.Slice{
-				ID:           mock.TestUUID(2),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+			wantData: &sandpiper.Subscription{
+				ID:     mock.TestUUID(2),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 	}
@@ -67,15 +59,16 @@ func TestCreate(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Subscription{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:   mock.TestUUID(1),
-		Name: "Acme Brakes"}, &cases[1].req); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Subscription{
+		ID:     mock.TestUUID(1),
+		Name:   "Acme Brakes",
+		Active: true}, &cases[1].req); err != nil {
 		t.Error(err)
 	}
 
-	mdb := pgsql.NewSlice()
+	mdb := pgsql.NewSubscription()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -99,22 +92,20 @@ func TestView(t *testing.T) {
 		name     string
 		wantErr  bool
 		id       uuid.UUID
-		wantData *sandpiper.Slice
+		wantData *sandpiper.Subscription
 	}{
 		{
-			name:    "VIEW Slice does not exist",
+			name:    "Subscription does not exist",
 			wantErr: true,
 			id:      mock.TestUUID(2),
 		},
 		{
-			name: "VIEW Success",
+			name: "Success",
 			id:   mock.TestUUID(1),
-			wantData: &sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+			wantData: &sandpiper.Subscription{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 	}
@@ -122,15 +113,16 @@ func TestView(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Subscription{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:   mock.TestUUID(1),
-		Name: "Acme Brakes"}, cases[1].wantData); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Subscription{
+		ID:     mock.TestUUID(1),
+		Name:   "Acme Brakes",
+		Active: true}, cases[1].wantData); err != nil {
 		t.Error(err)
 	}
 
-	udb := pgsql.NewSlice()
+	udb := pgsql.NewSubscription()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -153,24 +145,20 @@ func TestUpdate(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		data     *sandpiper.Slice
-		wantData *sandpiper.Slice
+		data     *sandpiper.Subscription
+		wantData *sandpiper.Subscription
 	}{
 		{
-			name: "UPDATE Success",
-			data: &sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+			name: "Success",
+			data: &sandpiper.Subscription{
+				ID:     mock.TestUUID(1),
+				Name:   "Before Update",
+				Active: false,
 			},
-			wantData: &sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 2,
-				LastUpdate:   mock.TestTime(2019),
+			wantData: &sandpiper.Subscription{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 	}
@@ -178,28 +166,28 @@ func TestUpdate(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Subscription{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:   mock.TestUUID(1),
-		Name: "Acme Brakes"}, cases[0].data); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Subscription{
+		ID:     mock.TestUUID(1),
+		Name:   "Acme Brakes",
+		Active: true}, cases[0].data); err != nil {
 		t.Error(err)
 	}
 
-	mdb := pgsql.NewSlice()
+	mdb := pgsql.NewSubscription()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			err := mdb.Update(db, tt.wantData)
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
-				comp := &sandpiper.Slice{ID: tt.data.ID}
+				comp := &sandpiper.Subscription{ID: tt.data.ID}
 				if err := db.Select(comp); err != nil {
 					t.Error(err)
 				}
 				tt.wantData.UpdatedAt = comp.UpdatedAt
 				tt.wantData.CreatedAt = comp.CreatedAt
-				tt.wantData.DeletedAt = comp.DeletedAt
 				assert.Equal(t, tt.wantData, comp)
 			}
 		})
@@ -212,7 +200,7 @@ func TestList(t *testing.T) {
 		wantErr  bool
 		qp       *scope.Clause
 		pg       *sandpiper.Pagination
-		wantData []sandpiper.Slice
+		wantData []sandpiper.Subscription
 	}{
 		{
 			name:    "Invalid pagination values",
@@ -229,22 +217,18 @@ func TestList(t *testing.T) {
 			},
 			qp: &scope.Clause{
 				ID:        mock.TestUUID(1),
-				Condition: "id = ?",
+				Condition: "subscription_id = ?",
 			},
-			wantData: []sandpiper.Slice{
+			wantData: []sandpiper.Subscription{
 				{
-					ID:           mock.TestUUID(1),
-					Name:         "Brakes",
-					ContentHash:  mock.TestHash(1),
-					ContentCount: 1,
-					LastUpdate:   mock.TestTime(2019),
+					ID:     mock.TestUUID(1),
+					Name:   "Acme Brakes",
+					Active: true,
 				},
 				{
-					ID:           mock.TestUUID(1),
-					Name:         "Brakes",
-					ContentHash:  mock.TestHash(1),
-					ContentCount: 1,
-					LastUpdate:   mock.TestTime(2019),
+					ID:     mock.TestUUID(2),
+					Name:   "Acme Wipers",
+					Active: true,
 				},
 			},
 		},
@@ -253,9 +237,9 @@ func TestList(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Subscription{})
 
-	mdb := pgsql.NewSlice()
+	mdb := pgsql.NewSubscription()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -276,21 +260,18 @@ func TestDelete(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		usr      *sandpiper.Slice
-		wantData *sandpiper.Slice
+		usr      *sandpiper.Subscription
+		wantData *sandpiper.Subscription
 	}{
 		{
 			name: "Success",
-			usr: &sandpiper.Slice{
-				ID:        mock.TestUUID(1),
-				DeletedAt: mock.TestTime(2018),
+			usr: &sandpiper.Subscription{
+				ID: mock.TestUUID(1),
 			},
-			wantData: &sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+			wantData: &sandpiper.Subscription{
+				ID:     mock.TestUUID(1),
+				Name:   "Acme Brakes",
+				Active: true,
 			},
 		},
 	}
@@ -298,15 +279,16 @@ func TestDelete(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Subscription{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:   mock.TestUUID(1),
-		Name: "Acme Brakes"}, cases[0].wantData); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Subscription{
+		ID:     mock.TestUUID(1),
+		Name:   "Acme Brakes",
+		Active: true}, cases[0].wantData); err != nil {
 		t.Error(err)
 	}
 
-	mdb := pgsql.NewSlice()
+	mdb := pgsql.NewSubscription()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {

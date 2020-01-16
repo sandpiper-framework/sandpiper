@@ -67,6 +67,12 @@ func (s *Service) isCompanyAdmin(c echo.Context) bool {
 	return !(c.Get("role").(sandpiper.AccessLevel) > sandpiper.CompanyAdminRole)
 }
 
+// EnforceSubscription makes sure we can do something with this subscription
+func (s *Service) EnforceSubscription(c echo.Context, sub sandpiper.Subscription) error {
+	// todo: implement this!!!
+	return nil
+}
+
 // AccountCreate performs auth check when creating a new account
 func (s *Service) AccountCreate(c echo.Context, role sandpiper.AccessLevel, companyID uuid.UUID) error {
 	if err := s.EnforceCompany(c, companyID); err != nil {

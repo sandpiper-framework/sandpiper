@@ -85,4 +85,4 @@ func main() {
 		fmt.Printf("input: %d, output %d\n", i, len(s2))
 	}
 }
- */
+*/

@@ -12,10 +12,11 @@ import (
 	"github.com/google/uuid"
 )
 
-// Subscription represents subscription model (m2m join table between companies and slices)
+// Subscription represents subscription model (also a m2m junction table between companies and slices)
 type Subscription struct {
-	SliceID     uuid.UUID `json:"slice_id" pg:",pk"`
-	CompanyID   uuid.UUID `json:"company_id" pg:",pk"`
+	ID          int       `json:"id" pg:",pk"`
+	SliceID     uuid.UUID `json:"slice_id" pg:",unique:altkey"`
+	CompanyID   uuid.UUID `json:"company_id" pg:",unique:altkey"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Active      bool      `json:"active"`

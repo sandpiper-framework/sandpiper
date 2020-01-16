@@ -4,7 +4,7 @@
 
 // Package company contains services for the companies resource. Companies have
 // users and subscriptions to slices. Users must be a "company admin" to make changes
-// to their company information. Companies use the "soft delete" feature.
+// to their company information.
 package company
 
 import (

@@ -170,7 +170,7 @@ Let's say you have a table named 'cars' that handles employee's cars. To impleme
 
 6. In logging directory create a file named `car.go` and copy the logic from another service. This serves as request/response logging.
 
-6. In `pkg/api/api.go` wire up all the logic, by instantiating car service, passing it to the logging and transport service afterwards.
+7. In `pkg/api/api.go` wire up all the logic, by instantiating car service, passing it to the logging and transport service afterwards.
 
 ### Implementing other platforms
 
