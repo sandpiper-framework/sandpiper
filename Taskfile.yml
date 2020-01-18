@@ -123,3 +123,4 @@ tasks:
       # docker images --no-trunc=true --filter dangling=true --quiet | xargs docker rmi
       - sh: docker stop $(docker ps -a -q)
       - sh: docker rm $(docker ps -a -q)
+      - sh: docker volume rm $(docker volume ls -qf dangling=true)

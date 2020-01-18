@@ -109,7 +109,8 @@ func (s *Slice) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sa
 		return q, nil
 	}
 
-	err := db.Model(&slices).Relation("Companies", filterFn).Limit(p.Limit).Offset(p.Offset).
+	err := db.Model(&slices).Relation("Companies", filterFn).
+		Limit(p.Limit).Offset(p.Offset).
 		Order("name").Select()
 	if err != nil {
 		return nil, err

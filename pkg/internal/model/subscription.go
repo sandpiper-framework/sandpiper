@@ -14,14 +14,16 @@ import (
 
 // Subscription represents subscription model (also a m2m junction table between companies and slices)
 type Subscription struct {
-	ID          int       `json:"id" pg:",pk"`
-	SliceID     uuid.UUID `json:"slice_id" pg:",unique:altkey"`
-	CompanyID   uuid.UUID `json:"company_id" pg:",unique:altkey"`
+	SubID       int       `json:"id" pg:",pk"`
+	SliceID     uuid.UUID `json:"-" pg:",unique:altkey"`
+	CompanyID   uuid.UUID `json:"-" pg:",unique:altkey"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Active      bool      `json:"active"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Company     *Company  `json:"company"`
+	Slice       *Slice    `json:"slice"`
 }
 
 // compile-time check variables for model hooks (which take no memory)

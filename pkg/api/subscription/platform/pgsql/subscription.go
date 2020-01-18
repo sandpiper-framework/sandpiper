@@ -46,15 +46,15 @@ func (s *Subscription) Create(db orm.DB, sub sandpiper.Subscription) (*sandpiper
 
 // View returns a single subscription by ID (assumes allowed to do this)
 func (s *Subscription) View(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
-	if sub.ID != 0 {
-		return findByPrimaryKey(db, sub)
+	if sub.SubID != 0 {
+		return selectByPrimaryKey(db, sub)
 	}
-	return findByJunction(db, sub)
+	return selectByJunction(db, sub)
 }
 
 // Update updates subscription info by primary key (assumes allowed to do this)
 func (s *Subscription) Update(db orm.DB, sub *sandpiper.Subscription) error {
-	_, err := db.Model(sub).Update()
+	_, err := db.Model(sub).UpdateNotZero()
 	return err
 }
 
@@ -69,6 +69,13 @@ func (s *Subscription) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination
 	if err := q.Select(); err != nil {
 		return nil, err
 	}
+
+	// todo: select from companies in (list of company_ids)
+	// insert into subs[].Company
+
+	// todo: select from slices in (list of slice_ids)
+	// insert into subs[].Slice
+
 	return subs, nil
 }
 
@@ -84,18 +91,33 @@ func nameExists(db orm.DB, name string) bool {
 	return err != pg.ErrNoRows
 }
 
-// findByPrimaryKey returns a subscription using supplied primary key
-func findByPrimaryKey(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
+// selectByPrimaryKey returns a subscription (with company and slice) using supplied primary key
+func selectByPrimaryKey(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
 	err := db.Select(&sub)
 	if err != nil {
 		return nil, err
 	}
-	return &sub, nil
+	return fillSubscription(db, sub)
 }
 
-// findByJunction returns a subscription using supplied junction table keys
-func findByJunction(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
+// selectByJunction returns a subscription using supplied junction table keys
+func selectByJunction(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
 	err := db.Model(&sub).Where("slice_id = ? and company_id = ?", sub.SliceID, sub.CompanyID).Select()
+	if err != nil {
+		return nil, err
+	}
+	return fillSubscription(db, sub)
+}
+
+// fillSubscription returns a fully populated subscription response (adding company and slice)
+func fillSubscription(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
+	sub.Company = &sandpiper.Company{ID: sub.CompanyID}
+	err := db.Select(sub.Company)
+	if err != nil {
+		return nil, err
+	}
+	sub.Slice = &sandpiper.Slice{ID: sub.SliceID}
+	err = db.Select(sub.Slice)
 	if err != nil {
 		return nil, err
 	}

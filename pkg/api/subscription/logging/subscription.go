@@ -70,7 +70,7 @@ func (ls *LogService) View(c echo.Context, req sandpiper.Subscription) (resp *sa
 			c,
 			source, "View subscription request", err,
 			map[string]interface{}{
-				"req-id":         req.ID,
+				"req-id":         req.SubID,
 				"req-slice_id":   req.SliceID,
 				"req-company_id": req.CompanyID,
 				"resp":           resp,

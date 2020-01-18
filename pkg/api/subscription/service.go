@@ -9,6 +9,7 @@ package subscription
 import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/subscription/platform/pgsql"
@@ -60,6 +61,6 @@ type Repository interface {
 // RBAC represents role-based-access-control interface
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
+	EnforceCompany(echo.Context, uuid.UUID) error
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
-	EnforceSubscription(echo.Context, sandpiper.Subscription) error
 }

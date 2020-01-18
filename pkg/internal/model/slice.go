@@ -17,15 +17,15 @@ type MetaMap map[string]string
 
 // Slice represents a single slice container
 type Slice struct {
-	ID           uuid.UUID  `json:"id"`
+	ID           uuid.UUID  `json:"id" pg:",pk"`
 	Name         string     `json:"slice_name"`
 	ContentHash  string     `json:"content_hash"`
 	ContentCount uint       `json:"content_count"`
 	ContentDate  time.Time  `json:"content_date"`
 	CreatedAt    time.Time  `json:"created_at"`
 	UpdatedAt    time.Time  `json:"updated_at"`
-	Metadata     MetaMap    `json:"metadata" pg:"-"`
-	Companies    []*Company `pg:"many2many:subscriptions"`
+	Metadata     MetaMap    `json:"metadata,omitempty" pg:"-"`
+	Companies    []*Company `json:"companies,omitempty" pg:"many2many:subscriptions"`
 	//Grains       []*Grain  // has-many relation
 
 }

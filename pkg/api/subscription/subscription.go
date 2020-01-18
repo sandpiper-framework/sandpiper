@@ -33,10 +33,15 @@ func (s *Subscription) List(c echo.Context, p *sandpiper.Pagination) ([]sandpipe
 
 // View returns a single subscription if allowed
 func (s *Subscription) View(c echo.Context, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
-	if err := s.rbac.EnforceSubscription(c, sub); err != nil {
+	// must get it first to see if we can return it
+	subscription, err := s.sdb.View(s.db, sub)
+	if err != nil {
 		return nil, err
 	}
-	return s.sdb.View(s.db, sub)
+	if err := s.rbac.EnforceCompany(c, subscription.CompanyID); err != nil {
+		return nil, err
+	}
+	return subscription, nil
 }
 
 // Delete deletes a subscription if administrator
@@ -44,7 +49,7 @@ func (s *Subscription) Delete(c echo.Context, id int) error {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return err
 	}
-	sub := sandpiper.Subscription{ID: id}
+	sub := sandpiper.Subscription{SubID: id}
 	subscription, err := s.sdb.View(s.db, sub)
 	if err != nil {
 		return err
@@ -54,7 +59,7 @@ func (s *Subscription) Delete(c echo.Context, id int) error {
 
 // Update contains subscription field request used for updating
 type Update struct {
-	ID          int
+	SubID       int
 	SliceID     uuid.UUID
 	CompanyID   uuid.UUID
 	Name        string
@@ -64,16 +69,16 @@ type Update struct {
 
 // Update updates subscription information
 func (s *Subscription) Update(c echo.Context, r *Update) (*sandpiper.Subscription, error) {
+	if err := s.rbac.EnforceCompany(c, r.CompanyID); err != nil {
+		return nil, err
+	}
 	sub := sandpiper.Subscription{
-		ID:          r.ID,
-		SliceID:     r.SliceID,
-		CompanyID:   r.CompanyID,
+		SubID: r.SubID,
+		//SliceID:     r.SliceID,
+		//CompanyID:   r.CompanyID,
 		Name:        r.Name,
 		Description: r.Description,
 		Active:      r.Active,
-	}
-	if err := s.rbac.EnforceSubscription(c, sub); err != nil {
-		return nil, err
 	}
 	err := s.sdb.Update(s.db, &sub)
 	if err != nil {

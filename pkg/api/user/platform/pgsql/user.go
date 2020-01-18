@@ -35,7 +35,7 @@ var (
 // Create creates a new user in the database (id is serially assigned)
 func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
 
-	if duplicate(db, usr.Username, usr.Email) {
+	if isDuplicate(db, usr.Username, usr.Email) {
 		return nil, ErrAlreadyExists
 	}
 
@@ -81,10 +81,10 @@ func (u *User) Delete(db orm.DB, user *sandpiper.User) error {
 	return db.Delete(user)
 }
 
-// duplicate returns true if name found in database
-func duplicate(db orm.DB, name, email string) bool {
+// isDuplicate returns true if name found in database
+func isDuplicate(db orm.DB, name, email string) bool {
 	m := new(sandpiper.User)
-	err := db.Model(m).Where("lower(username) = ? or lower(email) = ?", strings.ToLower(name), strings.ToLower(email)).
+	err := db.Model(m).Column("id").Where("lower(username) = ? or lower(email) = ?", strings.ToLower(name), strings.ToLower(email)).
 		Select()
 	return err != pg.ErrNoRows
 }
