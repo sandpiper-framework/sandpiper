@@ -11,8 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/user/platform/pgsql"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Service represents user application interface
@@ -51,7 +50,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.User) (*sandpiper.User, error)
 	View(orm.DB, int) (*sandpiper.User, error)
-	List(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.User, error)
+	List(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.User, error)
 	Update(orm.DB, *sandpiper.User) error
 	Delete(orm.DB, *sandpiper.User) error
 }
@@ -62,4 +61,5 @@ type RBAC interface {
 	EnforceUser(echo.Context, int) error
 	AccountCreate(echo.Context, sandpiper.AccessLevel, uuid.UUID) error
 	IsLowerRole(echo.Context, sandpiper.AccessLevel) error
+	EnforceScope(echo.Context) (*sandpiper.Clause, error)
 }

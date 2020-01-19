@@ -14,10 +14,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/pkg/api/user"
-	"autocare.org/sandpiper/pkg/internal/mock"
-	"autocare.org/sandpiper/pkg/internal/mock/mockdb"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/mock"
+	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 func TestCreate(t *testing.T) {
@@ -200,7 +199,7 @@ func TestList(t *testing.T) {
 					}
 				}},
 			udb: &mockdb.User{
-				ListFn: func(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.User, error) {
+				ListFn: func(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.User, error) {
 					return []sandpiper.User{
 						{
 							ID:        1,

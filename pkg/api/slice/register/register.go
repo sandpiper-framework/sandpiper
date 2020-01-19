@@ -8,16 +8,17 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-
 	"autocare.org/sandpiper/pkg/api/slice"
+	"autocare.org/sandpiper/pkg/shared/model"
+	"autocare.org/sandpiper/pkg/shared/rbac"
+
 	sl "autocare.org/sandpiper/pkg/api/slice/logging"
 	st "autocare.org/sandpiper/pkg/api/slice/transport"
 )
 
 // Register ties the slice service to its logger and transport mechanisms
-func Register(db *pg.DB, rbac slice.RBAC, sec slice.Securer, log sandpiper.Logger, v1 *echo.Group) {
-	svc := slice.Initialize(db, rbac, sec)
+func Register(db *pg.DB, sec slice.Securer, log sandpiper.Logger, v1 *echo.Group) {
+	svc := slice.Initialize(db, rbac.New(), sec)
 	ls := sl.ServiceLogger(svc, log)
 	st.NewHTTP(ls, v1)
 }

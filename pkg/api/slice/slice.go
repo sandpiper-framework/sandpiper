@@ -10,8 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"time"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Create creates a new slice to hold data-objects
@@ -24,8 +23,7 @@ func (s *Slice) Create(c echo.Context, req sandpiper.Slice) (*sandpiper.Slice, e
 
 // List returns list of slices
 func (s *Slice) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
-	au := s.rbac.CurrentUser(c)
-	q, err := scope.Limit(au)
+	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
 	}

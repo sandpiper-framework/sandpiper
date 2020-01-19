@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/auth/platform/pgsql"
-	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Auth represents auth application service

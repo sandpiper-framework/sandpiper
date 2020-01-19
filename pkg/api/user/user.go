@@ -8,8 +8,7 @@ package user
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Create creates a new user account
@@ -23,8 +22,7 @@ func (u *User) Create(c echo.Context, req sandpiper.User) (*sandpiper.User, erro
 
 // List returns list of users
 func (u *User) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.User, error) {
-	au := u.rbac.CurrentUser(c)
-	q, err := scope.Limit(au)
+	q, err := u.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
 	}

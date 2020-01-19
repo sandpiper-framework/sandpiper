@@ -16,10 +16,10 @@ import (
 
 	"autocare.org/sandpiper/pkg/api/password"
 	"autocare.org/sandpiper/pkg/api/password/transport"
-	"autocare.org/sandpiper/pkg/internal/mock"
-	"autocare.org/sandpiper/pkg/internal/mock/mockdb"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/server"
+	"autocare.org/sandpiper/pkg/shared/mock"
+	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
+	"autocare.org/sandpiper/pkg/shared/model"
+	"autocare.org/sandpiper/pkg/shared/server"
 )
 
 func TestChangePassword(t *testing.T) {

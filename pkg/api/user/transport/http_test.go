@@ -19,11 +19,11 @@ import (
 
 	"autocare.org/sandpiper/pkg/api/user"
 	"autocare.org/sandpiper/pkg/api/user/transport"
-	"autocare.org/sandpiper/pkg/internal/mock"
-	"autocare.org/sandpiper/pkg/internal/mock/mockdb"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
-	"autocare.org/sandpiper/pkg/internal/server"
+	"autocare.org/sandpiper/pkg/shared/mock"
+	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
+	"autocare.org/sandpiper/pkg/shared/model"
+
+	"autocare.org/sandpiper/pkg/shared/server"
 )
 
 func TestCreate(t *testing.T) {
@@ -173,7 +173,7 @@ func TestList(t *testing.T) {
 					}
 				}},
 			udb: &mockdb.User{
-				ListFn: func(db orm.DB, q *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.User, error) {
+				ListFn: func(db orm.DB, q *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.User, error) {
 					if p.Limit == 100 && p.Offset == 100 {
 						return []sandpiper.User{
 							{

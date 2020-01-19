@@ -13,8 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/subscription/platform/pgsql"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Service represents subscription application interface
@@ -53,7 +52,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.Subscription) (*sandpiper.Subscription, error)
 	View(orm.DB, sandpiper.Subscription) (*sandpiper.Subscription, error)
-	List(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Subscription, error)
+	List(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.Subscription, error)
 	Update(orm.DB, *sandpiper.Subscription) error
 	Delete(orm.DB, *sandpiper.Subscription) error
 }
@@ -63,4 +62,5 @@ type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceCompany(echo.Context, uuid.UUID) error
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
+	EnforceScope(echo.Context) (*sandpiper.Clause, error)
 }

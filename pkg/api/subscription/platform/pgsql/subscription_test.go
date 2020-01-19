@@ -11,9 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/pkg/api/subscription/platform/pgsql"
-	"autocare.org/sandpiper/pkg/internal/mock"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/mock"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 func TestCreate(t *testing.T) {
@@ -198,7 +197,7 @@ func TestList(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		qp       *scope.Clause
+		qp       *sandpiper.Clause
 		pg       *sandpiper.Pagination
 		wantData []sandpiper.Subscription
 	}{
@@ -215,7 +214,7 @@ func TestList(t *testing.T) {
 				Limit:  100,
 				Offset: 0,
 			},
-			qp: &scope.Clause{
+			qp: &sandpiper.Clause{
 				ID:        mock.TestUUID(1),
 				Condition: "subscription_id = ?",
 			},

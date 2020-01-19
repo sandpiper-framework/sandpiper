@@ -11,8 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/slice/platform/pgsql"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Service represents slice application interface
@@ -52,7 +51,7 @@ type Repository interface {
 	Create(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
 	View(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error)
-	List(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Slice, error)
+	List(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.Slice, error)
 	Update(orm.DB, *sandpiper.Slice) error
 	Delete(orm.DB, *sandpiper.Slice) error
 }
@@ -61,4 +60,5 @@ type Repository interface {
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
+	EnforceScope(echo.Context) (*sandpiper.Clause, error)
 }

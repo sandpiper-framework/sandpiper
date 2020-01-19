@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/slice"
-	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the slice service

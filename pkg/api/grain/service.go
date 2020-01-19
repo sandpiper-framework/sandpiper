@@ -11,8 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/grain/platform/pgsql"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Service represents grain application interface (note no update!)
@@ -52,7 +51,7 @@ type Repository interface {
 	View(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
 	ViewBySlice(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Grain, error)
-	List(orm.DB, *scope.Clause, *sandpiper.Pagination) ([]sandpiper.Grain, error)
+	List(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	Delete(orm.DB, uuid.UUID) error
 }
 
@@ -60,4 +59,5 @@ type Repository interface {
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
+	EnforceScope(echo.Context) (*sandpiper.Clause, error)
 }

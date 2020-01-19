@@ -15,8 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Company represents the client for company table
@@ -49,24 +48,18 @@ func (s *Company) Create(db orm.DB, company sandpiper.Company) (*sandpiper.Compa
 func (s *Company) View(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 	var company = &sandpiper.Company{ID: id}
 
-	err := db.Select(company)
+	err := db.Model(company).Column("company.*").Relation("Users").WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
 	return company, nil
 }
 
-// Update updates company info by primary key (assumes allowed to do this)
-func (s *Company) Update(db orm.DB, company *sandpiper.Company) error {
-	_, err := db.Model(company).Update()
-	return err
-}
-
 // List returns list of all companies
-func (s *Company) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
+func (s *Company) List(db orm.DB, sc *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
 	var companies []sandpiper.Company
 
-	q := db.Model(&companies).Limit(p.Limit).Offset(p.Offset).Order("name")
+	q := db.Model(&companies).Column("company.*").Relation("Users").Limit(p.Limit).Offset(p.Offset).Order("name")
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
@@ -74,6 +67,11 @@ func (s *Company) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]
 		return nil, err
 	}
 	return companies, nil
+}
+
+// Update updates company info by primary key (assumes allowed to do this)
+func (s *Company) Update(db orm.DB, company *sandpiper.Company) error {
+	return db.Update(company)
 }
 
 // Delete removes the company (and any related subscriptions)

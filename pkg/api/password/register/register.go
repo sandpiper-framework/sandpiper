@@ -8,16 +8,17 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-
 	"autocare.org/sandpiper/pkg/api/password"
+	"autocare.org/sandpiper/pkg/shared/model"
+	"autocare.org/sandpiper/pkg/shared/rbac"
+
 	pl "autocare.org/sandpiper/pkg/api/password/logging"
 	pt "autocare.org/sandpiper/pkg/api/password/transport"
 )
 
 // Register ties the company service to its logger and transport mechanisms
-func Register(db *pg.DB, rbac password.RBAC, sec password.Securer, log sandpiper.Logger, v1 *echo.Group) {
-	svc := password.Initialize(db, rbac, sec)
+func Register(db *pg.DB, sec password.Securer, log sandpiper.Logger, v1 *echo.Group) {
+	svc := password.Initialize(db, rbac.New(), sec)
 	ls := pl.ServiceLogger(svc, log)
 	pt.NewHTTP(ls, v1)
 }

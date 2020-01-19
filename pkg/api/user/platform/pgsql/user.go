@@ -14,8 +14,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // User represents the client for user table
@@ -63,10 +62,10 @@ func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 }
 
 // List returns list of all users retrievable for the current user, depending on role
-func (u *User) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.User, error) {
+func (u *User) List(db orm.DB, sc *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.User, error) {
 	var users []sandpiper.User
 
-	q := db.Model(&users).Limit(p.Limit).Offset(p.Offset).Order("user.id desc")
+	q := db.Model(&users).Limit(p.Limit).Offset(p.Offset).Order("username")
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}

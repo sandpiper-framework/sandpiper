@@ -14,8 +14,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Subscription represents the client for subscription table
@@ -46,37 +45,39 @@ func (s *Subscription) Create(db orm.DB, sub sandpiper.Subscription) (*sandpiper
 
 // View returns a single subscription by ID (assumes allowed to do this)
 func (s *Subscription) View(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
+	var q *orm.Query
+
 	if sub.SubID != 0 {
-		return selectByPrimaryKey(db, sub)
+		q = queryByPrimaryKey(db, &sub)
+	} else {
+		q = queryByJunctionKeys(db, &sub)
 	}
-	return selectByJunction(db, sub)
+	err := q.Select()
+	if err != nil {
+		return nil, err
+	}
+	return &sub, nil
+}
+
+// List returns list of all subscriptions
+func (s *Subscription) List(db orm.DB, sc *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.Subscription, error) {
+	var subs []sandpiper.Subscription
+
+	q := queryAll(db, &subs).Limit(p.Limit).Offset(p.Offset).Order("name")
+	if sc != nil {
+		q.Where(sc.Condition, sc.ID)
+	}
+	err := q.Select()
+	if err != nil {
+		return nil, err
+	}
+	return subs, nil
 }
 
 // Update updates subscription info by primary key (assumes allowed to do this)
 func (s *Subscription) Update(db orm.DB, sub *sandpiper.Subscription) error {
 	_, err := db.Model(sub).UpdateNotZero()
 	return err
-}
-
-// List returns list of all subscriptions
-func (s *Subscription) List(db orm.DB, sc *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Subscription, error) {
-	var subs []sandpiper.Subscription
-
-	q := db.Model(&subs).Limit(p.Limit).Offset(p.Offset).Order("name")
-	if sc != nil {
-		q.Where(sc.Condition, sc.ID)
-	}
-	if err := q.Select(); err != nil {
-		return nil, err
-	}
-
-	// todo: select from companies in (list of company_ids)
-	// insert into subs[].Company
-
-	// todo: select from slices in (list of slice_ids)
-	// insert into subs[].Slice
-
-	return subs, nil
 }
 
 // Delete removes the subscription by primary key
@@ -91,35 +92,18 @@ func nameExists(db orm.DB, name string) bool {
 	return err != pg.ErrNoRows
 }
 
-// selectByPrimaryKey returns a subscription (with company and slice) using supplied primary key
-func selectByPrimaryKey(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
-	err := db.Select(&sub)
-	if err != nil {
-		return nil, err
-	}
-	return fillSubscription(db, sub)
+// queryAll returns a query for all subscriptions (including company and slice)
+func queryAll(db orm.DB, subs *[]sandpiper.Subscription) *orm.Query {
+	return db.Model(subs).Column("subscription.*").Relation("Company").Relation("Slice")
 }
 
-// selectByJunction returns a subscription using supplied junction table keys
-func selectByJunction(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
-	err := db.Model(&sub).Where("slice_id = ? and company_id = ?", sub.SliceID, sub.CompanyID).Select()
-	if err != nil {
-		return nil, err
-	}
-	return fillSubscription(db, sub)
+// queryByPrimaryKey returns a query for a subscription by primary key (including company and slice)
+func queryByPrimaryKey(db orm.DB, sub *sandpiper.Subscription) *orm.Query {
+	return db.Model(sub).Column("subscription.*").Relation("Company").Relation("Slice").WherePK()
 }
 
-// fillSubscription returns a fully populated subscription response (adding company and slice)
-func fillSubscription(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
-	sub.Company = &sandpiper.Company{ID: sub.CompanyID}
-	err := db.Select(sub.Company)
-	if err != nil {
-		return nil, err
-	}
-	sub.Slice = &sandpiper.Slice{ID: sub.SliceID}
-	err = db.Select(sub.Slice)
-	if err != nil {
-		return nil, err
-	}
-	return &sub, nil
+// queryByJunctionKeys returns a query for a subscription by junction keys (including company and slice)
+func queryByJunctionKeys(db orm.DB, sub *sandpiper.Subscription) *orm.Query {
+	return db.Model(sub).Column("subscription.*").Relation("Company").Relation("Slice").
+		Where("slice_id = ? and company_id = ?", sub.SliceID, sub.CompanyID)
 }

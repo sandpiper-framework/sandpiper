@@ -14,7 +14,7 @@ import (
 	"net/url"
 	"time"
 
-	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 type Client struct {

@@ -15,11 +15,11 @@ import (
 
 	"autocare.org/sandpiper/pkg/api/auth"
 	"autocare.org/sandpiper/pkg/api/auth/transport"
-	"autocare.org/sandpiper/pkg/internal/middleware/jwt"
-	"autocare.org/sandpiper/pkg/internal/mock"
-	"autocare.org/sandpiper/pkg/internal/mock/mockdb"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/server"
+	"autocare.org/sandpiper/pkg/shared/middleware/jwt"
+	"autocare.org/sandpiper/pkg/shared/mock"
+	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
+	"autocare.org/sandpiper/pkg/shared/model"
+	"autocare.org/sandpiper/pkg/shared/server"
 )
 
 func TestLogin(t *testing.T) {

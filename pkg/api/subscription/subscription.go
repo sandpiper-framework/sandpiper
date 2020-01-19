@@ -9,8 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/scope"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Create adds a new subscription if administrator
@@ -23,8 +22,7 @@ func (s *Subscription) Create(c echo.Context, req sandpiper.Subscription) (*sand
 
 // List returns list of subscriptions that you can view
 func (s *Subscription) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Subscription, error) {
-	au := s.rbac.CurrentUser(c)
-	q, err := scope.Limit(au)
+	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
 	}

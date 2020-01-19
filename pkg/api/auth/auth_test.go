@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/pkg/api/auth"
-	"autocare.org/sandpiper/pkg/internal/mock"
-	"autocare.org/sandpiper/pkg/internal/mock/mockdb"
-	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/shared/mock"
+	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 func TestAuthenticate(t *testing.T) {

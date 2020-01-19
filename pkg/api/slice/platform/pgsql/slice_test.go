@@ -5,15 +5,14 @@
 package pgsql_test
 
 import (
-	"autocare.org/sandpiper/pkg/internal/scope"
 	"github.com/google/uuid"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"autocare.org/sandpiper/pkg/api/slice/platform/pgsql"
-	"autocare.org/sandpiper/pkg/internal/mock"
-	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/shared/mock"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 func TestCreate(t *testing.T) {
@@ -210,7 +209,7 @@ func TestList(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		qp       *scope.Clause
+		qp       *sandpiper.Clause
 		pg       *sandpiper.Pagination
 		wantData []sandpiper.Slice
 	}{
@@ -227,7 +226,7 @@ func TestList(t *testing.T) {
 				Limit:  100,
 				Offset: 0,
 			},
-			qp: &scope.Clause{
+			qp: &sandpiper.Clause{
 				ID:        mock.TestUUID(1),
 				Condition: "id = ?",
 			},

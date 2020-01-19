@@ -7,13 +7,12 @@
 package api
 
 import (
-	"autocare.org/sandpiper/pkg/internal/database"
-	"autocare.org/sandpiper/pkg/internal/middleware/jwt"
-	"autocare.org/sandpiper/pkg/internal/rbac"
-	"autocare.org/sandpiper/pkg/internal/secure"
-	"autocare.org/sandpiper/pkg/internal/server"
-	"autocare.org/sandpiper/pkg/internal/zlog"
 	"autocare.org/sandpiper/pkg/shared/config"
+	"autocare.org/sandpiper/pkg/shared/database"
+	"autocare.org/sandpiper/pkg/shared/middleware/jwt"
+	"autocare.org/sandpiper/pkg/shared/secure"
+	"autocare.org/sandpiper/pkg/shared/server"
+	"autocare.org/sandpiper/pkg/shared/zlog"
 
 	// One import for each service to register (with identifying alias).
 	// Must use a register subdirectory to avoid "import cycle" errors.
@@ -37,26 +36,25 @@ func Start(cfg *config.Configuration) error {
 
 	// setup token, security and logging available for all services
 	sec := secure.New(cfg.App.MinPasswordStr)
-	rba := rbac.New()
 	tok := jwt.New(cfg.JWT.Secret, cfg.JWT.SigningAlgorithm, cfg.JWT.Duration)
 	log := zlog.New(cfg.App.ServiceLogging)
 
 	// setup echo server (singleton)
 	srv := server.New()
 
-	// create version group using token middleware
+	// create version group using token authentication middleware
 	v1 := srv.Group("/v1")
 	v1.Use(tok.MWFunc())
 
 	// register each service (using proper import alias)
-	au.Register(db, rba, sec, log, srv, tok, tok.MWFunc()) // auth service (no version group)
-	pa.Register(db, rba, sec, log, v1)                     // password service
-	us.Register(db, rba, sec, log, v1)                     // user service
-	co.Register(db, rba, sec, log, v1)                     // company service
-	sl.Register(db, rba, sec, log, v1)                     // slice service
-	gr.Register(db, rba, sec, log, v1)                     // grain service
-	su.Register(db, rba, sec, log, v1)                     // subscription service
-	// sy.Register(db, rba, sec, log, v1)  // sync (exchange) service
+	au.Register(db, sec, log, srv, tok, tok.MWFunc()) // auth service (no version group)
+	pa.Register(db, sec, log, v1)                     // password service
+	us.Register(db, sec, log, v1)                     // user service
+	co.Register(db, sec, log, v1)                     // company service
+	sl.Register(db, sec, log, v1)                     // slice service
+	gr.Register(db, sec, log, v1)                     // grain service
+	su.Register(db, sec, log, v1)                     // subscription service
+	// sy.Register(db, sec, log, v1)  // sync (exchange) service
 
 	// listen for requests
 	server.Start(srv, &server.Config{

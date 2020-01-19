@@ -10,7 +10,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/internal/model"
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // Custom errors
@@ -34,11 +34,13 @@ func (a *Auth) Authenticate(c echo.Context, user, pass string) (*sandpiper.AuthT
 		return nil, ErrNotAuthorized
 	}
 
+	// generate new jwt with user information in the claims
 	token, expire, err := a.tg.GenerateToken(u)
 	if err != nil {
 		return nil, ErrNotAuthorized
 	}
 
+	// save token and when last login in user record
 	u.UpdateLastLogin(a.sec.Token(token))
 
 	if err := a.sdb.Update(a.db, u); err != nil {

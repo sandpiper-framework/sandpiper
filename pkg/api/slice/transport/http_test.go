@@ -5,7 +5,6 @@
 package transport_test
 
 import (
-	"autocare.org/sandpiper/pkg/internal/scope"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -20,10 +19,10 @@ import (
 
 	"autocare.org/sandpiper/pkg/api/slice"
 	"autocare.org/sandpiper/pkg/api/slice/transport"
-	"autocare.org/sandpiper/pkg/internal/mock"
-	"autocare.org/sandpiper/pkg/internal/mock/mockdb"
-	"autocare.org/sandpiper/pkg/internal/model"
-	"autocare.org/sandpiper/pkg/internal/server"
+	"autocare.org/sandpiper/pkg/shared/mock"
+	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
+	"autocare.org/sandpiper/pkg/shared/model"
+	"autocare.org/sandpiper/pkg/shared/server"
 )
 
 func TestCreate(t *testing.T) {
@@ -162,7 +161,7 @@ func TestList(t *testing.T) {
 					}
 				}},
 			udb: &mockdb.Slice{
-				ListFn: func(db orm.DB, q *scope.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+				ListFn: func(db orm.DB, q *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 					if p.Limit == 100 && p.Offset == 100 {
 						return []sandpiper.Slice{
 							{
