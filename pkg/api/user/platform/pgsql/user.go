@@ -62,7 +62,7 @@ func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 }
 
 // List returns list of all users retrievable for the current user, depending on role
-func (u *User) List(db orm.DB, sc *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.User, error) {
+func (u *User) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.User, error) {
 	var users []sandpiper.User
 
 	q := db.Model(&users).Limit(p.Limit).Offset(p.Offset).Order("username")

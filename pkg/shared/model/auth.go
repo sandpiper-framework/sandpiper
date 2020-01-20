@@ -6,7 +6,6 @@ package sandpiper
 
 import (
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v4"
 )
 
 // AuthToken holds authentication token details with refresh token
@@ -22,12 +21,6 @@ type RefreshToken struct {
 	Expires string `json:"expires"`
 }
 
-// Clause adds additional restrictions for scoping list queries based on roles
-type Clause struct {
-	Condition string
-	ID        uuid.UUID // always a companyID
-}
-
 // AuthUser represents data ("claims") stored in JWT token for the current user
 type AuthUser struct {
 	ID        int
@@ -35,32 +28,4 @@ type AuthUser struct {
 	Username  string
 	Email     string
 	Role      AccessLevel
-}
-
-// AtLeast checks user's access level
-func (u *AuthUser) AtLeast(lvl AccessLevel) bool {
-	// roles go from low to high (lower numbers are better)
-	return u.Role <= lvl
-}
-
-// Scope optionally adds a scope to a list query based on user roles
-func (u *AuthUser) Scope(lhs string, id uuid.UUID) (*Clause, error) {
-	switch true {
-	case u.Role <= AdminRole: // user is SuperAdmin or Admin
-		return nil, nil
-	case u.Role == CompanyAdminRole:
-		return &Clause{Condition: lhs + " = ?", ID: u.CompanyID}, nil
-	default:
-		return nil, echo.ErrForbidden
-	}
-}
-
-// RBACService represents role-based access control service interface
-type RBACService interface {
-	CurrentUser(echo.Context) *AuthUser
-	EnforceRole(echo.Context, AccessLevel) error
-	EnforceUser(echo.Context, int) error
-	EnforceCompany(echo.Context, uuid.UUID) error
-	AccountCreate(echo.Context, AccessLevel, int, int) error
-	IsLowerRole(echo.Context, AccessLevel) error
 }

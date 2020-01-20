@@ -60,7 +60,7 @@ func (s *Subscription) View(db orm.DB, sub sandpiper.Subscription) (*sandpiper.S
 }
 
 // List returns list of all subscriptions
-func (s *Subscription) List(db orm.DB, sc *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.Subscription, error) {
+func (s *Subscription) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Subscription, error) {
 	var subs []sandpiper.Subscription
 
 	q := queryAll(db, &subs).Limit(p.Limit).Offset(p.Offset).Order("name")
@@ -94,16 +94,16 @@ func nameExists(db orm.DB, name string) bool {
 
 // queryAll returns a query for all subscriptions (including company and slice)
 func queryAll(db orm.DB, subs *[]sandpiper.Subscription) *orm.Query {
-	return db.Model(subs).Column("subscription.*").Relation("Company").Relation("Slice")
+	return db.Model(subs).Relation("Company").Relation("Slice")
 }
 
 // queryByPrimaryKey returns a query for a subscription by primary key (including company and slice)
 func queryByPrimaryKey(db orm.DB, sub *sandpiper.Subscription) *orm.Query {
-	return db.Model(sub).Column("subscription.*").Relation("Company").Relation("Slice").WherePK()
+	return db.Model(sub).Relation("Company").Relation("Slice").WherePK()
 }
 
 // queryByJunctionKeys returns a query for a subscription by junction keys (including company and slice)
 func queryByJunctionKeys(db orm.DB, sub *sandpiper.Subscription) *orm.Query {
-	return db.Model(sub).Column("subscription.*").Relation("Company").Relation("Slice").
+	return db.Model(sub).Relation("Company").Relation("Slice").
 		Where("slice_id = ? and company_id = ?", sub.SliceID, sub.CompanyID)
 }

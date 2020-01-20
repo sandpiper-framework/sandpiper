@@ -12,7 +12,7 @@ type User struct {
 	ViewFn           func(orm.DB, int) (*sandpiper.User, error)
 	FindByUsernameFn func(orm.DB, string) (*sandpiper.User, error)
 	FindByTokenFn    func(orm.DB, string) (*sandpiper.User, error)
-	ListFn           func(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.User, error)
+	ListFn           func(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.User, error)
 	DeleteFn         func(orm.DB, *sandpiper.User) error
 	UpdateFn         func(orm.DB, *sandpiper.User) error
 }
@@ -38,7 +38,7 @@ func (u *User) FindByToken(db orm.DB, token string) (*sandpiper.User, error) {
 }
 
 // List mock
-func (u *User) List(db orm.DB, lq *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.User, error) {
+func (u *User) List(db orm.DB, lq *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.User, error) {
 	return u.ListFn(db, lq, p)
 }
 

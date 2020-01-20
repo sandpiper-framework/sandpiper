@@ -205,7 +205,7 @@ func TestList(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		qp       *sandpiper.Clause
+		qp       *sandpiper.Scope
 		pg       *sandpiper.Pagination
 		wantData []sandpiper.User
 	}{
@@ -222,7 +222,7 @@ func TestList(t *testing.T) {
 				Limit:  100,
 				Offset: 0,
 			},
-			qp: &sandpiper.Clause{
+			qp: &sandpiper.Scope{
 				ID:        mock.TestUUID(1),
 				Condition: "company_id = ?",
 			},

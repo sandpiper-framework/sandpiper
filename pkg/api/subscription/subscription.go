@@ -31,7 +31,7 @@ func (s *Subscription) List(c echo.Context, p *sandpiper.Pagination) ([]sandpipe
 
 // View returns a single subscription if allowed
 func (s *Subscription) View(c echo.Context, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
-	// must get it first to see if we can return it
+	// must get it first to see if we are allowed to return it
 	subscription, err := s.sdb.View(s.db, sub)
 	if err != nil {
 		return nil, err

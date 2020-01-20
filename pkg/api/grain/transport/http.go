@@ -64,7 +64,7 @@ func (h *HTTP) create(c echo.Context) error {
 
 	result, err := h.svc.Create(c, sandpiper.Grain{
 		ID:       r.id(),
-		SliceID:  r.SliceID,
+		SliceID:  &r.SliceID,
 		Type:     r.Type,
 		Key:      r.Key,
 		Encoding: r.Encoding,

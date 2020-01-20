@@ -13,12 +13,22 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
-// Create makes a new grain to hold data-objects
+// Create makes a new grain to hold our syncable data-objects
 func (s *Grain) Create(c echo.Context, req sandpiper.Grain) (*sandpiper.Grain, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}
 	return s.sdb.Create(s.db, req)
+}
+
+// View returns a single grain if allowed
+func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error) {
+	//au := s.rbac.CurrentUser(c)
+	//if au.Role != sandpiper.AdminRole {
+	//	// make sure the grain is subscribed to this user's company
+	//	return s.sdb.ViewBySub(s.db, au.CompanyID, grainID)
+	//}
+	return s.sdb.View(s.db, grainID)
 }
 
 // List returns list of grains scoped by user
@@ -28,16 +38,6 @@ func (s *Grain) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Grain
 		return nil, err
 	}
 	return s.sdb.List(s.db, q, p)
-}
-
-// View returns a single grain if allowed
-func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error) {
-	au := s.rbac.CurrentUser(c)
-	if au.Role != sandpiper.AdminRole {
-		// make sure the grain is subscribed to this user's company
-		return s.sdb.ViewBySub(s.db, au.CompanyID, grainID)
-	}
-	return s.sdb.View(s.db, grainID)
 }
 
 // Delete deletes a grain by id, if allowed

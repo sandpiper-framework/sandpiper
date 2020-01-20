@@ -51,7 +51,7 @@ type Repository interface {
 	View(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
 	ViewBySlice(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Grain, error)
-	List(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.Grain, error)
+	List(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	Delete(orm.DB, uuid.UUID) error
 }
 
@@ -59,5 +59,5 @@ type Repository interface {
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
-	EnforceScope(echo.Context) (*sandpiper.Clause, error)
+	EnforceScope(echo.Context) (*sandpiper.Scope, error)
 }

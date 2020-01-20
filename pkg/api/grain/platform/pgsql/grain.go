@@ -42,7 +42,7 @@ func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, erro
 	// key is always lowercase to allow faster lookups
 	grain.Key = strings.ToLower(grain.Key)
 
-	if isDuplicate(db, grain.SliceID, grain.Type, grain.Key) {
+	if isDuplicate(db, *grain.SliceID, grain.Type, grain.Key) {
 		return nil, ErrAlreadyExists
 	}
 
@@ -56,7 +56,10 @@ func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, erro
 func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	var grain = &sandpiper.Grain{ID: id}
 
-	if err := db.Select(grain); err != nil {
+	err := db.Model(grain).
+		Column("grain.id", "grain_type", "grain_key", "encoding", "payload", "grain.created_at").
+		Relation("Slice").WherePK().Select()
+	if err != nil {
 		return nil, err
 	}
 
@@ -86,12 +89,12 @@ func (s *Grain) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 }
 
 // List returns a list of all grains with scoping and pagination
-func (s *Grain) List(db orm.DB, sc *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+func (s *Grain) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
 
 	q := db.Model(&grains).
-		Relation("slices").
-		Limit(p.Limit).Offset(p.Offset)
+		Column("grain.id", "grain_type", "grain_key", "encoding", "grain.created_at").
+		Relation("Slice").Limit(p.Limit).Offset(p.Offset)
 	if sc != nil {
 		q.Relation("subscriptions.company_id")
 		q.Where(sc.Condition, sc.ID)
@@ -111,7 +114,8 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 // isDuplicate returns true if grain type/key found in database for a slice
 func isDuplicate(db orm.DB, sliceID uuid.UUID, grainType sandpiper.GrainType, grainKey string) bool {
 	m := new(sandpiper.Grain)
-	err := db.Model(m).Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, strings.ToLower(grainKey)).
+	err := db.Model(m).Column("id", "slice_id", "grain_type", "grain_key").
+		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
 		Select()
 	return err != pg.ErrNoRows
 }

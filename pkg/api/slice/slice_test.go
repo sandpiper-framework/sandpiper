@@ -201,7 +201,7 @@ func TestList(t *testing.T) {
 					}
 				}},
 			mdb: &mockdb.Slice{
-				ListFn: func(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+				ListFn: func(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 					return []sandpiper.Slice{
 						{
 							ID:           mock.TestUUID(1),

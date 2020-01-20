@@ -48,7 +48,7 @@ func (s *Company) Create(db orm.DB, company sandpiper.Company) (*sandpiper.Compa
 func (s *Company) View(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 	var company = &sandpiper.Company{ID: id}
 
-	err := db.Model(company).Column("company.*").Relation("Users").WherePK().Select()
+	err := db.Model(company).Relation("Users").WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
@@ -56,10 +56,10 @@ func (s *Company) View(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 }
 
 // List returns list of all companies
-func (s *Company) List(db orm.DB, sc *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
+func (s *Company) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
 	var companies []sandpiper.Company
 
-	q := db.Model(&companies).Column("company.*").Relation("Users").Limit(p.Limit).Offset(p.Offset).Order("name")
+	q := db.Model(&companies).Relation("Users").Limit(p.Limit).Offset(p.Offset).Order("name")
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}

@@ -97,7 +97,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 }
 
 // List returns a list of all slices limited by scope and paginated
-func (s *Slice) List(db orm.DB, sc *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices sandpiper.SliceArray
 
 	// filter function adds optional condition to "Companies" relationship

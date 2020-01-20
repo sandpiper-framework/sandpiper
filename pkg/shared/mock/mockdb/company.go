@@ -10,7 +10,7 @@ import (
 // Company database mock
 type Company struct {
 	CreateFn func(orm.DB, sandpiper.Company) (*sandpiper.Company, error)
-	ListFn   func(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.Company, error)
+	ListFn   func(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Company, error)
 	ViewFn   func(orm.DB, uuid.UUID) (*sandpiper.Company, error)
 	DeleteFn func(orm.DB, *sandpiper.Company) error
 	UpdateFn func(orm.DB, *sandpiper.Company) error
@@ -22,7 +22,7 @@ func (s *Company) Create(db orm.DB, cpy sandpiper.Company) (*sandpiper.Company, 
 }
 
 // List mock
-func (s *Company) List(db orm.DB, lq *sandpiper.Clause, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
+func (s *Company) List(db orm.DB, lq *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
 	return s.ListFn(db, lq, p)
 }
 

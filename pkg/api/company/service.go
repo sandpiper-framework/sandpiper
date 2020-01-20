@@ -52,7 +52,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.Company) (*sandpiper.Company, error)
 	View(orm.DB, uuid.UUID) (*sandpiper.Company, error)
-	List(orm.DB, *sandpiper.Clause, *sandpiper.Pagination) ([]sandpiper.Company, error)
+	List(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Company, error)
 	Update(orm.DB, *sandpiper.Company) error
 	Delete(orm.DB, *sandpiper.Company) error
 }
@@ -62,5 +62,5 @@ type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceCompany(echo.Context, uuid.UUID) error
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
-	EnforceScope(echo.Context) (*sandpiper.Clause, error)
+	EnforceScope(echo.Context) (*sandpiper.Scope, error)
 }

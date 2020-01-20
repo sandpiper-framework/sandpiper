@@ -78,9 +78,9 @@ func (s *Service) EnforceSubscription(c echo.Context, sub sandpiper.Subscription
 }
 
 // EnforceScope uses the current user to determine if scoping needs to be added to a query
-func (s *Service) EnforceScope(c echo.Context) (*sandpiper.Clause, error) {
+func (s *Service) EnforceScope(c echo.Context) (*sandpiper.Scope, error) {
 	au := s.CurrentUser(c)
-	return au.Scope(s.ScopingField, au.CompanyID)
+	return au.ApplyScope(s.ScopingField)
 }
 
 // IsLowerRole checks whether the requesting user has higher role than the user it wants to change
