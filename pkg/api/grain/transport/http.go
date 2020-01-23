@@ -39,12 +39,12 @@ var (
 
 // Grain create request
 type createReq struct {
-	ID       uuid.UUID                `json:"id"` // optional
-	SliceID  uuid.UUID                `json:"slice_id" validate:"required"`
-	Type     sandpiper.GrainType      `json:"grain_type" validate:"required"`
-	Key      string                   `json:"grain_key" validate:"required"`
-	Encoding sandpiper.EncodingMethod `json:"encoding" validate:"required"`
-	Payload  []byte                   `json:"payload" validate:"required"`
+	ID       uuid.UUID `json:"id"` // optional
+	SliceID  uuid.UUID `json:"slice_id" validate:"required"`
+	Type     string    `json:"grain_type" validate:"required"`
+	Key      string    `json:"grain_key" validate:"required"`
+	Encoding string    `json:"encoding" validate:"required"`
+	Payload  []byte    `json:"payload" validate:"required"`
 }
 
 func (r createReq) id() uuid.UUID {

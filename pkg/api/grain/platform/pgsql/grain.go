@@ -112,7 +112,8 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 }
 
 // isDuplicate returns true if grain type/key found in database for a slice
-func isDuplicate(db orm.DB, sliceID uuid.UUID, grainType sandpiper.GrainType, grainKey string) bool {
+func isDuplicate(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) bool {
+	// todo: change this to also return errors (invalid graintype for example!)
 	m := new(sandpiper.Grain)
 	err := db.Model(m).Column("id", "slice_id", "grain_type", "grain_key").
 		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).

@@ -5,12 +5,12 @@
 package pgsql_test
 
 import (
-	"github.com/google/uuid"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/api/slice/platform/pgsql"
+	"autocare.org/sandpiper/pkg/api/grain/platform/pgsql"
 	"autocare.org/sandpiper/pkg/shared/mock"
 	"autocare.org/sandpiper/pkg/shared/model"
 )
@@ -19,43 +19,45 @@ func TestCreate(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		req      sandpiper.Slice
-		wantData *sandpiper.Slice
+		req      sandpiper.Grain
+		wantData *sandpiper.Grain
 	}{
-		{
-			name:    "Slice Name already exists",
-			wantErr: true,
-			req: sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
-			},
-		},
 		{
 			name:    "Fail on insert duplicate ID",
 			wantErr: true,
-			req: sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+			req: sandpiper.Grain{
+				ID:       mock.TestUUID(1),
+				SliceID:  mock.TestUUID(1),
+				Type:     "aces-file",
+				Key:      "AAP Premium Brakes",
+				Encoding: "raw",
+				Payload:  "payload data",
+			},
+		},
+		{
+			name:    "Fail on slice_id not found",
+			wantErr: true,
+			req: sandpiper.Grain{
+				ID:       mock.TestUUID(1),
+				SliceID:  mock.TestUUID(0),
+				Type:     "aces-file",
+				Key:      "AAP Premium Brakes",
+				Encoding: "raw",
+				Payload:  "payload data",
 			},
 		},
 		{
 			name: "Success",
-			req: sandpiper.Slice{
+			req: sandpiper.Grain{
 				ID:           mock.TestUUID(2),
-				Name:         "AAP Premium Brakes",
+				Key:          "AAP Premium Brakes",
 				ContentHash:  mock.TestHash(1),
 				ContentCount: 1,
 				LastUpdate:   mock.TestTime(2019),
 			},
-			wantData: &sandpiper.Slice{
+			wantData: &sandpiper.Grain{
 				ID:           mock.TestUUID(2),
-				Name:         "AAP Premium Brakes",
+				Key:          "AAP Premium Brakes",
 				ContentHash:  mock.TestHash(1),
 				ContentCount: 1,
 				LastUpdate:   mock.TestTime(2019),
@@ -66,15 +68,15 @@ func TestCreate(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Grain{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:   mock.TestUUID(1),
-		Name: "Acme Brakes"}, &cases[1].req); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Grain{
+		ID:  mock.TestUUID(1),
+		Key: "Acme Brakes"}, &cases[1].req); err != nil {
 		t.Error(err)
 	}
 
-	mdb := pgsql.NewSlice()
+	mdb := pgsql.NewGrain()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -86,7 +88,6 @@ func TestCreate(t *testing.T) {
 					return
 				}
 				tt.wantData.CreatedAt = resp.CreatedAt
-				tt.wantData.UpdatedAt = resp.UpdatedAt
 				assert.Equal(t, tt.wantData, resp)
 			}
 		})
@@ -98,22 +99,21 @@ func TestView(t *testing.T) {
 		name     string
 		wantErr  bool
 		id       uuid.UUID
-		wantData *sandpiper.Slice
+		wantData *sandpiper.Grain
 	}{
 		{
-			name:    "VIEW Slice does not exist",
+			name:    "VIEW Grain does not exist",
 			wantErr: true,
 			id:      mock.TestUUID(2),
 		},
 		{
 			name: "VIEW Success",
 			id:   mock.TestUUID(1),
-			wantData: &sandpiper.Slice{
+			wantData: &sandpiper.Grain{
 				ID:           mock.TestUUID(1),
-				Name:         "AAP Premium Brakes",
+				Key:          "AAP Premium Brakes",
 				ContentHash:  mock.TestHash(1),
 				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
 			},
 		},
 	}
@@ -121,15 +121,15 @@ func TestView(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Grain{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:   mock.TestUUID(1),
-		Name: "Acme Brakes"}, cases[1].wantData); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Grain{
+		ID:  mock.TestUUID(1),
+		Key: "Acme Brakes"}, cases[1].wantData); err != nil {
 		t.Error(err)
 	}
 
-	udb := pgsql.NewSlice()
+	udb := pgsql.NewGrain()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -140,66 +140,8 @@ func TestView(t *testing.T) {
 					t.Errorf("response was nil due to: %v", err)
 				} else {
 					tt.wantData.CreatedAt = user.CreatedAt
-					tt.wantData.UpdatedAt = user.UpdatedAt
 					assert.Equal(t, tt.wantData, user)
 				}
-			}
-		})
-	}
-}
-
-func TestUpdate(t *testing.T) {
-	cases := []struct {
-		name     string
-		wantErr  bool
-		data     *sandpiper.Slice
-		wantData *sandpiper.Slice
-	}{
-		{
-			name: "UPDATE Success",
-			data: &sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
-			},
-			wantData: &sandpiper.Slice{
-				ID:           mock.TestUUID(1),
-				Name:         "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 2,
-				LastUpdate:   mock.TestTime(2019),
-			},
-		},
-	}
-
-	dbCon := mock.NewPGContainer(t)
-	defer dbCon.Shutdown()
-
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
-
-	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:   mock.TestUUID(1),
-		Name: "Acme Brakes"}, cases[0].data); err != nil {
-		t.Error(err)
-	}
-
-	mdb := pgsql.NewSlice()
-
-	for _, tt := range cases {
-		t.Run(tt.name, func(t *testing.T) {
-			err := mdb.Update(db, tt.wantData)
-			assert.Equal(t, tt.wantErr, err != nil)
-			if tt.wantData != nil {
-				comp := &sandpiper.Slice{ID: tt.data.ID}
-				if err := db.Select(comp); err != nil {
-					t.Error(err)
-				}
-				tt.wantData.UpdatedAt = comp.UpdatedAt
-				tt.wantData.CreatedAt = comp.CreatedAt
-				tt.wantData.DeletedAt = comp.DeletedAt
-				assert.Equal(t, tt.wantData, comp)
 			}
 		})
 	}
@@ -211,7 +153,7 @@ func TestList(t *testing.T) {
 		wantErr  bool
 		qp       *sandpiper.Scope
 		pg       *sandpiper.Pagination
-		wantData []sandpiper.Slice
+		wantData []sandpiper.Grain
 	}{
 		{
 			name:    "Invalid pagination values",
@@ -230,17 +172,17 @@ func TestList(t *testing.T) {
 				ID:        mock.TestUUID(1),
 				Condition: "id = ?",
 			},
-			wantData: []sandpiper.Slice{
+			wantData: []sandpiper.Grain{
 				{
 					ID:           mock.TestUUID(1),
-					Name:         "Brakes",
+					Key:          "Brakes",
 					ContentHash:  mock.TestHash(1),
 					ContentCount: 1,
 					LastUpdate:   mock.TestTime(2019),
 				},
 				{
 					ID:           mock.TestUUID(1),
-					Name:         "Brakes",
+					Key:          "Brakes",
 					ContentHash:  mock.TestHash(1),
 					ContentCount: 1,
 					LastUpdate:   mock.TestTime(2019),
@@ -252,9 +194,9 @@ func TestList(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Grain{})
 
-	mdb := pgsql.NewSlice()
+	mdb := pgsql.NewGrain()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -263,7 +205,6 @@ func TestList(t *testing.T) {
 			if tt.wantData != nil {
 				for i, v := range users {
 					tt.wantData[i].CreatedAt = v.CreatedAt
-					tt.wantData[i].UpdatedAt = v.UpdatedAt
 				}
 				assert.Equal(t, tt.wantData, users)
 			}
@@ -275,18 +216,17 @@ func TestDelete(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		usr      *sandpiper.Slice
-		wantData *sandpiper.Slice
+		usr      *sandpiper.Grain
+		wantData *sandpiper.Grain
 	}{
 		{
 			name: "Success",
-			usr: &sandpiper.Slice{
-				ID:        mock.TestUUID(1),
-				DeletedAt: mock.TestTime(2018),
+			usr: &sandpiper.Grain{
+				ID: mock.TestUUID(1),
 			},
-			wantData: &sandpiper.Slice{
+			wantData: &sandpiper.Grain{
 				ID:           mock.TestUUID(1),
-				Name:         "Brakes",
+				Key:          "Brakes",
 				ContentHash:  mock.TestHash(1),
 				ContentCount: 1,
 				LastUpdate:   mock.TestTime(2019),
@@ -297,15 +237,15 @@ func TestDelete(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Slice{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Grain{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Slice{
-		ID:   mock.TestUUID(1),
-		Name: "Acme Brakes"}, cases[0].wantData); err != nil {
+	if err := mock.InsertMultiple(db, &sandpiper.Grain{
+		ID:  mock.TestUUID(1),
+		Key: "Acme Brakes"}, cases[0].wantData); err != nil {
 		t.Error(err)
 	}
 
-	mdb := pgsql.NewSlice()
+	mdb := pgsql.NewGrain()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {

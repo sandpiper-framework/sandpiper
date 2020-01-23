@@ -8,6 +8,24 @@
  
 BEGIN;
 
+CREATE TYPE grain_type_enum AS ENUM (
+  'aces-file',
+  'aces-item',
+  'asset-file',
+  'partspro-file',
+  'partspro-item',
+  'pies-file',
+  'pies-item',
+  'pies-marketcopy',
+  'pies-pricesheet'
+);
+
+CREATE TYPE encoding_enum AS ENUM (
+  'raw',
+  'b64',
+  'gzipb64'
+);
+
 CREATE TABLE IF NOT EXISTS "settings" (
   "id"    SERIAL PRIMARY KEY,
   "key"   text UNIQUE NOT NULL,
@@ -55,9 +73,9 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 CREATE TABLE IF NOT EXISTS "grains" (
   "id"           uuid PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
-  "grain_type"   smallint,
+  "grain_type"   grain_type_enum,
   "grain_key"    text,
-  "encoding"     smallint,
+  "encoding"     encoding_enum,
   "payload"      bytea,
   "created_at"   timestamp,
   CONSTRAINT "grain_type_key" UNIQUE("slice_id", "grain_type", "grain_key")

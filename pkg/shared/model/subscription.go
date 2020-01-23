@@ -26,19 +26,6 @@ type Subscription struct {
 	Slice       *Slice    `json:"slice"`
 }
 
-/*
-type SubscriptionView struct {
-	SubID       int       `json:"id" pg:",pk"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Active      bool      `json:"active"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	Company     *Company  `json:"company"`
-	Slice       *Slice    `json:"slice"`
-}
-*/
-
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*Company)(nil)
 var _ orm.BeforeUpdateHook = (*Company)(nil)
