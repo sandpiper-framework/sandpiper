@@ -25,11 +25,22 @@ Table companies {
 }
 
 Table subscriptions  [headercolor: #8e44ad] {
-  slice_id uuid [pk, ref: > slices.id]
-  company_id uuid [pk, ref: > companies.id]
+  id uuid [pk]
+  slice_id uuid [ref: > slices.id]
+  company_id uuid [ref: > companies.id]
   name varchar
   description varchar
   active boolean
+}
+
+Table tags  [headercolor: #16a085] {
+  id int [pk]
+  name varchar
+}
+
+Table slice_tags  [headercolor: #16a085] {
+  tag_id int [pk, ref: > tags.id]
+  slice_id uuid [pk, ref: > slices.id]
 }
 
 Table slices {
@@ -37,7 +48,7 @@ Table slices {
   name varchar
   content_hash string [note: 'code representing all slice ids']
   content_count integer
-  content_date datetime [note: 'when data in slice was updated']
+  last_update datetime [note: 'when data in slice was updated']
 }
 
 Table slice_metadata {

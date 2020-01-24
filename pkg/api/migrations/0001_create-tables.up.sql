@@ -58,6 +58,16 @@ CREATE TABLE IF NOT EXISTS "slice_metadata" (
   PRIMARY KEY ("slice_id", "key")
 );
 
+CREATE TABLE IF NOT EXISTS "tags" (
+  "id"   serial PRIMARY KEY,
+  "name" text UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "slice_tags" (
+  "tag_id" int PRIMARY KEY,
+  "slice_id" uuid PRIMARY KEY
+);
+
 CREATE TABLE IF NOT EXISTS "subscriptions" (
   "sub_id"       serial PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,

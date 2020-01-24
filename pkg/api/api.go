@@ -54,6 +54,7 @@ func Start(cfg *config.Configuration) error {
 	sl.Register(db, sec, log, v1)                     // slice service
 	gr.Register(db, sec, log, v1)                     // grain service
 	su.Register(db, sec, log, v1)                     // subscription service
+	// ta.Register(db, sec, log, v1)  // tagging service
 	// sy.Register(db, sec, log, v1)  // sync (exchange) service
 
 	// listen for requests

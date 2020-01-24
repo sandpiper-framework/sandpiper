@@ -12,17 +12,23 @@ There are only a few prerequisites for getting a Sandpiper installation up and r
 Sandpiper requires access to a PostgreSQL sever for its data storage (for both primary and secondary roles). This can be an existing installation (either on premises or in the cloud) or follow
 the instructions below to install locally for your desired platform.
 
-##### Windows
+Download binary from official download site (or use package manager for your platform such as apt or scoop).
 
-https://www.postgresql.org/download/windows/
+```
+https://www.postgresql.org/download/
+```
+
+##### Windows
 
 To start/stop service, run `pg_ctl start`, `pg_ctl stop`.
 
 ##### Linux
 
-https://www.postgresql.org/download/windows/
+To start the service, run
 
-To start/stop service, run `pg_ctl start`, `pg_ctl stop`.
+```
+sudo service postgresql start
+```
 
 ##### Create Database (for each desired role)
 
@@ -60,7 +66,8 @@ To run Sandpiper in a production environment, simply download the correct binary
 [Downloads](https://sandpiper.org/downloads)
 
 ```
-./api [-config= "path/to/config.yaml"]
+./api [-config="path/to/config.yaml"] (defaults to ./server.config.yaml")
+Also supports DB_USER and DB_PASSWORD environment variables
 ```
 ## Deployment
 

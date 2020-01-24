@@ -7,8 +7,7 @@ package pgsql
 // grain service database access
 
 // The `grain` contains the actual data `payload` that is exchanged between trading partners.
-// The payload is transferred (and stored) as a binary object that has been gzipped and then
-// translated to base64 for easy delivery via json.
+// The payload is transferred (and stored) as a (possibly encoded) binary object.
 
 import (
 	"net/http"
@@ -42,8 +41,9 @@ func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, erro
 	// key is always lowercase to allow faster lookups
 	grain.Key = strings.ToLower(grain.Key)
 
-	if isDuplicate(db, *grain.SliceID, grain.Type, grain.Key) {
-		return nil, ErrAlreadyExists
+	err := validateNewGrain(db, *grain.SliceID, grain.Type, grain.Key)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := db.Insert(&grain); err != nil {
@@ -111,12 +111,19 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 	return db.Delete(grain)
 }
 
-// isDuplicate returns true if grain type/key found in database for a slice
-func isDuplicate(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) bool {
-	// todo: change this to also return errors (invalid graintype for example!)
+// validateNewGrain makes sure we can add this grain
+func validateNewGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
 	m := new(sandpiper.Grain)
 	err := db.Model(m).Column("id", "slice_id", "grain_type", "grain_key").
 		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
 		Select()
-	return err != pg.ErrNoRows
+
+	switch err {
+	case pg.ErrNoRows: // ok to add
+		return nil
+	case nil: // found a row, so duplicate
+		return ErrAlreadyExists
+	default: // return any other problem found
+		return err
+	}
 }
