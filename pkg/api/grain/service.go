@@ -17,7 +17,7 @@ import (
 // Service represents grain application interface (note no update!)
 type Service interface {
 	Create(echo.Context, sandpiper.Grain) (*sandpiper.Grain, error)
-	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Grain, error)
+	List(echo.Context, bool, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	View(echo.Context, uuid.UUID) (*sandpiper.Grain, error)
 	Delete(echo.Context, uuid.UUID) error
 }
@@ -51,7 +51,7 @@ type Repository interface {
 	CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.UUID) bool
 	View(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Grain, error)
-	List(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Grain, error)
+	List(orm.DB, bool, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	Delete(orm.DB, uuid.UUID) error
 }
 

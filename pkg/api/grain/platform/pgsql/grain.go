@@ -97,9 +97,15 @@ func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.U
 }
 
 // List returns a list of all grains with scoping and pagination
-func (s *Grain) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+func (s *Grain) List(db orm.DB, payload bool, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
 	var err error
+
+	// columns to select (optionally returning payload)
+	cols := "grain.id, grain_type, grain_key, encoding, grain.created_at"
+	if payload {
+		cols = cols + ", payload"
+	}
 
 	//todo: decide if we really need to return the slice as well.
 	if sc != nil {
@@ -107,13 +113,14 @@ func (s *Grain) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([
 		err = db.Model((*sandpiper.Subscription)(nil)).
 			Column("subscription.slice_id").
 			Where(sc.Condition, sc.ID).
-			WrapWith("ss").Table("ss").
-			Join("JOIN grains AS grain ON grain.slice_id = ss.slice_id").
-			Select(&grains)
+			WrapWith("scope").Table("scope").
+			Join("JOIN grains AS grain ON grain.slice_id = scope.slice_id").
+			ColumnExpr(cols).
+			Limit(p.Limit).Offset(p.Offset).Select(&grains)
 	} else {
 		// simple case with no scoping
 		err = db.Model(&grains).
-			Column("grain.id", "grain_type", "grain_key", "encoding", "grain.created_at").
+			ColumnExpr(cols).
 			Relation("Slice").Limit(p.Limit).Offset(p.Offset).Select()
 	}
 	if err != nil {

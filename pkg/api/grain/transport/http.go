@@ -26,7 +26,7 @@ func NewHTTP(svc grain.Service, er *echo.Group) {
 	h := HTTP{svc}
 	sr := er.Group("/grains")
 	sr.POST("", h.create)
-	sr.GET("", h.list)
+	sr.GET("", h.list) // ?payload=[yes/no*]
 	sr.GET("/:id", h.view)
 	sr.DELETE("/:id", h.delete)
 }
@@ -84,12 +84,18 @@ type listResponse struct {
 }
 
 func (h *HTTP) list(c echo.Context) error {
+	var includePayload bool = false
+
+	if c.QueryParam("payload") == "yes" {
+		includePayload = true
+	}
+
 	p := new(sandpiper.PaginationReq)
 	if err := c.Bind(p); err != nil {
 		return err
 	}
 
-	result, err := h.svc.List(c, p.Transform())
+	result, err := h.svc.List(c, includePayload, p.Transform())
 
 	if err != nil {
 		return err

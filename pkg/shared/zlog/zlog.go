@@ -39,10 +39,10 @@ func (z *Log) Log(ctx echo.Context, source, msg string, err error, params map[st
 		params = make(map[string]interface{})
 	}
 
-	params["source"] = source
+	params["service"] = source
 
 	if id, ok := ctx.Get("id").(int); ok {
-		params["id"] = id
+		params["user_id"] = id
 		params["user"] = ctx.Get("username").(string)
 	}
 

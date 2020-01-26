@@ -24,7 +24,7 @@ func (s *Grain) Create(c echo.Context, req sandpiper.Grain) (*sandpiper.Grain, e
 // View returns a single grain if allowed
 func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error) {
 	au := s.rbac.CurrentUser(c)
-	if au.Role != sandpiper.AdminRole {
+	if !au.AtLeast(sandpiper.AdminRole) {
 		// make sure the grain is subscribed to this user's company
 		//return s.sdb.ViewBySub(s.db, au.CompanyID, grainID)
 		if !s.sdb.CompanySubscribed(s.db, au.CompanyID, grainID) {
@@ -35,12 +35,12 @@ func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error
 }
 
 // List returns list of grains scoped by user
-func (s *Grain) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+func (s *Grain) List(c echo.Context, payload bool, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
 	}
-	return s.sdb.List(s.db, q, p)
+	return s.sdb.List(s.db, payload, q, p)
 }
 
 // Delete deletes a grain by id, if allowed

@@ -21,7 +21,7 @@ type Grain struct {
 	Encoding  string      `json:"encoding"`
 	Payload   PayloadData `json:"payload,omitempty"`
 	CreatedAt time.Time   `json:"created_at"`
-	Slice     *Slice      `json:"slice"` // has-one relation
+	Slice     *Slice      `json:"slice,omitempty"` // has-one relation
 }
 
 // compile-time check variables for model hooks (which take no memory)

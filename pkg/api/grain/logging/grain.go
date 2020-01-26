@@ -7,6 +7,7 @@ package grain
 // grain service logger
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -34,13 +35,20 @@ const source = "grain"
 
 // Create logging
 func (ls *LogService) Create(c echo.Context, req sandpiper.Grain) (resp *sandpiper.Grain, err error) {
+	// todo: consider a "debug" level that shows entire req/resp
 	defer func(begin time.Time) {
+		var g *sandpiper.Grain
+		// suppress payload in log for req and resp
+		req.Payload = nil
+		if resp != nil {
+			g = &sandpiper.Grain{ID: resp.ID, SliceID: resp.SliceID, Type: resp.Type, Encoding: resp.Encoding}
+		}
 		ls.logger.Log(
 			c,
 			source, "Create grain request", err,
 			map[string]interface{}{
 				"req":  req,
-				"resp": resp,
+				"resp": g,
 				"took": time.Since(begin),
 			},
 		)
@@ -49,30 +57,36 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Grain) (resp *sandpip
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Grain, err error) {
+func (ls *LogService) List(c echo.Context, payload bool, req *sandpiper.Pagination) (resp []sandpiper.Grain, err error) {
+	// todo: consider a "debug" level that shows entire resp
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
 			source, "List grain request", err,
 			map[string]interface{}{
 				"req":  req,
-				"resp": resp,
+				"resp": fmt.Sprintf("Count: %d", len(resp)),
 				"took": time.Since(begin),
 			},
 		)
 	}(time.Now())
-	return ls.Service.List(c, req)
+	return ls.Service.List(c, payload, req)
 }
 
 // View logging
 func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Grain, err error) {
+	// todo: consider a "debug" level that shows entire resp
 	defer func(begin time.Time) {
+		var g *sandpiper.Grain
+		if resp != nil {
+			g = &sandpiper.Grain{ID: resp.ID, SliceID: resp.SliceID, Type: resp.Type, Encoding: resp.Encoding}
+		}
 		ls.logger.Log(
 			c,
 			source, "View grain request", err,
 			map[string]interface{}{
 				"req":  req,
-				"resp": resp,
+				"resp": g,
 				"took": time.Since(begin),
 			},
 		)
