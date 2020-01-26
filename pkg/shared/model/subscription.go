@@ -27,8 +27,8 @@ type Subscription struct {
 }
 
 // compile-time check variables for model hooks (which take no memory)
-var _ orm.BeforeInsertHook = (*Company)(nil)
-var _ orm.BeforeUpdateHook = (*Company)(nil)
+var _ orm.BeforeInsertHook = (*Subscription)(nil)
+var _ orm.BeforeUpdateHook = (*Subscription)(nil)
 
 // BeforeInsert hooks into insert operations, setting createdAt and updatedAt to current time
 func (b *Subscription) BeforeInsert(ctx context.Context) (context.Context, error) {

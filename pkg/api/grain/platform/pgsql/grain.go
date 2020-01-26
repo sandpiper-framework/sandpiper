@@ -137,6 +137,8 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 
 // validateNewGrain makes sure we can add this grain
 func validateNewGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
+
+	// attempt to select by unique keys
 	m := new(sandpiper.Grain)
 	err := db.Model(m).Column("id", "slice_id", "grain_type", "grain_key").
 		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
