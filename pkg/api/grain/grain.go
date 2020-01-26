@@ -13,7 +13,7 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
-// Create makes a new grain to hold our syncable data-objects
+// Create makes a new grain to hold our syncable data-objects. Must be a sandpiper admin.
 func (s *Grain) Create(c echo.Context, req sandpiper.Grain) (*sandpiper.Grain, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
@@ -23,11 +23,14 @@ func (s *Grain) Create(c echo.Context, req sandpiper.Grain) (*sandpiper.Grain, e
 
 // View returns a single grain if allowed
 func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error) {
-	//au := s.rbac.CurrentUser(c)
-	//if au.Role != sandpiper.AdminRole {
-	//	// make sure the grain is subscribed to this user's company
-	//	return s.sdb.ViewBySub(s.db, au.CompanyID, grainID)
-	//}
+	au := s.rbac.CurrentUser(c)
+	if au.Role != sandpiper.AdminRole {
+		// make sure the grain is subscribed to this user's company
+		//return s.sdb.ViewBySub(s.db, au.CompanyID, grainID)
+		if !s.sdb.CompanySubscribed(s.db, au.CompanyID, grainID) {
+			return nil, echo.ErrForbidden
+		}
+	}
 	return s.sdb.View(s.db, grainID)
 }
 

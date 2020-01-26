@@ -83,8 +83,8 @@ func (s *Service) EnforceScope(c echo.Context) (*sandpiper.Scope, error) {
 	return au.ApplyScope(s.ScopingField)
 }
 
-// IsLowerRole checks whether the requesting user has higher role than the user it wants to change
-// Used for account creation/deletion
+// IsLowerRole checks whether the requesting user has supplied level access
+// for example if the user has higher role than the user it wants to change
 func (s *Service) IsLowerRole(c echo.Context, r sandpiper.AccessLevel) error {
 	return checkBool(c.Get("role").(sandpiper.AccessLevel) < r)
 }

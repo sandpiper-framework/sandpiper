@@ -62,23 +62,17 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return grain, nil
 }
 
-// ViewBySlice returns a single grain by ID if included in the supplied slice.
-func (s *Grain) ViewBySlice(db orm.DB, grainID uuid.UUID) (*sandpiper.Grain, error) {
-	// todo: implement this
-	panic("implement me")
-}
-
 // ViewBySub returns a single grain by ID if included in company subscriptions.
+// todo: is this necessary? it doesn't currently work!
 func (s *Grain) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Grain, error) {
 	var grain = &sandpiper.Grain{ID: sliceID}
 
 	err := db.Model(grain).
-		Relation("slices").
-		Relation("subscriptions.company_id").
+		Relation("Slice").
+		Relation("Slice.Subscription").
 		Where("slice_id = ? and company_id = ?", sliceID, companyID).
 		Select()
 
@@ -88,18 +82,41 @@ func (s *Grain) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	return grain, nil
 }
 
+// CompanySubscribed checks if grain is included in a company's subscriptions.
+func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.UUID) bool {
+	grain := new(sandpiper.Grain)
+	err := db.Model(grain).Column("grain.id").
+		Join("JOIN slices AS sl ON grain.slice_id = sl.id").
+		Join("JOIN subscriptions AS sub ON sl.id = sub.slice_id").
+		Where("sub.company_id = ?", companyID).
+		Where("grain.id = ?", grainID).Select()
+	if err == nil {
+		return true
+	}
+	return false
+}
+
 // List returns a list of all grains with scoping and pagination
 func (s *Grain) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
+	var err error
 
-	q := db.Model(&grains).
-		Column("grain.id", "grain_type", "grain_key", "encoding", "grain.created_at").
-		Relation("Slice").Limit(p.Limit).Offset(p.Offset)
+	//todo: decide if we really need to return the slice as well.
 	if sc != nil {
-		q.Relation("subscriptions.company_id")
-		q.Where(sc.Condition, sc.ID)
+		// Use CTE query to get all subscriptions for the scope (i.e. the company)
+		err = db.Model((*sandpiper.Subscription)(nil)).
+			Column("subscription.slice_id").
+			Where(sc.Condition, sc.ID).
+			WrapWith("ss").Table("ss").
+			Join("JOIN grains AS grain ON grain.slice_id = ss.slice_id").
+			Select(&grains)
+	} else {
+		// simple case with no scoping
+		err = db.Model(&grains).
+			Column("grain.id", "grain_type", "grain_key", "encoding", "grain.created_at").
+			Relation("Slice").Limit(p.Limit).Offset(p.Offset).Select()
 	}
-	if err := q.Select(); err != nil {
+	if err != nil {
 		return nil, err
 	}
 	return grains, nil

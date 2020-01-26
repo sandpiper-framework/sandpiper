@@ -27,7 +27,6 @@ type Slice struct {
 	Metadata     MetaMap    `json:"metadata,omitempty" pg:"-"`
 	Companies    []*Company `json:"companies,omitempty" pg:"many2many:subscriptions"`
 	//Grains       []*Grain  // has-many relation
-
 }
 
 // compile-time check variables for model hooks (which take no memory)

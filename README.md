@@ -131,9 +131,9 @@ You can log in as admin to the application by sending a post request to localhos
 
 1. Root directory contains things not related to code directly, e.g. readme, license, docker-compose, taskfile, etc.
 
-2. Cmd package contains code for starting applications ("main" packages). The directory name for each application should match the name of the executable you want to have. Sandpiper is structured as a monolith application but can be restructured to contain multiple microservices. We use the Go convention of placing main package as a subdirectory of the cmd package. As an example, the "client" application's binary would be located under cmd/client. It also loads the necessary configuration and passes it to the service initializers.
+2. Cmd package contains code for starting applications ("main" packages). The directory name for each application should match the name of the executable you want to have. Sandpiper is structured as a monolith application but was written with microservices in mind. We use the Go convention of placing each main package as a subdirectory of the cmd directory. As an example, the "client" application's binary would be located under `cmd/client`. It also loads the necessary configuration and passes it to the service initializers.
 
-3. The rest of the code is located under two directories: `internal` and `pkg`. The pkg directory contains a directory for each of the executables found in the cmd directory. These can be thought of like microservices of Sandpiper. The internal directory contains code common to all cmds. 
+3. The rest of the code is located under two directories: `shared` and `pkg`. The pkg directory contains a directory for each of the executables found in the cmd directory. These can be thought of like microservices of Sandpiper. The shared directory contains code common to all cmds. 
 
 4. Microservice directories, like api (naming corresponds to `cmd/` folder naming) contains multiple folders for each domain it interacts with, for example: `user`, `company`, `slice` etc.
 
@@ -147,11 +147,7 @@ You can log in as admin to the application by sending a post request to localhos
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+... Explain how to run automated tests ...
 
 ```
 Give an example
@@ -161,11 +157,16 @@ Give an example
 
 This section highlights areas helpful for continued development of the project.
 
+### Calling API Endpoints Using Insomnia
+
+An [Insomnia](https://insomnia.rest/) workspace configuration is provided in the `/test/api` directory with instructions in the
+associated README.md file.
+
 ### Implementing CRUD of another table
 
 Let's say you have a table named 'cars' that handles employee's cars. To implement CRUD on this table you need:
 
-1. Inside `pkg/utl/model` create a new file named `car.go`. Inside put your entity (struct), and methods on the struct if you need them.
+1. Inside `pkg/shared/model` create a new file named `car.go`. Inside put your entity (struct), and methods on the struct if you need them.
 
 2. Create a new `car` folder in the (micro)service where your service will be located, most probably inside `api`. Inside create a file/service named car.go and test file for it (`car/car.go` and `car/car_test.go`). You can test your code without writing a single query by mocking the database logic inside /mock/mockdb folder. If you have complex queries interfering with other entities, you can create in this folder other files such as car_users.go or car_templates.go for example.
 
@@ -189,7 +190,7 @@ Similarly to implementing APIs relying only on a database, you can implement oth
 
 3. Once the new platform logic is implemented, create an instance of it in main.go (for example `elastic.Client`) and pass it as an argument to car service (`pkg/api/car/car.go`).
 
-### Running database queries in transaction
+### Running database queries in a transaction
 
 To use a transaction, before interacting with db create a new transaction:
 
@@ -200,13 +201,6 @@ err := s.db.RunInTransaction(func (tx *pg.Tx) error{
 ```
 
 Instead of passing database client as `s.db` , inside this function pass it as `tx`. Handle the error accordingly.
-
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
 
 ## Contributing
 
