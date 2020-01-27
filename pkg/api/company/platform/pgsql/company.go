@@ -35,8 +35,8 @@ var (
 // Create creates a new company in database (assumes allowed to do this)
 func (s *Company) Create(db orm.DB, company sandpiper.Company) (*sandpiper.Company, error) {
 	// don't add if duplicate name
-	if nameExists(db, company.Name) {
-		return nil, ErrAlreadyExists
+	if err := checkDuplicate(db, company.Name); err != nil {
+		return nil, err
 	}
 	if err := db.Insert(&company); err != nil {
 		return nil, err
@@ -80,9 +80,21 @@ func (s *Company) Delete(db orm.DB, company *sandpiper.Company) error {
 	return db.Delete(company)
 }
 
-// nameExists returns true if name found in database
-func nameExists(db orm.DB, name string) bool {
+// checkDuplicate returns true if name found in database
+func checkDuplicate(db orm.DB, name string) error {
+	// attempt to select by unique key
 	m := new(sandpiper.Company)
-	err := db.Model(m).Where("lower(name) = ?", strings.ToLower(name)).Select()
-	return err != pg.ErrNoRows
+	err := db.Model(m).
+		Column("id").
+		Where("lower(name) = ?", strings.ToLower(name)).
+		Select()
+
+	switch err {
+	case pg.ErrNoRows: // ok to add
+		return nil
+	case nil: // found a row, so a duplicate
+		return ErrAlreadyExists
+	default: // return any other problem found
+		return err
+	}
 }

@@ -140,14 +140,15 @@ func validateNewGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey s
 
 	// attempt to select by unique keys
 	m := new(sandpiper.Grain)
-	err := db.Model(m).Column("id", "slice_id", "grain_type", "grain_key").
+	err := db.Model(m).
+		Column("id", "slice_id", "grain_type", "grain_key").
 		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
 		Select()
 
 	switch err {
 	case pg.ErrNoRows: // ok to add
 		return nil
-	case nil: // found a row, so duplicate
+	case nil: // found a row, so a duplicate
 		return ErrAlreadyExists
 	default: // return any other problem found
 		return err

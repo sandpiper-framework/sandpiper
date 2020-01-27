@@ -34,8 +34,8 @@ var (
 // Create creates a new Subscription in database (assumes allowed to do this)
 func (s *Subscription) Create(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
 	// don't add if duplicate name
-	if nameExists(db, sub.Name) {
-		return nil, ErrAlreadyExists
+	if err := checkDuplicate(db, sub.Name); err != nil {
+		return nil, err
 	}
 	if err := db.Insert(&sub); err != nil {
 		return nil, err
@@ -85,11 +85,23 @@ func (s *Subscription) Delete(db orm.DB, sub *sandpiper.Subscription) error {
 	return db.Delete(sub)
 }
 
-// nameExists returns true if name found in database
-func nameExists(db orm.DB, name string) bool {
+// checkDuplicate returns true if name found in database
+func checkDuplicate(db orm.DB, name string) error {
+	// attempt to select by unique key
 	m := new(sandpiper.Subscription)
-	err := db.Model(m).Where("lower(name) = ?", strings.ToLower(name)).Select()
-	return err != pg.ErrNoRows
+	err := db.Model(m).
+		Column("id").
+		Where("lower(name) = ?", strings.ToLower(name)).
+		Select()
+
+	switch err {
+	case pg.ErrNoRows: // ok to add
+		return nil
+	case nil: // found a row, so a duplicate
+		return ErrAlreadyExists
+	default: // return any other problem found
+		return err
+	}
 }
 
 // queryAll returns a query for all subscriptions (including company and slice)

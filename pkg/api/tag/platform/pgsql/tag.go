@@ -34,8 +34,8 @@ var (
 // Create creates a new Tag in database (assumes allowed to do this)
 func (s *Tag) Create(db orm.DB, tag sandpiper.Tag) (*sandpiper.Tag, error) {
 	// don't add if duplicate name
-	if nameExists(db, tag.Name) {
-		return nil, ErrAlreadyExists
+	if err := checkDuplicate(db, tag.Name); err != nil {
+		return nil, err
 	}
 	if err := db.Insert(&tag); err != nil {
 		return nil, err
@@ -56,13 +56,13 @@ func (s *Tag) View(db orm.DB, id int) (*sandpiper.Tag, error) {
 
 // List returns list of all tags
 func (s *Tag) List(db orm.DB, p *sandpiper.Pagination) ([]sandpiper.Tag, error) {
-	var subs []sandpiper.Tag
+	var tags []sandpiper.Tag
 
-	err := db.Model(subs).Limit(p.Limit).Offset(p.Offset).Order("name").Select()
+	err := db.Model(&tags).Limit(p.Limit).Offset(p.Offset).Order("name").Select()
 	if err != nil {
 		return nil, err
 	}
-	return subs, nil
+	return tags, nil
 }
 
 // Update updates tag info by primary key (assumes allowed to do this)
@@ -76,9 +76,21 @@ func (s *Tag) Delete(db orm.DB, sub *sandpiper.Tag) error {
 	return db.Delete(sub)
 }
 
-// nameExists returns true if name found in database
-func nameExists(db orm.DB, name string) bool {
+// checkDuplicate returns true if name found in database
+func checkDuplicate(db orm.DB, name string) error {
+	// attempt to select by unique key
 	m := new(sandpiper.Tag)
-	err := db.Model(m).Where("lower(name) = ?", strings.ToLower(name)).Select()
-	return err != pg.ErrNoRows
+	err := db.Model(m).
+		Column("id").
+		Where("lower(name) = ?", strings.ToLower(name)).
+		Select()
+
+	switch err {
+	case pg.ErrNoRows: // ok to add
+		return nil
+	case nil: // found a row, so a duplicate
+		return ErrAlreadyExists
+	default: // return any other problem found
+		return err
+	}
 }

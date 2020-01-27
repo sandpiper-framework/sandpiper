@@ -49,19 +49,20 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Slice) (resp *sandpip
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Slice, err error) {
+func (ls *LogService) List(c echo.Context, tags string, req *sandpiper.Pagination) (resp []sandpiper.Slice, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
 			source, "List slice request", err,
 			map[string]interface{}{
+				"tags": tags,
 				"req":  req,
 				"resp": resp,
 				"took": time.Since(begin),
 			},
 		)
 	}(time.Now())
-	return ls.Service.List(c, req)
+	return ls.Service.List(c, tags, req)
 }
 
 // View logging

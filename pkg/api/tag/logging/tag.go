@@ -4,7 +4,7 @@
 
 package tag
 
-// subscription service logger
+// tag service logger
 
 import (
 	"time"

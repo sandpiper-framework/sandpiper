@@ -37,8 +37,8 @@ var (
 func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
 
 	// don't add if would create a duplicate name
-	if nameExists(db, slice.Name) {
-		return nil, ErrAlreadyExists
+	if err := checkDuplicate(db, slice.Name); err != nil {
+		return nil, err
 	}
 
 	// insert supplied slice data ("id" already assigned by create service)
@@ -96,8 +96,33 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	return slice, err
 }
 
+/*
+todo: use these queries as a basis for filtering slices by tags (maybe as a CTE?)
+
+Intersection (AND)
+Query for bookmark+webservice+semweb
+
+SELECT b.*
+FROM tagmap bt, bookmark b, tag t
+WHERE bt.tag_id = t.tag_id
+AND (t.name IN ('bookmark', 'webservice', 'semweb'))
+AND b.id = bt.bookmark_id
+GROUP BY b.id
+HAVING COUNT( b.id )=3
+
+Union (OR)
+Query for bookmark,webservice,semweb
+
+SELECT b.*
+FROM tagmap bt, bookmark b, tag t
+WHERE bt.tag_id = t.tag_id
+AND (t.name IN ('bookmark', 'webservice', 'semweb'))
+AND b.id = bt.bookmark_id
+GROUP BY b.id
+*/
+
 // List returns a list of all slices limited by scope and paginated
-func (s *Slice) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(db orm.DB, tags string, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices sandpiper.SliceArray
 
 	// filter function adds optional condition to "Companies" relationship
@@ -146,7 +171,7 @@ func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
 }
 
 // metaDataMap returns a map of slice metadata. We use this separate query instead of
-// an orm relationship because we don't want array of structs in json in this case.
+// an orm relationship because we don't want array of structs in json here.
 // Maps marshal as {"key1": "value1", "key2": "value2", ...}
 func metaDataMap(db orm.DB, sliceID uuid.UUID) (sandpiper.MetaMap, error) {
 	var meta sandpiper.MetaArray
@@ -157,12 +182,21 @@ func metaDataMap(db orm.DB, sliceID uuid.UUID) (sandpiper.MetaMap, error) {
 	return meta.ToMap(sliceID), nil
 }
 
-// nameExists returns true if name found in database
-func nameExists(db orm.DB, name string) bool {
+// checkDuplicate returns true if name found in database
+func checkDuplicate(db orm.DB, name string) error {
+	// attempt to select by unique key
 	m := new(sandpiper.Slice)
 	err := db.Model(m).
-		Column("id", "name").
+		Column("id").
 		Where("lower(name) = ?", strings.ToLower(name)).
 		Select()
-	return err != pg.ErrNoRows
+
+	switch err {
+	case pg.ErrNoRows: // ok to add
+		return nil
+	case nil: // found a row, so a duplicate
+		return ErrAlreadyExists
+	default: // return any other problem found
+		return err
+	}
 }

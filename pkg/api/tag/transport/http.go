@@ -40,7 +40,6 @@ var (
 
 // Tag create request
 type createReq struct {
-	ID          int    `json:"id" validate:"required"`
 	Name        string `json:"name" validate:"required,min=2"`
 	Description string `json:"description"`
 }
@@ -52,7 +51,6 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 	result, err := h.svc.Create(c, sandpiper.Tag{
-		ID:          r.ID,
 		Name:        r.Name,
 		Description: r.Description,
 	})

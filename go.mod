@@ -5,7 +5,6 @@ go 1.13
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fortytw2/dockertest v0.0.0-20171126212657-a73397bdeff4
-	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/go-pg/pg/v9 v9.0.1
 	github.com/go-playground/locales v0.12.1 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect

@@ -11,6 +11,9 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
+// See "Toxi" solution in this article:
+// http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
+
 // Create adds a new tag if administrator
 func (s *Tag) Create(c echo.Context, req sandpiper.Tag) (*sandpiper.Tag, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {

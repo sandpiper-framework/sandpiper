@@ -22,12 +22,12 @@ func (s *Slice) Create(c echo.Context, req sandpiper.Slice) (*sandpiper.Slice, e
 }
 
 // List returns list of slices
-func (s *Slice) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(c echo.Context, tags string, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
 	}
-	return s.sdb.List(s.db, q, p)
+	return s.sdb.List(s.db, tags, q, p)
 }
 
 // View returns a single slice if allowed

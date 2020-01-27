@@ -27,7 +27,7 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 	h := HTTP{svc}
 	sr := er.Group("/slices")
 	sr.POST("", h.create)
-	sr.GET("", h.list)
+	sr.GET("", h.list)     // can filter by tags (and: /slices?tags=aaa+bbb, or: /slices?tags=aaa,bbb)
 	sr.GET("/:id", h.view)
 	sr.PATCH("/:id", h.update)
 	sr.DELETE("/:id", h.delete)
@@ -87,12 +87,15 @@ type listResponse struct {
 }
 
 func (h *HTTP) list(c echo.Context) error {
+	//todo: allow slices filtered by tags (/slices?tags=aaa+bbb+ccc, /slices?tags=aaa,bbb,ccc)
+	tags := c.QueryParam("tags")
+
 	p := new(sandpiper.PaginationReq)
 	if err := c.Bind(p); err != nil {
 		return err
 	}
 
-	result, err := h.svc.List(c, p.Transform())
+	result, err := h.svc.List(c, tags, p.Transform())
 
 	if err != nil {
 		return err

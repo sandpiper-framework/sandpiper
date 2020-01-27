@@ -33,9 +33,9 @@ var (
 
 // Create creates a new user in the database (id is serially assigned)
 func (u *User) Create(db orm.DB, usr sandpiper.User) (*sandpiper.User, error) {
-
-	if isDuplicate(db, usr.Username, usr.Email) {
-		return nil, ErrAlreadyExists
+	// make sure we can add this user
+	if err := checkDuplicate(db, usr.Username, usr.Email); err != nil {
+		return nil, err
 	}
 
 	if err := db.Insert(&usr); err != nil {
@@ -80,10 +80,21 @@ func (u *User) Delete(db orm.DB, user *sandpiper.User) error {
 	return db.Delete(user)
 }
 
-// isDuplicate returns true if name found in database
-func isDuplicate(db orm.DB, name, email string) bool {
+// checkDuplicate returns true if name found in database
+func checkDuplicate(db orm.DB, name, email string) error {
+	// attempt to select by unique keys
 	m := new(sandpiper.User)
-	err := db.Model(m).Column("id").Where("lower(username) = ? or lower(email) = ?", strings.ToLower(name), strings.ToLower(email)).
+	err := db.Model(m).
+		Column("id").
+		Where("lower(username) = ? or lower(email) = ?", strings.ToLower(name), strings.ToLower(email)).
 		Select()
-	return err != pg.ErrNoRows
+
+	switch err {
+	case pg.ErrNoRows: // ok to add
+		return nil
+	case nil: // found a row, so a duplicate
+		return ErrAlreadyExists
+	default: // return any other problem found
+		return err
+	}
 }
