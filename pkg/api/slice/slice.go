@@ -22,7 +22,7 @@ func (s *Slice) Create(c echo.Context, req sandpiper.Slice) (*sandpiper.Slice, e
 }
 
 // List returns list of slices
-func (s *Slice) List(c echo.Context, tags string, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(c echo.Context, tags *sandpiper.TagQuery, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err

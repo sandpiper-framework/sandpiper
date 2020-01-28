@@ -100,7 +100,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 todo: use these queries as a basis for filtering slices by tags (maybe as a CTE?)
 
 Intersection (AND)
-Query for bookmark+webservice+semweb
+Query for bookmark,webservice,semweb
 
 SELECT b.*
 FROM tagmap bt, bookmark b, tag t
@@ -119,10 +119,31 @@ WHERE bt.tag_id = t.tag_id
 AND (t.name IN ('bookmark', 'webservice', 'semweb'))
 AND b.id = bt.bookmark_id
 GROUP BY b.id
+
+SELECT slices.id, slices.name, tags.name
+FROM Slices
+INNER JOIN slice_tags ON Slices.id = slice_tags.slice_id
+INNER JOIN tags ON slice_tags.tag_id = tags.id
+WHERE tags.name IN ('brake_products', 'wiper_products')
+GROUP By slices.id, tags.name
+
+---
+SELECT "slice"."id", "slice"."name", "slice"."content_hash", "slice"."content_count", "slice"."content_date", "slice"."created_at", "slice"."updated_at"
+FROM "slices" AS "slice" ORDER BY "name" LIMIT 100%
+
+SELECT "subscriptions".*, "company"."id", "company"."name", "company"."sync_addr", "company"."active", "company"."created_at", "company"."updated_at"
+FROM "companies" AS "company"
+JOIN "subscriptions" AS "subscriptions" ON ("subscriptions"."slice_id") IN ('1b40204a-7acd-4c78-a3c4-0fa95d2f00f6', '2bea8308-1840-4802-ad38-72b53e31594c')
+WHERE ("company"."id" = "subscriptions"."company_id")
+
+SELECT "slice_metadata"."slice_id", "slice_metadata"."key", "slice_metadata"."value"
+FROM "slice_metadata" AS "slice_metadata"
+WHERE (slice_id in ('1b40204a-7acd-4c78-a3c4-0fa95d2f00f6','2bea8308-1840-4802-ad38-72b53e31594c'))
+
 */
 
 // List returns a list of all slices limited by scope and paginated
-func (s *Slice) List(db orm.DB, tags string, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(db orm.DB, tags *sandpiper.TagQuery, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
 	var slices sandpiper.SliceArray
 
 	// filter function adds optional condition to "Companies" relationship

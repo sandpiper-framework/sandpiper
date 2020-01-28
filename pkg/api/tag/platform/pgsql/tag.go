@@ -7,12 +7,10 @@ package pgsql
 // tag service database access
 
 import (
-	"net/http"
-	"strings"
-
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
+	"net/http"
 
 	"autocare.org/sandpiper/pkg/shared/model"
 )
@@ -43,11 +41,11 @@ func (s *Tag) Create(db orm.DB, tag sandpiper.Tag) (*sandpiper.Tag, error) {
 	return &tag, nil
 }
 
-// View returns a single tag by ID (assumes allowed to do this)
+// View returns a single tag by ID with any associated slices (assumes allowed to do this)
 func (s *Tag) View(db orm.DB, id int) (*sandpiper.Tag, error) {
 	var tag = &sandpiper.Tag{ID: id}
 
-	err := db.Select(tag)
+	err := db.Model(tag).Relation("Slices").WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
@@ -82,13 +80,13 @@ func checkDuplicate(db orm.DB, name string) error {
 	m := new(sandpiper.Tag)
 	err := db.Model(m).
 		Column("id").
-		Where("lower(name) = ?", strings.ToLower(name)).
+		Where("name = ?", name).		// already lower-case
 		Select()
 
 	switch err {
 	case pg.ErrNoRows: // ok to add
 		return nil
-	case nil: // found a row, so a duplicate
+	case nil: // would be a duplicate
 		return ErrAlreadyExists
 	default: // return any other problem found
 		return err

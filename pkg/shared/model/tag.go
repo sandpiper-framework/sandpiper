@@ -6,9 +6,12 @@ package sandpiper
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 )
 
 // Tag allows grouping of slices
@@ -18,6 +21,24 @@ type Tag struct {
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Slices      []*Slice  `json:"slices,omitempty" pg:"many2many:slice_tags"`
+}
+
+// SliceTags represents the many-to-many junction table
+type SliceTags struct {
+	TagID   int       `json:"-" pg:",pk"`
+	SliceID uuid.UUID `json:"slice_id" pg:",pk"`
+}
+
+// CleanName removes invalid values from tag name (returning error if now empty)
+func (t *Tag) CleanName() error {
+	r := strings.NewReplacer(",", "_", " ", "_", "'", "", "\"", "")
+	s := r.Replace(t.Name)
+	if len(s) == 0 {
+		return errors.New("invalid tag name")
+	}
+	t.Name = strings.ToLower(s)
+	return nil
 }
 
 // compile-time check variables for model hooks (which take no memory)
@@ -36,4 +57,10 @@ func (b *Tag) BeforeInsert(ctx context.Context) (context.Context, error) {
 func (b *Tag) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	b.UpdatedAt = time.Now()
 	return ctx, nil
+}
+
+func init() {
+	// Register many to many model so ORM can better recognize m2m relation.
+	// This should be done before dependant models are used.
+	orm.RegisterTable((*SliceTags)(nil))
 }
