@@ -23,13 +23,6 @@ func (s *Tag) Create(c echo.Context, req sandpiper.Tag) (*sandpiper.Tag, error) 
 	return s.sdb.Create(s.db, req)
 }
 
-func (s *Tag) Assign(c echo.Context, tagID int, sliceID uuid.UUID) (*sandpiper.SliceTag, error) {
-	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
-		return nil, err
-	}
-	return s.sdb.Assign(s.db, tagID, sliceID)
-}
-
 // List returns list of tags that you can view
 func (s *Tag) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Tag, error) {
 	return s.sdb.List(s.db, p)
@@ -78,4 +71,20 @@ func (s *Tag) Update(c echo.Context, r *Update) (*sandpiper.Tag, error) {
 		return nil, err
 	}
 	return s.sdb.View(s.db, r.ID)
+}
+
+// Assign adds a tag assignment to a slice
+func (s *Tag) Assign(c echo.Context, tagID int, sliceID uuid.UUID) error {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+		return err
+	}
+	return s.sdb.Assign(s.db, tagID, sliceID)
+}
+
+// Remove deletes a tag assignment from a slice
+func (s *Tag) Remove(c echo.Context, tagID int, sliceID uuid.UUID) error {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+		return err
+	}
+	return s.sdb.Remove(s.db, tagID, sliceID)
 }

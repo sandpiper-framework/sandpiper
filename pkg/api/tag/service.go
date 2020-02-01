@@ -19,11 +19,12 @@ import (
 // Service represents tag application interface
 type Service interface {
 	Create(echo.Context, sandpiper.Tag) (*sandpiper.Tag, error)
-	Assign(echo.Context, int, uuid.UUID) (*sandpiper.SliceTag, error)
 	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Tag, error)
 	View(echo.Context, int) (*sandpiper.Tag, error)
 	Delete(echo.Context, int) error
 	Update(echo.Context, *Update) (*sandpiper.Tag, error)
+	Assign(echo.Context, int, uuid.UUID) error
+	Remove(echo.Context, int, uuid.UUID) error
 }
 
 // New creates new company application service
@@ -52,11 +53,12 @@ type Securer interface {
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
 	Create(orm.DB, sandpiper.Tag) (*sandpiper.Tag, error)
-	Assign(orm.DB, int, uuid.UUID) (*sandpiper.SliceTag, error)
 	View(orm.DB, int) (*sandpiper.Tag, error)
 	List(orm.DB, *sandpiper.Pagination) ([]sandpiper.Tag, error)
 	Update(orm.DB, *sandpiper.Tag) error
 	Delete(orm.DB, *sandpiper.Tag) error
+	Assign(orm.DB, int, uuid.UUID) error
+	Remove(orm.DB, int, uuid.UUID) error
 }
 
 // RBAC represents role-based-access-control interface

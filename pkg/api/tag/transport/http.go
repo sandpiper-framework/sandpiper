@@ -32,7 +32,7 @@ func NewHTTP(svc tag.Service, er *echo.Group) {
 	er.GET("/tags/:id", h.view)
 	er.PATCH("/tags/:id", h.update)
 	er.DELETE("/tags/:id", h.delete)
-	//er.DELETE("/tags/:id/slices/:id", h.remove)
+	er.DELETE("/tags/:id/slices/:id", h.remove)
 }
 
 // Custom errors
@@ -66,24 +66,6 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	result, err := h.svc.Create(c, *t)
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, result)
-}
-
-// assign adds a tag to a slice
-func (h *HTTP) assign(c echo.Context) error {
-	tagID, err := strconv.Atoi(c.Param("tagid"))
-	if err != nil {
-		return ErrNonNumericTagID
-	}
-	sliceID, err := uuid.Parse(c.Param("sliceid"))
-	if err != nil {
-		return ErrInvalidSliceUUID
-	}
-
-	result, err := h.svc.Assign(c, tagID, sliceID)
 	if err != nil {
 		return err
 	}
@@ -153,6 +135,38 @@ func (h *HTTP) delete(c echo.Context) error {
 		return ErrNonNumericTagID
 	}
 	if err := h.svc.Delete(c, id); err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+// assign adds a tag to a slice
+func (h *HTTP) assign(c echo.Context) error {
+	tagID, err := strconv.Atoi(c.Param("tagid"))
+	if err != nil {
+		return ErrNonNumericTagID
+	}
+	sliceID, err := uuid.Parse(c.Param("sliceid"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+	if err := h.svc.Assign(c, tagID, sliceID); err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+// remove deletes a tag from a slice
+func (h *HTTP) remove(c echo.Context) error {
+	tagID, err := strconv.Atoi(c.Param("tagid"))
+	if err != nil {
+		return ErrNonNumericTagID
+	}
+	sliceID, err := uuid.Parse(c.Param("sliceid"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+	if err := h.svc.Remove(c, tagID, sliceID); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusOK)

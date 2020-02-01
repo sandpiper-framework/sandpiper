@@ -48,23 +48,6 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Tag) (resp *sandpiper
 	return ls.Service.Create(c, req)
 }
 
-// Assign logging
-func (ls *LogService) Assign(c echo.Context, tagID int, sliceID uuid.UUID) (resp *sandpiper.SliceTag, err error) {
-	defer func(begin time.Time) {
-		ls.logger.Log(
-			c,
-			source, "assign request", err,
-			map[string]interface{}{
-				"tagID":   tagID,
-				"sliceID": sliceID,
-				"resp":    resp,
-				"took":    time.Since(begin),
-			},
-		)
-	}(time.Now())
-	return ls.Service.Assign(c, tagID, sliceID)
-}
-
 // List logging
 func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Tag, err error) {
 	defer func(begin time.Time) {
@@ -126,4 +109,36 @@ func (ls *LogService) Update(c echo.Context, req *tag.Update) (resp *sandpiper.T
 		)
 	}(time.Now())
 	return ls.Service.Update(c, req)
+}
+
+// Assign logging
+func (ls *LogService) Assign(c echo.Context, tagID int, sliceID uuid.UUID) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "assign request", err,
+			map[string]interface{}{
+				"tagID":   tagID,
+				"sliceID": sliceID,
+				"took":    time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Assign(c, tagID, sliceID)
+}
+
+// Remove logging
+func (ls *LogService) Remove(c echo.Context, tagID int, sliceID uuid.UUID) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "assign request", err,
+			map[string]interface{}{
+				"tagID":   tagID,
+				"sliceID": sliceID,
+				"took":    time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Remove(c, tagID, sliceID)
 }

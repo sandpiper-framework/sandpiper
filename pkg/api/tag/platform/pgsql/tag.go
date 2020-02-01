@@ -27,8 +27,9 @@ func NewTag() *Tag {
 
 // Custom errors
 var (
-	// ErrAlreadyExists indicates the tag name is already used
-	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Tag name already exists.")
+	ErrAlreadyExists     = echo.NewHTTPError(http.StatusInternalServerError, "Tag name already exists.")
+	ErrTagDoesNotExist   = echo.NewHTTPError(http.StatusInternalServerError, "Cannot assign a tag ID that does not exist.")
+	ErrSliceDoesNotExist = echo.NewHTTPError(http.StatusInternalServerError, "Cannot assign to a slice ID that does not exist.")
 )
 
 // Create creates a new Tag in database (assumes allowed to do this)
@@ -41,15 +42,6 @@ func (s *Tag) Create(db orm.DB, tag sandpiper.Tag) (*sandpiper.Tag, error) {
 		return nil, err
 	}
 	return &tag, nil
-}
-
-// Assign adds a tag to a slice
-func (s *Tag) Assign(db orm.DB, tagID int, sliceID uuid.UUID) (*sandpiper.SliceTag, error) {
-	sliceTag := sandpiper.SliceTag{TagID: tagID, SliceID: sliceID}
-	if err := db.Insert(&sliceTag); err != nil {
-		return nil, err
-	}
-	return &sliceTag, nil
 }
 
 // View returns a single tag by ID with any associated slices (assumes allowed to do this)
@@ -85,6 +77,24 @@ func (s *Tag) Delete(db orm.DB, sub *sandpiper.Tag) error {
 	return db.Delete(sub)
 }
 
+// Assign adds a a slice_tag record
+func (s *Tag) Assign(db orm.DB, tagID int, sliceID uuid.UUID) error {
+	sliceTag := sandpiper.SliceTag{TagID: tagID, SliceID: sliceID}
+	if err := db.Insert(&sliceTag); err != nil {
+		if chk := checkAssignIDs(db, tagID, sliceID); chk != nil {
+			return chk
+		}
+		return err
+	}
+	return nil
+}
+
+// Remove deletes a slice_tag record by composite primary key
+func (s *Tag) Remove(db orm.DB, tagID int, sliceID uuid.UUID) error {
+	sliceTag := sandpiper.SliceTag{TagID: tagID, SliceID: sliceID}
+	return db.Delete(sliceTag)
+}
+
 // checkDuplicate returns true if name found in database
 func checkDuplicate(db orm.DB, name string) error {
 	// attempt to select by unique key
@@ -102,4 +112,30 @@ func checkDuplicate(db orm.DB, name string) error {
 	default: // return any other problem found
 		return err
 	}
+}
+
+func checkAssignIDs(db orm.DB, tagID int, sliceID uuid.UUID) error {
+	if !tagExists(db, tagID) {
+		return ErrTagDoesNotExist
+	}
+	if !sliceExists(db, sliceID) {
+		return ErrSliceDoesNotExist
+	}
+	return nil
+}
+
+func tagExists(db orm.DB, tagID int) bool {
+	m := &sandpiper.Tag{ID: tagID}
+	err := db.Model(m).Column("id").WherePK().Select()
+	// return true if found (nil) or any error besides not found
+	// return false if not found (ErrNoRows) or any other error
+	return (err == nil) || (err != pg.ErrNoRows)
+}
+
+func sliceExists(db orm.DB, sliceID uuid.UUID) bool {
+	m := &sandpiper.Slice{ID: sliceID}
+	err := db.Model(m).Column("id").WherePK().Select()
+	// return true if found (nil) or any error besides not found
+	// return false if not found (ErrNoRows) or any other error
+	return (err == nil) || (err != pg.ErrNoRows)
 }

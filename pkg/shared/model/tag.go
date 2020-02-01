@@ -26,7 +26,7 @@ type Tag struct {
 
 // SliceTag represents the many-to-many junction table
 type SliceTag struct {
-	TagID   int       `json:"-" pg:",pk"`
+	TagID   int       `json:"tag_id" pg:",pk"`
 	SliceID uuid.UUID `json:"slice_id" pg:",pk"`
 }
 
