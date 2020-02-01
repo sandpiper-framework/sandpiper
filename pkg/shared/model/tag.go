@@ -24,8 +24,8 @@ type Tag struct {
 	Slices      []*Slice  `json:"slices,omitempty" pg:"many2many:slice_tags"`
 }
 
-// SliceTags represents the many-to-many junction table
-type SliceTags struct {
+// SliceTag represents the many-to-many junction table
+type SliceTag struct {
 	TagID   int       `json:"-" pg:",pk"`
 	SliceID uuid.UUID `json:"slice_id" pg:",pk"`
 }
@@ -62,5 +62,5 @@ func (b *Tag) BeforeUpdate(ctx context.Context) (context.Context, error) {
 func init() {
 	// Register many to many model so ORM can better recognize m2m relation.
 	// This should be done before dependant models are used.
-	orm.RegisterTable((*SliceTags)(nil))
+	orm.RegisterTable((*SliceTag)(nil))
 }

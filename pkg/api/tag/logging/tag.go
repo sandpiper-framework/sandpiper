@@ -9,6 +9,7 @@ package tag
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/tag"
@@ -45,6 +46,23 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Tag) (resp *sandpiper
 		)
 	}(time.Now())
 	return ls.Service.Create(c, req)
+}
+
+// Assign logging
+func (ls *LogService) Assign(c echo.Context, tagID int, sliceID uuid.UUID) (resp *sandpiper.SliceTag, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "assign request", err,
+			map[string]interface{}{
+				"tagID":   tagID,
+				"sliceID": sliceID,
+				"resp":    resp,
+				"took":    time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Assign(c, tagID, sliceID)
 }
 
 // List logging

@@ -9,6 +9,7 @@ package tag
 import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/tag/platform/pgsql"
@@ -18,6 +19,7 @@ import (
 // Service represents tag application interface
 type Service interface {
 	Create(echo.Context, sandpiper.Tag) (*sandpiper.Tag, error)
+	Assign(echo.Context, int, uuid.UUID) (*sandpiper.SliceTag, error)
 	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Tag, error)
 	View(echo.Context, int) (*sandpiper.Tag, error)
 	Delete(echo.Context, int) error
@@ -50,6 +52,7 @@ type Securer interface {
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
 	Create(orm.DB, sandpiper.Tag) (*sandpiper.Tag, error)
+	Assign(orm.DB, int, uuid.UUID) (*sandpiper.SliceTag, error)
 	View(orm.DB, int) (*sandpiper.Tag, error)
 	List(orm.DB, *sandpiper.Pagination) ([]sandpiper.Tag, error)
 	Update(orm.DB, *sandpiper.Tag) error

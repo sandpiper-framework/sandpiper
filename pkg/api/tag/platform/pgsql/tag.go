@@ -7,10 +7,12 @@ package pgsql
 // tag service database access
 
 import (
+	"net/http"
+
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"net/http"
 
 	"autocare.org/sandpiper/pkg/shared/model"
 )
@@ -39,6 +41,15 @@ func (s *Tag) Create(db orm.DB, tag sandpiper.Tag) (*sandpiper.Tag, error) {
 		return nil, err
 	}
 	return &tag, nil
+}
+
+// Assign adds a tag to a slice
+func (s *Tag) Assign(db orm.DB, tagID int, sliceID uuid.UUID) (*sandpiper.SliceTag, error) {
+	sliceTag := sandpiper.SliceTag{TagID: tagID, SliceID: sliceID}
+	if err := db.Insert(&sliceTag); err != nil {
+		return nil, err
+	}
+	return &sliceTag, nil
 }
 
 // View returns a single tag by ID with any associated slices (assumes allowed to do this)
@@ -80,7 +91,7 @@ func checkDuplicate(db orm.DB, name string) error {
 	m := new(sandpiper.Tag)
 	err := db.Model(m).
 		Column("id").
-		Where("name = ?", name).		// already lower-case
+		Where("name = ?", name). // already lower-case
 		Select()
 
 	switch err {

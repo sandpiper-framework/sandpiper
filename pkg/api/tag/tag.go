@@ -6,6 +6,7 @@
 package tag
 
 import (
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/shared/model"
@@ -20,6 +21,13 @@ func (s *Tag) Create(c echo.Context, req sandpiper.Tag) (*sandpiper.Tag, error) 
 		return nil, err
 	}
 	return s.sdb.Create(s.db, req)
+}
+
+func (s *Tag) Assign(c echo.Context, tagID int, sliceID uuid.UUID) (*sandpiper.SliceTag, error) {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+		return nil, err
+	}
+	return s.sdb.Assign(s.db, tagID, sliceID)
 }
 
 // List returns list of tags that you can view

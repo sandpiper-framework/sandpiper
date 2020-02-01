@@ -50,8 +50,8 @@ func (b *Slice) BeforeUpdate(ctx context.Context) (context.Context, error) {
 // SliceArray is an array of slices
 type SliceArray []Slice
 
-// The SliceIDs method creates an array of slice_ids
-func (a SliceArray) SliceIDs() []uuid.UUID {
+// The IDs method creates an array of slice_ids
+func (a SliceArray) IDs() []uuid.UUID {
 	var ids = make([]uuid.UUID, 0, len(a))
 
 	for _, slice := range a {

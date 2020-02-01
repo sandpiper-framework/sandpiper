@@ -107,7 +107,6 @@ func (s *Grain) List(db orm.DB, payload bool, sc *sandpiper.Scope, p *sandpiper.
 		cols = cols + ", payload"
 	}
 
-	//todo: decide if we really need to return the slice as well.
 	if sc != nil {
 		// Use CTE query to get all subscriptions for the scope (i.e. the company)
 		err = db.Model((*sandpiper.Subscription)(nil)).
@@ -119,9 +118,7 @@ func (s *Grain) List(db orm.DB, payload bool, sc *sandpiper.Scope, p *sandpiper.
 			Limit(p.Limit).Offset(p.Offset).Select(&grains)
 	} else {
 		// simple case with no scoping
-		err = db.Model(&grains).
-			ColumnExpr(cols).
-			Relation("Slice").Limit(p.Limit).Offset(p.Offset).Select()
+		err = db.Model(&grains).ColumnExpr(cols).Limit(p.Limit).Offset(p.Offset).Select()
 	}
 	if err != nil {
 		return nil, err
@@ -137,7 +134,6 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 
 // validateNewGrain makes sure we can add this grain
 func validateNewGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
-
 	// attempt to select by unique keys
 	m := new(sandpiper.Grain)
 	err := db.Model(m).

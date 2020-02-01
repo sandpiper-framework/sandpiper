@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/tag"
@@ -26,16 +27,19 @@ func NewHTTP(svc tag.Service, er *echo.Group) {
 	h := HTTP{svc}
 
 	er.POST("/tags", h.create)
+	er.POST("/tags/:tagid/slices/:sliceid", h.assign)
 	er.GET("/tags", h.list)
 	er.GET("/tags/:id", h.view)
 	er.PATCH("/tags/:id", h.update)
 	er.DELETE("/tags/:id", h.delete)
+	//er.DELETE("/tags/:id/slices/:id", h.remove)
 }
 
 // Custom errors
 var (
 	// ErrNonNumericTagID indicates a malformed url parameter
-	ErrNonNumericTagID = echo.NewHTTPError(http.StatusBadRequest, "non-numeric tag id")
+	ErrNonNumericTagID  = echo.NewHTTPError(http.StatusBadRequest, "non-numeric tag id")
+	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "invalid slice uuid")
 )
 
 // Tag create request
@@ -62,6 +66,24 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	result, err := h.svc.Create(c, *t)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, result)
+}
+
+// assign adds a tag to a slice
+func (h *HTTP) assign(c echo.Context) error {
+	tagID, err := strconv.Atoi(c.Param("tagid"))
+	if err != nil {
+		return ErrNonNumericTagID
+	}
+	sliceID, err := uuid.Parse(c.Param("sliceid"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+
+	result, err := h.svc.Assign(c, tagID, sliceID)
 	if err != nil {
 		return err
 	}

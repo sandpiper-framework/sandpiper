@@ -15,7 +15,7 @@ type TagQuery struct {
 	TagList []string
 }
 
-// NewTagQuery returns a new tag query structure
+// NewTagQuery returns a new tag query structure with parsed tags
 func NewTagQuery(params url.Values) *TagQuery {
 	tq := new(TagQuery)
 	for k, v := range params {
@@ -25,7 +25,7 @@ func NewTagQuery(params url.Values) *TagQuery {
 			tq.TagList = strings.Split(tags, ",")
 			return tq
 		}
-		if k == "tags-any" {
+		if k == "tags-all" {
 			tq.TagList = strings.Split(tags, ",")
 			return tq
 		}

@@ -127,9 +127,23 @@ INNER JOIN tags ON slice_tags.tag_id = tags.id
 WHERE tags.name IN ('brake_products', 'wiper_products')
 GROUP By slices.id, tags.name
 
----
+CTE
+
+WITH "scope" AS (
+	SELECT slices.id FROM Slices
+	INNER JOIN slice_tags ON Slices.id = slice_tags.slice_id
+	INNER JOIN tags ON slice_tags.tag_id = tags.id
+	WHERE tags.name IN ('brake_products', 'wiper_products')
+	GROUP By slices.id
+)
 SELECT "slice"."id", "slice"."name", "slice"."content_hash", "slice"."content_count", "slice"."content_date", "slice"."created_at", "slice"."updated_at"
-FROM "slices" AS "slice" ORDER BY "name" LIMIT 100%
+FROM "scope" JOIN "slices" AS "slice" ON slice.id = scope.id ORDER BY "name" LIMIT 100
+
+---
+CURRENT:
+
+SELECT "slice"."id", "slice"."name", "slice"."content_hash", "slice"."content_count", "slice"."content_date", "slice"."created_at", "slice"."updated_at"
+FROM "slices" AS "slice" ORDER BY "name" LIMIT 100
 
 SELECT "subscriptions".*, "company"."id", "company"."name", "company"."sync_addr", "company"."active", "company"."created_at", "company"."updated_at"
 FROM "companies" AS "company"
@@ -163,7 +177,7 @@ func (s *Slice) List(db orm.DB, tags *sandpiper.TagQuery, sc *sandpiper.Scope, p
 
 	// look up metadata for all slices returned above (using an "in" list)
 	var meta sandpiper.MetaArray
-	ids := slices.SliceIDs()
+	ids := slices.IDs()
 
 	err = db.Model(&meta).Where("slice_id in (?)", pg.In(ids)).Select()
 	if err != nil {

@@ -27,7 +27,7 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 	h := HTTP{svc}
 	sr := er.Group("/slices")
 	sr.POST("", h.create)
-	sr.GET("", h.list) // filter by tags (/slices?tags=aaa,bbb or /slices?tags-any=aaa,bbb)
+	sr.GET("", h.list) // filter by tags (/slices?tags=aaa,bbb or /slices?tags-all=aaa,bbb)
 	sr.GET("/:id", h.view)
 	sr.PATCH("/:id", h.update)
 	sr.DELETE("/:id", h.delete)
@@ -87,7 +87,7 @@ type listResponse struct {
 }
 
 func (h *HTTP) list(c echo.Context) error {
-	// allow slices filtered by tags (/slices?tags=aaa,bbb or /slices?tags-any=aaa,bbb)
+	// allow slices filtered by tags (/slices?tags=aaa,bbb or /slices?tags-all=aaa,bbb)
 	tags := sandpiper.NewTagQuery(c.QueryParams())
 
 	p := new(sandpiper.PaginationReq)
