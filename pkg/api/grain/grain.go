@@ -26,7 +26,6 @@ func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error
 	au := s.rbac.CurrentUser(c)
 	if !au.AtLeast(sandpiper.AdminRole) {
 		// make sure the grain is subscribed to this user's company
-		//return s.sdb.ViewBySub(s.db, au.CompanyID, grainID)
 		if !s.sdb.CompanySubscribed(s.db, au.CompanyID, grainID) {
 			return nil, echo.ErrForbidden
 		}

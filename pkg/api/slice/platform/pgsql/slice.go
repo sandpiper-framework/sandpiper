@@ -19,6 +19,12 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
+// Custom errors
+var (
+	// ErrAlreadyExists indicates the slice name is already used
+	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Slice name already exists.")
+)
+
 // Slice represents the client for slice table
 type Slice struct{}
 
@@ -27,11 +33,61 @@ func NewSlice() *Slice {
 	return &Slice{}
 }
 
-// Custom errors
-var (
-	// ErrAlreadyExists indicates the slice name is already used
-	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Slice name already exists.")
-)
+// Slices holds multiple slice records returned from the database
+type Slices []sandpiper.Slice
+
+// The IDs method creates an array of slice_ids
+func (a Slices) IDs() []uuid.UUID {
+	var ids = make([]uuid.UUID, 0, len(a))
+
+	for _, slice := range a {
+		ids = append(ids, slice.ID)
+	}
+	return ids
+}
+
+// FilterByTags creates a new Slices array using the tag query
+func (a Slices) FilterByTags(db orm.DB, tags *sandpiper.TagQuery) (Slices, error) {
+	var tagged Slices
+
+	if tags.IsUnion { // slice must include at least one of the tags (union)
+		err := db.Model(&tagged).Column("slice.id").
+			Join("INNER JOIN slice_tags AS st ON slice.id = st.slice_id").
+			Join("INNER JOIN tags AS t ON st.tag_id = t.id").
+			Where("t.name IN (?)", pg.In(tags.TagList)).
+			Group("slice.id").Select()
+		if err != nil {
+			return nil, err
+		}
+	} else { // slice must include all of the tags (intersection)
+		err := db.Model(&tagged).Column("slice.id").
+			Join("INNER JOIN slice_tags AS st ON slice.id = st.slice_id").
+			Join("INNER JOIN tags AS t ON st.tag_id = t.id").
+			Where("t.name IN (?)", pg.In(tags.TagList)).
+			Group("slice.id").
+			Having("COUNT(slice.id) = ?", tags.Count()).Select()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// put tagged slice ids in a set (map) for fast access
+	taggedSet := make(map[uuid.UUID]bool)
+	for _, slice := range tagged {
+		taggedSet[slice.ID] = true
+	}
+
+	// run through all received slices "a" and if found in tagged set, add to results
+	// use "filtering without allocating" (https://github.com/golang/go/wiki/SliceTricks)
+	results := a[:0]
+	for _, slice := range a {
+		if taggedSet[slice.ID] {
+			results = append(results, slice)
+		}
+	}
+
+	return results, nil
+}
 
 // Create adds a new slice with optional metadata (assumes allowed to do this)
 func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
@@ -99,34 +155,6 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 /*
 todo: use these queries as a basis for filtering slices by tags (maybe as a CTE?)
 
-Intersection (AND)
-Query for bookmark,webservice,semweb
-
-SELECT b.*
-FROM tagmap bt, bookmark b, tag t
-WHERE bt.tag_id = t.tag_id
-AND (t.name IN ('bookmark', 'webservice', 'semweb'))
-AND b.id = bt.bookmark_id
-GROUP BY b.id
-HAVING COUNT( b.id )=3
-
-Union (OR)
-Query for bookmark,webservice,semweb
-
-SELECT b.*
-FROM tagmap bt, bookmark b, tag t
-WHERE bt.tag_id = t.tag_id
-AND (t.name IN ('bookmark', 'webservice', 'semweb'))
-AND b.id = bt.bookmark_id
-GROUP BY b.id
-
-SELECT slices.id, slices.name, tags.name
-FROM Slices
-INNER JOIN slice_tags ON Slices.id = slice_tags.slice_id
-INNER JOIN tags ON slice_tags.tag_id = tags.id
-WHERE tags.name IN ('brake_products', 'wiper_products')
-GROUP By slices.id, tags.name
-
 CTE
 
 WITH "scope" AS (
@@ -139,7 +167,6 @@ WITH "scope" AS (
 SELECT "slice"."id", "slice"."name", "slice"."content_hash", "slice"."content_count", "slice"."content_date", "slice"."created_at", "slice"."updated_at"
 FROM "scope" JOIN "slices" AS "slice" ON slice.id = scope.id ORDER BY "name" LIMIT 100
 
----
 CURRENT:
 
 SELECT "slice"."id", "slice"."name", "slice"."content_hash", "slice"."content_count", "slice"."content_date", "slice"."created_at", "slice"."updated_at"
@@ -158,7 +185,7 @@ WHERE (slice_id in ('1b40204a-7acd-4c78-a3c4-0fa95d2f00f6','2bea8308-1840-4802-a
 
 // List returns a list of all slices limited by scope and paginated
 func (s *Slice) List(db orm.DB, tags *sandpiper.TagQuery, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
-	var slices sandpiper.SliceArray
+	var slices Slices
 
 	// filter function adds optional condition to "Companies" relationship
 	var filterFn = func(q *orm.Query) (*orm.Query, error) {
@@ -173,6 +200,19 @@ func (s *Slice) List(db orm.DB, tags *sandpiper.TagQuery, sc *sandpiper.Scope, p
 		Order("name").Select()
 	if err != nil {
 		return nil, err
+	}
+
+	// create new Slices limited to TagQuery (if one was provided)
+	if tags.Provided() {
+		filtered, err := slices.FilterByTags(db, tags)
+		if err != nil {
+			return nil, err
+		}
+		slices = filtered
+	}
+
+	if len(slices) == 0 {
+		return slices, nil
 	}
 
 	// look up metadata for all slices returned above (using an "in" list)

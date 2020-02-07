@@ -50,7 +50,6 @@ type Repository interface {
 	Create(orm.DB, sandpiper.Grain) (*sandpiper.Grain, error)
 	CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.UUID) bool
 	View(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
-	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Grain, error)
 	List(orm.DB, bool, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	Delete(orm.DB, uuid.UUID) error
 }

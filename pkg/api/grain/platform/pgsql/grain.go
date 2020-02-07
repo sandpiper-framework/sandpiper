@@ -65,23 +65,6 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	return grain, nil
 }
 
-// ViewBySub returns a single grain by ID if included in company subscriptions.
-// todo: is this necessary? it doesn't currently work!
-func (s *Grain) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Grain, error) {
-	var grain = &sandpiper.Grain{ID: sliceID}
-
-	err := db.Model(grain).
-		Relation("Slice").
-		Relation("Slice.Subscription").
-		Where("slice_id = ? and company_id = ?", sliceID, companyID).
-		Select()
-
-	if err != nil {
-		return nil, err
-	}
-	return grain, nil
-}
-
 // CompanySubscribed checks if grain is included in a company's subscriptions.
 func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.UUID) bool {
 	grain := new(sandpiper.Grain)

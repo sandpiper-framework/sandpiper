@@ -19,7 +19,7 @@ type TagQuery struct {
 func NewTagQuery(params url.Values) *TagQuery {
 	tq := new(TagQuery)
 	for k, v := range params {
-		tags := strings.ReplaceAll(v[0]," ", "")
+		tags := strings.ReplaceAll(v[0], " ", "")
 		if k == "tags" {
 			tq.IsUnion = true
 			tq.TagList = strings.Split(tags, ",")
@@ -31,4 +31,14 @@ func NewTagQuery(params url.Values) *TagQuery {
 		}
 	}
 	return nil
+}
+
+// Provided checks to see if a tag query was included in the url
+func (q *TagQuery) Provided() bool {
+  return len(q.TagList)>0
+}
+
+// Count returns the number of tags provided in the query
+func (q *TagQuery) Count() int {
+	return len(q.TagList)
 }

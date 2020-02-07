@@ -4,6 +4,8 @@
 
 package transport_test
 
+// grain service
+
 import (
 	"bytes"
 	"encoding/json"
@@ -17,8 +19,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/api/slice"
-	"autocare.org/sandpiper/pkg/api/slice/transport"
+	"autocare.org/sandpiper/pkg/api/grain"
+	"autocare.org/sandpiper/pkg/api/grain/transport"
 	"autocare.org/sandpiper/pkg/shared/mock"
 	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
 	"autocare.org/sandpiper/pkg/shared/model"
@@ -30,8 +32,8 @@ func TestCreate(t *testing.T) {
 		name       string
 		req        string
 		wantStatus int
-		wantResp   *sandpiper.Slice
-		udb        *mockdb.Slice
+		wantResp   *sandpiper.Grain
+		udb        *mockdb.Grain
 		rbac       *mock.RBAC
 	}{
 		{
@@ -73,15 +75,15 @@ func TestCreate(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.Slice{
-				CreateFn: func(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, error) {
-					slice.ID = mock.TestUUID(1)
-					slice.CreatedAt = mock.TestTime(2018)
-					slice.UpdatedAt = mock.TestTime(2018)
-					return &slice, nil
+			udb: &mockdb.Grain{
+				CreateFn: func(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, error) {
+					grain.ID = mock.TestUUID(1)
+					grain.CreatedAt = mock.TestTime(2018)
+					grain.UpdatedAt = mock.TestTime(2018)
+					return &grain, nil
 				},
 			},
-			wantResp: &sandpiper.Slice{
+			wantResp: &sandpiper.Grain{
 				ID:        mock.TestUUID(1),
 				Name:      "AAP Brakes",
 				CreatedAt: mock.TestTime(2018),
@@ -95,17 +97,17 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(slice.New(nil, tt.udb, tt.rbac, nil), rg)
+			transport.NewHTTP(grain.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/slices"
+			path := ts.URL + "/grains"
 			res, err := http.Post(path, "application/json", bytes.NewBufferString(tt.req))
 			if err != nil {
 				t.Fatal(err)
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.Slice)
+				response := new(sandpiper.Grain)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -118,7 +120,7 @@ func TestCreate(t *testing.T) {
 
 func TestList(t *testing.T) {
 	type listResponse struct {
-		Slices []sandpiper.Slice `json:"slices"`
+		Grains []sandpiper.Grain `json:"grains"`
 		Page   int               `json:"page"`
 	}
 	cases := []struct {
@@ -126,7 +128,7 @@ func TestList(t *testing.T) {
 		req        string
 		wantStatus int
 		wantResp   *listResponse
-		udb        *mockdb.Slice
+		udb        *mockdb.Grain
 		rbac       *mock.RBAC
 	}{
 		{
@@ -160,10 +162,10 @@ func TestList(t *testing.T) {
 						Email:     "john@mail.com",
 					}
 				}},
-			udb: &mockdb.Slice{
-				ListFn: func(db orm.DB, q *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+			udb: &mockdb.Grain{
+				ListFn: func(db orm.DB, q *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 					if p.Limit == 100 && p.Offset == 100 {
-						return []sandpiper.Slice{
+						return []sandpiper.Grain{
 							{
 								ID:        mock.TestUUID(1),
 								Name:      "AAP Brakes",
@@ -183,7 +185,7 @@ func TestList(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &listResponse{
-				Slices: []sandpiper.Slice{
+				Grains: []sandpiper.Grain{
 					{
 						ID:        mock.TestUUID(1),
 						Name:      "AAP Brakes",
@@ -204,10 +206,10 @@ func TestList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(slice.New(nil, tt.udb, tt.rbac, nil), rg)
+			transport.NewHTTP(grain.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/slices" + tt.req
+			path := ts.URL + "/grains" + tt.req
 			res, err := http.Get(path)
 			if err != nil {
 				t.Fatal(err)
@@ -230,8 +232,8 @@ func TestView(t *testing.T) {
 		name       string
 		req        string
 		wantStatus int
-		wantResp   *sandpiper.Slice
-		udb        *mockdb.Slice
+		wantResp   *sandpiper.Grain
+		udb        *mockdb.Grain
 		rbac       *mock.RBAC
 	}{
 		{
@@ -257,9 +259,9 @@ func TestView(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.Slice{
-				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
-					return &sandpiper.Slice{
+			udb: &mockdb.Grain{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
+					return &sandpiper.Grain{
 						ID:        mock.TestUUID(1),
 						Name:      "AAP Brakes",
 						CreatedAt: mock.TestTime(2000),
@@ -268,7 +270,7 @@ func TestView(t *testing.T) {
 				},
 			},
 			wantStatus: http.StatusOK,
-			wantResp: &sandpiper.Slice{
+			wantResp: &sandpiper.Grain{
 				ID:        mock.TestUUID(1),
 				Name:      "AAP Brakes",
 				CreatedAt: mock.TestTime(2000),
@@ -281,17 +283,17 @@ func TestView(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(slice.New(nil, tt.udb, tt.rbac, nil), rg)
+			transport.NewHTTP(grain.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/slices/" + tt.req
+			path := ts.URL + "/grains/" + tt.req
 			res, err := http.Get(path)
 			if err != nil {
 				t.Fatal(err)
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.Slice)
+				response := new(sandpiper.Grain)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -308,8 +310,8 @@ func TestUpdate(t *testing.T) {
 		req        string
 		id         string
 		wantStatus int
-		wantResp   *sandpiper.Slice
-		udb        *mockdb.Slice
+		wantResp   *sandpiper.Grain
+		udb        *mockdb.Grain
 		rbac       *mock.RBAC
 	}{
 		{
@@ -343,9 +345,9 @@ func TestUpdate(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.Slice{
-				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Slice, error) {
-					return &sandpiper.Slice{
+			udb: &mockdb.Grain{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
+					return &sandpiper.Grain{
 						ID:           mock.TestUUID(1),
 						Name:         "AAP Brakes",
 						ContentCount: 1,
@@ -353,14 +355,14 @@ func TestUpdate(t *testing.T) {
 						UpdatedAt:    mock.TestTime(2000),
 					}, nil
 				},
-				UpdateFn: func(db orm.DB, slice *sandpiper.Slice) error {
-					slice.UpdatedAt = mock.TestTime(2010)
-					slice.ContentCount = 2
+				UpdateFn: func(db orm.DB, grain *sandpiper.Grain) error {
+					grain.UpdatedAt = mock.TestTime(2010)
+					grain.ContentCount = 2
 					return nil
 				},
 			},
 			wantStatus: http.StatusOK,
-			wantResp: &sandpiper.Slice{
+			wantResp: &sandpiper.Grain{
 				ID:           mock.TestUUID(1),
 				Name:         "AAP Brakes",
 				ContentCount: 1,
@@ -376,10 +378,10 @@ func TestUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(slice.New(nil, tt.udb, tt.rbac, nil), rg)
+			transport.NewHTTP(grain.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/slices/" + tt.id
+			path := ts.URL + "/grains/" + tt.id
 			req, _ := http.NewRequest("PATCH", path, bytes.NewBufferString(tt.req))
 			req.Header.Set("Content-Type", "application/json")
 			res, err := client.Do(req)
@@ -388,7 +390,7 @@ func TestUpdate(t *testing.T) {
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.Slice)
+				response := new(sandpiper.Grain)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -405,7 +407,7 @@ func TestDelete(t *testing.T) {
 		id         string // to allow testing a bad request
 		cid        uuid.UUID
 		wantStatus int
-		mdb        *mockdb.Slice
+		mdb        *mockdb.Grain
 		rbac       *mock.RBAC
 	}{
 		{
@@ -417,9 +419,9 @@ func TestDelete(t *testing.T) {
 			name: "Fail on RBAC",
 			id:   mock.TestUUID(1).String(),
 			cid:  mock.TestUUID(1),
-			mdb: &mockdb.Slice{
-				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Slice, error) {
-					return &sandpiper.Slice{
+			mdb: &mockdb.Grain{
+				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Grain, error) {
+					return &sandpiper.Grain{
 						Name: "AAP Brakes",
 					}, nil
 				},
@@ -435,13 +437,13 @@ func TestDelete(t *testing.T) {
 			name: "Success",
 			id:   mock.TestUUID(1).String(),
 			cid:  mock.TestUUID(1),
-			mdb: &mockdb.Slice{
-				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Slice, error) {
-					return &sandpiper.Slice{
+			mdb: &mockdb.Grain{
+				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Grain, error) {
+					return &sandpiper.Grain{
 						Name: "AAP Brakes",
 					}, nil
 				},
-				DeleteFn: func(orm.DB, *sandpiper.Slice) error {
+				DeleteFn: func(orm.DB, *sandpiper.Grain) error {
 					return nil
 				},
 			},
@@ -460,10 +462,10 @@ func TestDelete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(slice.New(nil, tt.mdb, tt.rbac, nil), rg)
+			transport.NewHTTP(grain.New(nil, tt.mdb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/slices/" + tt.id
+			path := ts.URL + "/grains/" + tt.id
 			req, _ := http.NewRequest("DELETE", path, nil)
 			res, err := client.Do(req)
 			if err != nil {

@@ -81,6 +81,20 @@ func (h *HTTP) create(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+func (h *HTTP) view(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+
+	result, err := h.svc.View(c, id)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
 type listResponse struct {
 	Slices []sandpiper.Slice `json:"slices"`
 	Page   int               `json:"page"`
@@ -100,20 +114,6 @@ func (h *HTTP) list(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, listResponse{result, p.Page})
-}
-
-func (h *HTTP) view(c echo.Context) error {
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return ErrInvalidSliceUUID
-	}
-
-	result, err := h.svc.View(c, id)
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, result)
 }
 
 // Slice update request

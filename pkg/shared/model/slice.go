@@ -47,19 +47,6 @@ func (b *Slice) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-// SliceArray is an array of slices
-type SliceArray []Slice
-
-// The IDs method creates an array of slice_ids
-func (a SliceArray) IDs() []uuid.UUID {
-	var ids = make([]uuid.UUID, 0, len(a))
-
-	for _, slice := range a {
-		ids = append(ids, slice.ID)
-	}
-	return ids
-}
-
 // SliceMetadata contains information about a slice
 type SliceMetadata struct {
 	SliceID uuid.UUID `json:"-" pg:",pk"`
