@@ -33,11 +33,11 @@ func NewSlice() *Slice {
 	return &Slice{}
 }
 
-// Slices holds multiple slice records returned from the database
-type Slices []sandpiper.Slice
+// sliceList holds multiple slice records returned from the database
+type sliceList []sandpiper.Slice
 
 // The IDs method creates an array of slice_ids
-func (a Slices) IDs() []uuid.UUID {
+func (a sliceList) IDs() []uuid.UUID {
 	var ids = make([]uuid.UUID, 0, len(a))
 
 	for _, slice := range a {
@@ -47,8 +47,9 @@ func (a Slices) IDs() []uuid.UUID {
 }
 
 // FilterByTags creates a new Slices array using the tag query
-func (a Slices) FilterByTags(db orm.DB, tags *sandpiper.TagQuery) (Slices, error) {
-	var tagged Slices
+func (sl sliceList) FilterByTags(db orm.DB, tags *sandpiper.TagQuery) (sliceList, error) {
+	var tagged sliceList
+	// See "Toxi" Solution http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
 
 	if tags.IsUnion { // slice must include at least one of the tags (union)
 		err := db.Model(&tagged).Column("slice.id").
@@ -77,10 +78,10 @@ func (a Slices) FilterByTags(db orm.DB, tags *sandpiper.TagQuery) (Slices, error
 		taggedSet[slice.ID] = true
 	}
 
-	// run through all received slices "a" and if found in tagged set, add to results
+	// run through received slice list "sl" and add to results if found in tagged set
 	// use "filtering without allocating" (https://github.com/golang/go/wiki/SliceTricks)
-	results := a[:0]
-	for _, slice := range a {
+	results := sl[:0]
+	for _, slice := range sl {
 		if taggedSet[slice.ID] {
 			results = append(results, slice)
 		}
@@ -115,7 +116,6 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 }
 
 // View returns a single slice by ID with metadata and subscribed companies
-// (optionally limited to a company)
 func (s *Slice) View(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: sliceID}
 
@@ -185,7 +185,7 @@ WHERE (slice_id in ('1b40204a-7acd-4c78-a3c4-0fa95d2f00f6','2bea8308-1840-4802-a
 
 // List returns a list of all slices limited by scope and paginated
 func (s *Slice) List(db orm.DB, tags *sandpiper.TagQuery, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
-	var slices Slices
+	var slices sliceList
 
 	// filter function adds optional condition to "Companies" relationship
 	var filterFn = func(q *orm.Query) (*orm.Query, error) {

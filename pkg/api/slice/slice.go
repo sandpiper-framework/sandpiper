@@ -8,9 +8,16 @@ package slice
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"net/http"
 	"time"
 
 	"autocare.org/sandpiper/pkg/shared/model"
+)
+
+// Custom errors
+var (
+	// ErrTagsNotAllowed indicates the slice name is already used
+	ErrTagsNotAllowed = echo.NewHTTPError(http.StatusInternalServerError, "Not authorized for tagged queries")
 )
 
 // Create creates a new slice to hold data-objects
@@ -26,6 +33,11 @@ func (s *Slice) List(c echo.Context, tags *sandpiper.TagQuery, p *sandpiper.Pagi
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
+	}
+	au := s.rbac.CurrentUser(c)
+	if tags.Provided() && !au.AtLeast(sandpiper.AdminRole) {
+		// only admin can query by tags (internal structuring of slices)
+		return nil, ErrTagsNotAllowed
 	}
 	return s.sdb.List(s.db, tags, q, p)
 }

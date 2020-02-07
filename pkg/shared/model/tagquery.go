@@ -11,13 +11,15 @@ import (
 
 // TagQuery is used to store tag query parameters
 type TagQuery struct {
-	IsUnion bool
-	TagList []string
+	RawQuery string
+	IsUnion  bool
+	TagList  []string
 }
 
 // NewTagQuery returns a new tag query structure with parsed tags
-func NewTagQuery(params url.Values) *TagQuery {
+func NewTagQuery(params url.Values, q string) *TagQuery {
 	tq := new(TagQuery)
+	tq.RawQuery = q
 	for k, v := range params {
 		tags := strings.ReplaceAll(v[0], " ", "")
 		if k == "tags" {
@@ -35,7 +37,7 @@ func NewTagQuery(params url.Values) *TagQuery {
 
 // Provided checks to see if a tag query was included in the url
 func (q *TagQuery) Provided() bool {
-  return len(q.TagList)>0
+	return len(q.TagList) > 0
 }
 
 // Count returns the number of tags provided in the query

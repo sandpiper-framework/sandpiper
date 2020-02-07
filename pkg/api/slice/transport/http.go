@@ -102,7 +102,7 @@ type listResponse struct {
 
 func (h *HTTP) list(c echo.Context) error {
 	// allow slices filtered by tags (/slices?tags=aaa,bbb or /slices?tags-all=aaa,bbb)
-	tags := sandpiper.NewTagQuery(c.QueryParams())
+	tags := sandpiper.NewTagQuery(c.QueryParams(), c.QueryString())
 
 	p := new(sandpiper.PaginationReq)
 	if err := c.Bind(p); err != nil {

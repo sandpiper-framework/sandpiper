@@ -93,7 +93,15 @@ CREATE TABLE IF NOT EXISTS "grains" (
   "payload"      bytea,
   "created_at"   timestamp,
   CONSTRAINT "grain_type_key" UNIQUE("slice_id", "grain_type", "grain_key")
-); 
+);
+
+CREATE TABLE IF NOT EXISTS "slices" (
+  "id"         serial PRIMARY KEY,
+  "slice_id"   uuid REFERENCES "slices" ON DELETE CASCADE,
+  "message"    text,
+  "duration"   timestamp,
+  "created_at" timestamp
+);
 
 CREATE TABLE IF NOT EXISTS users (
   "id"               serial PRIMARY KEY,
