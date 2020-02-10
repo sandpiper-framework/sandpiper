@@ -1,0 +1,8 @@
+# sandpiper client configuration file
+
+server:
+  url: localhost
+  port: :4040
+  debug: true
+  read_timeout_seconds: 10
+  write_timeout_seconds: 5
