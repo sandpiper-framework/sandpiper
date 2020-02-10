@@ -11,7 +11,7 @@ import (
 	"log"
 	"os"
 
-	args "github.com/urfave/cli"
+	args "github.com/urfave/cli/v2"
 
 	"autocare.org/sandpiper/pkg/cli"
 	"autocare.org/sandpiper/pkg/cli/version"
@@ -23,6 +23,7 @@ func main() {
 	app := args.NewApp()
 	app.Name = "sandpiper"
 	app.Version = version.Version
+  app.Copyright = "Copyright Auto Care Association. All rights reserved."
 	app.Usage = "store & retrieve level-1 sandpiper objects"
 	app.Flags = cli.GlobalFlags
 	app.Commands = cli.Commands

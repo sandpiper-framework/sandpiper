@@ -2,9 +2,8 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package cli is the sandpiper command line interface
-// for changes and executes the sync.
-package cli
+// Package client is used to communicate with the api server
+package client
 
 import (
 	"bytes"
