@@ -87,4 +87,3 @@ func (s *Sync) Delete(db orm.DB, id int) error {
 	sync := sandpiper.Sync{ID: id}
 	return db.Delete(sync)
 }
-

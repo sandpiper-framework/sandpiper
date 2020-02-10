@@ -1,6 +1,8 @@
 ## Introduction
 
-Level 1 implementation of Sandpiper means syncing "file-based" data-objects. I think it makes sense to implement two CLI tools for Level 1. This functionality would be duplicated when we create the Admin screens, but should be much easier to implement than a full admin interface (since there is no UI and it just calls the exposed API). Plus it will be useful for early testing.
+Level 1 implementation of Sandpiper means syncing "file-based" data-objects. The `sandpiper` CLI tool supports the adding and pulling of Level 1 files.
+This functionality will be duplicated in the Admin screens, but is easier to implement than a full admin interface (since there is no UI and it just calls the exposed API)
+and allows for hands-free automation.
 
 ## Add File-Based Objects
 Implement the "add" command to add "file" data-objects to a slice in the pool. This command could be called by an internal PIM, for example, to "publish" completed delivery files.
@@ -9,22 +11,27 @@ Implement the "add" command to add "file" data-objects to a slice in the pool. T
 
 ```
 sandpiper add \
--u user         \ # database user
--p password     \ # database password, prompt if not supplied
--s "aap-slice"  \ # slice name
--t "aces-file"  \ # file-type
+-u user                  \ # database user
+-p password              \ # database password, prompt if not supplied
+-slice "aap-brake-pads"  \ # slice-name
+-type "aces-file"        \ # grain-type
+-key  "brakes"           \ # grain-key
+-noprompt                \ # don't prompt before over-writing
 -f "acme_brakes_full_2019-12-12.xml" # file to add
 ```
 
-This would add the ACES xml file as a data-object to the "aap-slice" slice.
+This command adds the ACES xml file as a grain as defined by the supplied request body (see below).
 
-The database connection information (including user and password) could be pulled from a "config" file. If the password is not provided, it would prompt for it.
+The sandpiper server url is pulled from the "config" file. If the password is not provided, it would prompt for it.
 
 Here is an example of a config.yml file.
 
 ```
-database:
-  psn: postgres://user:password@localhost:5432/sandpiper?sslmode=disabled
+server:
+  port: :4040
+  debug: true
+  read_timeout_seconds: 10
+  write_timeout_seconds: 5
 ```
   
 ### Sandpiper API
@@ -35,16 +42,16 @@ The following api is used to add an object with the sandpiper add command:
 POST /slice/{slice-name}
 ```
 
-The "request body" would look like this:
+The "response" would look like this:
 
 ```
 {
-  "token": "--jwt here--",
-  "oid": "da9fd323-151a-4035-82db-7b18e4ba6c79",
-  "type": "aces-file",
-  "payload":"MQkxOTk1CTEJNQkJCQkJCQkJCQkJCQk3NDE4MglNR0MJNDU3M ...",
-  ...
- }
+	"id": "0d5e171e-d3c2-4ddb-bd37-92fda5eca8a1",
+	"slice_id": "2bea8308-1840-4802-ad38-72b53e31594c",
+	"grain_type": "aces-file",
+	"grain_key": "disc-brakes",
+	"encoding": "gzipb64"
+}
 ```
  
 ## Pull File-Based Objects

@@ -31,6 +31,7 @@ func main() {
 	}
 
 	// Update the database if necessary
+
 	msg := database.Migrate(cfg.DB.URL(), embeddedFiles())
 	fmt.Println(msg)
 

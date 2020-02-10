@@ -28,6 +28,9 @@ func Migrate(psn string, bin *bindata.AssetSource) string {
 	}
 
 	v1, v2 := applyMigrations(m)
+	if v1 > v2 {
+		log.Fatalf("software version mismatch: db version (%d) is more current than program expects (%d)... update the software", v1, v2)
+	}
 
 	_, err = m.Close()
 	if err != nil {
@@ -59,6 +62,7 @@ func applyMigrations(m *migrate.Migrate) (uint, uint) {
 	return v1, v2
 }
 
+// getDatabaseVersion returns the current database version
 func getDatabaseVersion(m *migrate.Migrate) uint {
 	ver, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNilVersion {
