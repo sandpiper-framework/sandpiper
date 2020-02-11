@@ -31,6 +31,7 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 	sr.GET("/:id", h.view)
 	sr.PATCH("/:id", h.update)
 	sr.DELETE("/:id", h.delete)
+	sr.GET("/name/:name", h.viewByName)
 }
 
 // Custom errors
@@ -92,6 +93,14 @@ func (h *HTTP) view(c echo.Context) error {
 		return err
 	}
 
+	return c.JSON(http.StatusOK, result)
+}
+
+func (h *HTTP) viewByName(c echo.Context) error {
+	result, err := h.svc.ViewByName(c, c.Param("name"))
+	if err != nil {
+		return err
+	}
 	return c.JSON(http.StatusOK, result)
 }
 

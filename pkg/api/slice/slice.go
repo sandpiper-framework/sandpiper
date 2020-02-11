@@ -52,6 +52,17 @@ func (s *Slice) View(c echo.Context, sliceID uuid.UUID) (*sandpiper.Slice, error
 	return s.sdb.ViewBySub(s.db, au.CompanyID, sliceID)
 }
 
+// ViewByName returns a single slice by name if allowed
+func (s *Slice) ViewByName(c echo.Context, name string) (*sandpiper.Slice, error) {
+	au := s.rbac.CurrentUser(c)
+	companyID := au.CompanyID
+	if au.AtLeast(sandpiper.AdminRole) {
+		companyID = uuid.UUID{}
+	}
+	// make sure the slice is subscribed to the current user's company
+	return s.sdb.ViewByName(s.db, companyID, name)
+}
+
 // Update contains slice's information used for updating
 type Update struct {
 	ID           uuid.UUID

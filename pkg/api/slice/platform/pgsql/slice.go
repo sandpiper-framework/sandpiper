@@ -115,6 +115,8 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 	return &slice, nil
 }
 
+//todo: consider combining View() and ViewBySub() as we did with ViewByName() using a nil companyID
+
 // View returns a single slice by ID with metadata and subscribed companies
 func (s *Slice) View(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: sliceID}
@@ -135,13 +137,13 @@ func (s *Slice) View(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{ID: sliceID}
 
-	// this filter function adds a condition to the companies relationship
+	// this filter function adds a condition to the "companies" relationship
 	var filterFn = func(q *orm.Query) (*orm.Query, error) {
 		return q.Where("company_id = ?", companyID), nil
 	}
 
 	// get slice with subscribed companies
-	err := db.Model(slice).Column("slice.*").Relation("Companies", filterFn).WherePK().Select()
+	err := db.Model(slice).Relation("Companies", filterFn).WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
@@ -150,6 +152,32 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	slice.Metadata, err = metaDataMap(db, sliceID)
 
 	return slice, err
+}
+
+// ViewByName returns a single slice by slice-name optionally limited by company subscriptions
+func (s *Slice) ViewByName(db orm.DB, companyID uuid.UUID, name string) (*sandpiper.Slice, error) {
+	var slice = &sandpiper.Slice{Name: name}
+	var nilUUID = uuid.UUID{}
+
+	// this filter function can add a condition to the "companies" relationship
+	var filterFn = func(q *orm.Query) (*orm.Query, error) {
+		if companyID == nilUUID {
+			return q, nil
+		}
+		return q.Where("company_id = ?", companyID), nil
+	}
+
+	// get slice with subscribed companies
+	err := db.Model(slice).Relation("Companies", filterFn).Where("name = ?", name).Select()
+
+	if err != nil {
+		return nil, err
+	}
+
+	// insert any metadata for the slice as a map
+	slice.Metadata, err = metaDataMap(db, slice.ID)
+
+	return slice, nil
 }
 
 // List returns a list of all slices limited by scope and paginated

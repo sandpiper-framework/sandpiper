@@ -19,6 +19,7 @@ type Service interface {
 	Create(echo.Context, sandpiper.Slice) (*sandpiper.Slice, error)
 	List(echo.Context, *sandpiper.TagQuery, *sandpiper.Pagination) ([]sandpiper.Slice, error)
 	View(echo.Context, uuid.UUID) (*sandpiper.Slice, error)
+	ViewByName(echo.Context, string) (*sandpiper.Slice, error)
 	Delete(echo.Context, uuid.UUID) error
 	Update(echo.Context, *Update) (*sandpiper.Slice, error)
 }
@@ -51,6 +52,7 @@ type Repository interface {
 	Create(orm.DB, sandpiper.Slice) (*sandpiper.Slice, error)
 	View(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error)
+	ViewByName(orm.DB, uuid.UUID, string) (*sandpiper.Slice, error)
 	List(orm.DB, *sandpiper.TagQuery, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Slice, error)
 	Update(orm.DB, *sandpiper.Slice) error
 	Delete(orm.DB, *sandpiper.Slice) error

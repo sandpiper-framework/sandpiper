@@ -43,6 +43,7 @@ type createReq struct {
 	SliceID  uuid.UUID `json:"slice_id" validate:"required"`
 	Type     string    `json:"grain_type" validate:"required"`
 	Key      string    `json:"grain_key" validate:"required"`
+	Source   string    `json:"source"`
 	Encoding string    `json:"encoding" validate:"required"`
 	Payload  []byte    `json:"payload" validate:"required"`
 }
@@ -67,6 +68,7 @@ func (h *HTTP) create(c echo.Context) error {
 		SliceID:  &r.SliceID,
 		Type:     r.Type,
 		Key:      r.Key,
+		Source:   r.Source,
 		Encoding: r.Encoding,
 		Payload:  r.Payload,
 	})

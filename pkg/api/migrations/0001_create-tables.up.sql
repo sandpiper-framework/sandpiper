@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS "grains" (
   "grain_key"    text,
   "encoding"     encoding_enum,
   "payload"      bytea,
+  "source"       text,
   "created_at"   timestamp,
   CONSTRAINT "grain_type_key" UNIQUE("slice_id", "grain_type", "grain_key")
 );

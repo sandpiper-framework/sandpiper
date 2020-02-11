@@ -70,7 +70,7 @@ func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Slice
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "View slice request", err,
+			source, "View slice (by id) request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -79,6 +79,22 @@ func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Slice
 		)
 	}(time.Now())
 	return ls.Service.View(c, req)
+}
+
+// ViewByName logging
+func (ls *LogService) ViewByName(c echo.Context, req string) (resp *sandpiper.Slice, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "View slice (by name) request", err,
+			map[string]interface{}{
+				"req":  req,
+				"resp": resp,
+				"took": time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.ViewByName(c, req)
 }
 
 // Delete logging

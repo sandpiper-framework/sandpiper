@@ -11,13 +11,13 @@ Implement the "add" command to add "file" data-objects to a slice in the pool. T
 
 ```
 sandpiper add \
--u user                  \ # database user
--p password              \ # database password, prompt if not supplied
--slice "aap-brake-pads"  \ # slice-name
--type "aces-file"        \ # grain-type
--key  "brakes"           \ # grain-key
--noprompt                \ # don't prompt before over-writing
--f "acme_brakes_full_2019-12-12.xml" # file to add
+-u user                          \ # database user
+-p password                      \ # database password, prompt if not supplied
+-slice "aap-brake-pads"          \ # slice-name
+-type "aces-file"                \ # grain-type
+-key  "brakes"                   \ # grain-key
+-noprompt                        \ # don't prompt before over-writing
+acme_brakes_full_2019-12-12.xml    # file to add
 ```
 
 This command adds the ACES xml file as a grain as defined by the supplied request body (see below).
@@ -28,8 +28,8 @@ Here is an example of a config.yml file.
 
 ```
 server:
+  url: localhost
   port: :4040
-  debug: true
   read_timeout_seconds: 10
   write_timeout_seconds: 5
 ```
@@ -39,20 +39,22 @@ server:
 The following api is used to add an object with the sandpiper add command:
 
 ```
-POST /slice/{slice-name}
+POST /grains
 ```
 
-The "response" would look like this:
+The request "body" would look like this:
 
 ```
 {
-	"id": "0d5e171e-d3c2-4ddb-bd37-92fda5eca8a1",
 	"slice_id": "2bea8308-1840-4802-ad38-72b53e31594c",
 	"grain_type": "aces-file",
 	"grain_key": "disc-brakes",
 	"encoding": "gzipb64"
+    "payload": "--encoded payload data--"
 }
 ```
+
+The response would include the assigned grain "id" (but not the payload)
  
 ## Pull File-Based Objects
 

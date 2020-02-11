@@ -18,6 +18,7 @@ type Grain struct {
 	SliceID   *uuid.UUID  `json:"slice_id,omitempty"` // must be pointer for omitempty to work here!
 	Type      string      `json:"grain_type" pg:"grain_type"`
 	Key       string      `json:"grain_key" pg:"grain_key"`
+	Source    string      `json:"source"`
 	Encoding  string      `json:"encoding"`
 	Payload   PayloadData `json:"payload,omitempty"`
 	CreatedAt time.Time   `json:"created_at"`

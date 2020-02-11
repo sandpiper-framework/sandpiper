@@ -75,6 +75,17 @@ func (c *Client) ListUsers() ([]sandpiper.User, error) {
 	return users, err
 }
 
+func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
+	path := "/slices/name/" + name
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	var slice sandpiper.Slice
+	_, err = c.do(req, &slice)
+	return &slice, err
+}
+
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
 	rel := &url.URL{Path: path}
 	u := c.BaseURL.ResolveReference(rel)

@@ -41,7 +41,14 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Grain) (resp *sandpip
 		// suppress payload in log for req and resp
 		req.Payload = nil
 		if resp != nil {
-			g = &sandpiper.Grain{ID: resp.ID, SliceID: resp.SliceID, Type: resp.Type, Encoding: resp.Encoding}
+			g = &sandpiper.Grain{
+				ID:       resp.ID,
+				SliceID:  resp.SliceID,
+				Type:     resp.Type,
+				Key:      resp.Key,
+				Source:   resp.Source,
+				Encoding: resp.Encoding,
+			}
 		}
 		ls.logger.Log(
 			c,
@@ -75,11 +82,19 @@ func (ls *LogService) List(c echo.Context, payload bool, req *sandpiper.Paginati
 
 // View logging
 func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Grain, err error) {
-	// todo: consider a "debug" level that shows entire resp
+	// todo: consider a "debug" level that shows entire resp (including payload)
 	defer func(begin time.Time) {
 		var g *sandpiper.Grain
 		if resp != nil {
-			g = &sandpiper.Grain{ID: resp.ID, SliceID: resp.SliceID, Type: resp.Type, Encoding: resp.Encoding}
+			// suppress payload in log
+			g = &sandpiper.Grain{
+				ID:       resp.ID,
+				SliceID:  resp.SliceID,
+				Type:     resp.Type,
+				Key:      resp.Key,
+				Source:   resp.Source,
+				Encoding: resp.Encoding,
+			}
 		}
 		ls.logger.Log(
 			c,
