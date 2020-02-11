@@ -26,16 +26,16 @@ import (
 // GlobalFlags apply to all the commands
 var GlobalFlags = []args.Flag{
 	&args.StringFlag{
-		Name: "user",
-		Aliases: []string{"u"},
-		Usage: "api login name",
-		EnvVars: []string{"SANDPIPER_USER"},
+		Name:     "user",
+		Aliases:  []string{"u"},
+		Usage:    "api login name",
+		EnvVars:  []string{"SANDPIPER_USER"},
 		Required: true,
 	},
 	&args.StringFlag{
-		Name: "password",
+		Name:    "password",
 		Aliases: []string{"p"},
-		Usage: "api password",
+		Usage:   "api password",
 		EnvVars: []string{"SANDPIPER_PASSWORD"},
 	},
 }
@@ -50,31 +50,31 @@ var Commands = []*args.Command{
 		-noprompt                \ # don't prompt before over-writing
 		"acme_brakes_full_2019-12-12.xml" # file to add (accessed via c.Args().Get(0))
 		*/
-		Name:   "add",
-		Usage:  "add a file-based grain",
+		Name:      "add",
+		Usage:     "add a file-based grain",
 		ArgsUsage: "<unzipped-file-to-add>",
-		Action: command.Add,
-		Flags:  []args.Flag{
+		Action:    command.Add,
+		Flags: []args.Flag{
 			&args.StringFlag{
-				Name: "slice",
-				Aliases: []string{"s"},
-				Usage: "slice name",
+				Name:     "slice",
+				Aliases:  []string{"s"},
+				Usage:    "slice name",
 				Required: true,
 			},
 			&args.StringFlag{
-				Name: "type",
-				Aliases: []string{"t"},
-				Usage: "grain-type",
+				Name:     "type",
+				Aliases:  []string{"t"},
+				Usage:    "grain-type",
 				Required: true,
 			},
 			&args.StringFlag{
-				Name: "key",
-				Aliases: []string{"k"},
-				Usage: "grain-key",
+				Name:     "key",
+				Aliases:  []string{"k"},
+				Usage:    "grain-key",
 				Required: true,
 			},
 			&args.BoolFlag{
-				Name: "noprompt",
+				Name:  "noprompt",
 				Usage: "do not prompt before over-writing a grain (default is to prompt)",
 				Value: false,
 			},

@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/base64"
+	"io"
 	"io/ioutil"
 )
 
@@ -15,8 +16,8 @@ import (
  * Usage:
  *   import "autocare.org/sandpiper/pkg/shared/payload"
  *
- *   rawBytes := []byte("payload data to store")
- *   payloadData, err := sandpiper.Encode(rawBytes)
+ *   data := bytes.NewReader([]byte("payload data to store"))
+ *   payloadData, err := sandpiper.Encode(data)
  *
  *   rawBytes, err := payloadData.Decode()
  */
@@ -25,14 +26,15 @@ import (
 type PayloadData []byte
 
 // Encode payload data for transmission and storage
-func Encode(b []byte) (PayloadData, error) {
+func Encode(b io.Reader) (PayloadData, error) {
 	var zipped bytes.Buffer
 
 	// zip source data into local buffer
 	gz, _ := gzip.NewWriterLevel(&zipped, gzip.BestCompression)
-	if _, err := gz.Write(b); err != nil {
+	if _, err := io.Copy(gz, b); err != nil {
 		return nil, err
 	}
+
 	if err := gz.Flush(); err != nil {
 		return nil, err
 	}

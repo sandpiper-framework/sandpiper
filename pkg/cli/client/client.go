@@ -8,22 +8,26 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
 
-	//"github.com/ddliu/go-httpclient"
+	//"github.com/ddliu/go-httpclient" use this for reference
 
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
+// Client represents the http client
 type Client struct {
 	BaseURL    *url.URL // basePath holds the path to prepend to the requests.
 	UserAgent  string
+	Auth       *sandpiper.AuthToken
 	httpClient *http.Client // client used to send and receive http requests.
 }
 
+// New creates a new http client for the given sandpiper server url
 func New(baseURL *url.URL) *Client {
 	netClient := &http.Client{
 		Timeout: 10 * time.Second,
@@ -35,6 +39,30 @@ func New(baseURL *url.URL) *Client {
 		httpClient: netClient,
 	}
 	return c
+}
+
+// Login to the sandpiper server
+func (c *Client) Login(username, password string) error {
+	body := fmt.Sprintf("{\"username\": \"%s\", \"password\": \"%s\"}", username, password)
+	req, err := c.newRequest("POST", "/login", body)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, c.Auth)
+	return err
+}
+
+func (c *Client) Add(grain *sandpiper.Grain) error {
+	body, err := json.Marshal(grain)
+	if err != nil {
+		return err
+	}
+	req, err := c.newRequest("POST", "/grains", body)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, nil)
+	return err
 }
 
 func (c *Client) ListUsers() ([]sandpiper.User, error) {
@@ -67,6 +95,9 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", c.UserAgent)
+	if c.Auth != nil {
+		req.Header.Set("Authorization", "Bearer "+c.Auth.Token)
+	}
 	return req, nil
 }
 

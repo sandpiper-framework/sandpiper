@@ -6,6 +6,7 @@ package sandpiper_test
 
 import (
 	"autocare.org/sandpiper/pkg/shared/model"
+	"bytes"
 	"testing"
 )
 
@@ -20,7 +21,8 @@ func TestEncode(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := sandpiper.Encode(test.src)
+			data := bytes.NewReader(test.src)
+			got, err := sandpiper.Encode(data)
 			if (err != nil) != test.wantErr {
 				t.Errorf("error = %v, wantErr %v", err, test.wantErr)
 				return
@@ -59,7 +61,8 @@ func TestPayloadData(t *testing.T) {
 	src := []byte("sandpiper rocks!")
 
 	t.Run("Back & Forth", func(t *testing.T) {
-		in, err := sandpiper.Encode(src)
+		data := bytes.NewReader(src)
+		in, err := sandpiper.Encode(data)
 		if err != nil {
 			t.Errorf("error = %v", err)
 			return
