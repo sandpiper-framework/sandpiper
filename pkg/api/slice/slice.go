@@ -57,7 +57,7 @@ func (s *Slice) ViewByName(c echo.Context, name string) (*sandpiper.Slice, error
 	au := s.rbac.CurrentUser(c)
 	companyID := au.CompanyID
 	if au.AtLeast(sandpiper.AdminRole) {
-		companyID = uuid.UUID{}
+		companyID = uuid.Nil
 	}
 	// make sure the slice is subscribed to the current user's company
 	return s.sdb.ViewByName(s.db, companyID, name)

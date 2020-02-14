@@ -25,9 +25,10 @@ type HTTP struct {
 func NewHTTP(svc grain.Service, er *echo.Group) {
 	h := HTTP{svc}
 	sr := er.Group("/grains")
-	sr.POST("", h.create)
-	sr.GET("", h.list) // ?payload=[yes/no*]
+	sr.POST("", h.create) // ?replace=[yes/no*]
+	sr.GET("", h.list)    // ?payload=[yes/no*]
 	sr.GET("/:id", h.view)
+	sr.GET("/:sliceid/:graintype/:grainkey", h.exists)
 	sr.DELETE("/:id", h.delete)
 }
 
@@ -49,21 +50,25 @@ type createReq struct {
 }
 
 func (r createReq) id() uuid.UUID {
-	var nilUUID = uuid.UUID{}
-	if r.ID == nilUUID {
+	if r.ID == uuid.Nil {
 		return uuid.New()
 	}
 	return r.ID
 }
 
 func (h *HTTP) create(c echo.Context) error {
-	r := new(createReq)
+	var replaceFlag bool = false
 
+	if c.QueryParam("replace") == "yes" {
+		replaceFlag = true
+	}
+
+	r := new(createReq)
 	if err := c.Bind(r); err != nil {
 		return err
 	}
 
-	result, err := h.svc.Create(c, sandpiper.Grain{
+	result, err := h.svc.Create(c, replaceFlag, sandpiper.Grain{
 		ID:       r.id(),
 		SliceID:  &r.SliceID,
 		Type:     r.Type,
@@ -113,6 +118,20 @@ func (h *HTTP) view(c echo.Context) error {
 	}
 
 	result, err := h.svc.View(c, id)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func (h *HTTP) exists(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("sliceid"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+
+	result, err := h.svc.Exists(c, id, c.Param("graintype"), c.Param("grainkey"))
 	if err != nil {
 		return err
 	}

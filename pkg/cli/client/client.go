@@ -16,6 +16,8 @@ import (
 
 	//"github.com/ddliu/go-httpclient" use this for reference
 
+	"github.com/google/uuid"
+
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
@@ -81,9 +83,31 @@ func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
 	if err != nil {
 		return nil, err
 	}
-	var slice sandpiper.Slice
-	_, err = c.do(req, &slice)
-	return &slice, err
+	slice := new(sandpiper.Slice)
+	_, err = c.do(req, slice)
+	return slice, err
+}
+
+func (c *Client) GrainExists(sliceID uuid.UUID, grainType, grainKey string) (*sandpiper.Grain, error) {
+	path := fmt.Sprintf("/grains/%s/%s/%s", sliceID.String(), grainType, grainKey)
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	grain := new(sandpiper.Grain)
+	_, err = c.do(req, grain)
+	return grain, err
+}
+
+func (c *Client) DeleteGrain(grainID uuid.UUID) error {
+	path := fmt.Sprintf("/grains/%s", grainID.String())
+	req, err := c.newRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+	grain := new(sandpiper.Grain)
+	_, err = c.do(req, grain)
+	return err
 }
 
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {

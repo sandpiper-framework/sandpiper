@@ -34,7 +34,7 @@ type LogService struct {
 const source = "grain"
 
 // Create logging
-func (ls *LogService) Create(c echo.Context, req sandpiper.Grain) (resp *sandpiper.Grain, err error) {
+func (ls *LogService) Create(c echo.Context, replaceFlag bool, req sandpiper.Grain) (resp *sandpiper.Grain, err error) {
 	// todo: consider a "debug" level that shows entire req/resp
 	defer func(begin time.Time) {
 		var g *sandpiper.Grain
@@ -55,12 +55,13 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Grain) (resp *sandpip
 			source, "Create grain request", err,
 			map[string]interface{}{
 				"req":  req,
+				"replace": replaceFlag,
 				"resp": g,
 				"took": time.Since(begin),
 			},
 		)
 	}(time.Now())
-	return ls.Service.Create(c, req)
+	return ls.Service.Create(c, replaceFlag, req)
 }
 
 // List logging
@@ -107,6 +108,34 @@ func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Grain
 		)
 	}(time.Now())
 	return ls.Service.View(c, req)
+}
+
+// Exists logging
+func (ls *LogService) Exists(c echo.Context, sliceID uuid.UUID, grainType, grainKey string) (resp *sandpiper.Grain, err error) {
+	defer func(begin time.Time) {
+		var g *sandpiper.Grain
+		if resp != nil {
+			g = &sandpiper.Grain{
+				ID:      resp.ID,
+				SliceID: resp.SliceID,
+				Type:    resp.Type,
+				Key:     resp.Key,
+				Source:  resp.Source,
+			}
+		}
+		ls.logger.Log(
+			c,
+			source, "Exists grain request", err,
+			map[string]interface{}{
+				"slice_id":   sliceID,
+				"grain_type": grainType,
+				"grain_key":  grainKey,
+				"resp":       g,
+				"took":       time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Exists(c, sliceID, grainType, grainKey)
 }
 
 // Delete logging

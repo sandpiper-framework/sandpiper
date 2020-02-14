@@ -157,11 +157,10 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 // ViewByName returns a single slice by slice-name optionally limited by company subscriptions
 func (s *Slice) ViewByName(db orm.DB, companyID uuid.UUID, name string) (*sandpiper.Slice, error) {
 	var slice = &sandpiper.Slice{Name: name}
-	var nilUUID = uuid.UUID{}
 
 	// this filter function can add a condition to the "companies" relationship
 	var filterFn = func(q *orm.Query) (*orm.Query, error) {
-		if companyID == nilUUID {
+		if companyID == uuid.Nil {
 			return q, nil
 		}
 		return q.Where("company_id = ?", companyID), nil

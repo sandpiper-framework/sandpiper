@@ -36,14 +36,21 @@ var (
 )
 
 // Create creates a new grain in database (assumes allowed to do this)
-func (s *Grain) Create(db orm.DB, grain sandpiper.Grain) (*sandpiper.Grain, error) {
-
+func (s *Grain) Create(db orm.DB, replaceFlag bool, grain sandpiper.Grain) (*sandpiper.Grain, error) {
 	// key is always lowercase to allow faster lookups
 	grain.Key = strings.ToLower(grain.Key)
 
-	err := validateNewGrain(db, *grain.SliceID, grain.Type, grain.Key)
-	if err != nil {
-		return nil, err
+	if replaceFlag {
+		err := removeExistingGrain(db, *grain.SliceID, grain.Type, grain.Key)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// todo: do we need to check? maybe we can check the insert error for existing keys (?)
+		err := assertAddGrain(db, *grain.SliceID, grain.Type, grain.Key)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if err := db.Insert(&grain); err != nil {
@@ -59,6 +66,18 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	err := db.Model(grain).
 		Column("grain.id", "grain_type", "grain_key", "encoding", "payload", "grain.created_at").
 		Relation("Slice").WherePK().Select()
+	if err != nil {
+		return nil, err
+	}
+	return grain, nil
+}
+
+// Exists returns minimal grain information if found
+func (s *Grain) Exists(db orm.DB, sliceID uuid.UUID, grainType, grainKey string) (*sandpiper.Grain, error) {
+	grain := new(sandpiper.Grain)
+	err := db.Model(grain).Column("grain.id", "source").
+		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
+		Select()
 	if err != nil {
 		return nil, err
 	}
@@ -115,8 +134,8 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 	return db.Delete(grain)
 }
 
-// validateNewGrain makes sure we can add this grain
-func validateNewGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
+// assertAddGrain makes sure we can add this grain
+func assertAddGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
 	// attempt to select by unique keys
 	m := new(sandpiper.Grain)
 	err := db.Model(m).
@@ -124,6 +143,25 @@ func validateNewGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey s
 		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
 		Select()
 
+	switch err {
+	case pg.ErrNoRows: // ok to add
+		return nil
+	case nil: // found a row, so a duplicate
+		return ErrAlreadyExists
+	default: // return any other problem found
+		return err
+	}
+}
+
+// removeExistingGrain will remove a grain by alternate unique key. Only return real errors.
+func removeExistingGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
+	// attempt to delete by unique keys
+	m := new(sandpiper.Grain)
+	_, err := db.Model(m).
+		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
+		Delete()
+
+	// todo: fix this test. See what is actually returned when delete vs nothing to delete.
 	switch err {
 	case pg.ErrNoRows: // ok to add
 		return nil

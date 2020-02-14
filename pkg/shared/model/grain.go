@@ -6,6 +6,7 @@ package sandpiper
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-pg/pg/v9/orm"
@@ -32,4 +33,14 @@ var _ orm.BeforeInsertHook = (*Grain)(nil)
 func (b *Grain) BeforeInsert(ctx context.Context) (context.Context, error) {
 	b.CreatedAt = time.Now()
 	return ctx, nil
+}
+
+// Display prints basic grain information to stdout
+func (g *Grain) Display() {
+	fmt.Printf("id: %s", g.ID.String())
+	fmt.Printf("slice_id: %s", g.ID.String())
+	fmt.Printf("Type: %s", g.Type)
+	fmt.Printf("key: %s", g.Key)
+	fmt.Printf("source: %s", g.Source)
+	fmt.Printf("created: %s", g.CreatedAt.String())
 }

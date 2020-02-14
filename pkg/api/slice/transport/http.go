@@ -51,8 +51,7 @@ type createReq struct {
 }
 
 func (r createReq) id() uuid.UUID {
-	var nilUUID = uuid.UUID{}
-	if r.ID == nilUUID {
+	if r.ID == uuid.Nil {
 		return uuid.New()
 	}
 	return r.ID

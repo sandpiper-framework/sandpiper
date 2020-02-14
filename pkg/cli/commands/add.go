@@ -5,10 +5,13 @@
 package command
 
 import (
+	"bufio"
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 
+	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2"
 
 	"autocare.org/sandpiper/pkg/cli/client"
@@ -23,10 +26,12 @@ type params struct {
 	grainType string
 	grainKey  string
 	fileName  string
+	prompt    bool
 }
 
 // Add attempts to add a new file-based grain to a slice
 func Add(c *args.Context) error {
+	var grain *sandpiper.Grain
 
 	// parse parameters
 	p, err := getParams(c)
@@ -35,35 +40,45 @@ func Add(c *args.Context) error {
 	}
 
 	// connect to the api server
-	api, err := connect(p)
+	api, err := connect(p.addr, p.user, p.password)
 	if err != nil {
 		return err
 	}
 
-	// lookup sliceID by name (should we add an api to add by name to avoid this extra lookup?)
+	// lookup sliceID by name
 	slice, err := api.SliceByName(p.sliceName)
-	if err != nil{
-		return err
-	}
-
-	// todo: delete existing grain (if slice-id, grain-type, grain-key is found)
-	// prompt for delete unless "noprompt" flag
-
-	// get a reader for the file to add
-	file, err := os.Open(p.fileName)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
-	// encode file contents for grain's payload
-	payload, err := sandpiper.Encode(file)
+	// load basic info from existing grain using alternate key (if found)
+	grain, err = api.GrainExists(slice.ID, p.grainType, p.grainKey)
+	if err != nil {
+		return err
+	}
+
+	// if grain exists, remove it first (prompt for delete unless "noprompt" flag)
+	if grain.ID != uuid.Nil {
+		if p.prompt {
+			grain.Display() // show what we're overwriting
+			if !allowOverwrite() {
+				return nil
+			}
+		}
+		err := api.DeleteGrain(grain.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// encode supplied file for grain's payload
+	payload, err := payloadFromFile(p.fileName)
 	if err != nil {
 		return err
 	}
 
 	// create the new grain
-	grain := &sandpiper.Grain{
+	grain = &sandpiper.Grain{
 		SliceID:  &slice.ID,
 		Type:     p.grainType,
 		Key:      p.grainKey,
@@ -95,13 +110,37 @@ func getParams(c *args.Context) (*params, error) {
 		grainType: c.String("type"),
 		grainKey:  c.String("key"),
 		fileName:  c.Args().Get(0),
+		prompt:    !c.Bool("noprompt"),
 	}, nil
 }
 
-func connect(p *params) (*client.Client, error) {
-	http := client.New(p.addr)
-	if err := http.Login(p.user, p.password); err != nil {
+func connect(addr *url.URL, user, password string) (*client.Client, error) {
+	http := client.New(addr)
+	if err := http.Login(user, password); err != nil {
 		return nil, err
 	}
 	return http, nil
+}
+
+func allowOverwrite() bool {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Overwrite (y/n)? ")
+	ans, _ := reader.ReadString('\n')
+	return strings.ToLower(ans) == "y"
+}
+
+func payloadFromFile(fileName string) (sandpiper.PayloadData, error) {
+	// get a reader for the file to add
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// encode file contents for grain's payload
+	payload, err := sandpiper.Encode(file)
+	if err != nil {
+		return nil, err
+	}
+	return payload, nil
 }
