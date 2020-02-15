@@ -2,7 +2,10 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
+// Package command holds all the sandpiper commands
 package command
+
+// sandpiper add
 
 import (
 	"bufio"
@@ -15,6 +18,7 @@ import (
 	args "github.com/urfave/cli/v2"
 
 	"autocare.org/sandpiper/pkg/cli/client"
+	"autocare.org/sandpiper/pkg/shared/config"
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
@@ -96,8 +100,18 @@ func getParams(c *args.Context) (*params, error) {
 		return nil, fmt.Errorf("missing filename argument (see 'sandpiper --help')")
 	}
 
-	// get sandpiper server address from command line
-	addr, err := url.Parse(c.String("url"))
+	// get sandpiper server address from config file
+  cfgPath := c.String("config")
+  if cfgPath == "" {
+  	cfgPath = "cli.config.yaml"
+	}
+
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		return nil, err
+	}
+
+	addr, err := url.Parse(cfg.DB.URL())
 	if err != nil {
 		return nil, err
 	}

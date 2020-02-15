@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	args "github.com/urfave/cli/v2"
 
@@ -20,14 +21,23 @@ import (
 func main() {
 	fmt.Println(version.Banner())
 
-	app := args.NewApp()
-	app.Name = "sandpiper"
-	app.Version = version.Version
-	app.Copyright = "Copyright Auto Care Association. All rights reserved."
-	app.Usage = "store & retrieve level-1 sandpiper objects"
-	app.Flags = cli.GlobalFlags
-	app.Commands = cli.Commands
-	app.CommandNotFound = cli.CommandNotFound
+	app := &args.App{
+		Name: "sandpiper",
+		Version: version.Version,
+		Compiled: time.Now(),
+		Authors: []*args.Author{
+			&args.Author{
+				Name:  "Doug Winsby",
+				Email: "dougw@winsbygroup.com",
+			},
+		},
+		Copyright: "Copyright Auto Care Association. All rights reserved.",
+		HelpName: "sandpiper",
+		Usage: "Store & retrieve \"level-1\" (file-based) sandpiper objects",
+		Flags: cli.GlobalFlags,
+		Commands: cli.Commands,
+		CommandNotFound: cli.CommandNotFound,
+	}
 
 	err := app.Run(os.Args)
 	if err != nil {

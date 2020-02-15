@@ -54,10 +54,10 @@ func (ls *LogService) Create(c echo.Context, replaceFlag bool, req sandpiper.Gra
 			c,
 			source, "Create grain request", err,
 			map[string]interface{}{
-				"req":  req,
+				"req":     req,
 				"replace": replaceFlag,
-				"resp": g,
-				"took": time.Since(begin),
+				"resp":    g,
+				"took":    time.Since(begin),
 			},
 		)
 	}(time.Now())

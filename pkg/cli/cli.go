@@ -28,7 +28,7 @@ var GlobalFlags = []args.Flag{
 	&args.StringFlag{
 		Name:     "user",
 		Aliases:  []string{"u"},
-		Usage:    "api login name",
+		Usage:    "api login `name`",
 		EnvVars:  []string{"SANDPIPER_USER"},
 		Required: true,
 	},
@@ -37,6 +37,13 @@ var GlobalFlags = []args.Flag{
 		Aliases: []string{"p"},
 		Usage:   "api password",
 		EnvVars: []string{"SANDPIPER_PASSWORD"},
+	},
+	&args.StringFlag{
+		Name:     "config",
+		Aliases:  []string{"c"},
+		Usage:    "Load configuration from `FILE`",
+		EnvVars: []string{"SANDPIPER_CONFIG"},
+		DefaultText: "./cli.config.yaml",
 	},
 }
 
