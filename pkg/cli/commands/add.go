@@ -2,7 +2,7 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package command holds all the sandpiper commands
+// Package command implements `sandpiper` commands (add, pull, list, ...)
 package command
 
 // sandpiper add
@@ -15,7 +15,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	args "github.com/urfave/cli/v2"
+	args "github.com/urfave/cli/v2" // conflicts with our package name
 
 	"autocare.org/sandpiper/pkg/cli/client"
 	"autocare.org/sandpiper/pkg/shared/config"
@@ -23,7 +23,7 @@ import (
 )
 
 type params struct {
-	addr      *url.URL
+	addr      *url.URL	// our sandpiper api server
 	user      string
 	password  string
 	sliceName string
@@ -37,13 +37,13 @@ type params struct {
 func Add(c *args.Context) error {
 	var grain *sandpiper.Grain
 
-	// parse parameters
+	// save parameters in a `params` struct for easy access
 	p, err := getParams(c)
 	if err != nil {
 		return err
 	}
 
-	// connect to the api server
+	// connect to the api server (saving token)
 	api, err := connect(p.addr, p.user, p.password)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func Add(c *args.Context) error {
 		return err
 	}
 
-	// load basic info from existing grain using alternate key (if found)
+	// load basic info from existing grain (if found) using alternate key
 	grain, err = api.GrainExists(slice.ID, p.grainType, p.grainKey)
 	if err != nil {
 		return err
@@ -91,6 +91,7 @@ func Add(c *args.Context) error {
 		Payload:  payload,
 	}
 
+	// finally, add the new grain
 	return api.Add(grain)
 }
 
@@ -100,10 +101,10 @@ func getParams(c *args.Context) (*params, error) {
 		return nil, fmt.Errorf("missing filename argument (see 'sandpiper --help')")
 	}
 
-	// get sandpiper server address from config file
-  cfgPath := c.String("config")
-  if cfgPath == "" {
-  	cfgPath = "cli.config.yaml"
+	// get sandpiper api server address from config file
+	cfgPath := c.String("config")
+	if cfgPath == "" {
+		cfgPath = DefaultConfigFile
 	}
 
 	cfg, err := config.Load(cfgPath)
@@ -111,7 +112,7 @@ func getParams(c *args.Context) (*params, error) {
 		return nil, err
 	}
 
-	addr, err := url.Parse(cfg.DB.URL())
+	addr, err := url.Parse(cfg.Server.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +125,7 @@ func getParams(c *args.Context) (*params, error) {
 		grainType: c.String("type"),
 		grainKey:  c.String("key"),
 		fileName:  c.Args().Get(0),
-		prompt:    !c.Bool("noprompt"),
+		prompt:    !c.Bool("noprompt"), // avoid double negative
 	}, nil
 }
 

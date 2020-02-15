@@ -2,6 +2,7 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
+// Package command implements `sandpiper` commands (add, pull, list, ...)
 package command
 
 import args "github.com/urfave/cli/v2"

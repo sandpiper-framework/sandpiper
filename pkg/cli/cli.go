@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"os"
 
-	args "github.com/urfave/cli/v2"
+	args "github.com/urfave/cli/v2" // conflicts with our package name
 
 	"autocare.org/sandpiper/pkg/cli/commands"
 )
@@ -39,11 +39,11 @@ var GlobalFlags = []args.Flag{
 		EnvVars: []string{"SANDPIPER_PASSWORD"},
 	},
 	&args.StringFlag{
-		Name:     "config",
-		Aliases:  []string{"c"},
-		Usage:    "Load configuration from `FILE`",
-		EnvVars: []string{"SANDPIPER_CONFIG"},
-		DefaultText: "./cli.config.yaml",
+		Name:        "config",
+		Aliases:     []string{"c"},
+		Usage:       "Load configuration from `FILE`",
+		EnvVars:     []string{"SANDPIPER_CONFIG"},
+		DefaultText: command.DefaultConfigFile,
 	},
 }
 

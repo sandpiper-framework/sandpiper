@@ -14,12 +14,12 @@ import (
 	"net/url"
 	"time"
 
-	//"github.com/ddliu/go-httpclient" use this for reference
-
 	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/pkg/shared/model"
 )
+
+/* Use "github.com/ddliu/go-httpclient" for a sample client reference */
 
 // Client represents the http client
 type Client struct {
@@ -54,6 +54,7 @@ func (c *Client) Login(username, password string) error {
 	return err
 }
 
+// Add a grain to a slice with option to overwrite
 func (c *Client) Add(grain *sandpiper.Grain) error {
 	body, err := json.Marshal(grain)
 	if err != nil {
@@ -67,16 +68,7 @@ func (c *Client) Add(grain *sandpiper.Grain) error {
 	return err
 }
 
-func (c *Client) ListUsers() ([]sandpiper.User, error) {
-	req, err := c.newRequest("GET", "/users", nil)
-	if err != nil {
-		return nil, err
-	}
-	var users []sandpiper.User
-	_, err = c.do(req, &users)
-	return users, err
-}
-
+// SliceByName returns a slice by unique key name
 func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
 	path := "/slices/name/" + name
 	req, err := c.newRequest("GET", path, nil)
@@ -88,6 +80,7 @@ func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
 	return slice, err
 }
 
+// GrainExists will return basic information about a grain if it exists
 func (c *Client) GrainExists(sliceID uuid.UUID, grainType, grainKey string) (*sandpiper.Grain, error) {
 	path := fmt.Sprintf("/grains/%s/%s/%s", sliceID.String(), grainType, grainKey)
 	req, err := c.newRequest("GET", path, nil)
@@ -99,6 +92,7 @@ func (c *Client) GrainExists(sliceID uuid.UUID, grainType, grainKey string) (*sa
 	return grain, err
 }
 
+// DeleteGrain deletes a grain by primary key
 func (c *Client) DeleteGrain(grainID uuid.UUID) error {
 	path := fmt.Sprintf("/grains/%s", grainID.String())
 	req, err := c.newRequest("DELETE", path, nil)
@@ -110,6 +104,9 @@ func (c *Client) DeleteGrain(grainID uuid.UUID) error {
 	return err
 }
 
+/* Utility Routines */
+
+// newRequest prepares a request for an api call
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
 	rel := &url.URL{Path: path}
 	u := c.BaseURL.ResolveReference(rel)
@@ -136,6 +133,7 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 	return req, nil
 }
 
+// do executes the request
 func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

@@ -5,11 +5,7 @@
 // Package command implements `sandpiper` commands (add, pull, list, ...)
 package command
 
-import args "github.com/urfave/cli/v2"
-
-// List returns a list of all grains for a slice
-func List(c *args.Context) error {
-	// Write your code here
-
-	return nil
-}
+const (
+	// DefaultConfigFile can be overridden by command line options
+	DefaultConfigFile = "cli.config.yaml"
+)
