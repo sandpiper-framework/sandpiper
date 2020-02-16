@@ -38,8 +38,8 @@ func (b *Grain) BeforeInsert(ctx context.Context) (context.Context, error) {
 // Display prints basic grain information to stdout
 func (g *Grain) Display() {
 	fmt.Printf("id: %s", g.ID.String())
-	fmt.Printf("slice_id: %s", g.ID.String())
-	fmt.Printf("Type: %s", g.Type)
+	fmt.Printf("slice_id: %s", g.SliceID.String())
+	fmt.Printf("type: %s", g.Type)
 	fmt.Printf("key: %s", g.Key)
 	fmt.Printf("source: %s", g.Source)
 	fmt.Printf("created: %s", g.CreatedAt.String())

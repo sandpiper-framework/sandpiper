@@ -8,22 +8,21 @@ package command
 // sandpiper add
 
 import (
-	"bufio"
+	"errors"
 	"fmt"
 	"net/url"
-	"os"
-	"strings"
+	"path/filepath"
 
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"autocare.org/sandpiper/pkg/cli/client"
+	"autocare.org/sandpiper/pkg/cli/payload"
 	"autocare.org/sandpiper/pkg/shared/config"
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 type params struct {
-	addr      *url.URL	// our sandpiper api server
+	addr      *url.URL // our sandpiper api server
 	user      string
 	password  string
 	sliceName string
@@ -44,7 +43,7 @@ func Add(c *args.Context) error {
 	}
 
 	// connect to the api server (saving token)
-	api, err := connect(p.addr, p.user, p.password)
+	api, err := Connect(p.addr, p.user, p.password)
 	if err != nil {
 		return err
 	}
@@ -65,8 +64,8 @@ func Add(c *args.Context) error {
 	if grain.ID != uuid.Nil {
 		if p.prompt {
 			grain.Display() // show what we're overwriting
-			if !allowOverwrite() {
-				return nil
+			if !AllowOverwrite() {
+				return errors.New("grain could not be added without overwrite")
 			}
 		}
 		err := api.DeleteGrain(grain.ID)
@@ -76,7 +75,7 @@ func Add(c *args.Context) error {
 	}
 
 	// encode supplied file for grain's payload
-	payload, err := payloadFromFile(p.fileName)
+	data, err := payload.FromFile(p.fileName)
 	if err != nil {
 		return err
 	}
@@ -86,9 +85,9 @@ func Add(c *args.Context) error {
 		SliceID:  &slice.ID,
 		Type:     p.grainType,
 		Key:      p.grainKey,
-		Source:   p.fileName,
+		Source:   filepath.Base(p.fileName),
 		Encoding: "gzipb64",
-		Payload:  payload,
+		Payload:  data,
 	}
 
 	// finally, add the new grain
@@ -127,35 +126,4 @@ func getParams(c *args.Context) (*params, error) {
 		fileName:  c.Args().Get(0),
 		prompt:    !c.Bool("noprompt"), // avoid double negative
 	}, nil
-}
-
-func connect(addr *url.URL, user, password string) (*client.Client, error) {
-	http := client.New(addr)
-	if err := http.Login(user, password); err != nil {
-		return nil, err
-	}
-	return http, nil
-}
-
-func allowOverwrite() bool {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Overwrite (y/n)? ")
-	ans, _ := reader.ReadString('\n')
-	return strings.ToLower(ans) == "y"
-}
-
-func payloadFromFile(fileName string) (sandpiper.PayloadData, error) {
-	// get a reader for the file to add
-	file, err := os.Open(fileName)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	// encode file contents for grain's payload
-	payload, err := sandpiper.Encode(file)
-	if err != nil {
-		return nil, err
-	}
-	return payload, nil
 }
