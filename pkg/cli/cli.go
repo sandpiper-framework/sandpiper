@@ -16,7 +16,7 @@ import (
 	"autocare.org/sandpiper/pkg/cli/commands"
 )
 
-//  sandpiper [global options] command [command options] [arguments...]
+//  sandpiper [global options] command [command options] [arguments]
 
 // global options (also available through env variables)
 // 		-u user         # sandpiper user

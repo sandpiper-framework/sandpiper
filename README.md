@@ -222,17 +222,19 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-1. Echo - HTTP 'framework'.
-2. Go-Pg - PostgreSQL ORM
-3. JWT-Go - JWT Authentication
-4. Zerolog - Structured logging
-5. Bcrypt - Password hashing
-6. Yaml - Unmarshalling YAML config file
-7. Validator - Request validation.
-8. lib/pq - PostgreSQL driver
-9. zxcvbn-go - Password strength checker
-10. DockerTest - Testing database queries
-11. Testify/Assert - Asserting test results
-12. uuid - Google's library to generate and manipulate uuid values
+1. [Echo](https://echo.labstack.com/) - HTTP 'framework'.
+2. [Go-Pg](https://github.com/go-pg/pg) - PostgreSQL ORM
+3. [JWT-Go](https://github.com/dgrijalva/jwt-go) - JWT Authentication
+4. [Zerolog](https://github.com/rs/zerolog) - Structured logging
+5. [Bcrypt](https://github.com/golang/crypto/) - Password hashing
+6. [Yaml](https://gopkg.in/yaml.v2) - Unmarshalling YAML config file
+7. [Validator](https://github.com/go-playground/validator) - Request validation.
+8. [lib/pq](https://github.com/lib/pq) - PostgreSQL driver
+9. [zxcvbn-go](https://github.com/nbutton23/zxcvbn-go) - Password strength checker
+10. [DockerTest](https://github.com/fortytw2/dockertest) - Testing database queries (might need to change this lib choice)
+11. [Testify/Assert](https://github.com/stretchr/testify) - Asserting test results
+12. [go-bindata](https://github.com/go-bindata/go-bindata) - Turn data file into go code (for migrations)
+13. [uuid](https://github.com/google/uuid) - Google's library to generate and manipulate uuid values
+14. [cli](https://github.com/urfave/cli) - Command line argument processing
 
 Efforts were made to abstract and localize these dependencies.
