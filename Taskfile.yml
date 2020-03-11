@@ -15,7 +15,7 @@ vars:
 tasks:
   create-pub-db:
     desc: Create the publishing database from default postgresql installation using "psql"
-    dir: pkg/api/migrations
+    dir: pkg/primary/migrations
     cmds:
       - "{{.PSQLCMD}}"
     vars:
@@ -53,19 +53,19 @@ tasks:
 
   bindata-server:
     desc: Use go-bindata to encode file migrations in a go source file
-    dir: pkg/api/migrations
+    dir: pkg/primary/migrations
     deps: [go-bindata]
     cmds:
       - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
 
   build-server:
     desc: Build sandpiper server
-    dir: cmd/api
+    dir: cmd/primary
     deps: [bindata-server]
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/api/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/primary/version.Version={{.VER}}"
     vars:
-      EXE: api{{exeExt}}
+      EXE: primary{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
 
   bindata-client:
@@ -78,11 +78,11 @@ tasks:
   build-client:
     desc: Build sandpiper client
     deps: [bindata-client]
-    dir: cmd/client
+    dir: cmd/secondary
     cmds:
       - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/client/version.Version={{.VER}}"
     vars:
-      EXE: client{{exeExt}}
+      EXE: secondary{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
 
   build-cli:
@@ -112,10 +112,10 @@ tasks:
     silent: true
 
   run:
-    desc: Launch sandpiper server
-    dir: cmd/api
+    desc: Launch sandpiper primary (publication) server
+    dir: cmd/primary
     cmds:
-      - ./api
+      - ./primary
 
   release-docker:
     desc: Create a docker file for release
