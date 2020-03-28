@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -57,7 +57,7 @@ func (u *User) View(db orm.DB, id int) (*sandpiper.User, error) {
 
 // Update updates user's contact info
 func (u *User) Update(db orm.DB, user *sandpiper.User) error {
-	_, err := db.Model(user).UpdateNotZero()
+	_, err := db.Model(user).WherePK().UpdateNotZero()
 	return err
 }
 

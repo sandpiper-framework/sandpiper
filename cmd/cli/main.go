@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -31,7 +31,7 @@ func main() {
 				Email: "dougw@winsbygroup.com",
 			},
 		},
-		Copyright:       "Copyright Auto Care Association. All rights reserved.",
+		Copyright:       "Copyright The Sandpiper Authors. All rights reserved.",
 		HelpName:        "sandpiper",
 		Usage:           "Store & retrieve \"level-1\" (file-based) sandpiper objects",
 		Flags:           cli.GlobalFlags,

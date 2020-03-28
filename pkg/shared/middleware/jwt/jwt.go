@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -8,6 +8,7 @@ package jwt
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -26,16 +27,24 @@ var (
 )
 
 // New generates new JWT service necessary for auth middleware
-func New(secret, algo string, d int) *Service {
+func New(secret, algo string, ttlMinutes int, minLen int) (*Service, error) {
+	var minSecretLen = 128
+
+	if minLen > 0 {
+		minSecretLen = minLen
+	}
+	if len(secret) < minSecretLen {
+		return &Service{}, fmt.Errorf("jwt secret length is %v, which is less than required %v", len(secret), minSecretLen)
+	}
 	signingMethod := jwt.GetSigningMethod(algo)
 	if signingMethod == nil {
-		panic("invalid jwt signing method")
+		return &Service{}, fmt.Errorf("invalid jwt signing method: %s", algo)
 	}
 	return &Service{
-		key:      []byte(secret),
-		algo:     signingMethod,
-		duration: time.Duration(d) * time.Minute,
-	}
+		key:  []byte(secret),
+		algo: signingMethod,
+		ttl:  time.Duration(ttlMinutes) * time.Minute,
+	}, nil
 }
 
 // Service provides a Json-Web-Token authentication implementation
@@ -44,7 +53,7 @@ type Service struct {
 	key []byte
 
 	// Duration for which the jwt token is valid.
-	duration time.Duration
+	ttl time.Duration
 
 	// JWT signing algorithm
 	algo jwt.SigningMethod
@@ -102,7 +111,7 @@ func (j *Service) ParseToken(c echo.Context) (*jwt.Token, error) {
 
 // GenerateToken generates new JWT token and populates it with user data for rbac
 func (j *Service) GenerateToken(u *sandpiper.User) (string, string, error) {
-	expire := time.Now().Add(j.duration)
+	expire := time.Now().Add(j.ttl)
 
 	token := jwt.NewWithClaims(j.algo, jwt.MapClaims{
 		"id":  u.ID,

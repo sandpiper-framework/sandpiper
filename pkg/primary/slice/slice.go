@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -63,10 +63,11 @@ func (s *Slice) ViewByName(c echo.Context, name string) (*sandpiper.Slice, error
 	return s.sdb.ViewByName(s.db, companyID, name)
 }
 
-// Update contains slice's information used for updating
+// Update contains slice information used for updating
 type Update struct {
 	ID           uuid.UUID
 	Name         string
+	ContentType  string
 	ContentHash  string
 	ContentCount uint
 	ContentDate  time.Time
@@ -80,6 +81,7 @@ func (s *Slice) Update(c echo.Context, r *Update) (*sandpiper.Slice, error) {
 	slice := &sandpiper.Slice{
 		ID:           r.ID,
 		Name:         r.Name,
+		ContentType:  r.ContentType,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
 		ContentDate:  r.ContentDate,

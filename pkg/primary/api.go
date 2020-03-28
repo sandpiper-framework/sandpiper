@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -38,7 +38,10 @@ func Start(cfg *config.Configuration) error {
 
 	// setup token, security and logging available for all services
 	sec := secure.New(cfg.App.MinPasswordStr)
-	tok := jwt.New(cfg.JWT.Secret, cfg.JWT.SigningAlgorithm, cfg.JWT.Duration)
+	tok, err := jwt.New(cfg.JWT.SecretKey(), cfg.JWT.SigningAlgorithm, cfg.JWT.Duration, cfg.JWT.MinSecretLength)
+	if err != nil {
+		return err
+	}
 	log := zlog.New(cfg.App.ServiceLogging)
 
 	// setup echo server (singleton)

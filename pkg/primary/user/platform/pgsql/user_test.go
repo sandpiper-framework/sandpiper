@@ -1,10 +1,11 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
 package pgsql_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -184,6 +185,9 @@ func TestUpdate(t *testing.T) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			err := udb.Update(db, tt.wantData)
+			if tt.wantErr != (err != nil) {
+				fmt.Println(tt.wantErr, err)
+			}
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
 				user := &sandpiper.User{

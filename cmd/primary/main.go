@@ -1,8 +1,8 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package main is the entry point for the sandpiper api server.
+// Package main is the entry point for the sandpiper primary server.
 // It checks the database-version and uses a config file to launch the server properly.
 package main
 

@@ -2,10 +2,10 @@
 # this file would be copied to /etc/systemd/system/
 
 [Unit]
-Description=Sandpiper Server
+Description=Sandpiper Primary Server
 
 [Service]
-ExecStart=/home/ubuntu/sandpiper/api
+ExecStart=/home/ubuntu/sandpiper/primary
 WorkingDirectory=/home/ubuntu/sandpiper
 Restart=always
 

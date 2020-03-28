@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -19,6 +19,7 @@ type MetaMap map[string]string
 type Slice struct {
 	ID           uuid.UUID  `json:"id" pg:",pk"`
 	Name         string     `json:"slice_name"`
+	ContentType  string     `json:"content_type"`
 	ContentHash  string     `json:"content_hash"`
 	ContentCount uint       `json:"content_count"`
 	ContentDate  time.Time  `json:"content_date"`

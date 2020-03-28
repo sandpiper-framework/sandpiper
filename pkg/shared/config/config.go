@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -78,6 +78,12 @@ type JWT struct {
 	RefreshDuration  int    `yaml:"refresh_duration_minutes,omitempty"`
 	MaxRefresh       int    `yaml:"max_refresh_minutes,omitempty"`
 	SigningAlgorithm string `yaml:"signing_algorithm,omitempty"`
+	MinSecretLength  int    `yaml:"min_secret_length,omitempty"`
+}
+
+// SecretKey allows overriding the config secret with the JWT_SECRET environment variable
+func (j *JWT) SecretKey() string {
+	return env("JWT_SECRET", j.Secret)
 }
 
 // Application holds application configuration details

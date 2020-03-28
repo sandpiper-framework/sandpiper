@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -10,6 +10,7 @@ package pgsql
 // The payload is transferred (and stored) as a (possibly encoded) binary object.
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -32,23 +33,27 @@ func NewGrain() *Grain {
 // Custom errors
 var (
 	// ErrAlreadyExists indicates the grain-type-key constraint would fail
-	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain type/key already exists for this Slice.")
+	ErrAlreadyExists  = echo.NewHTTPError(http.StatusInternalServerError, "Grain type/key already exists for this Slice.")
+	ErrTypeNotAllowed = echo.NewHTTPError(http.StatusInternalServerError, "Grain Type does not match Slice Type")
 )
 
-// Create creates a new grain in database (assumes allowed to do this)
+// Create creates a new grain in database (assumes allowed to do this). Grain must match the Slice
+// content type.
 func (s *Grain) Create(db orm.DB, replaceFlag bool, grain sandpiper.Grain) (*sandpiper.Grain, error) {
 	// key is always lowercase to allow faster lookups
 	grain.Key = strings.ToLower(grain.Key)
 
+	if err := grainTypeAllowed(db, *grain.SliceID, grain.Type); err != nil {
+		return nil, err
+	}
+
 	if replaceFlag {
-		err := removeExistingGrain(db, *grain.SliceID, grain.Type, grain.Key)
-		if err != nil {
+		if err := removeExistingGrain(db, *grain.SliceID, grain.Type, grain.Key); err != nil {
 			return nil, err
 		}
 	} else {
 		// todo: do we need to check? maybe we can check the insert error for existing keys (?)
-		err := assertAddGrain(db, *grain.SliceID, grain.Type, grain.Key)
-		if err != nil {
+		if err := canAddGrain(db, *grain.SliceID, grain.Type, grain.Key); err != nil {
 			return nil, err
 		}
 	}
@@ -134,8 +139,24 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 	return db.Delete(grain)
 }
 
-// assertAddGrain makes sure we can add this grain
-func assertAddGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
+// grainTypeAllowed makes sure you can add this grain-type to the slice
+func grainTypeAllowed(db orm.DB, sliceID uuid.UUID, grainType string) error {
+	m := sandpiper.Slice{ID: sliceID}
+
+	if err := db.Model(m).Column("content_type").WherePK().Select(); err != nil {
+		return err
+	}
+	if m.ContentType != grainType {
+		msg := fmt.Sprintf("Attempted to add \"%s\" Grain to \"%s\" Slice.", m.ContentType, grainType)
+
+		ErrTypeNotAllowed.Message = fmt.Sprintf(msg, m.ContentType, grainType)
+		return ErrTypeNotAllowed
+	}
+	return nil
+}
+
+// canAddGrain makes sure we can add this grain
+func canAddGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
 	// attempt to select by unique keys
 	m := new(sandpiper.Grain)
 	err := db.Model(m).

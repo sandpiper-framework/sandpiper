@@ -87,12 +87,13 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 CREATE TABLE IF NOT EXISTS "grains" (
   "id"           uuid PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
+  "grain_type"   content_type_enum,
   "grain_key"    text NOT NULL,
   "encoding"     encoding_enum,
   "payload"      bytea,
   "source"       text,
   "created_at"   timestamp,
-  CONSTRAINT "grain_alt_key" UNIQUE("slice_id", "grain_key")
+  CONSTRAINT "grain_alt_key" UNIQUE("slice_id", "grain_type", "grain_key")
 );
 
 CREATE TABLE IF NOT EXISTS "syncs" (

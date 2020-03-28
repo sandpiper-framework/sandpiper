@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -16,7 +16,7 @@ import (
 	"autocare.org/sandpiper/pkg/cli/commands"
 )
 
-//  sandpiper [global options] command [command options] [arguments]
+// sandpiper [global options] command [command options] [arguments]
 
 // global options (also available through env variables)
 // 		-u user         # sandpiper user
