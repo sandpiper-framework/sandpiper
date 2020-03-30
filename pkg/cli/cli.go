@@ -94,10 +94,20 @@ var Commands = []*args.Command{
 		Flags:  []args.Flag{},
 	},
 	{
+		/* sandpiper list
+				-slice "aap-brake-pads"  \ # slice-name (if empty, list all slices)
+		*/
 		Name:   "list",
 		Usage:  "list file-based grains",
 		Action: command.List,
-		Flags:  []args.Flag{},
+		Flags:  []args.Flag{
+			&args.StringFlag{
+				Name:     "slice",
+				Aliases:  []string{"s"},
+				Usage:    "slice name",
+				Required: false,
+			},
+		},
 	},
 }
 

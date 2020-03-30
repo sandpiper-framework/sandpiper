@@ -17,7 +17,7 @@ import (
 func Load(path string) (*Configuration, error) {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("error reading config file (use -config flag), %s", err)
+		return nil, fmt.Errorf("error reading config file \"%s\"", err)
 	}
 	var cfg = new(Configuration)
 
@@ -27,12 +27,13 @@ func Load(path string) (*Configuration, error) {
 	return cfg, nil
 }
 
-// Configuration holds data necessary for configuring application
+// Configuration defines available config sections with pointers to their structs
 type Configuration struct {
-	Server *Server      `yaml:"server,omitempty"`
-	DB     *Database    `yaml:"database,omitempty"`
-	JWT    *JWT         `yaml:"jwt,omitempty"`
-	App    *Application `yaml:"application,omitempty"`
+	Server  *Server      `yaml:"server,omitempty"`
+	DB      *Database    `yaml:"database,omitempty"`
+	JWT     *JWT         `yaml:"jwt,omitempty"`
+	App     *Application `yaml:"application,omitempty"`
+	Command *Command     `yaml:"command,omitempty"`
 }
 
 // Database structure holds settings for database configuration
@@ -90,6 +91,13 @@ func (j *JWT) SecretKey() string {
 type Application struct {
 	MinPasswordStr int  `yaml:"min_password_strength,omitempty"`
 	ServiceLogging bool `yaml:"service_logging,omitempty"`
+}
+
+// Command holds configuration options for the `sandpiper` command
+type Command struct {
+	URL   string `yaml:"url,omitempty"`
+	Port  string `yaml:"port,omitempty"`
+	Debug bool   `yaml:"debug,omitempty"`
 }
 
 func env(key, defValue string) string {

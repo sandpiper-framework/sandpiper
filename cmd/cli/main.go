@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE.md file.
 
 // Package main is the entry point for the `sandpiper` command.
-// It opens the database (using a config file), checks the database-version and executes the provided command.
+// It uses the published api to perform operations against a primary or secondary server.
 package main
 
 import (

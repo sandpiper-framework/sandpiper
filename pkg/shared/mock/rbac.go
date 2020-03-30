@@ -15,6 +15,7 @@ import (
 type RBAC struct {
 	CurrentUserFn    func(echo.Context) *sandpiper.AuthUser
 	EnforceRoleFn    func(echo.Context, sandpiper.AccessLevel) error
+	EnforceScopeFn   func(echo.Context) (*sandpiper.Scope, error)
 	EnforceUserFn    func(echo.Context, int) error
 	EnforceCompanyFn func(echo.Context, uuid.UUID) error
 	AccountCreateFn  func(echo.Context, sandpiper.AccessLevel, uuid.UUID) error
@@ -29,6 +30,11 @@ func (a *RBAC) CurrentUser(c echo.Context) *sandpiper.AuthUser {
 // EnforceRole mock
 func (a *RBAC) EnforceRole(c echo.Context, role sandpiper.AccessLevel) error {
 	return a.EnforceRoleFn(c, role)
+}
+
+// EnforceScope mock
+func (a *RBAC) EnforceScope(c echo.Context) (*sandpiper.Scope, error) {
+	return a.EnforceScopeFn(c)
 }
 
 // EnforceUser mock

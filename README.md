@@ -66,7 +66,7 @@ To run Sandpiper in a production environment, simply download the correct binary
 [Downloads](https://sandpiper.org/downloads)
 
 ```
-./api [-config="path/to/config.yaml"] (defaults to ./server.config.yaml")
+./api [-config="path/to/config.yaml"] (defaults to ./config.yaml")
 Also supports DB_USER and DB_PASSWORD environment variables
 ```
 ## Deployment

@@ -24,7 +24,7 @@ tasks:
 
   create-sub-db:
     desc: Create the subscribing database from default postgresql installation using "psql"
-    dir: pkg/client/migrations
+    dir: pkg/secondary/migrations
     cmds:
       - "{{.PSQLCMD}}"
     vars:
@@ -51,36 +51,36 @@ tasks:
       - go get -u github.com/go-bindata/go-bindata/...
     silent: true
 
-  bindata-server:
+  bindata-primary:
     desc: Use go-bindata to encode file migrations in a go source file
     dir: pkg/primary/migrations
     deps: [go-bindata]
     cmds:
       - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
 
-  build-server:
-    desc: Build sandpiper server
+  build-primary:
+    desc: Build sandpiper primary server
     dir: cmd/primary
-    deps: [bindata-server]
+    deps: [bindata-primary]
     cmds:
       - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/primary/version.Version={{.VER}}"
     vars:
       EXE: primary{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
 
-  bindata-client:
+  bindata-secondary:
     desc: Use go-bindata to encode file migrations in a go source file
-    dir: pkg/client/migrations
+    dir: pkg/secondary/migrations
     deps: [go-bindata]
     cmds:
       - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
 
-  build-client:
-    desc: Build sandpiper client
-    deps: [bindata-client]
+  build-secondary:
+    desc: Build sandpiper secondary server
+    deps: [bindata-secondary]
     dir: cmd/secondary
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/client/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/secondary/version.Version={{.VER}}"
     vars:
       EXE: secondary{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
@@ -96,7 +96,7 @@ tasks:
 
   build:
     desc: Build all sandpiper executables
-    deps: [build-server, build-client, build-cli]
+    deps: [build-primary, build-secondary, build-cli]
 
   test:
     desc: Run test suite (having trouble with dockertesting under Windows!)

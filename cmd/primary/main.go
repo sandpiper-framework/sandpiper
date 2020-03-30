@@ -23,7 +23,7 @@ import (
 func main() {
 	fmt.Println(version.Banner())
 
-	cfgPath := flag.String("config", "./server.config.yaml", "Path to config file")
+	cfgPath := flag.String("config", "./config.yaml", "Path to config file")
 	flag.Parse()
 
 	cfg, err := config.Load(*cfgPath)

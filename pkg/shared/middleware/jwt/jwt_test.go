@@ -6,12 +6,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
+
 	"autocare.org/sandpiper/pkg/shared/middleware/jwt"
 	"autocare.org/sandpiper/pkg/shared/mock"
 	"autocare.org/sandpiper/pkg/shared/model"
-
-	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 )
 
 func echoHandler(mw ...echo.MiddlewareFunc) *echo.Echo {
@@ -54,7 +54,7 @@ func TestMWFunc(t *testing.T) {
 			wantStatus: http.StatusOK,
 		},
 	}
-	jwtMW := jwt.New("jwtsecret", "HS256", 60)
+	jwtMW, _ := jwt.New("jwtsecret", "HS256", 60, 5)
 	ts := httptest.NewServer(echoHandler(jwtMW.MWFunc()))
 	defer ts.Close()
 	path := ts.URL + "/hello"
@@ -74,42 +74,56 @@ func TestMWFunc(t *testing.T) {
 }
 
 func TestGenerateToken(t *testing.T) {
-	cases := []struct {
-		name      string
-		wantToken string
-		algo      string
-		req       *sandpiper.User
+	cases := map[string]struct {
+		algo         string
+		secret       string
+		minSecretLen int
+		req          sandpiper.User
+		wantErr      bool
+		want         string
 	}{
-		{
-			name: "Invalid algo",
-			algo: "invalid",
+		"invalid algo": {
+			algo:    "invalid",
+			wantErr: true,
 		},
-		{
-			name: "Success",
-			algo: "HS256",
-			req: &sandpiper.User{
+		"secret not set": {
+			algo:    "HS256",
+			wantErr: true,
+		},
+		"invalid secret length": {
+			algo:    "HS256",
+			secret:  "123",
+			wantErr: true,
+		},
+		"invalid secret length with min defined": {
+			algo:         "HS256",
+			minSecretLen: 4,
+			secret:       "123",
+			wantErr:      true,
+		},
+		"success": {
+			algo:         "HS256",
+			secret:       "g0r$kt3$t1ng",
+			minSecretLen: 1,
+			req: sandpiper.User{
 				ID:        1,
 				Username:  "johndoe",
 				Email:     "johndoe@mail.com",
 				Role:      sandpiper.SuperAdminRole,
 				CompanyID: mock.TestUUID(1),
 			},
-			wantToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+			want: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
 		},
 	}
 
-	for _, tt := range cases {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.algo != "HS256" {
-				assert.Panics(t, func() {
-					jwt.New("jwtsecret", tt.algo, 60)
-				}, "The code did not panic")
-				return
+	for name, tt := range cases {
+		t.Run(name, func(t *testing.T) {
+			jwtSvc, err := jwt.New(tt.algo, tt.secret, 60, tt.minSecretLen)
+			assert.Equal(t, tt.wantErr, err != nil)
+			if err == nil && !tt.wantErr {
+				token, _, _ := jwtSvc.GenerateToken(&tt.req)
+				assert.Equal(t, tt.want, strings.Split(token, ".")[0])
 			}
-			jwt := jwt.New("jwtsecret", tt.algo, 60)
-			str, _, err := jwt.GenerateToken(tt.req)
-			assert.Nil(t, err)
-			assert.Equal(t, tt.wantToken, strings.Split(str, ".")[0])
 		})
 	}
 }

@@ -18,12 +18,11 @@ import (
 
 	"autocare.org/sandpiper/pkg/cli/client"
 	"autocare.org/sandpiper/pkg/cli/payload"
-	"autocare.org/sandpiper/pkg/shared/config"
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
-type params struct {
-	addr      *url.URL // our sandpiper api server
+type addParams struct {
+	addr      *url.URL // our sandpiper server
 	user      string
 	password  string
 	sliceName string
@@ -37,7 +36,7 @@ type params struct {
 func Add(c *args.Context) error {
 
 	// save parameters in a `params` struct for easy access
-	p, err := getParams(c)
+	p, err := getAddParams(c)
 	if err != nil {
 		return err
 	}
@@ -80,32 +79,22 @@ func Add(c *args.Context) error {
 	return api.Add(grain)
 }
 
-func getParams(c *args.Context) (*params, error) {
+func getAddParams(c *args.Context) (*addParams, error) {
 	// check for required file argument
 	if c.NArg() != 1 {
 		return nil, fmt.Errorf("missing filename argument (see 'sandpiper --help')")
 	}
 
-	// get sandpiper api server address from config file
-	cfgPath := c.String("config")
-	if cfgPath == "" {
-		cfgPath = DefaultConfigFile
-	}
-
-	cfg, err := config.Load(cfgPath)
+	// get sandpiper global params from config file and args
+	g, err := GetGlobalParams(c)
 	if err != nil {
 		return nil, err
 	}
 
-	addr, err := url.Parse(cfg.Server.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	return &params{
-		addr:      addr,
-		user:      c.String("user"),
-		password:  c.String("password"),
+	return &addParams{
+		addr:      g.addr,
+		user:      g.user,
+		password:  g.password,
 		sliceName: c.String("name"),
 		grainType: c.String("type"),
 		grainKey:  c.String("key"),

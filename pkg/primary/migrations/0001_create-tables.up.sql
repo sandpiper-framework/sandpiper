@@ -7,16 +7,15 @@
  
 BEGIN;
 
-CREATE TYPE content_type_enum AS ENUM (
+CREATE TYPE grain_type_enum AS ENUM (
   'aces-file',
-  'aces-items',
-  'asset-files',
+  'aces-item',
+  'asset-file',
   'partspro-file',
-  'partspro-items',
+  'partspro-item',
   'pies-file',
-  'pies-items',
-  'pies-marketcopy',
-  'pies-pricesheets'
+  'pies-item',
+  'pies-marketcopy'
 );
 
 CREATE TYPE encoding_enum AS ENUM (
@@ -43,7 +42,7 @@ CREATE TABLE IF NOT EXISTS companies (
 CREATE TABLE IF NOT EXISTS "slices" (
   "id"            uuid PRIMARY KEY,
   "name"          text UNIQUE NOT NULL,
-  "content_type"  content_type_enum NOT NULL,
+  "content_type"  grain_type_enum NOT NULL,
   "content_hash"  text,
   "content_count" integer,
   "content_date"  timestamp,
@@ -87,7 +86,7 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 CREATE TABLE IF NOT EXISTS "grains" (
   "id"           uuid PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
-  "grain_type"   content_type_enum,
+  "grain_type"   grain_type_enum,
   "grain_key"    text NOT NULL,
   "encoding"     encoding_enum,
   "payload"      bytea,

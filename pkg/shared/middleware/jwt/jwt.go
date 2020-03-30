@@ -28,17 +28,17 @@ var (
 
 // New generates new JWT service necessary for auth middleware
 func New(secret, algo string, ttlMinutes int, minLen int) (*Service, error) {
-	var minSecretLen = 128
+	var minSecretLen = 32 // based on guidelines using the HS256 algorithm
 
-	if minLen > 0 {
+	if minLen > 0 { // check for an override of the minimum value
 		minSecretLen = minLen
 	}
 	if len(secret) < minSecretLen {
-		return &Service{}, fmt.Errorf("jwt secret length is %v, which is less than required %v", len(secret), minSecretLen)
+		return nil, fmt.Errorf("jwt secret length is %v, which is less than required %v", len(secret), minSecretLen)
 	}
 	signingMethod := jwt.GetSigningMethod(algo)
 	if signingMethod == nil {
-		return &Service{}, fmt.Errorf("invalid jwt signing method: %s", algo)
+		return nil, fmt.Errorf("invalid jwt signing method: %s", algo)
 	}
 	return &Service{
 		key:  []byte(secret),
