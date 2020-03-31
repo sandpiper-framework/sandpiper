@@ -47,7 +47,6 @@ The request "body" would look like this:
 ```
 {
 	"slice_id": "2bea8308-1840-4802-ad38-72b53e31594c",
-	"grain_type": "aces-file",
 	"grain_key": "disc-brakes",
 	"encoding": "gzipb64"
     "payload": "--encoded payload data--"

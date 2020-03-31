@@ -12,6 +12,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+/* The custom HTTP error handler. Uses server.debug config setting */
+
 type customErrHandler struct {
 	e *echo.Echo
 }

@@ -54,11 +54,10 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 CREATE TABLE IF NOT EXISTS "grains" (
   "id"           uuid PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices",
-  "grain_type"   smallint,
   "grain_key"    text,
   "payload"      text,
   "created_at"   timestamp,
-  CONSTRAINT "grain_type_key" UNIQUE("grain_type", "grain_key")
+  CONSTRAINT "grain_alt_key" UNIQUE("slice_id", "grain_key")
 );
 
 CREATE TABLE IF NOT EXISTS users (

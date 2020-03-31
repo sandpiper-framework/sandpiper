@@ -19,7 +19,7 @@ type MetaMap map[string]string
 type Slice struct {
 	ID           uuid.UUID  `json:"id" pg:",pk"`
 	Name         string     `json:"slice_name"`
-	ContentType  string     `json:"content_type"`
+	SliceType    string     `json:"slice_type"`
 	ContentHash  string     `json:"content_hash"`
 	ContentCount uint       `json:"content_count"`
 	ContentDate  time.Time  `json:"content_date"`
@@ -34,17 +34,36 @@ var _ orm.BeforeInsertHook = (*Slice)(nil)
 var _ orm.BeforeUpdateHook = (*Slice)(nil)
 
 // BeforeInsert hooks into insert operations, setting createdAt and updatedAt to current time
-func (b *Slice) BeforeInsert(ctx context.Context) (context.Context, error) {
+func (s *Slice) BeforeInsert(ctx context.Context) (context.Context, error) {
 	now := time.Now()
-	b.CreatedAt = now
-	b.UpdatedAt = now
+	s.CreatedAt = now
+	s.UpdatedAt = now
 	return ctx, nil
 }
 
 // BeforeUpdate hooks into update operations, setting updatedAt to current time
-func (b *Slice) BeforeUpdate(ctx context.Context) (context.Context, error) {
-	b.UpdatedAt = time.Now()
+func (s *Slice) BeforeUpdate(ctx context.Context) (context.Context, error) {
+	s.UpdatedAt = time.Now()
 	return ctx, nil
+}
+
+// Validate checks slice_type enum
+func (s Slice) Validate() bool {
+	// todo: pull values from database at system start
+	// using `select enum_range(null::slice_type_enum)`
+	switch s.SliceType {
+	case "aces-file",
+		"aces-items",
+		"asset-files",
+		"pies-file",
+		"pies-items",
+		"pies-marketcopy",
+		"pies-pricesheet",
+		"partspro-file",
+		"partspro-items":
+		return true
+	}
+	return false
 }
 
 // SliceMetadata contains information about a slice

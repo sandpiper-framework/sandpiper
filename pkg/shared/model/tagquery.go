@@ -32,7 +32,7 @@ func NewTagQuery(params url.Values, q string) *TagQuery {
 			return tq
 		}
 	}
-	return nil
+	return tq // empty struct
 }
 
 // Provided checks to see if a tag query was included in the url

@@ -44,7 +44,6 @@ func (ls *LogService) Create(c echo.Context, replaceFlag bool, req sandpiper.Gra
 			g = &sandpiper.Grain{
 				ID:       resp.ID,
 				SliceID:  resp.SliceID,
-				Type:     resp.Type,
 				Key:      resp.Key,
 				Source:   resp.Source,
 				Encoding: resp.Encoding,
@@ -91,7 +90,6 @@ func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Grain
 			g = &sandpiper.Grain{
 				ID:       resp.ID,
 				SliceID:  resp.SliceID,
-				Type:     resp.Type,
 				Key:      resp.Key,
 				Source:   resp.Source,
 				Encoding: resp.Encoding,
@@ -111,14 +109,13 @@ func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Grain
 }
 
 // Exists logging
-func (ls *LogService) Exists(c echo.Context, sliceID uuid.UUID, grainType, grainKey string) (resp *sandpiper.Grain, err error) {
+func (ls *LogService) Exists(c echo.Context, sliceID uuid.UUID, grainKey string) (resp *sandpiper.Grain, err error) {
 	defer func(begin time.Time) {
 		var g *sandpiper.Grain
 		if resp != nil {
 			g = &sandpiper.Grain{
 				ID:      resp.ID,
 				SliceID: resp.SliceID,
-				Type:    resp.Type,
 				Key:     resp.Key,
 				Source:  resp.Source,
 			}
@@ -127,15 +124,14 @@ func (ls *LogService) Exists(c echo.Context, sliceID uuid.UUID, grainType, grain
 			c,
 			source, "Exists grain request", err,
 			map[string]interface{}{
-				"slice_id":   sliceID,
-				"grain_type": grainType,
-				"grain_key":  grainKey,
-				"resp":       g,
-				"took":       time.Since(begin),
+				"slice_id":  sliceID,
+				"grain_key": grainKey,
+				"resp":      g,
+				"took":      time.Since(begin),
 			},
 		)
 	}(time.Now())
-	return ls.Service.Exists(c, sliceID, grainType, grainKey)
+	return ls.Service.Exists(c, sliceID, grainKey)
 }
 
 // Delete logging

@@ -17,7 +17,7 @@ database:
 
 server:
   port: :8080
-  debug: true
+  debug: true  # true gives underlying error message (not for production!)
   read_timeout_seconds: 10
   write_timeout_seconds: 5
 

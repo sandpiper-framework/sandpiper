@@ -1,7 +1,7 @@
 # `sandpiper` command configuration file
 
 command:
-  url: localhost
+  url: http://localhost:8080
   port: :8080
   debug: true
   read_timeout_seconds: 10

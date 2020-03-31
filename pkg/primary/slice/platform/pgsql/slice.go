@@ -23,6 +23,7 @@ import (
 var (
 	// ErrAlreadyExists indicates the slice name is already used
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Slice name already exists.")
+	ErrSliceNotFound = echo.NewHTTPError(http.StatusNotFound, "Slice not found.")
 )
 
 // Slice represents the client for slice table
@@ -124,7 +125,7 @@ func (s *Slice) View(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	// get slice by primary key with subscribed companies
 	err := db.Model(slice).Relation("Companies").WherePK().Select()
 	if err != nil {
-		return nil, err
+		return nil, selectError(err)
 	}
 
 	// insert any metadata for the slice as a map
@@ -145,7 +146,7 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 	// get slice with subscribed companies
 	err := db.Model(slice).Relation("Companies", filterFn).WherePK().Select()
 	if err != nil {
-		return nil, err
+		return nil, selectError(err)
 	}
 
 	// insert any metadata for the slice as a map
@@ -168,9 +169,8 @@ func (s *Slice) ViewByName(db orm.DB, companyID uuid.UUID, name string) (*sandpi
 
 	// get slice with subscribed companies
 	err := db.Model(slice).Relation("Companies", filterFn).Where("name = ?", name).Select()
-
 	if err != nil {
-		return nil, err
+		return nil, selectError(err)
 	}
 
 	// insert any metadata for the slice as a map
@@ -270,4 +270,11 @@ func checkDuplicate(db orm.DB, name string) error {
 	default: // return any other problem found
 		return err
 	}
+}
+
+func selectError(err error) error {
+	if err == pg.ErrNoRows {
+		return ErrSliceNotFound
+	}
+	return err
 }

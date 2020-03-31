@@ -4,23 +4,23 @@
 
 Table settings  [headercolor: #8e44ad] {
   id integer [pk, increment]
-  key varchar [unique, not null]
-  value varchar
+  key string [unique, not null]
+  value string
 }
 
 Table users {
   id int [pk]
-  name varchar
-  email varchar
-  password varchar
+  name string
+  email string
+  password string
   company_id uuid [ref: > companies.id]
 }
 
 Table companies {
   id uuid [pk]
-  name varchar
-  contact varchar
-  email varchar
+  name string
+  contact string
+  email string
   status statustype
 }
 
@@ -28,14 +28,15 @@ Table subscriptions  [headercolor: #8e44ad] {
   id uuid [pk]
   slice_id uuid [ref: > slices.id]
   company_id uuid [ref: > companies.id]
-  name varchar
-  description varchar
+  name string
+  description string
   active boolean
 }
 
 Table tags  [headercolor: #16a085] {
   id int [pk]
-  name varchar
+  name string
+  description string
 }
 
 Table slice_tags  [headercolor: #16a085] {
@@ -46,9 +47,10 @@ Table slice_tags  [headercolor: #16a085] {
 Table slices {
   id uuid [pk]
   name varchar
+  slice_type slicetype_enum
   content_hash string [note: 'code representing all slice ids']
   content_count integer
-  last_update datetime [note: 'when data in slice was updated']
+  content_date datetime [note: 'when data in slice was updated']
 }
 
 Table slice_metadata {
@@ -60,9 +62,9 @@ Table slice_metadata {
 Table grains {
   id uuid [pk]
   slice_id uuid [ref: > slices.id]
-  grain_type payloadtype
   grain_key string
   payload string
+  source string
 }
 
 Enum statustype {
@@ -70,7 +72,7 @@ Enum statustype {
   inactive
 }
 
-Enum payloadtype {
+Enum slicetype_enum {
   "aces-file"        // level 1
   "pies-file"        // level 1
   "partspro-file"    // level 1

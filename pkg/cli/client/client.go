@@ -81,7 +81,7 @@ func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
 }
 
 // ListSlices returns a list of all slices
-func (c* Client) ListSlices() ([]sandpiper.Slice, error) {
+func (c *Client) ListSlices() ([]sandpiper.Slice, error) {
 	var slices []sandpiper.Slice
 
 	// todo: add paging support as an argument
@@ -95,8 +95,8 @@ func (c* Client) ListSlices() ([]sandpiper.Slice, error) {
 }
 
 // GrainExists will return basic information about a grain if it exists
-func (c *Client) GrainExists(sliceID uuid.UUID, grainType, grainKey string) (*sandpiper.Grain, error) {
-	path := fmt.Sprintf("/grains/%s/%s/%s", sliceID.String(), grainType, grainKey)
+func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
+	path := fmt.Sprintf("/grains/%s/%s", sliceID.String(), grainKey)
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err

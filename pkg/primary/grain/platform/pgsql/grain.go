@@ -10,7 +10,6 @@ package pgsql
 // The payload is transferred (and stored) as a (possibly encoded) binary object.
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -33,8 +32,7 @@ func NewGrain() *Grain {
 // Custom errors
 var (
 	// ErrAlreadyExists indicates the grain-type-key constraint would fail
-	ErrAlreadyExists  = echo.NewHTTPError(http.StatusInternalServerError, "Grain type/key already exists for this Slice.")
-	ErrTypeNotAllowed = echo.NewHTTPError(http.StatusInternalServerError, "Grain Type does not match Slice Type")
+	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain key already exists for this Slice.")
 )
 
 // Create creates a new grain in database (assumes allowed to do this). Grain must match the Slice
@@ -43,17 +41,13 @@ func (s *Grain) Create(db orm.DB, replaceFlag bool, grain sandpiper.Grain) (*san
 	// key is always lowercase to allow faster lookups
 	grain.Key = strings.ToLower(grain.Key)
 
-	if err := grainTypeAllowed(db, *grain.SliceID, grain.Type); err != nil {
-		return nil, err
-	}
-
 	if replaceFlag {
-		if err := removeExistingGrain(db, *grain.SliceID, grain.Type, grain.Key); err != nil {
+		if err := removeExistingGrain(db, *grain.SliceID, grain.Key); err != nil {
 			return nil, err
 		}
 	} else {
 		// todo: do we need to check? maybe we can check the insert error for existing keys (?)
-		if err := canAddGrain(db, *grain.SliceID, grain.Type, grain.Key); err != nil {
+		if err := canAddGrain(db, *grain.SliceID, grain.Key); err != nil {
 			return nil, err
 		}
 	}
@@ -69,7 +63,7 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	var grain = &sandpiper.Grain{ID: id}
 
 	err := db.Model(grain).
-		Column("grain.id", "grain_type", "grain_key", "encoding", "payload", "grain.created_at").
+		Column("grain.id", "grain_key", "encoding", "payload", "grain.created_at").
 		Relation("Slice").WherePK().Select()
 	if err != nil {
 		return nil, err
@@ -78,10 +72,10 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 }
 
 // Exists returns minimal grain information if found
-func (s *Grain) Exists(db orm.DB, sliceID uuid.UUID, grainType, grainKey string) (*sandpiper.Grain, error) {
+func (s *Grain) Exists(db orm.DB, sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
 	grain := new(sandpiper.Grain)
 	err := db.Model(grain).Column("grain.id", "source").
-		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
+		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
 		Select()
 	if err != nil {
 		return nil, err
@@ -109,7 +103,7 @@ func (s *Grain) List(db orm.DB, payload bool, sc *sandpiper.Scope, p *sandpiper.
 	var err error
 
 	// columns to select (optionally returning payload)
-	cols := "grain.id, grain_type, grain_key, encoding, grain.created_at"
+	cols := "grain.id, grain_key, encoding, grain.created_at"
 	if payload {
 		cols = cols + ", payload"
 	}
@@ -139,29 +133,13 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 	return db.Delete(grain)
 }
 
-// grainTypeAllowed makes sure you can add this grain-type to the slice
-func grainTypeAllowed(db orm.DB, sliceID uuid.UUID, grainType string) error {
-	m := sandpiper.Slice{ID: sliceID}
-
-	if err := db.Model(m).Column("content_type").WherePK().Select(); err != nil {
-		return err
-	}
-	if m.ContentType != grainType {
-		msg := fmt.Sprintf("Attempted to add \"%s\" Grain to \"%s\" Slice.", m.ContentType, grainType)
-
-		ErrTypeNotAllowed.Message = fmt.Sprintf(msg, m.ContentType, grainType)
-		return ErrTypeNotAllowed
-	}
-	return nil
-}
-
 // canAddGrain makes sure we can add this grain
-func canAddGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
+func canAddGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
 	// attempt to select by unique keys
 	m := new(sandpiper.Grain)
 	err := db.Model(m).
-		Column("id", "slice_id", "grain_type", "grain_key").
-		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
+		Column("id", "slice_id", "grain_key").
+		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
 		Select()
 
 	switch err {
@@ -175,11 +153,11 @@ func canAddGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string
 }
 
 // removeExistingGrain will remove a grain by alternate unique key. Only return real errors.
-func removeExistingGrain(db orm.DB, sliceID uuid.UUID, grainType string, grainKey string) error {
+func removeExistingGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
 	// attempt to delete by unique keys
 	m := new(sandpiper.Grain)
 	_, err := db.Model(m).
-		Where("slice_id = ? and grain_type = ? and grain_key = ?", sliceID, grainType, grainKey).
+		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
 		Delete()
 
 	// todo: fix this test. See what is actually returned when delete vs nothing to delete.

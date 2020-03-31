@@ -67,7 +67,7 @@ func (s *Slice) ViewByName(c echo.Context, name string) (*sandpiper.Slice, error
 type Update struct {
 	ID           uuid.UUID
 	Name         string
-	ContentType  string
+	SliceType    string
 	ContentHash  string
 	ContentCount uint
 	ContentDate  time.Time
@@ -81,7 +81,7 @@ func (s *Slice) Update(c echo.Context, r *Update) (*sandpiper.Slice, error) {
 	slice := &sandpiper.Slice{
 		ID:           r.ID,
 		Name:         r.Name,
-		ContentType:  r.ContentType,
+		SliceType:    r.SliceType,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
 		ContentDate:  r.ContentDate,

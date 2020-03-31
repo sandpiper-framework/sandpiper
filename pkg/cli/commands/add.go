@@ -54,7 +54,7 @@ func Add(c *args.Context) error {
 	}
 
 	// remove the old grain first if it exists
-	err = removeExistingGrain(api, p.prompt, slice.ID, p.grainType, p.grainKey)
+	err = removeExistingGrain(api, p.prompt, slice.ID, p.grainKey)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,6 @@ func Add(c *args.Context) error {
 	// create the new grain
 	grain := &sandpiper.Grain{
 		SliceID:  &slice.ID,
-		Type:     p.grainType,
 		Key:      p.grainKey,
 		Source:   filepath.Base(p.fileName),
 		Encoding: "gzipb64",
@@ -96,16 +95,15 @@ func getAddParams(c *args.Context) (*addParams, error) {
 		user:      g.user,
 		password:  g.password,
 		sliceName: c.String("name"),
-		grainType: c.String("type"),
 		grainKey:  c.String("key"),
 		fileName:  c.Args().Get(0),
 		prompt:    !c.Bool("noprompt"), // avoid double negative
 	}, nil
 }
 
-func removeExistingGrain(api *client.Client, prompt bool, sliceID uuid.UUID, grainType, grainKey string) error {
+func removeExistingGrain(api *client.Client, prompt bool, sliceID uuid.UUID, grainKey string) error {
 	// load basic info from existing grain (if found) using alternate key
-	grain, err := api.GrainExists(sliceID, grainType, grainKey)
+	grain, err := api.GrainExists(sliceID, grainKey)
 	if err != nil {
 		return err
 	}

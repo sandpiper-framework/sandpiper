@@ -38,12 +38,14 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 var (
 	// ErrInvalidSliceUUID indicates a malformed uuid
 	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "invalid slice uuid")
+	ErrInvalidSliceType = echo.NewHTTPError(http.StatusBadRequest, "invalid slice-type")
 )
 
 // Slice create request
 type createReq struct {
 	ID           uuid.UUID         `json:"id"` // optional
 	Name         string            `json:"name" validate:"required,min=3"`
+	SliceType    string            `json:"slice_type" validate:"required"`
 	ContentHash  string            `json:"content_hash"`
 	ContentCount uint              `json:"content_count"`
 	ContentDate  time.Time         `json:"content_date"`
@@ -65,15 +67,21 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	result, err := h.svc.Create(c, sandpiper.Slice{
+	rec := sandpiper.Slice{
 		ID:           r.id(),
 		Name:         r.Name,
+		SliceType:    r.SliceType,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
 		ContentDate:  r.ContentDate,
 		Metadata:     r.Metadata,
-	})
+	}
 
+	if !rec.Validate() {
+		return ErrInvalidSliceType
+	}
+
+	result, err := h.svc.Create(c, rec)
 	if err != nil {
 		return err
 	}

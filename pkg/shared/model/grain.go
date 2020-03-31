@@ -17,7 +17,6 @@ import (
 type Grain struct {
 	ID        uuid.UUID   `json:"id" pg:",pk"`
 	SliceID   *uuid.UUID  `json:"slice_id,omitempty"` // must be pointer for omitempty to work here!
-	Type      string      `json:"grain_type" pg:"grain_type"`
 	Key       string      `json:"grain_key" pg:"grain_key"`
 	Source    string      `json:"source"`
 	Encoding  string      `json:"encoding"`
@@ -39,7 +38,6 @@ func (b *Grain) BeforeInsert(ctx context.Context) (context.Context, error) {
 func (g *Grain) Display() {
 	fmt.Printf("id: %s", g.ID.String())
 	fmt.Printf("slice_id: %s", g.SliceID.String())
-	fmt.Printf("type: %s", g.Type)
 	fmt.Printf("key: %s", g.Key)
 	fmt.Printf("source: %s", g.Source)
 	fmt.Printf("created: %s", g.CreatedAt.String())

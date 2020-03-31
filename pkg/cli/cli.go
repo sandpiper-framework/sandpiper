@@ -52,7 +52,6 @@ var Commands = []*args.Command{
 	{
 		/*sandpiper add \
 		-slice "aap-brake-pads"  \ # slice-name
-		-type "aces-file"        \ # grain-type
 		-key  "brakes"           \ # grain-key
 		-noprompt                \ # don't prompt before over-writing
 		"acme_brakes_full_2019-12-12.xml" # file to add (accessed via c.Args().Get(0))
@@ -66,12 +65,6 @@ var Commands = []*args.Command{
 				Name:     "slice",
 				Aliases:  []string{"s"},
 				Usage:    "slice name",
-				Required: true,
-			},
-			&args.StringFlag{
-				Name:     "type",
-				Aliases:  []string{"t"},
-				Usage:    "grain-type",
 				Required: true,
 			},
 			&args.StringFlag{
@@ -95,12 +88,12 @@ var Commands = []*args.Command{
 	},
 	{
 		/* sandpiper list
-				-slice "aap-brake-pads"  \ # slice-name (if empty, list all slices)
+		-slice "aap-brake-pads"  \ # slice-name (if empty, list all slices)
 		*/
 		Name:   "list",
-		Usage:  "list file-based grains",
+		Usage:  "list slices or file-based grains",
 		Action: command.List,
-		Flags:  []args.Flag{
+		Flags: []args.Flag{
 			&args.StringFlag{
 				Name:     "slice",
 				Aliases:  []string{"s"},

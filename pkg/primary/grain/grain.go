@@ -34,8 +34,8 @@ func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error
 }
 
 // Exists returns a single grain's basic information (without authorization checks)
-func (s *Grain) Exists(c echo.Context, sliceID uuid.UUID, grainType, grainKey string) (*sandpiper.Grain, error) {
-	return s.sdb.Exists(s.db, sliceID, grainType, grainKey)
+func (s *Grain) Exists(c echo.Context, sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
+	return s.sdb.Exists(s.db, sliceID, grainKey)
 }
 
 // List returns list of grains scoped by user

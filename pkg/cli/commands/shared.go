@@ -19,7 +19,7 @@ import (
 
 const (
 	// DefaultConfigFile can be overridden by command line options
-	DefaultConfigFile = "cli.config.yaml"
+	DefaultConfigFile = "config.yaml"
 )
 
 // GlobalParams holds non-command specific params
