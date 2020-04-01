@@ -28,14 +28,14 @@ var GlobalFlags = []args.Flag{
 	&args.StringFlag{
 		Name:     "user",
 		Aliases:  []string{"u"},
-		Usage:    "api login `name`",
+		Usage:    "server login `name`",
 		EnvVars:  []string{"SANDPIPER_USER"},
 		Required: true,
 	},
 	&args.StringFlag{
 		Name:    "password",
 		Aliases: []string{"p"},
-		Usage:   "api password",
+		Usage:   "user password",
 		EnvVars: []string{"SANDPIPER_PASSWORD"},
 	},
 	&args.StringFlag{
@@ -50,7 +50,7 @@ var GlobalFlags = []args.Flag{
 // Commands defines the valid command line sub-commands
 var Commands = []*args.Command{
 	{
-		/*sandpiper add \
+		/* sandpiper add \
 		-slice "aap-brake-pads"  \ # slice-name
 		-key  "brakes"           \ # grain-key
 		-noprompt                \ # don't prompt before over-writing
@@ -87,8 +87,8 @@ var Commands = []*args.Command{
 		Flags:  []args.Flag{},
 	},
 	{
-		/* sandpiper list
-		-slice "aap-brake-pads"  \ # slice-name (if empty, list all slices)
+		/* sandpiper list \
+		-s "aap-brake-pads"  \ # slice-name (if empty, list all slices)
 		*/
 		Name:   "list",
 		Usage:  "list slices or file-based grains",

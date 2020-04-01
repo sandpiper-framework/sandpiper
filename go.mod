@@ -13,6 +13,7 @@ require (
 	github.com/go-playground/validator v9.21.1+incompatible
 	github.com/golang-migrate/migrate/v4 v4.7.0
 	github.com/google/uuid v1.1.1
+	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/lib/pq v1.2.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20171102151520-eafdab6b0663

@@ -7,9 +7,17 @@ package pgsql
 // auth service database access
 
 import (
+	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/labstack/echo/v4"
+	"net/http"
 
 	"autocare.org/sandpiper/pkg/shared/model"
+)
+
+var (
+	// ErrAuthNotFound message is a bit obscure on purpose
+	ErrAuthNotFound = echo.NewHTTPError(http.StatusNotFound, "Authentication Error.")
 )
 
 // User represents the client for user table
@@ -20,7 +28,7 @@ func NewUser() *User {
 	return &User{}
 }
 
-// View returns single user by ID
+// View returns single user by ID (used by the /me route)
 func (u *User) View(db orm.DB, id int) (*sandpiper.User, error) {
 	var user = &sandpiper.User{ID: id}
 
@@ -37,7 +45,7 @@ func (u *User) FindByUsername(db orm.DB, uname string) (*sandpiper.User, error) 
 
 	err := db.Model(user).Where("username = ?", uname).Select()
 	if err != nil {
-		return nil, err
+		return nil, selectError(err)
 	}
 	return user, nil
 }
@@ -48,7 +56,7 @@ func (u *User) FindByToken(db orm.DB, token string) (*sandpiper.User, error) {
 
 	err := db.Model(user).Where("token = ?", token).Select()
 	if err != nil {
-		return nil, err
+		return nil, selectError(err)
 	}
 	return user, err
 }
@@ -56,4 +64,11 @@ func (u *User) FindByToken(db orm.DB, token string) (*sandpiper.User, error) {
 // Update updates user's info
 func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 	return db.Update(user)
+}
+
+func selectError(err error) error {
+	if err == pg.ErrNoRows {
+		return ErrAuthNotFound
+	}
+	return err
 }

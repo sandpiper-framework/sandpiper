@@ -15,7 +15,7 @@ import (
 
 // Custom errors
 var (
-	ErrInvalidCredentials = echo.NewHTTPError(http.StatusUnauthorized, "Username or password does not exist")
+	ErrInvalidCredentials = echo.NewHTTPError(http.StatusUnauthorized, "Authentication Error.")
 	ErrNotAuthorized      = echo.NewHTTPError(http.StatusUnauthorized, "User is not authorized")
 )
 

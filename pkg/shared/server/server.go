@@ -49,7 +49,7 @@ type Config struct {
 // Start starts echo server.
 func Start(srv *echo.Echo, cfg *Config) {
 	httpServer := &http.Server{
-		Addr:         cfg.Port,
+		Addr:         formatPort(cfg.Port),
 		ReadTimeout:  time.Duration(cfg.ReadTimeoutSeconds) * time.Second,
 		WriteTimeout: time.Duration(cfg.WriteTimeoutSeconds) * time.Second,
 	}
@@ -87,4 +87,11 @@ func healthCheck(c echo.Context) error {
 func listRoutes(c echo.Context) error {
 	r, _ := json.Marshal(c.Echo().Routes())
 	return c.String(http.StatusOK, string(r))
+}
+
+func formatPort(port string) string {
+	if port[0:1] != ":" {
+		return ":" + port
+	}
+	return port
 }

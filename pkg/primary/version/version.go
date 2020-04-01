@@ -15,7 +15,7 @@ var Version = "unknown"
 
 // Banner prints identifying information about the server.
 func Banner() string {
-	const copyright = "Copyright (c) Auto Care Association. All rights reserved."
+	const copyright = "Copyright (c) The Sandpiper Authors. All rights reserved."
 
 	return fmt.Sprintf("%s\nSandpiper API Server (%s)\n%s\n", product(), Version, copyright)
 }

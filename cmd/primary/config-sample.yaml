@@ -16,8 +16,8 @@ database:
   log_queries: true
 
 server:
-  port: :8080
-  debug: true  # true gives underlying error message (not for production!)
+  port: 8080
+  debug: true  # WARNING: debug creates non-JSON responses (but shows underlying errors). Not for production!
   read_timeout_seconds: 10
   write_timeout_seconds: 5
 

@@ -9,8 +9,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"time"
 
@@ -19,26 +19,37 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
+const apiVer = "/v1"
+
 /* Use "github.com/ddliu/go-httpclient" for a sample client reference */
 
 // Client represents the http client
 type Client struct {
-	BaseURL    *url.URL // basePath holds the path to prepend to the requests.
-	UserAgent  string
-	Auth       *sandpiper.AuthToken
+	baseURL    *url.URL // basePath holds the path to prepend to the requests.
+	userAgent  string
+	auth       *sandpiper.AuthToken
 	httpClient *http.Client // client used to send and receive http requests.
+	debug      bool
 }
 
 // New creates a new http client for the given sandpiper server url
-func New(baseURL *url.URL) *Client {
+func New(baseURL *url.URL, debugFlag bool) *Client {
+	var timeout time.Duration = 10
+
+	if debugFlag {
+		timeout = 3600
+	}
+
 	netClient := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: timeout * time.Second,
 	}
 
 	c := &Client{
-		BaseURL:    baseURL,
-		UserAgent:  "Sandpiper",
+		baseURL:    baseURL,
+		userAgent:  "Sandpiper",
+		auth:       &sandpiper.AuthToken{},
 		httpClient: netClient,
+		debug:      debugFlag,
 	}
 	return c
 }
@@ -50,7 +61,10 @@ func (c *Client) Login(username, password string) error {
 	if err != nil {
 		return err
 	}
-	_, err = c.do(req, c.Auth)
+	resp, err := c.do(req, c.auth)
+	if err == nil && resp.StatusCode != 200 {
+		return fmt.Errorf("Login failed (%d).", resp.StatusCode)
+	}
 	return err
 }
 
@@ -60,7 +74,7 @@ func (c *Client) Add(grain *sandpiper.Grain) error {
 	if err != nil {
 		return err
 	}
-	req, err := c.newRequest("POST", "/grains", body)
+	req, err := c.newRequest("POST", apiVer+"/grains", body)
 	if err != nil {
 		return err
 	}
@@ -70,7 +84,7 @@ func (c *Client) Add(grain *sandpiper.Grain) error {
 
 // SliceByName returns a slice by unique key name
 func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
-	path := "/slices/name/" + name
+	path := apiVer + "/slices/name/" + name
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -81,22 +95,22 @@ func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
 }
 
 // ListSlices returns a list of all slices
-func (c *Client) ListSlices() ([]sandpiper.Slice, error) {
-	var slices []sandpiper.Slice
+func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
+	var slices sandpiper.SlicesPaginated
 
 	// todo: add paging support as an argument
-	path := "/slices"
+	path := apiVer + "/slices"
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.do(req, slices)
-	return slices, err
+	_, err = c.do(req, &slices)
+	return &slices, err
 }
 
 // GrainExists will return basic information about a grain if it exists
 func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
-	path := fmt.Sprintf("/grains/%s/%s", sliceID.String(), grainKey)
+	path := fmt.Sprintf("%s/grains/%s/%s", apiVer, sliceID.String(), grainKey)
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -108,7 +122,7 @@ func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Gra
 
 // DeleteGrain deletes a grain by primary key
 func (c *Client) DeleteGrain(grainID uuid.UUID) error {
-	path := fmt.Sprintf("/grains/%s", grainID.String())
+	path := fmt.Sprintf("%s/grains/%s", apiVer, grainID.String())
 	req, err := c.newRequest("DELETE", path, nil)
 	if err != nil {
 		return err
@@ -121,18 +135,11 @@ func (c *Client) DeleteGrain(grainID uuid.UUID) error {
 /* Utility Routines */
 
 // newRequest prepares a request for an api call
+// any `body` must be valid json
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
 	rel := &url.URL{Path: path}
-	u := c.BaseURL.ResolveReference(rel)
-	var buf io.ReadWriter
-	if body != nil {
-		buf = new(bytes.Buffer)
-		err := json.NewEncoder(buf).Encode(body)
-		if err != nil {
-			return nil, err
-		}
-	}
-	req, err := http.NewRequest(method, u.String(), buf)
+	u := c.baseURL.ResolveReference(rel)
+	req, err := http.NewRequest(method, u.String(), toReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -140,9 +147,9 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 		req.Header.Set("Content-Type", "application/json")
 	}
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", c.UserAgent)
-	if c.Auth != nil {
-		req.Header.Set("Authorization", "Bearer "+c.Auth.Token)
+	req.Header.Set("User-Agent", c.userAgent)
+	if c.auth.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+c.auth.Token)
 	}
 	return req, nil
 }
@@ -154,7 +161,29 @@ func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if c.debug {
+		dump, err := httputil.DumpRequestOut(req, true)
+		if err == nil {
+			fmt.Printf("/n%s", dump)
+		}
+		fmt.Printf("req: %v\n\nresp: %v\n", req, resp)
+	}
 	// consider limits using json.NewDecoder(io.LimitReader(response.Body, SomeSaneConst)).Decode(v)
 	err = json.NewDecoder(resp.Body).Decode(v)
 	return resp, err
+}
+
+func toReader(v interface{}) *bytes.Reader {
+	switch t := v.(type) {
+	case []byte:
+		return bytes.NewReader(t)
+	case string:
+		return bytes.NewReader([]byte(t))
+	case *bytes.Reader:
+		return t
+	case nil:
+		return bytes.NewReader(nil)
+	default:
+		panic("Invalid value")
+	}
 }

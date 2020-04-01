@@ -45,7 +45,7 @@ var (
 type createReq struct {
 	ID           uuid.UUID         `json:"id"` // optional
 	Name         string            `json:"name" validate:"required,min=3"`
-	SliceType    string            `json:"slice_type" validate:"required"`
+	SLiceType    string            `json:"slice_type" validate:"required"`
 	ContentHash  string            `json:"content_hash"`
 	ContentCount uint              `json:"content_count"`
 	ContentDate  time.Time         `json:"content_date"`
@@ -70,7 +70,7 @@ func (h *HTTP) create(c echo.Context) error {
 	rec := sandpiper.Slice{
 		ID:           r.id(),
 		Name:         r.Name,
-		SliceType:    r.SliceType,
+		SliceType:    r.SLiceType,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
 		ContentDate:  r.ContentDate,
@@ -111,11 +111,6 @@ func (h *HTTP) viewByName(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-type listResponse struct {
-	Slices []sandpiper.Slice `json:"slices"`
-	Page   int               `json:"page"`
-}
-
 func (h *HTTP) list(c echo.Context) error {
 	// allow slices filtered by tags (/slices?tags=aaa,bbb or /slices?tags-all=aaa,bbb)
 	tags := sandpiper.NewTagQuery(c.QueryParams(), c.QueryString())
@@ -129,7 +124,7 @@ func (h *HTTP) list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, listResponse{result, p.Page})
+	return c.JSON(http.StatusOK, sandpiper.SlicesPaginated{Slices: result, Page: p.Page})
 }
 
 // Slice update request

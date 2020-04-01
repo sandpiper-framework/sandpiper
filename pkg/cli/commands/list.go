@@ -17,6 +17,7 @@ type listParams struct {
 	user      string
 	password  string
 	sliceName string
+	debug     bool
 }
 
 // List returns a list of all grains for a slice
@@ -27,23 +28,27 @@ func List(c *args.Context) error {
 	}
 
 	// connect to the api server (saving token)
-	api, err := Connect(p.addr, p.user, p.password)
+	api, err := Connect(p.addr, p.user, p.password, p.debug)
 	if err != nil {
 		return err
 	}
 
 	if p.sliceName == "" {
 		// if slice is empty, list all slices
-		slices, err := api.ListSlices()
+		result, err := api.ListSlices()
 		if err != nil {
 			return err
 		}
-		for _, slice := range slices {
-			fmt.Printf("%v", slice)
+		for i, slice := range result.Slices {
+			fmt.Printf(
+				"%d: %s\nName: %s (%s)\nHash: %s\nGrains: %d\n",
+				i+1, slice.ID, slice.Name, slice.SliceType, slice.ContentHash, slice.ContentCount,
+			)
+			fmt.Printf("Metadata: %v\n", slice.Metadata)
+			fmt.Printf("Companies: %v\n\n", slice.Companies)
 		}
 	} else {
 		// todo: if slice is supplied, list all grains for that slice
-
 	}
 
 	return nil
@@ -61,5 +66,6 @@ func getListParams(c *args.Context) (*listParams, error) {
 		user:      g.user,
 		password:  g.password,
 		sliceName: c.String("name"),
+		debug:     g.debug,
 	}, nil
 }

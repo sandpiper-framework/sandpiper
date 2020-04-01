@@ -30,6 +30,7 @@ type addParams struct {
 	grainKey  string
 	fileName  string
 	prompt    bool
+	debug     bool
 }
 
 // Add attempts to add a new file-based grain to a slice
@@ -42,7 +43,7 @@ func Add(c *args.Context) error {
 	}
 
 	// connect to the api server (saving token)
-	api, err := Connect(p.addr, p.user, p.password)
+	api, err := Connect(p.addr, p.user, p.password, p.debug)
 	if err != nil {
 		return err
 	}
@@ -98,6 +99,7 @@ func getAddParams(c *args.Context) (*addParams, error) {
 		grainKey:  c.String("key"),
 		fileName:  c.Args().Get(0),
 		prompt:    !c.Bool("noprompt"), // avoid double negative
+		debug:     g.debug,
 	}, nil
 }
 

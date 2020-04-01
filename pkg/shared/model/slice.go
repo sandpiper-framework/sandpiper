@@ -29,6 +29,12 @@ type Slice struct {
 	Companies    []*Company `json:"companies,omitempty" pg:"many2many:subscriptions"`
 }
 
+// SlicesPaginated adds pagination
+type SlicesPaginated struct {
+	Slices []Slice `json:"slices"`
+	Page   int     `json:"page"`
+}
+
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*Slice)(nil)
 var _ orm.BeforeUpdateHook = (*Slice)(nil)

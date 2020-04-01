@@ -8,10 +8,12 @@ package command
 import (
 	"bufio"
 	"fmt"
-	args "github.com/urfave/cli/v2"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/howeyc/gopass"
+	args "github.com/urfave/cli/v2"
 
 	"autocare.org/sandpiper/pkg/cli/client"
 	"autocare.org/sandpiper/pkg/shared/config"
@@ -27,6 +29,7 @@ type GlobalParams struct {
 	addr     *url.URL
 	user     string
 	password string
+	debug    bool
 }
 
 // GetGlobalParams parses global parameters from command line
@@ -42,21 +45,27 @@ func GetGlobalParams(c *args.Context) (*GlobalParams, error) {
 		return nil, err
 	}
 
-	addr, err := url.Parse(cfg.Command.URL)
+	addr, err := getServerAddr(cfg.Command.URL, cfg.Command.Port)
 	if err != nil {
 		return nil, err
+	}
+
+	passwd, err := getPassword(c.String("password"))
+	if passwd == "" {
+		return nil, fmt.Errorf("password not supplied")
 	}
 
 	return &GlobalParams{
 		addr:     addr,
 		user:     c.String("user"),
-		password: c.String("password"),
+		password: passwd,
+		debug:    cfg.Command.Debug,
 	}, nil
 }
 
 // Connect to the sandpiper api server (saving token in the client struct)
-func Connect(addr *url.URL, user, password string) (*client.Client, error) {
-	http := client.New(addr)
+func Connect(addr *url.URL, user, password string, debug bool) (*client.Client, error) {
+	http := client.New(addr, debug)
 	if err := http.Login(user, password); err != nil {
 		return nil, err
 	}
@@ -69,4 +78,22 @@ func AllowOverwrite() bool {
 	fmt.Print("Overwrite (y/n)? ")
 	ans, _ := reader.ReadString('\n')
 	return strings.ToLower(ans) == "y"
+}
+
+func getPassword(pw string) (string, error) {
+	if pw == "" {
+		password, err := gopass.GetPasswdPrompt("Password: ", true, os.Stdin, os.Stdout)
+		if err != nil {
+			return "", err
+		}
+		pw = string(password)
+	}
+	return pw, nil
+}
+
+func getServerAddr(addr, port string) (*url.URL, error) {
+	if port != "" {
+		return url.Parse(addr + ":" + port)
+	}
+	return url.Parse(addr)
 }
