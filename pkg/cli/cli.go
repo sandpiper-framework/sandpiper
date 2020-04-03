@@ -100,6 +100,11 @@ var Commands = []*args.Command{
 				Usage:    "slice name",
 				Required: false,
 			},
+			&args.BoolFlag{
+				Name:  "full",
+				Usage: "provide full listings",
+				Value: false,
+			},
 		},
 	},
 }

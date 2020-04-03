@@ -42,3 +42,9 @@ func (g *Grain) Display() {
 	fmt.Printf("source: %s", g.Source)
 	fmt.Printf("created: %s", g.CreatedAt.String())
 }
+
+// GrainsPaginated adds pagination
+type GrainsPaginated struct {
+	Grains []Grain `json:"grains"`
+	Page   int     `json:"page"`
+}

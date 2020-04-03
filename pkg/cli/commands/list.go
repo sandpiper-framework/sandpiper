@@ -6,6 +6,7 @@
 package command
 
 import (
+	sandpiper "autocare.org/sandpiper/pkg/shared/model"
 	"fmt"
 	"net/url"
 
@@ -17,6 +18,7 @@ type listParams struct {
 	user      string
 	password  string
 	sliceName string
+	full      bool
 	debug     bool
 }
 
@@ -40,15 +42,24 @@ func List(c *args.Context) error {
 			return err
 		}
 		for i, slice := range result.Slices {
-			fmt.Printf(
-				"%d: %s\nName: %s (%s)\nHash: %s\nGrains: %d\n",
-				i+1, slice.ID, slice.Name, slice.SliceType, slice.ContentHash, slice.ContentCount,
-			)
-			fmt.Printf("Metadata: %v\n", slice.Metadata)
-			fmt.Printf("Companies: %v\n\n", slice.Companies)
+			if p.full {
+				printSliceFull(i, slice)
+			} else {
+				printSliceBrief(slice)
+			}
 		}
 	} else {
 		// todo: if slice is supplied, list all grains for that slice
+		result, err := api.ListGrains(p.sliceName)
+		if err != nil {
+			for i, grain := range result.Grains {
+				if p.full {
+					printGrainFull(i, &grain)
+				} else {
+					printGrainBrief(&grain)
+				}
+			}
+		}
 	}
 
 	return nil
@@ -66,6 +77,28 @@ func getListParams(c *args.Context) (*listParams, error) {
 		user:      g.user,
 		password:  g.password,
 		sliceName: c.String("name"),
+		full:      c.Bool("full"),
 		debug:     g.debug,
 	}, nil
+}
+
+func printSliceFull(i int, slice sandpiper.Slice) {
+	fmt.Printf(
+		"%d: %s\nName: %s (%s)\nHash: %s\nGrains: %d\n",
+		i+1, slice.ID.String(), slice.Name, slice.SliceType, slice.ContentHash, slice.ContentCount,
+	)
+	fmt.Printf("Metadata: %v\n", slice.Metadata)
+	fmt.Printf("Subscriptions: %v\n\n", slice.Companies)
+}
+
+func printSliceBrief(slice sandpiper.Slice) {
+	fmt.Printf("%s (%s) \"%s\" Grains: %d\n", slice.Name, slice.ID.String(), slice.SliceType, slice.ContentCount)
+}
+
+func printGrainFull(i int, grain *sandpiper.Grain) {
+	fmt.Printf("%d: %s\n", i, grain.ID.String())
+}
+
+func printGrainBrief(grain *sandpiper.Grain) {
+	fmt.Printf("%s\n", grain.ID.String())
 }

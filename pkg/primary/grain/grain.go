@@ -44,7 +44,16 @@ func (s *Grain) List(c echo.Context, payload bool, p *sandpiper.Pagination) ([]s
 	if err != nil {
 		return nil, err
 	}
-	return s.sdb.List(s.db, payload, q, p)
+	return s.sdb.List(s.db, uuid.Nil, payload, q, p)
+}
+
+// ListBySlice returns a list of grains for a slice scoped by user
+func (s *Grain) ListBySlice(c echo.Context, sliceID uuid.UUID, payload bool, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+	q, err := s.rbac.EnforceScope(c)
+	if err != nil {
+		return nil, err
+	}
+	return s.sdb.List(s.db, sliceID, payload, q, p)
 }
 
 // Delete deletes a grain by id, if allowed

@@ -90,7 +90,7 @@ func checkDuplicate(db orm.DB, name string) error {
 	// attempt to select by unique key
 	m := new(sandpiper.Subscription)
 	err := db.Model(m).
-		Column("id").
+		Column("sub_id").
 		Where("lower(name) = ?", strings.ToLower(name)).
 		Select()
 

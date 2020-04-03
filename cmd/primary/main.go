@@ -35,6 +35,10 @@ func main() {
 	msg := database.Migrate(cfg.DB.URL(), embeddedFiles())
 	fmt.Println(msg)
 
+	if cfg.Server.Debug {
+		fmt.Println("** RUNNING IN DEBUG (NON-PRODUCTION) MODE **")
+	}
+
 	err = primary.Start(cfg)
 	if err != nil {
 		panic(err.Error())

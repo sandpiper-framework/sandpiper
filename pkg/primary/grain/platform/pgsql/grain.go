@@ -31,8 +31,8 @@ func NewGrain() *Grain {
 
 // Custom errors
 var (
-	// ErrAlreadyExists indicates the grain-type-key constraint would fail
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain key already exists for this Slice.")
+	ErrGrainNotFound = echo.NewHTTPError(http.StatusNotFound, "Grain does not exist.")
 )
 
 // Create creates a new grain in database (assumes allowed to do this). Grain must match the Slice
@@ -66,7 +66,7 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 		Column("grain.id", "grain_key", "encoding", "payload", "grain.created_at").
 		Relation("Slice").WherePK().Select()
 	if err != nil {
-		return nil, err
+		return nil, selectError(err)
 	}
 	return grain, nil
 }
@@ -78,7 +78,7 @@ func (s *Grain) Exists(db orm.DB, sliceID uuid.UUID, grainKey string) (*sandpipe
 		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
 		Select()
 	if err != nil {
-		return nil, err
+		return nil, selectError(err)
 	}
 	return grain, nil
 }
@@ -97,30 +97,44 @@ func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.U
 	return false
 }
 
-// List returns a list of all grains with scoping and pagination
-func (s *Grain) List(db orm.DB, payload bool, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+// List returns a list of all grains with scoping and pagination (optionally for a slice)
+func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payload bool, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
-	var err error
+	//var listModel = (*[]sandpiper.Grain)(nil)
+	var q *orm.Query
 
 	// columns to select (optionally returning payload)
-	cols := "grain.id, grain_key, encoding, grain.created_at"
+	cols := "grain.id, slice_id, grain_key, encoding, grain.created_at"
 	if payload {
 		cols = cols + ", payload"
 	}
 
-	if sc != nil {
-		// Use CTE query to get all subscriptions for the scope (i.e. the company)
-		err = db.Model((*sandpiper.Subscription)(nil)).
-			Column("subscription.slice_id").
-			Where(sc.Condition, sc.ID).
+	// build the query
+	switch {
+	case sc != nil && sliceID != uuid.Nil:
+		// both provided, do a simple join to subscriptions (by-passing the slices table)
+		q = db.Model(&grains).ColumnExpr(cols).
+			Join("INNER JOIN subscriptions AS sub ON grain.slice_id = sub.slice_id").
+			Where("sub.company_id = ?", sc.ID).Where("active = true")
+	case sc != nil && sliceID == uuid.Nil:
+		// scope without a slice
+		// Use CTE query to get all "active" subscriptions for the scope (i.e. the company)
+		q = db.Model((*sandpiper.Subscription)(nil)).
+			Column("subscription.slice_id").Where(sc.Condition, sc.ID).Where("active = true").
 			WrapWith("scope").Table("scope").
-			Join("JOIN grains AS grain ON grain.slice_id = scope.slice_id").
-			ColumnExpr(cols).
-			Limit(p.Limit).Offset(p.Offset).Select(&grains)
-	} else {
-		// simple case with no scoping
-		err = db.Model(&grains).ColumnExpr(cols).Limit(p.Limit).Offset(p.Offset).Select()
+			Join("INNER JOIN grains AS grain ON grain.slice_id = scope.slice_id").
+			ColumnExpr(cols)
+	case sc == nil && sliceID != uuid.Nil:
+		// slice without a scope
+		q = db.Model(&grains).ColumnExpr(cols).Where("slice_id = ?", sliceID)
+			//Join("INNER JOIN slices AS slice ON grain.slice_id = slice.id")
+	default:
+		// neither provided, simple case returning all grains
+		q = db.Model(&grains).ColumnExpr(cols)
 	}
+
+	// execute the query
+	err := q.Limit(p.Limit).Offset(p.Offset).Select(&grains)
 	if err != nil {
 		return nil, err
 	}
@@ -169,4 +183,11 @@ func removeExistingGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
 	default: // return any other problem found
 		return err
 	}
+}
+
+func selectError(err error) error {
+	if err == pg.ErrNoRows {
+		return ErrGrainNotFound
+	}
+	return err
 }

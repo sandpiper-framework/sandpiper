@@ -27,6 +27,7 @@ func NewHTTP(svc grain.Service, er *echo.Group) {
 	sr := er.Group("/grains")
 	sr.POST("", h.create) // ?replace=[yes/no*]
 	sr.GET("", h.list)    // ?payload=[yes/no*]
+	sr.GET("/slice/:id", h.listBySlice)
 	sr.GET("/:id", h.view)
 	sr.GET("/:sliceid/:grainkey", h.exists)
 	sr.DELETE("/:id", h.delete)
@@ -34,8 +35,8 @@ func NewHTTP(svc grain.Service, er *echo.Group) {
 
 // Custom errors
 var (
-	// ErrInvalidSliceUUID indicates a malformed uuid
-	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "Invalid grain uuid")
+	ErrInvalidGrainUUID = echo.NewHTTPError(http.StatusBadRequest, "Invalid grain uuid")
+	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "Invalid slice uuid")
 )
 
 // Grain create request
@@ -56,7 +57,7 @@ func (r createReq) id() uuid.UUID {
 }
 
 func (h *HTTP) create(c echo.Context) error {
-	var replaceFlag bool = false
+	var replaceFlag = false
 
 	if c.QueryParam("replace") == "yes" {
 		replaceFlag = true
@@ -83,13 +84,8 @@ func (h *HTTP) create(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-type listResponse struct {
-	Slices []sandpiper.Grain `json:"grains"`
-	Page   int               `json:"page"`
-}
-
 func (h *HTTP) list(c echo.Context) error {
-	var includePayload bool = false
+	var includePayload = false
 
 	if c.QueryParam("payload") == "yes" {
 		includePayload = true
@@ -101,12 +97,36 @@ func (h *HTTP) list(c echo.Context) error {
 	}
 
 	result, err := h.svc.List(c, includePayload, p.Transform())
-
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, listResponse{result, p.Page})
+	return c.JSON(http.StatusOK, sandpiper.GrainsPaginated{Grains: result, Page: p.Page})
+}
+
+func (h *HTTP) listBySlice(c echo.Context) error {
+	var includePayload = false
+
+	sliceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+
+	if c.QueryParam("payload") == "yes" {
+		includePayload = true
+	}
+
+	p := new(sandpiper.PaginationReq)
+	if err := c.Bind(p); err != nil {
+		return err
+	}
+
+	result, err := h.svc.ListBySlice(c, sliceID, includePayload, p.Transform())
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, sandpiper.GrainsPaginated{Grains: result, Page: p.Page})
 }
 
 func (h *HTTP) view(c echo.Context) error {

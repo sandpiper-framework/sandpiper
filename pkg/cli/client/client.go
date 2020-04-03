@@ -26,6 +26,7 @@ const apiVer = "/v1"
 // Client represents the http client
 type Client struct {
 	baseURL    *url.URL // basePath holds the path to prepend to the requests.
+	apiPrefix  string   // prepended to endpoint after successful /login
 	userAgent  string
 	auth       *sandpiper.AuthToken
 	httpClient *http.Client // client used to send and receive http requests.
@@ -63,8 +64,12 @@ func (c *Client) Login(username, password string) error {
 	}
 	resp, err := c.do(req, c.auth)
 	if err == nil && resp.StatusCode != 200 {
-		return fmt.Errorf("Login failed (%d).", resp.StatusCode)
+		return fmt.Errorf("login failed (%d)", resp.StatusCode)
 	}
+
+	// add api version to all subsequent api calls
+	c.apiPrefix = apiVer
+
 	return err
 }
 
@@ -74,7 +79,7 @@ func (c *Client) Add(grain *sandpiper.Grain) error {
 	if err != nil {
 		return err
 	}
-	req, err := c.newRequest("POST", apiVer+"/grains", body)
+	req, err := c.newRequest("POST", "/grains", body)
 	if err != nil {
 		return err
 	}
@@ -84,7 +89,7 @@ func (c *Client) Add(grain *sandpiper.Grain) error {
 
 // SliceByName returns a slice by unique key name
 func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
-	path := apiVer + "/slices/name/" + name
+	path := "/slices/name/" + name
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -94,12 +99,18 @@ func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
 	return slice, err
 }
 
+// ListGrains returns a list of grains for the supplied slice
+func (c *Client) ListGrains(name string) (*sandpiper.GrainsPaginated, error) {
+	//
+	return nil, nil
+}
+
 // ListSlices returns a list of all slices
 func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
 	var slices sandpiper.SlicesPaginated
 
 	// todo: add paging support as an argument
-	path := apiVer + "/slices"
+	path := "/slices"
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -110,7 +121,7 @@ func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
 
 // GrainExists will return basic information about a grain if it exists
 func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
-	path := fmt.Sprintf("%s/grains/%s/%s", apiVer, sliceID.String(), grainKey)
+	path := fmt.Sprintf("/grains/%s/%s", sliceID.String(), grainKey)
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -122,7 +133,7 @@ func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Gra
 
 // DeleteGrain deletes a grain by primary key
 func (c *Client) DeleteGrain(grainID uuid.UUID) error {
-	path := fmt.Sprintf("%s/grains/%s", apiVer, grainID.String())
+	path := fmt.Sprintf("/grains/%s", grainID.String())
 	req, err := c.newRequest("DELETE", path, nil)
 	if err != nil {
 		return err
@@ -137,7 +148,7 @@ func (c *Client) DeleteGrain(grainID uuid.UUID) error {
 // newRequest prepares a request for an api call
 // any `body` must be valid json
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
-	rel := &url.URL{Path: path}
+	rel := &url.URL{Path: c.apiPrefix + path}
 	u := c.baseURL.ResolveReference(rel)
 	req, err := http.NewRequest(method, u.String(), toReader(body))
 	if err != nil {
