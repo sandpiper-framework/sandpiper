@@ -8,22 +8,27 @@ package command
 import (
 	sandpiper "autocare.org/sandpiper/pkg/shared/model"
 	"fmt"
+	"github.com/google/uuid"
 	"net/url"
 
 	args "github.com/urfave/cli/v2"
 )
 
 type listParams struct {
-	addr      *url.URL // our sandpiper server
-	user      string
-	password  string
-	sliceName string
-	full      bool
-	debug     bool
+	addr     *url.URL // our sandpiper server
+	user     string
+	password string
+	argument string
+	nameFlag bool
+	full     bool
+	debug    bool
 }
 
 // List returns a list of all grains for a slice
 func List(c *args.Context) error {
+	var slice *sandpiper.Slice
+	var sliceID uuid.UUID
+
 	p, err := getListParams(c)
 	if err != nil {
 		return err
@@ -35,8 +40,8 @@ func List(c *args.Context) error {
 		return err
 	}
 
-	if p.sliceName == "" {
-		// if slice is empty, list all slices
+	if p.argument == "" {
+		// no argument means to list all slices
 		result, err := api.ListSlices()
 		if err != nil {
 			return err
@@ -49,19 +54,31 @@ func List(c *args.Context) error {
 			}
 		}
 	} else {
-		// todo: if slice is supplied, list all grains for that slice
-		result, err := api.ListGrains(p.sliceName)
+		// show grains either by slice-id or by slice-name
+		if p.nameFlag {
+			slice, err = api.SliceByName(p.argument)
+			if err != nil {
+				return err
+			}
+			sliceID = slice.ID
+		} else {
+			sliceID, err = uuid.Parse(p.argument)
+			if err != nil {
+				return err
+			}
+		}
+		result, err := api.ListGrains(sliceID)
 		if err != nil {
-			for i, grain := range result.Grains {
-				if p.full {
-					printGrainFull(i, &grain)
-				} else {
-					printGrainBrief(&grain)
-				}
+			return err
+		}
+		for i, grain := range result.Grains {
+			if p.full {
+				printGrainFull(i, &grain)
+			} else {
+				printGrainBrief(&grain)
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -73,12 +90,13 @@ func getListParams(c *args.Context) (*listParams, error) {
 	}
 
 	return &listParams{
-		addr:      g.addr,
-		user:      g.user,
-		password:  g.password,
-		sliceName: c.String("name"),
-		full:      c.Bool("full"),
-		debug:     g.debug,
+		addr:     g.addr,
+		user:     g.user,
+		password: g.password,
+		nameFlag: c.Bool("name"),
+		full:     c.Bool("full"),
+		argument: c.Args().Get(0), // either slice-id or slice-name
+		debug:    g.debug,
 	}, nil
 }
 
@@ -96,9 +114,9 @@ func printSliceBrief(slice sandpiper.Slice) {
 }
 
 func printGrainFull(i int, grain *sandpiper.Grain) {
-	fmt.Printf("%d: %s\n", i, grain.ID.String())
+	fmt.Println(grain.Display())
 }
 
 func printGrainBrief(grain *sandpiper.Grain) {
-	fmt.Printf("%s\n", grain.ID.String())
+	fmt.Println(grain.Display())
 }

@@ -6,7 +6,7 @@ package sandpiper
 
 import (
 	"context"
-	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-pg/pg/v9/orm"
@@ -34,13 +34,15 @@ func (b *Grain) BeforeInsert(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-// Display prints basic grain information to stdout
-func (g *Grain) Display() {
-	fmt.Printf("id: %s", g.ID.String())
-	fmt.Printf("slice_id: %s", g.SliceID.String())
-	fmt.Printf("key: %s", g.Key)
-	fmt.Printf("source: %s", g.Source)
-	fmt.Printf("created: %s", g.CreatedAt.String())
+// Display returns basic grain information in string format
+func (g *Grain) Display() string {
+	s := strings.Builder{}
+	s.WriteString("grain_id: " + g.ID.String() + "\n")
+	s.WriteString("slice_id: " + g.SliceID.String()+ "\n")
+	s.WriteString("key: \"" + g.Key+ "\"\n")
+	s.WriteString("source: \"" + g.Source+ "\"\n")
+	s.WriteString("created: " + g.CreatedAt.String()+ "\n")
+	return s.String()
 }
 
 // GrainsPaginated adds pagination

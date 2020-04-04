@@ -54,7 +54,7 @@ var Commands = []*args.Command{
 		-slice "aap-brake-pads"  \ # slice-name
 		-key  "brakes"           \ # grain-key
 		-noprompt                \ # don't prompt before over-writing
-		"acme_brakes_full_2019-12-12.xml" # file to add (accessed via c.Args().Get(0))
+		acme_brakes_full_2019-12-12.xml # file to add (accessed via c.Args().Get(0))
 		*/
 		Name:      "add",
 		Usage:     "add a file-based grain",
@@ -88,16 +88,18 @@ var Commands = []*args.Command{
 	},
 	{
 		/* sandpiper list \
-		-s "aap-brake-pads"  \ # slice-name (if empty, list all slices)
+		-n  \ # interpret the argument as a slice name
+		arg  # either slice_id or slice_name (if empty, list all slices)
 		*/
 		Name:   "list",
 		Usage:  "list slices or file-based grains",
+		ArgsUsage: "[empty | slice_id | slice_name]",
 		Action: command.List,
 		Flags: []args.Flag{
-			&args.StringFlag{
-				Name:     "slice",
-				Aliases:  []string{"s"},
-				Usage:    "slice name",
+			&args.BoolFlag{
+				Name:     "name",
+				Aliases:  []string{"n"},
+				Usage:    "argument is a slice-name",
 				Required: false,
 			},
 			&args.BoolFlag{

@@ -113,7 +113,7 @@ func removeExistingGrain(api *client.Client, prompt bool, sliceID uuid.UUID, gra
 	// if grain exists, must remove it (prompt for delete unless "noprompt" flag)
 	if grain.ID != uuid.Nil {
 		if prompt {
-			grain.Display() // show what we're overwriting
+			fmt.Println(grain.Display()) // show what we're overwriting
 			if !AllowOverwrite() {
 				return errors.New("grain could not be added without overwrite")
 			}

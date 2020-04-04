@@ -111,7 +111,7 @@ tasks:
       DOCKER_RUNNING: {sh: docker ps -q}
     silent: true
 
-  run:
+  server:
     desc: Launch sandpiper primary (publication) server
     dir: cmd/primary
     cmds:

@@ -87,8 +87,7 @@ func (s *Grain) Exists(db orm.DB, sliceID uuid.UUID, grainKey string) (*sandpipe
 func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.UUID) bool {
 	grain := new(sandpiper.Grain)
 	err := db.Model(grain).Column("grain.id").
-		Join("JOIN slices AS sl ON grain.slice_id = sl.id").
-		Join("JOIN subscriptions AS sub ON sl.id = sub.slice_id").
+		Join("INNER JOIN subscriptions AS sub ON grain.slice_id = sub.slice_id").
 		Where("sub.company_id = ?", companyID).
 		Where("grain.id = ?", grainID).Select()
 	if err == nil {
@@ -100,11 +99,10 @@ func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.U
 // List returns a list of all grains with scoping and pagination (optionally for a slice)
 func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payload bool, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
-	//var listModel = (*[]sandpiper.Grain)(nil)
 	var q *orm.Query
 
 	// columns to select (optionally returning payload)
-	cols := "grain.id, slice_id, grain_key, encoding, grain.created_at"
+	cols := "grain.id, grain.slice_id, grain_key, encoding, grain.created_at"
 	if payload {
 		cols = cols + ", payload"
 	}
@@ -112,12 +110,12 @@ func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payload bool, sc *sandpiper.S
 	// build the query
 	switch {
 	case sc != nil && sliceID != uuid.Nil:
-		// both provided, do a simple join to subscriptions (by-passing the slices table)
+		// both provided, join to subscriptions (by-passing slices table)
 		q = db.Model(&grains).ColumnExpr(cols).
 			Join("INNER JOIN subscriptions AS sub ON grain.slice_id = sub.slice_id").
 			Where("sub.company_id = ?", sc.ID).Where("active = true")
 	case sc != nil && sliceID == uuid.Nil:
-		// scope without a slice
+		// provided scope without a slice
 		// Use CTE query to get all "active" subscriptions for the scope (i.e. the company)
 		q = db.Model((*sandpiper.Subscription)(nil)).
 			Column("subscription.slice_id").Where(sc.Condition, sc.ID).Where("active = true").
@@ -125,11 +123,10 @@ func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payload bool, sc *sandpiper.S
 			Join("INNER JOIN grains AS grain ON grain.slice_id = scope.slice_id").
 			ColumnExpr(cols)
 	case sc == nil && sliceID != uuid.Nil:
-		// slice without a scope
+		// provided slice without a scope, use simple where clause
 		q = db.Model(&grains).ColumnExpr(cols).Where("slice_id = ?", sliceID)
-			//Join("INNER JOIN slices AS slice ON grain.slice_id = slice.id")
 	default:
-		// neither provided, simple case returning all grains
+		// neither provided, simply return all grains
 		q = db.Model(&grains).ColumnExpr(cols)
 	}
 

@@ -88,8 +88,8 @@ func (c *Client) Add(grain *sandpiper.Grain) error {
 }
 
 // SliceByName returns a slice by unique key name
-func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
-	path := "/slices/name/" + name
+func (c *Client) SliceByName(sliceName string) (*sandpiper.Slice, error) {
+	path := "/slices/name/" + sliceName
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -100,14 +100,21 @@ func (c *Client) SliceByName(name string) (*sandpiper.Slice, error) {
 }
 
 // ListGrains returns a list of grains for the supplied slice
-func (c *Client) ListGrains(name string) (*sandpiper.GrainsPaginated, error) {
-	//
-	return nil, nil
+func (c *Client) ListGrains(sliceID uuid.UUID) (*sandpiper.GrainsPaginated, error) {
+	var results sandpiper.GrainsPaginated
+
+	path := "/grains/slice/" + sliceID.String()
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, &results)
+	return &results, err
 }
 
 // ListSlices returns a list of all slices
 func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
-	var slices sandpiper.SlicesPaginated
+	var results sandpiper.SlicesPaginated
 
 	// todo: add paging support as an argument
 	path := "/slices"
@@ -115,8 +122,8 @@ func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.do(req, &slices)
-	return &slices, err
+	_, err = c.do(req, &results)
+	return &results, err
 }
 
 // GrainExists will return basic information about a grain if it exists
