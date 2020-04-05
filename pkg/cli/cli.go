@@ -76,7 +76,6 @@ var Commands = []*args.Command{
 			&args.BoolFlag{
 				Name:  "noprompt",
 				Usage: "do not prompt before over-writing a grain (default is to prompt)",
-				Value: false,
 			},
 		},
 	},
@@ -91,10 +90,10 @@ var Commands = []*args.Command{
 		-n  \ # interpret the argument as a slice name
 		arg  # either slice_id or slice_name (if empty, list all slices)
 		*/
-		Name:   "list",
-		Usage:  "list slices or file-based grains",
+		Name:      "list",
+		Usage:     "list slices (with an empty argument) or file-based grains by slice_id or slice_name",
 		ArgsUsage: "[empty | slice_id | slice_name]",
-		Action: command.List,
+		Action:    command.List,
 		Flags: []args.Flag{
 			&args.BoolFlag{
 				Name:     "name",
@@ -105,7 +104,6 @@ var Commands = []*args.Command{
 			&args.BoolFlag{
 				Name:  "full",
 				Usage: "provide full listings",
-				Value: false,
 			},
 		},
 	},

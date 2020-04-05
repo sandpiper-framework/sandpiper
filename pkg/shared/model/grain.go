@@ -38,10 +38,30 @@ func (b *Grain) BeforeInsert(ctx context.Context) (context.Context, error) {
 func (g *Grain) Display() string {
 	s := strings.Builder{}
 	s.WriteString("grain_id: " + g.ID.String() + "\n")
-	s.WriteString("slice_id: " + g.SliceID.String()+ "\n")
-	s.WriteString("key: \"" + g.Key+ "\"\n")
-	s.WriteString("source: \"" + g.Source+ "\"\n")
-	s.WriteString("created: " + g.CreatedAt.String()+ "\n")
+	s.WriteString("slice_id: " + g.SliceID.String() + "\n")
+	s.WriteString("key: \"" + g.Key + "\"\n")
+	s.WriteString("source: \"" + g.Source + "\"\n")
+	s.WriteString("created: " + g.CreatedAt.String() + "\n")
+	return s.String()
+}
+
+// DisplayFull returns abbreviated grain information in string format
+func (g *Grain) DisplayFull() string {
+	var payload string
+
+	p, err := g.Payload.Decode()
+	if err != nil {
+		payload = "(" + err.Error() + ")"
+	} else {
+		payload = string(p)
+	}
+	s := strings.Builder{}
+	s.WriteString("grain_id: " + g.ID.String() + "\n")
+	s.WriteString("slice_id: " + g.SliceID.String() + "\n")
+	s.WriteString("key: \"" + g.Key + "\"\n")
+	s.WriteString("source: \"" + g.Source + "\"\n")
+	s.WriteString("Payload: " + payload + "\n")
+	s.WriteString("created: " + g.CreatedAt.String() + "\n")
 	return s.String()
 }
 

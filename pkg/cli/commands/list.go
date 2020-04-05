@@ -54,20 +54,23 @@ func List(c *args.Context) error {
 			}
 		}
 	} else {
-		// show grains either by slice-id or by slice-name
 		if p.nameFlag {
+			// use provided slice-name to get the slice-id
 			slice, err = api.SliceByName(p.argument)
 			if err != nil {
 				return err
 			}
 			sliceID = slice.ID
 		} else {
+			// make sure the provided slice-id is a valid uuid
 			sliceID, err = uuid.Parse(p.argument)
 			if err != nil {
 				return err
 			}
 		}
-		result, err := api.ListGrains(sliceID)
+		// return a list of paginated grains for the slice-id
+		// todo: add pagination logic
+		result, err := api.ListGrains(sliceID, p.full)
 		if err != nil {
 			return err
 		}
@@ -114,7 +117,7 @@ func printSliceBrief(slice sandpiper.Slice) {
 }
 
 func printGrainFull(i int, grain *sandpiper.Grain) {
-	fmt.Println(grain.Display())
+	fmt.Println(grain.DisplayFull())
 }
 
 func printGrainBrief(grain *sandpiper.Grain) {

@@ -100,10 +100,14 @@ func (c *Client) SliceByName(sliceName string) (*sandpiper.Slice, error) {
 }
 
 // ListGrains returns a list of grains for the supplied slice
-func (c *Client) ListGrains(sliceID uuid.UUID) (*sandpiper.GrainsPaginated, error) {
+func (c *Client) ListGrains(sliceID uuid.UUID, fullFlag bool) (*sandpiper.GrainsPaginated, error) {
 	var results sandpiper.GrainsPaginated
+	var payloadParam string
 
-	path := "/grains/slice/" + sliceID.String()
+	if fullFlag {
+		payloadParam = "?payload=yes"
+	}
+	path := "/grains/slice/" + sliceID.String() + payloadParam
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -155,8 +159,10 @@ func (c *Client) DeleteGrain(grainID uuid.UUID) error {
 // newRequest prepares a request for an api call
 // any `body` must be valid json
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
-	rel := &url.URL{Path: c.apiPrefix + path}
-	u := c.baseURL.ResolveReference(rel)
+	u, err := c.baseURL.Parse(c.apiPrefix + path)
+	if err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequest(method, u.String(), toReader(body))
 	if err != nil {
 		return nil, err
@@ -173,12 +179,17 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 }
 
 // do executes the request
-func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
-	resp, err := c.httpClient.Do(req)
+func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
+	r, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
+	resp := &Response{r} // wrap it in our struct for new methods
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		msg, _ := resp.ToString()
+		return nil, fmt.Errorf("%s: %s", resp.Status, msg)
+	}
 	if c.debug {
 		dump, err := httputil.DumpRequestOut(req, true)
 		if err == nil {
