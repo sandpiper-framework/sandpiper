@@ -7,6 +7,7 @@ package sandpiper
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/ascii85"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -31,72 +32,137 @@ const PayloadNil = ""
 
 // Encode payload data for transmission and storage
 func Encode(b io.Reader, enc string) (PayloadData, error) {
-	if enc == "raw" {
+	switch enc {
+	case "raw":
 		// no conversion, just return original from reader
 		buf, err := ioutil.ReadAll(b)
 		if err != nil {
 			return PayloadNil, err
 		}
 		return PayloadData(buf), nil
-	}
-
-	if enc == "b64" {
-		// convert to base64 using a new byte slice
+	case "a85":
+		// convert to ascii85 (1.25 size)
 		buf, err := ioutil.ReadAll(b)
 		if err != nil {
 			return PayloadNil, err
 		}
-		b64 := base64.StdEncoding.EncodeToString(buf)
-		return PayloadData(b64), nil
+		return PayloadData(toAscii85(buf)), nil
+	case "b64":
+		// convert to base64 (1.33 size)
+		buf, err := ioutil.ReadAll(b)
+		if err != nil {
+			return PayloadNil, err
+		}
+		return PayloadData(toBase64(buf)), nil
+	case "z64":
+		// compress and encode base64
+		gz, err := toZip(b)
+		if err != nil {
+			return PayloadNil, err
+		}
+		return PayloadData(toBase64(gz)), nil
+	case "z85":
+		// compress and encode ascii85
+		gz, err := toZip(b)
+		if err != nil {
+			return PayloadNil, err
+		}
+		return PayloadData(toAscii85(gz)), nil
+	default:
+		return PayloadNil, fmt.Errorf("unknown encoding \"%s\"", enc)
 	}
+}
 
-	if enc == "z64" {
-		// compress into zipped
-		var zipped bytes.Buffer
-		gz, _ := gzip.NewWriterLevel(&zipped, gzip.BestCompression)
-		if _, err := io.Copy(gz, b); err != nil {
-			return PayloadNil, err
-		}
-		if err := gz.Flush(); err != nil {
-			return PayloadNil, err
-		}
-		if err := gz.Close(); err != nil {
-			return PayloadNil, err
-		}
-		// base64 using a new byte slice
-		b64 := make([]byte, base64.StdEncoding.EncodedLen(zipped.Len()))
-		base64.StdEncoding.Encode(b64, zipped.Bytes())
-		return PayloadData(b64), nil
+func toZip(b io.Reader) ([]byte, error) {
+	var zipped bytes.Buffer
+	gz, _ := gzip.NewWriterLevel(&zipped, gzip.BestCompression)
+	if _, err := io.Copy(gz, b); err != nil {
+		return nil, err
 	}
+	if err := gz.Flush(); err != nil {
+		return nil, err
+	}
+	if err := gz.Close(); err != nil {
+		return nil, err
+	}
+	return zipped.Bytes(), nil
+}
 
-	return PayloadNil, fmt.Errorf("unknown encoding \"%s\"", enc)
+func toBase64(buf []byte) []byte {
+	b64 := make([]byte, base64.StdEncoding.EncodedLen(len(buf)))
+	base64.StdEncoding.Encode(b64, buf)
+	return b64
+}
+
+func toAscii85(buf []byte) []byte {
+	a85 := make([]byte, ascii85.MaxEncodedLen(len(buf)))
+	ascii85.Encode(a85, buf)
+	return a85
 }
 
 // Decode method converts encoded payload to human-readable
 func (p PayloadData) Decode(enc string) (PayloadData, error) {
-	if enc == "raw" {
+	switch enc {
+	case "raw":
 		return p, nil
-	}
-	if enc == "b64" {
-		b := make([]byte, base64.StdEncoding.DecodedLen(len(p)))
-		_, err := base64.StdEncoding.Decode(b, []byte(p))
-		return PayloadData(b), err
-	}
-	if enc == "z64" {
-		// convert base64 to compressed binary
-		z := make([]byte, base64.StdEncoding.DecodedLen(len(p)))
-		_, err := base64.StdEncoding.Decode(z, []byte(p))
+	case "a85":
+		buf, err := fromAscii85([]byte(p))
+		return PayloadData(buf), err
+	case "b64":
+		buf, err := fromBase64([]byte(p))
+		return PayloadData(buf), err
+	case "z85":
+		// convert ascii85 to compressed binary to original
+		gz, err := fromAscii85([]byte(p))
 		if err != nil {
 			return PayloadNil, err
 		}
-		// decompress zipped binary to original text
-		reader, err := gzip.NewReader(bytes.NewReader(z))
+		buf, err := fromGzip(gz)
+		return PayloadData(buf), err
+	case "z64":
+		// convert base64 to compressed binary to original
+		gz, err := fromBase64([]byte(p))
 		if err != nil {
 			return PayloadNil, err
 		}
-		defer reader.Close()
-		b, err := ioutil.ReadAll(reader)
-		return PayloadData(b), err
+		buf, err := fromGzip(gz)
+		return PayloadData(buf), err
 	}
 	return PayloadNil, fmt.Errorf("unknown encoding \"%s\"", enc)
 }
+
+func fromAscii85(a85 []byte) ([]byte, error) {
+	maxLen := int64(float64(len(a85)) * .85) //80% efficient
+	buf := make([]byte, maxLen)
+	_, _, err := ascii85.Decode(buf, a85, true)
+	return buf, err
+}
+
+func fromBase64(b64 []byte) ([]byte, error) {
+	buf := make([]byte, base64.StdEncoding.DecodedLen(len(b64)))
+	_, err := base64.StdEncoding.Decode(buf, b64)
+	return buf, err
+}
+
+func fromGzip(gz []byte) ([]byte, error) {
+	reader, err := gzip.NewReader(bytes.NewReader(gz))
+	if err != nil {
+		return nil, err
+	}
+	// This will avoid invalid header errors (default expects multiple files in the stream)
+	reader.Multistream(false)
+
+	defer reader.Close()
+	return ioutil.ReadAll(reader)
+}
+
+/*
+NOTE: string([]byte) makes a copy... Might need to use this unsafe method to avoid
+the memory if performance is a problem! (What happens with a 200MB payload?)
+
+func BytesToString(b []byte) string {
+	bh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+	sh := reflect.StringHeader{bh.Data, bh.Len}
+	return *(*string)(unsafe.Pointer(&sh))
+}
+*/

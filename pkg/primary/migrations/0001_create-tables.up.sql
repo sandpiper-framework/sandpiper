@@ -23,6 +23,8 @@ CREATE TYPE encoding_enum AS ENUM (
   'raw',
   'b64',
   'z64'
+  'a85'
+  'z85'
 );
 
 CREATE TABLE IF NOT EXISTS "settings" (
@@ -95,7 +97,7 @@ CREATE TABLE IF NOT EXISTS "grains" (
   "payload"      text,
   "source"       text,
   "created_at"   timestamp,
-  CONSTRAINT "grain_alt_key" UNIQUE("slice_id", "grain_key")
+  CONSTRAINT "grains_sliceid_grainkey_key" UNIQUE("slice_id", "grain_key")
 );
 
 CREATE TABLE IF NOT EXISTS "syncs" (

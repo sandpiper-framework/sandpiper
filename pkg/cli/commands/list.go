@@ -7,9 +7,10 @@ package command
 
 import (
 	"fmt"
+	"net/url"
+
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2"
-	"net/url"
 
 	"autocare.org/sandpiper/pkg/shared/model"
 )
@@ -74,9 +75,9 @@ func List(c *args.Context) error {
 		if err != nil {
 			return err
 		}
-		for i, grain := range result.Grains {
+		for _, grain := range result.Grains {
 			if p.full {
-				printGrainFull(i, &grain)
+				printGrainFull(&grain)
 			} else {
 				printGrainBrief(&grain)
 			}
@@ -116,7 +117,7 @@ func printSliceBrief(slice sandpiper.Slice) {
 	fmt.Printf("%s (%s) \"%s\" Grains: %d\n", slice.Name, slice.ID.String(), slice.SliceType, slice.ContentCount)
 }
 
-func printGrainFull(i int, grain *sandpiper.Grain) {
+func printGrainFull(grain *sandpiper.Grain) {
 	fmt.Println(grain.DisplayFull())
 }
 

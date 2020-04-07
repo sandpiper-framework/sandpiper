@@ -83,9 +83,7 @@ func (c *Client) Add(grain *sandpiper.Grain) error {
 	if err != nil {
 		return err
 	}
-	// todo: figure out a way to not unmarshall the grain we just added!
-	g := new(sandpiper.Grain)
-	_, err = c.do(req, g)
+	_, err = c.do(req, nil)
 	return err
 }
 
@@ -198,8 +196,11 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 		}
 		fmt.Printf("req: %v\n\nresp: %v\n", req, resp)
 	}
-	// consider limits using json.NewDecoder(io.LimitReader(response.Body, SomeSaneConst)).Decode(v)
-	err = json.NewDecoder(resp.Body).Decode(v)
+	if v != nil {
+		// convert the json response to the provided structure pointer
+		// consider limits using json.NewDecoder(io.LimitReader(response.Body, SomeSaneConst)).Decode(v)
+		err = json.NewDecoder(resp.Body).Decode(v)
+	}
 	return resp, err
 }
 

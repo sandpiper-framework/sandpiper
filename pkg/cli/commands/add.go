@@ -21,8 +21,13 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
-// grainKey is always the same for level-1 grains
-const grainKey = "level-1"
+const (
+	// L1GrainKey is always the same for level-1 grains
+	L1GrainKey = "level-1"
+
+	// L1Encoding for level-1 grains using `sandpiper add`
+	L1Encoding = "z64"
+)
 
 type addParams struct {
 	addr      *url.URL // our sandpiper server
@@ -56,13 +61,13 @@ func Add(c *args.Context) error {
 	}
 
 	// remove the old grain first if it exists
-	err = removeExistingGrain(api, p.prompt, slice.ID, grainKey)
+	err = removeExistingGrain(api, p.prompt, slice.ID, L1GrainKey)
 	if err != nil {
 		return err
 	}
 
 	// encode supplied file for grain's payload
-	data, err := payload.FromFile(p.fileName)
+	data, err := payload.FromFile(p.fileName, L1Encoding)
 	if err != nil {
 		return err
 	}
@@ -70,9 +75,9 @@ func Add(c *args.Context) error {
 	// create the new grain
 	grain := &sandpiper.Grain{
 		SliceID:  &slice.ID,
-		Key:      grainKey,
+		Key:      L1GrainKey,
 		Source:   filepath.Base(p.fileName),
-		Encoding: "z64",
+		Encoding: L1Encoding,
 		Payload:  data,
 	}
 

@@ -15,14 +15,15 @@ import (
 
 // Grain represents the sandpiper syncable-object
 type Grain struct {
-	ID        uuid.UUID   `json:"id" pg:",pk"`
-	SliceID   *uuid.UUID  `json:"slice_id,omitempty"` // must be pointer for omitempty to work here!
-	Key       string      `json:"grain_key" pg:"grain_key"`
-	Source    string      `json:"source"`
-	Encoding  string      `json:"encoding"`
-	Payload   PayloadData `json:"payload,omitempty"`
-	CreatedAt time.Time   `json:"created_at"`
-	Slice     *Slice      `json:"slice,omitempty"` // has-one relation
+	ID         uuid.UUID   `json:"id" pg:",pk"`
+	SliceID    *uuid.UUID  `json:"slice_id,omitempty"` // must be pointer for omitempty to work here!
+	Key        string      `json:"grain_key" pg:"grain_key"`
+	Source     string      `json:"source"`
+	Encoding   string      `json:"encoding"`
+	PayloadLen int         `json:"payload_len" pg:"-"` // calculated: "length(payload) AS payload_len"
+	Payload    PayloadData `json:"payload,omitempty"`
+	CreatedAt  time.Time   `json:"created_at"`
+	Slice      *Slice      `json:"slice,omitempty"` // has-one relation
 }
 
 // compile-time check variables for model hooks (which take no memory)

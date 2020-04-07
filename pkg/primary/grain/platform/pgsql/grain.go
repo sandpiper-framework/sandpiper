@@ -31,8 +31,9 @@ func NewGrain() *Grain {
 
 // Custom errors
 var (
-	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain key already exists for this Slice.")
+	// ErrGrainNotFound indicates select returned no rows
 	ErrGrainNotFound = echo.NewHTTPError(http.StatusNotFound, "Grain does not exist.")
+	//ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain key already exists for this Slice.")
 	//ErrDecodePayload = echo.NewHTTPError(http.StatusInternalServerError, "Error preparing payload for database.")
 )
 
@@ -44,11 +45,6 @@ func (s *Grain) Create(db orm.DB, replaceFlag bool, grain *sandpiper.Grain) (*sa
 
 	if replaceFlag {
 		if err := removeExistingGrain(db, *grain.SliceID, grain.Key); err != nil {
-			return nil, err
-		}
-	} else {
-		// todo: do we need to check? maybe we can check the insert error for existing keys (?)
-		if err := canAddGrain(db, *grain.SliceID, grain.Key); err != nil {
 			return nil, err
 		}
 	}
@@ -64,7 +60,7 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	var grain = &sandpiper.Grain{ID: id}
 
 	err := db.Model(grain).
-		Column("grain.id", "grain_key", "encoding", "payload", "grain.created_at").
+		Column("grain.id", "grain_key", "encoding", "length(payload) as payload_len", "payload", "grain.created_at").
 		Relation("Slice").WherePK().Select()
 	if err != nil {
 		return nil, selectError(err)
@@ -103,7 +99,7 @@ func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payload bool, sc *sandpiper.S
 	var q *orm.Query
 
 	// columns to select (optionally returning payload)
-	cols := "grain.id, grain.slice_id, grain_key, encoding, grain.created_at"
+	cols := "grain.id, grain.slice_id, grain_key, source, encoding, grain.created_at, length(payload) as payload_len"
 	if payload {
 		cols = cols + ", payload"
 	}
@@ -145,6 +141,7 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 	return db.Delete(&grain)
 }
 
+/*
 // canAddGrain makes sure we can add this grain
 func canAddGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
 	// attempt to select by unique keys
@@ -163,6 +160,7 @@ func canAddGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
 		return err
 	}
 }
+*/
 
 // removeExistingGrain will remove a grain by alternate unique key. Only return real errors.
 func removeExistingGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
@@ -171,16 +169,10 @@ func removeExistingGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
 	_, err := db.Model(m).
 		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
 		Delete()
-
-	// todo: fix this test. See what is actually returned when delete vs nothing to delete.
-	switch err {
-	case pg.ErrNoRows: // ok to add
-		return nil
-	case nil: // found a row, so a duplicate
-		return ErrAlreadyExists
-	default: // return any other problem found
+	if err != nil && err != pg.ErrNoRows {
 		return err
 	}
+	return nil
 }
 
 func selectError(err error) error {
