@@ -52,7 +52,6 @@ var Commands = []*args.Command{
 	{
 		/* sandpiper add \
 		-slice "aap-brake-pads"  \ # slice-name
-		-key  "brakes"           \ # grain-key
 		-noprompt                \ # don't prompt before over-writing
 		acme_brakes_full_2019-12-12.xml # file to add (accessed via c.Args().Get(0))
 		*/
@@ -65,12 +64,6 @@ var Commands = []*args.Command{
 				Name:     "slice",
 				Aliases:  []string{"s"},
 				Usage:    "slice name",
-				Required: true,
-			},
-			&args.StringFlag{
-				Name:     "key",
-				Aliases:  []string{"k"},
-				Usage:    "grain-key",
 				Required: true,
 			},
 			&args.BoolFlag{

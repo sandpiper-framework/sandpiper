@@ -27,6 +27,7 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 	h := HTTP{svc}
 	sr := er.Group("/slices")
 	sr.POST("", h.create)
+	sr.POST("/refresh/:id", h.refresh)
 	sr.GET("", h.list) // filter by tags (/slices?tags=aaa,bbb or /slices?tags-all=aaa,bbb)
 	sr.GET("/:id", h.view)
 	sr.PATCH("/:id", h.update)
@@ -61,7 +62,7 @@ func (r createReq) id() uuid.UUID {
 
 // create populates createReq from body json adding UUID if not provided
 func (h *HTTP) create(c echo.Context) error {
-	r := new(createReq)
+	r := &createReq{ContentCount: 0, ContentHash: ""}
 
 	if err := c.Bind(r); err != nil {
 		return err
@@ -87,6 +88,20 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
+}
+
+// refresh content information after slice grains are changed
+func (h *HTTP) refresh(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+
+	if err := h.svc.Refresh(c, id); err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
 }
 
 func (h *HTTP) view(c echo.Context) error {

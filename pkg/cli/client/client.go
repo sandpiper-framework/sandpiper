@@ -83,7 +83,9 @@ func (c *Client) Add(grain *sandpiper.Grain) error {
 	if err != nil {
 		return err
 	}
-	_, err = c.do(req, nil)
+	// todo: figure out a way to not unmarshall the grain we just added!
+	g := new(sandpiper.Grain)
+	_, err = c.do(req, g)
 	return err
 }
 
@@ -149,8 +151,7 @@ func (c *Client) DeleteGrain(grainID uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	grain := new(sandpiper.Grain)
-	_, err = c.do(req, grain)
+	_, err = c.do(req, nil)
 	return err
 }
 

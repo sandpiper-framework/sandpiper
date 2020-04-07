@@ -168,7 +168,10 @@ func (s *Slice) ViewByName(db orm.DB, companyID uuid.UUID, name string) (*sandpi
 	}
 
 	// get slice with subscribed companies
-	err := db.Model(slice).Relation("Companies", filterFn).Where("name = ?", name).Select()
+	err := db.Model(slice).
+		Relation("Companies", filterFn).
+		Where("lower(name) = ?", strings.ToLower(name)).
+		Select()
 	if err != nil {
 		return nil, selectError(err)
 	}
@@ -239,6 +242,11 @@ func (s *Slice) Update(db orm.DB, slice *sandpiper.Slice) error {
 func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
 	// WARNING: Foreign key constraints remove related metadata and grains!
 	return db.Delete(slice)
+}
+
+// Refresh a slice's content information
+func (s *Slice) Refresh(db orm.DB, sliceID uuid.UUID) error {
+	panic("implement me")
 }
 
 // metaDataMap returns a map of slice metadata. We use this separate query instead of

@@ -27,11 +27,10 @@ func TestCreate(t *testing.T) {
 			wantErr: true,
 			req: sandpiper.Grain{
 				ID:       mock.TestUUID(1),
-				SliceID:  mock.TestUUID(1),
-				Type:     "aces-file",
+				SliceID:  mock.TestUUIDp(1),
 				Key:      "AAP Premium Brakes",
 				Encoding: "raw",
-				Payload:  "payload data",
+				Payload:  sandpiper.PayloadData("payload data"),
 			},
 		},
 		{
@@ -39,28 +38,23 @@ func TestCreate(t *testing.T) {
 			wantErr: true,
 			req: sandpiper.Grain{
 				ID:       mock.TestUUID(1),
-				SliceID:  mock.TestUUID(0),
-				Type:     "aces-file",
+				SliceID:  mock.TestUUIDp(0),
 				Key:      "AAP Premium Brakes",
 				Encoding: "raw",
-				Payload:  "payload data",
+				Payload:  sandpiper.PayloadData("payload data"),
 			},
 		},
 		{
 			name: "Success",
 			req: sandpiper.Grain{
-				ID:           mock.TestUUID(2),
-				Key:          "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+				ID:        mock.TestUUID(2),
+				Key:       "AAP Premium Brakes",
+				CreatedAt: mock.TestTime(2019),
 			},
 			wantData: &sandpiper.Grain{
-				ID:           mock.TestUUID(2),
-				Key:          "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+				ID:        mock.TestUUID(2),
+				Key:       "AAP Premium Brakes",
+				CreatedAt: mock.TestTime(2019),
 			},
 		},
 	}
@@ -80,7 +74,7 @@ func TestCreate(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := mdb.Create(db, tt.req)
+			resp, err := mdb.Create(db, false, &tt.req)
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
 				if resp == nil {
@@ -110,10 +104,8 @@ func TestView(t *testing.T) {
 			name: "VIEW Success",
 			id:   mock.TestUUID(1),
 			wantData: &sandpiper.Grain{
-				ID:           mock.TestUUID(1),
-				Key:          "AAP Premium Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
+				ID:  mock.TestUUID(1),
+				Key: "AAP Premium Brakes",
 			},
 		},
 	}
@@ -174,18 +166,14 @@ func TestList(t *testing.T) {
 			},
 			wantData: []sandpiper.Grain{
 				{
-					ID:           mock.TestUUID(1),
-					Key:          "Brakes",
-					ContentHash:  mock.TestHash(1),
-					ContentCount: 1,
-					LastUpdate:   mock.TestTime(2019),
+					ID:        mock.TestUUID(1),
+					Key:       "Brakes",
+					CreatedAt: mock.TestTime(2019),
 				},
 				{
-					ID:           mock.TestUUID(1),
-					Key:          "Brakes",
-					ContentHash:  mock.TestHash(1),
-					ContentCount: 1,
-					LastUpdate:   mock.TestTime(2019),
+					ID:        mock.TestUUID(1),
+					Key:       "Brakes",
+					CreatedAt: mock.TestTime(2019),
 				},
 			},
 		},
@@ -200,13 +188,13 @@ func TestList(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			users, err := mdb.List(db, tt.qp, tt.pg)
+			grains, err := mdb.List(db, uuid.Nil, false, tt.qp, tt.pg)
 			assert.Equal(t, tt.wantErr, err != nil)
 			if tt.wantData != nil {
-				for i, v := range users {
+				for i, v := range grains {
 					tt.wantData[i].CreatedAt = v.CreatedAt
 				}
-				assert.Equal(t, tt.wantData, users)
+				assert.Equal(t, tt.wantData, grains)
 			}
 		})
 	}
@@ -216,20 +204,18 @@ func TestDelete(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		usr      *sandpiper.Grain
+		grain    *sandpiper.Grain
 		wantData *sandpiper.Grain
 	}{
 		{
 			name: "Success",
-			usr: &sandpiper.Grain{
+			grain: &sandpiper.Grain{
 				ID: mock.TestUUID(1),
 			},
 			wantData: &sandpiper.Grain{
-				ID:           mock.TestUUID(1),
-				Key:          "Brakes",
-				ContentHash:  mock.TestHash(1),
-				ContentCount: 1,
-				LastUpdate:   mock.TestTime(2019),
+				ID:        mock.TestUUID(1),
+				Key:       "Brakes",
+				CreatedAt: mock.TestTime(2019),
 			},
 		},
 	}
@@ -250,7 +236,7 @@ func TestDelete(t *testing.T) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 
-			err := mdb.Delete(db, tt.usr)
+			err := mdb.Delete(db, tt.grain.ID)
 			assert.Equal(t, tt.wantErr, err != nil)
 
 		})

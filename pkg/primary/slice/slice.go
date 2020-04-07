@@ -104,3 +104,11 @@ func (s *Slice) Delete(c echo.Context, id uuid.UUID) error {
 	}
 	return s.sdb.Delete(s.db, slice)
 }
+
+// Refresh updates slice content information
+func (s *Slice) Refresh(c echo.Context, id uuid.UUID) error {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+		return err
+	}
+	return s.sdb.Refresh(s.db, id)
+}

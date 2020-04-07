@@ -127,3 +127,18 @@ func (ls *LogService) Update(c echo.Context, req *slice.Update) (resp *sandpiper
 	}(time.Now())
 	return ls.Service.Update(c, req)
 }
+
+// Refresh logging
+func (ls *LogService) Refresh(c echo.Context, req uuid.UUID) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "Refresh slice request", err,
+			map[string]interface{}{
+				"req":  req,
+				"took": time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Refresh(c, req)
+}

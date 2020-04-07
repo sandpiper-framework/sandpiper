@@ -77,7 +77,7 @@ func AllowOverwrite() bool {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Overwrite (y/n)? ")
 	ans, _ := reader.ReadString('\n')
-	return strings.ToLower(ans) == "y"
+	return strings.ToLower(strings.TrimSpace(ans)) == "y"
 }
 
 func getPassword(pw string) (string, error) {

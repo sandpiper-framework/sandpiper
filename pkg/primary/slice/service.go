@@ -22,6 +22,7 @@ type Service interface {
 	ViewByName(echo.Context, string) (*sandpiper.Slice, error)
 	Delete(echo.Context, uuid.UUID) error
 	Update(echo.Context, *Update) (*sandpiper.Slice, error)
+	Refresh(echo.Context, uuid.UUID) error
 }
 
 // New creates new slice application service
@@ -56,6 +57,7 @@ type Repository interface {
 	List(orm.DB, *sandpiper.TagQuery, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Slice, error)
 	Update(orm.DB, *sandpiper.Slice) error
 	Delete(orm.DB, *sandpiper.Slice) error
+	Refresh(orm.DB, uuid.UUID) error
 }
 
 // RBAC represents role-based-access-control interface

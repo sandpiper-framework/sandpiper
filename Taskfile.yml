@@ -20,7 +20,7 @@ tasks:
       - "{{.PSQLCMD}}"
     vars:
       PSQLCMD:
-        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql'
+        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql --quiet'
 
   create-sub-db:
     desc: Create the subscribing database from default postgresql installation using "psql"
@@ -29,7 +29,7 @@ tasks:
       - "{{.PSQLCMD}}"
     vars:
       PSQLCMD:
-        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql'
+        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql --quiet'
 
   create-both-db:
     desc: Create both databases

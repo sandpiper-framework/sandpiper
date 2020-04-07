@@ -16,7 +16,7 @@ import (
 
 // Service represents grain application interface (note no update!)
 type Service interface {
-	Create(echo.Context, bool, sandpiper.Grain) (*sandpiper.Grain, error)
+	Create(echo.Context, bool, *sandpiper.Grain) (*sandpiper.Grain, error)
 	List(echo.Context, bool, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	ListBySlice(echo.Context, uuid.UUID, bool, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	View(echo.Context, uuid.UUID) (*sandpiper.Grain, error)
@@ -49,7 +49,7 @@ type Securer interface {
 
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
-	Create(orm.DB, bool, sandpiper.Grain) (*sandpiper.Grain, error)
+	Create(orm.DB, bool, *sandpiper.Grain) (*sandpiper.Grain, error)
 	CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.UUID) bool
 	View(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
 	Exists(orm.DB, uuid.UUID, string) (*sandpiper.Grain, error)

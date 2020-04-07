@@ -14,7 +14,7 @@ import (
 )
 
 // Create makes a new grain to hold our syncable data-objects. Must be a sandpiper admin.
-func (s *Grain) Create(c echo.Context, replaceFlag bool, req sandpiper.Grain) (*sandpiper.Grain, error) {
+func (s *Grain) Create(c echo.Context, replaceFlag bool, req *sandpiper.Grain) (*sandpiper.Grain, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error
 }
 
 // Exists returns a single grain's basic information (without authorization checks)
-func (s *Grain) Exists(c echo.Context, sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
+func (s *Grain) Exists(_ echo.Context, sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
 	return s.sdb.Exists(s.db, sliceID, grainKey)
 }
 

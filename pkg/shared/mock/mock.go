@@ -25,6 +25,13 @@ func TestUUID(n int) uuid.UUID {
 	return uuid.MustParse(s[0:1] + "0000000-0000-0000-0000-000000000000")
 }
 
+// TestUUIDp returns a pointer to a valid test uuid starting with the supplied number (1-9)
+func TestUUIDp(n int) *uuid.UUID {
+	s := strconv.Itoa(n)
+	u := uuid.MustParse(s[0:1] + "0000000-0000-0000-0000-000000000000")
+	return &u
+}
+
 // TestTime is used for testing time fields
 func TestTime(year int) time.Time {
 	return time.Date(year, time.May, 19, 1, 2, 3, 4, time.UTC)

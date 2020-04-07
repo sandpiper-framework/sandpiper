@@ -34,12 +34,12 @@ type LogService struct {
 const source = "grain"
 
 // Create logging
-func (ls *LogService) Create(c echo.Context, replaceFlag bool, req sandpiper.Grain) (resp *sandpiper.Grain, err error) {
+func (ls *LogService) Create(c echo.Context, replaceFlag bool, req *sandpiper.Grain) (resp *sandpiper.Grain, err error) {
 	// todo: consider a "debug" level that shows entire req/resp
 	defer func(begin time.Time) {
 		var g *sandpiper.Grain
 		// suppress payload in log for req and resp
-		req.Payload = nil
+		req.Payload = sandpiper.PayloadNil
 		if resp != nil {
 			g = &sandpiper.Grain{
 				ID:       resp.ID,

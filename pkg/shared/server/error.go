@@ -65,7 +65,8 @@ func (ce *customErrHandler) handler(err error, c echo.Context) {
 			msg = resp{Message: errMsg}
 			code = http.StatusBadRequest
 		default:
-			msg = http.StatusText(code)
+			//msg = http.StatusText(code)
+			msg = err.Error()
 		}
 		if _, ok := msg.(string); ok {
 			msg = resp{Message: msg}

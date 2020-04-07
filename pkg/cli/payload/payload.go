@@ -11,19 +11,19 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
-// FromFile encodes a filesystem file to binary data for storing in the database
+// FromFile encodes a filesystem file for storing in the database
 func FromFile(fileName string) (sandpiper.PayloadData, error) {
 	// get a reader for the file to add
 	file, err := os.Open(fileName)
 	if err != nil {
-		return nil, err
+		return sandpiper.PayloadNil, err
 	}
 	defer file.Close()
 
 	// encode file contents for grain's payload
-	payload, err := sandpiper.Encode(file)
+	payload, err := sandpiper.Encode(file, "z64")
 	if err != nil {
-		return nil, err
+		return sandpiper.PayloadNil, err
 	}
 	return payload, nil
 }

@@ -34,7 +34,7 @@ func (b *Grain) BeforeInsert(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-// Display returns basic grain information in string format
+// Display returns basic grain information as a string
 func (g *Grain) Display() string {
 	s := strings.Builder{}
 	s.WriteString("grain_id: " + g.ID.String() + "\n")
@@ -45,11 +45,11 @@ func (g *Grain) Display() string {
 	return s.String()
 }
 
-// DisplayFull returns abbreviated grain information in string format
+// DisplayFull returns basic grain information plus decoded payload as a string
 func (g *Grain) DisplayFull() string {
 	var payload string
 
-	p, err := g.Payload.Decode()
+	p, err := g.Payload.Decode(g.Encoding)
 	if err != nil {
 		payload = "(" + err.Error() + ")"
 	} else {

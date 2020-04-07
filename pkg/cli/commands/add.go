@@ -21,13 +21,14 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
+// grainKey is always the same for level-1 grains
+const grainKey = "level-1"
+
 type addParams struct {
 	addr      *url.URL // our sandpiper server
 	user      string
 	password  string
 	sliceName string
-	grainType string
-	grainKey  string
 	fileName  string
 	prompt    bool
 	debug     bool
@@ -55,7 +56,7 @@ func Add(c *args.Context) error {
 	}
 
 	// remove the old grain first if it exists
-	err = removeExistingGrain(api, p.prompt, slice.ID, p.grainKey)
+	err = removeExistingGrain(api, p.prompt, slice.ID, grainKey)
 	if err != nil {
 		return err
 	}
@@ -69,9 +70,9 @@ func Add(c *args.Context) error {
 	// create the new grain
 	grain := &sandpiper.Grain{
 		SliceID:  &slice.ID,
-		Key:      p.grainKey,
+		Key:      grainKey,
 		Source:   filepath.Base(p.fileName),
-		Encoding: "gzipb64",
+		Encoding: "z64",
 		Payload:  data,
 	}
 
@@ -95,8 +96,7 @@ func getAddParams(c *args.Context) (*addParams, error) {
 		addr:      g.addr,
 		user:      g.user,
 		password:  g.password,
-		sliceName: c.String("name"),
-		grainKey:  c.String("key"),
+		sliceName: c.String("slice"),
 		fileName:  c.Args().Get(0),
 		prompt:    !c.Bool("noprompt"), // avoid double negative
 		debug:     g.debug,

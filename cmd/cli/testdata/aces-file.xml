@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ACES version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Header>
+		<Company>AcmeSupply</Company>
+		<SenderName>Joe Smith</SenderName>
+		<SenderPhone>999-999-9999</SenderPhone>
+		<TransferDate>2018-06-04</TransferDate>
+		<BrandAAIAID>ZZZZ</BrandAAIAID>
+		<DocumentTitle>Sample Product File</DocumentTitle>
+		<EffectiveDate>2018-06-04</EffectiveDate>
+		<ApprovedFor>
+			<Country>US</Country>
+			<Country>CA</Country>
+		</ApprovedFor>
+		<SubmissionType>FULL</SubmissionType>
+		<VcdbVersionDate>2018-05-25</VcdbVersionDate>		<!-- Use the VCdb Sample file to validate this file -->
+		<QdbVersionDate>2018-05-25</QdbVersionDate>
+		<PcdbVersionDate>2018-05-25</PcdbVersionDate>
+	</Header>
+	<App action="A" id="1">
+		<BaseVehicle id="1939"/> 	<!-- 1997 Dodge Neon -->
+		<Qty>1</Qty>				
+		<PartType id="5340"/> 		<!-- Engine Oil Filter -->
+		<Part>F1406</Part>
+	</App>
+	<App action="A" id="2">
+		<BaseVehicle id="2771"/> 	<!-- 1997 Cadillac Catera -->
+		<Qty>1</Qty>
+		<PartType id="1896"/>		<!-- Disc Brake Rotor -->
+		<Position id="22"/>
+		<Part>PR93160</Part>
+	</App>
+	<App action="A" id="3">
+		<BaseVehicle id="2772"/>	<!-- 1998 Cadillac Catera -->
+		<Qty>1</Qty>
+		<PartType id="1896"/>		<!-- Disc Brake Rotor -->
+		<Position id="30"/>
+		<Part>PR93170</Part>
+	</App>
+	<App action="A" id="4">
+		<!-- 1997-1998 Cadillac Catera -->
+		<Years from="1997" to="1998"/>
+		<Make id="46"/>
+		<Model id="404"/>
+		<Qty>1</Qty>
+		<PartType id="4472"/>	 <!-- Electrical / Switches / Headlight Switch -->
+		<Part>SW1417</Part>
+	</App>
+	<App action="A" id="5">
+		<BaseVehicle id="2771"/> <!-- 1997 Cadillac Catera -->
+		<EngineBase id="391"/> 	 <!-- V6 181ci 3.0L -->
+		<EngineVIN id="18"/> 	 <!-- [R] -->
+		<Qual id="12877">
+			<text>With A/C</text>
+		</Qual>
+		<Qual id="945">
+			<param value="1st Design"/>
+			<param value="90487546"/>
+			<text>1st Design Starter # 90487546</text>
+		</Qual>
+		<Qty>1</Qty>
+		<PartType id="4188"/>	<!-- Starter and Related Components / Starter Solenoid -->
+		<Part>SS769</Part>
+	</App>
+	
+	<App action="A" id="6">
+		<BaseVehicle id="2771"/> <!-- 1997 Cadillac Catera -->
+		<EngineBlock id="7"/> 	 <!-- V6 181ci 3.0L -->
+		<Qty>1</Qty>
+		<PartType id="6860"/>	<!-- HVAC Heater Control Valve -->
+		<Part>3831</Part>
+	</App>
+	<App action="A" id="7">
+		<BaseVehicle id="15173"/> <!-- 1972 Ford LTD -->
+		<Note>Exc. Wagon</Note> 
+		<Qty>1</Qty>
+		<PartType id="4472"/>	 <!-- Electrical / Switches / Headlight Switch -->
+		<Part>SW1406</Part>
+	</App>
+	<App action="A" id="8" validate="no"> <!-- intentionally invalid config -->
+		<BaseVehicle id="5404"/> <!--1980 Ford Fairmont -->
+		<Aspiration id="6"/> <!-- Turbo (not valid in VehicleTo table) -->
+		<Qty>1</Qty>
+		<PartType id="10068"/> 	<!-- Radiator Coolant Hose -->
+		<Position id="46"/> <!-- Upper -->
+		<Part>H9281</Part>
+	</App>
+	<App action="A" id="9">
+		<Years from="1994" to="1995"/>
+		<Make id="54"/> <!-- Ford -->
+		<Model id="688"/> <!-- Mustang -->
+		<SubModel id="39"/> <!-- GT -->
+		<EngineBase id=" 143"/> <!-- V8-302cid 5.0L -->
+		<Qual id="14031">
+			<text>With Dual Exhaust</text>
+		</Qual>
+		<Qual id="3368">
+			<text>Except California Built</text>
+		</Qual>
+		<Qual id="8101">
+			<text>Replaces Both Front &amp; Rear OE Converters</text>
+		</Qual>
+		
+		<Qty>1</Qty>
+		<PartType id="10038"/> 	<!-- Exhaust Pipe -->
+		<Part BrandAAIAID="ZZZX">29633</Part>
+		<AssetName>123</AssetName>
+		<AssetItemOrder>1</AssetItemOrder>
+	</App>
+		
+	<App action="A" id="10">
+		<BaseVehicle id="5459"/> 	<!-- 1994 Ford Mustang -->
+				
+		<SubModel id="39"/> <!-- GT -->
+		<EngineBlock id="20"/> <!-- V8-302cid 5.0L -->
+
+		<Note>Dual Exhaust</Note>
+		<Note>Exc. Calif. </Note>
+		<Note>Replaces both front &amp; rear OE Converters</Note>
+		<Qty>1</Qty>
+		<PartType id="10039"/> 	<!-- Exhaust Pipe -->
+		<Part>P135</Part>
+	</App>
+	
+	<!-- equipment application with engine block -->
+	<App action="A" id="11">
+	<Mfr id ="22"/> <!-- Ford -->
+    <EquipmentModel id="1"/> <!-- '4.6L Triton' -->
+	<VehicleType id="2194"/> <!-- Performance Engine -->
+	<EngineBlock id="17"/> 	 <!-- 4.6L -->
+    <Qty>8</Qty>
+    <PartType id="5620"/> <!-- Engine Piston -->
+    <Part>P123</Part>
+	</App>
+	
+	<!-- equipment base application with engine block -->
+	<App action="A" id="12">
+	<EquipmentBase id ="1"/> <!-- Ford - 4.6L Triton -->
+    <EngineBlock id="17"/> 	 <!-- 4.6L -->
+    <Qty>8</Qty>
+    <PartType id="5620"/> <!-- Engine Piston -->
+    <Part>P124</Part>
+	</App>
+	
+	<!-- powersports example from sample file -->
+	<App action="A" id="13">
+		<BaseVehicle id="121679"/> 	<!-- 2012 Kawasaki ZX1000 Ninja 1000 ABS -->
+		<Qty>1</Qty>				
+		<PartType id="5340"/> 		<!-- Engine Oil Filter -->
+		<Part>F1206</Part>
+	</App>
+	
+	<!-- Submodel Example -->
+	<App action="A" id="14">
+		<BaseVehicle id="5264"/> 	<!-- 2002 Ford Explorer -->
+		<SubModel id="646"/>			<!-- Eddie Bauer -->
+		<EngineBlock id="14"/>
+		<Qty>1</Qty>				
+		<PartType id="5340"/> 		<!-- Engine Oil Filter -->
+		<Part>F1217</Part>
+	</App>
+	
+	<Asset action="A" id="1">
+		<!-- Note: this asset tag example record is similar to the 1994 - 1995 Ford Mustang application data to the application 
+		record above.  The Asset tag is only required for Vehicle specific assets that do not link to a part number -->
+		<Years from="1994" to="1995"/>
+		<Make id="54"/> 		<!-- Ford -->
+		<Model id="688"/> 		<!-- Mustang -->
+		<SubModel id="39"/> 	<!-- GT -->
+		<EngineBase id=" 143"/>	<!-- V8-302cid 5.0L -->
+		<Note>Dual Exhaust</Note>
+		<AssetName>704</AssetName>
+	</Asset>
+	<DigitalAsset>
+		<DigitalFileInformation AssetName="123" action="A" LanguageCode="EN">
+			<FileName>abc.jpg</FileName>
+			<AssetDetailType>BRO</AssetDetailType>
+			<FileType>JPG</FileType>
+			<Representation>A</Representation>
+			<FileSize>123456</FileSize>
+			<Resolution>72</Resolution>
+			<ColorMode>RGB</ColorMode>
+			<Background>WHI</Background>
+			<OrientationView>ANG</OrientationView>
+			<AssetDimensions UOM="PX">
+				<AssetHeight>250</AssetHeight>
+				<AssetWidth>250</AssetWidth>
+			</AssetDimensions>
+			<AssetDescription>High resolution image from brochure</AssetDescription>
+			<FilePath>\Mfg\xyz.jpg</FilePath>
+			<URI>http://www.mfg.com/Images/abc.jpg</URI>
+			<FileDateModified>2013-01-31</FileDateModified>
+			<EffectiveDate>2013-01-31</EffectiveDate>
+			<ExpirationDate>2013-12-31</ExpirationDate>
+			<Country>US</Country>
+		</DigitalFileInformation>	
+		<DigitalFileInformation AssetName="704" action="A" LanguageCode="EN" >
+			<FileName>xyz.jpg</FileName>
+			<AssetDetailType>BRO</AssetDetailType>
+			<FileType>JPG</FileType>
+			<Representation>A</Representation>
+			<FileSize>123456</FileSize>
+			<Resolution>72</Resolution>
+			<ColorMode>RGB</ColorMode>
+			<Background>WHI</Background>
+			<OrientationView>ANG</OrientationView>
+			<AssetDimensions UOM="PX">
+				<AssetHeight>250</AssetHeight>
+				<AssetWidth>250</AssetWidth>
+			</AssetDimensions>
+			<AssetDescription>High resolution image from brochure</AssetDescription>
+			<FilePath>\Mfg\xyz.jpg</FilePath>
+			<URI>http://www.mfg.com/Images/xyz.jpg</URI>
+			<FileDateModified>2013-01-31</FileDateModified>
+			<EffectiveDate>2013-01-31</EffectiveDate>
+			<ExpirationDate>2013-12-31</ExpirationDate>
+			<Country>US</Country>
+		</DigitalFileInformation>
+	</DigitalAsset>
+	<Footer>
+		<RecordCount>14</RecordCount>
+	</Footer>
+</ACES>

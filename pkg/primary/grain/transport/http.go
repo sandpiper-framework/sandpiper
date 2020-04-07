@@ -41,12 +41,12 @@ var (
 
 // Grain create request
 type createReq struct {
-	ID       uuid.UUID `json:"id"` // optional
-	SliceID  uuid.UUID `json:"slice_id" validate:"required"`
-	Key      string    `json:"grain_key" validate:"required"`
-	Source   string    `json:"source"`
-	Encoding string    `json:"encoding" validate:"required"`
-	Payload  []byte    `json:"payload" validate:"required"`
+	ID       uuid.UUID             `json:"id"` // optional
+	SliceID  uuid.UUID             `json:"slice_id" validate:"required"`
+	Key      string                `json:"grain_key" validate:"required"`
+	Source   string                `json:"source"`
+	Encoding string                `json:"encoding" validate:"required"`
+	Payload  sandpiper.PayloadData `json:"payload" validate:"required"`
 }
 
 func (r createReq) id() uuid.UUID {
@@ -68,7 +68,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	result, err := h.svc.Create(c, replaceFlag, sandpiper.Grain{
+	result, err := h.svc.Create(c, replaceFlag, &sandpiper.Grain{
 		ID:       r.id(),
 		SliceID:  &r.SliceID,
 		Key:      r.Key,
@@ -76,7 +76,6 @@ func (h *HTTP) create(c echo.Context) error {
 		Encoding: r.Encoding,
 		Payload:  r.Payload,
 	})
-
 	if err != nil {
 		return err
 	}
@@ -132,7 +131,7 @@ func (h *HTTP) listBySlice(c echo.Context) error {
 func (h *HTTP) view(c echo.Context) error {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return ErrInvalidSliceUUID
+		return ErrInvalidGrainUUID
 	}
 
 	result, err := h.svc.View(c, id)
@@ -144,12 +143,12 @@ func (h *HTTP) view(c echo.Context) error {
 }
 
 func (h *HTTP) exists(c echo.Context) error {
-	id, err := uuid.Parse(c.Param("sliceid"))
+	SliceID, err := uuid.Parse(c.Param("sliceid"))
 	if err != nil {
 		return ErrInvalidSliceUUID
 	}
 
-	result, err := h.svc.Exists(c, id, c.Param("grainkey"))
+	result, err := h.svc.Exists(c, SliceID, c.Param("grainkey"))
 	if err != nil {
 		return err
 	}

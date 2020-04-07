@@ -22,7 +22,7 @@ CREATE TYPE slice_type_enum AS ENUM (
 CREATE TYPE encoding_enum AS ENUM (
   'raw',
   'b64',
-  'gzipb64'
+  'z64'
 );
 
 CREATE TABLE IF NOT EXISTS "settings" (
@@ -33,16 +33,17 @@ CREATE TABLE IF NOT EXISTS "settings" (
 
 CREATE TABLE IF NOT EXISTS companies (
   "id"         uuid PRIMARY KEY,
-  "name"       text UNIQUE NOT NULL,
+  "name"       text NOT NULL,
   "sync_addr"  text,
   "active"     boolean,
   "created_at" timestamp,
   "updated_at" timestamp
 );
+CREATE UNIQUE INDEX ON companies (lower(name));
 
 CREATE TABLE IF NOT EXISTS "slices" (
   "id"            uuid PRIMARY KEY,
-  "name"          text UNIQUE NOT NULL,
+  "name"          text NOT NULL,
   "slice_type"    slice_type_enum NOT NULL,
   "content_hash"  text,
   "content_count" integer,
@@ -50,6 +51,7 @@ CREATE TABLE IF NOT EXISTS "slices" (
   "created_at"    timestamp,
   "updated_at"    timestamp
 );
+CREATE UNIQUE INDEX ON slices (lower(name));
 
 CREATE TABLE IF NOT EXISTS "slice_metadata" (
   "slice_id" uuid REFERENCES "slices" ON DELETE CASCADE,
@@ -60,7 +62,7 @@ CREATE TABLE IF NOT EXISTS "slice_metadata" (
 
 CREATE TABLE IF NOT EXISTS "tags" (
   "id"          serial PRIMARY KEY,
-  "name"        text UNIQUE NOT NULL,
+  "name"        text UNIQUE NOT NULL, /* lowercase by convention */
   "description" text,
   "created_at"  timestamp,
   "updated_at"  timestamp
@@ -76,20 +78,21 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
   "sub_id"       serial PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
   "company_id"   uuid REFERENCES "companies" ON DELETE CASCADE,
-  "name"         text UNIQUE NOT NULL,
+  "name"         text NOT NULL,
   "description"  text,
   "active"       boolean,
   "created_at"   timestamp,
   "updated_at"   timestamp,
   CONSTRAINT "sub_alt_key" UNIQUE("slice_id", "company_id")
 );
+CREATE UNIQUE INDEX ON subscriptions (lower(name));
 
 CREATE TABLE IF NOT EXISTS "grains" (
   "id"           uuid PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
   "grain_key"    text NOT NULL,
   "encoding"     encoding_enum,
-  "payload"      bytea,
+  "payload"      text,
   "source"       text,
   "created_at"   timestamp,
   CONSTRAINT "grain_alt_key" UNIQUE("slice_id", "grain_key")

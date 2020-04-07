@@ -33,12 +33,13 @@ func NewGrain() *Grain {
 var (
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain key already exists for this Slice.")
 	ErrGrainNotFound = echo.NewHTTPError(http.StatusNotFound, "Grain does not exist.")
+	//ErrDecodePayload = echo.NewHTTPError(http.StatusInternalServerError, "Error preparing payload for database.")
 )
 
-// Create creates a new grain in database (assumes allowed to do this). Grain must match the Slice
-// content type.
-func (s *Grain) Create(db orm.DB, replaceFlag bool, grain sandpiper.Grain) (*sandpiper.Grain, error) {
-	// key is always lowercase to allow faster lookups
+// Create creates a new grain in database (assumes allowed to do this).
+func (s *Grain) Create(db orm.DB, replaceFlag bool, grain *sandpiper.Grain) (*sandpiper.Grain, error) {
+
+	// key is always lowercase to allow faster lookups without a function index
 	grain.Key = strings.ToLower(grain.Key)
 
 	if replaceFlag {
@@ -52,10 +53,10 @@ func (s *Grain) Create(db orm.DB, replaceFlag bool, grain sandpiper.Grain) (*san
 		}
 	}
 
-	if err := db.Insert(&grain); err != nil {
+	if err := db.Insert(grain); err != nil {
 		return nil, err
 	}
-	return &grain, nil
+	return grain, nil
 }
 
 // View returns a single grain by ID (assumes allowed to do this)
@@ -71,14 +72,14 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	return grain, nil
 }
 
-// Exists returns minimal grain information if found
+// Exists returns minimal grain information if found, an empty grain if not found
 func (s *Grain) Exists(db orm.DB, sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
 	grain := new(sandpiper.Grain)
-	err := db.Model(grain).Column("grain.id", "source").
+	err := db.Model(grain).Column("id", "slice_id", "grain_key", "source", "encoding", "created_at").
 		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
 		Select()
-	if err != nil {
-		return nil, selectError(err)
+	if err != nil && err != pg.ErrNoRows {
+		return nil, err
 	}
 	return grain, nil
 }
@@ -141,7 +142,7 @@ func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payload bool, sc *sandpiper.S
 // Delete permanently removes a grain by primary key (id)
 func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 	grain := sandpiper.Grain{ID: id}
-	return db.Delete(grain)
+	return db.Delete(&grain)
 }
 
 // canAddGrain makes sure we can add this grain
