@@ -108,8 +108,8 @@ func (ls *LogService) View(c echo.Context, req uuid.UUID) (resp *sandpiper.Grain
 	return ls.Service.View(c, req)
 }
 
-// Exists logging
-func (ls *LogService) Exists(c echo.Context, sliceID uuid.UUID, grainKey string) (resp *sandpiper.Grain, err error) {
+// ViewByKeys logging
+func (ls *LogService) ViewByKeys(c echo.Context, sliceID uuid.UUID, grainKey string, payloadFlag bool) (resp *sandpiper.Grain, err error) {
 	defer func(begin time.Time) {
 		var g *sandpiper.Grain
 		if resp != nil {
@@ -131,7 +131,7 @@ func (ls *LogService) Exists(c echo.Context, sliceID uuid.UUID, grainKey string)
 			},
 		)
 	}(time.Now())
-	return ls.Service.Exists(c, sliceID, grainKey)
+	return ls.Service.ViewByKeys(c, sliceID, grainKey, payloadFlag)
 }
 
 // Delete logging

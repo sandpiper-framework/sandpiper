@@ -57,7 +57,7 @@ func Add(c *args.Context) error {
 	}
 
 	// remove the old grain first if it exists
-	err = removeExistingGrain(api, p.prompt, p.sliceID, L1GrainKey)
+	err = removeExistingGrain(api, p.prompt, p.sliceID, sandpiper.L1GrainKey)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func Add(c *args.Context) error {
 	// create the new grain
 	grain := &sandpiper.Grain{
 		SliceID:  &p.sliceID,
-		Key:      L1GrainKey,
+		Key:      sandpiper.L1GrainKey,
 		Source:   filepath.Base(p.fileName),
 		Encoding: L1Encoding,
 		Payload:  data,

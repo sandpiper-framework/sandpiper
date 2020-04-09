@@ -13,6 +13,10 @@ import (
 	"github.com/google/uuid"
 )
 
+const
+// L1GrainKey is always the same for level-1 grains
+L1GrainKey = "level-1"
+
 // Grain represents the sandpiper syncable-object
 type Grain struct {
 	ID         uuid.UUID   `json:"id" pg:",pk"`

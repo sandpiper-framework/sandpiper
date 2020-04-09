@@ -82,10 +82,10 @@ var Commands = []*args.Command{
 		--slice "aap-slice" \ # required slice_id or slice_name
 		--dir                 # required output directory
 		*/
-		Name:   "pull",
-		Usage:  "save file-based grains to the file system",
+		Name:      "pull",
+		Usage:     "save file-based grains to the file system",
 		ArgsUsage: "<root-directory>",
-		Action: command.Pull,
+		Action:    command.Pull,
 		Flags: []args.Flag{
 			&args.StringFlag{
 				Name:     "slice",

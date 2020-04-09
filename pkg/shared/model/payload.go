@@ -24,6 +24,8 @@ import (
  *   rawBytes, err := payloadData.Decode()
  */
 
+// todo: change from gzip library to https://github.com/klauspost/compress
+
 // PayloadData is the data type for encoded payload data.
 type PayloadData string
 
@@ -102,6 +104,8 @@ func toAscii85(buf []byte) []byte {
 
 // Decode method converts encoded payload to human-readable
 func (p PayloadData) Decode(enc string) (PayloadData, error) {
+	// todo: change to use io.writer? (want to avoid copying payload in memory)
+
 	switch enc {
 	case "raw":
 		return p, nil

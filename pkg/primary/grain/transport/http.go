@@ -29,7 +29,7 @@ func NewHTTP(svc grain.Service, er *echo.Group) {
 	sr.GET("", h.list)    // ?payload=[yes/no*]
 	sr.GET("/slice/:id", h.listBySlice)
 	sr.GET("/:id", h.view)
-	sr.GET("/:sliceid/:grainkey", h.exists)
+	sr.GET("/:sliceid/:grainkey", h.viewByKeys) // ?payload=[yes/no*]
 	sr.DELETE("/:id", h.delete)
 }
 
@@ -142,13 +142,19 @@ func (h *HTTP) view(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func (h *HTTP) exists(c echo.Context) error {
+func (h *HTTP) viewByKeys(c echo.Context) error {
+	var includePayload = false
+
 	SliceID, err := uuid.Parse(c.Param("sliceid"))
 	if err != nil {
 		return ErrInvalidSliceUUID
 	}
 
-	result, err := h.svc.Exists(c, SliceID, c.Param("grainkey"))
+	if c.QueryParam("payload") == "yes" {
+		includePayload = true
+	}
+
+	result, err := h.svc.ViewByKeys(c, SliceID, c.Param("grainkey"), includePayload)
 	if err != nil {
 		return err
 	}

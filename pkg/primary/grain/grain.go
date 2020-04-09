@@ -33,9 +33,13 @@ func (s *Grain) View(c echo.Context, grainID uuid.UUID) (*sandpiper.Grain, error
 	return s.sdb.View(s.db, grainID)
 }
 
-// Exists returns a single grain's basic information (without authorization checks)
-func (s *Grain) Exists(_ echo.Context, sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
-	return s.sdb.Exists(s.db, sliceID, grainKey)
+// ViewByKeys returns a single grain by (slice_id, grain_key) (admin function only)
+func (s *Grain) ViewByKeys(c echo.Context, sliceID uuid.UUID, grainKey string, payloadFlag bool) (*sandpiper.Grain, error) {
+	au := s.rbac.CurrentUser(c)
+	if au.AtLeast(sandpiper.AdminRole) {
+		return s.sdb.ViewByKeys(s.db, sliceID, grainKey, payloadFlag)
+	}
+	return nil, echo.ErrForbidden
 }
 
 // List returns list of grains scoped by user
@@ -48,12 +52,12 @@ func (s *Grain) List(c echo.Context, payload bool, p *sandpiper.Pagination) ([]s
 }
 
 // ListBySlice returns a list of grains for a slice scoped by user
-func (s *Grain) ListBySlice(c echo.Context, sliceID uuid.UUID, payload bool, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+func (s *Grain) ListBySlice(c echo.Context, sliceID uuid.UUID, payloadFlag bool, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
 	}
-	return s.sdb.List(s.db, sliceID, payload, q, p)
+	return s.sdb.List(s.db, sliceID, payloadFlag, q, p)
 }
 
 // Delete deletes a grain by id, if allowed

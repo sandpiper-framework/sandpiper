@@ -69,10 +69,16 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	return grain, nil
 }
 
-// Exists returns minimal grain information if found, an empty grain if not found
-func (s *Grain) Exists(db orm.DB, sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
+// ViewByKeys returns minimal grain information if found, an empty grain if not found
+func (s *Grain) ViewByKeys(db orm.DB, sliceID uuid.UUID, grainKey string, payloadFlag bool) (*sandpiper.Grain, error) {
+	// columns to select (optionally returning payload)
+	cols := "id, slice_id, grain_key, source, encoding, created_at, length(payload) as payload_len"
+	if payloadFlag {
+		cols = cols + ", payload"
+	}
+
 	grain := new(sandpiper.Grain)
-	err := db.Model(grain).Column("id", "slice_id", "grain_key", "source", "encoding", "created_at").
+	err := db.Model(grain).ColumnExpr(cols).
 		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
 		Select()
 	if err != nil && err != pg.ErrNoRows {
@@ -95,13 +101,13 @@ func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.U
 }
 
 // List returns a list of all grains with scoping and pagination (optionally for a slice)
-func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payload bool, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
 	var q *orm.Query
 
 	// columns to select (optionally returning payload)
 	cols := "grain.id, grain.slice_id, grain_key, source, encoding, grain.created_at, length(payload) as payload_len"
-	if payload {
+	if payloadFlag {
 		cols = cols + ", payload"
 	}
 

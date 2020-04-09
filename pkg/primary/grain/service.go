@@ -20,7 +20,7 @@ type Service interface {
 	List(echo.Context, bool, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	ListBySlice(echo.Context, uuid.UUID, bool, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	View(echo.Context, uuid.UUID) (*sandpiper.Grain, error)
-	Exists(echo.Context, uuid.UUID, string) (*sandpiper.Grain, error)
+	ViewByKeys(echo.Context, uuid.UUID, string, bool) (*sandpiper.Grain, error)
 	Delete(echo.Context, uuid.UUID) error
 }
 
@@ -52,7 +52,7 @@ type Repository interface {
 	Create(orm.DB, bool, *sandpiper.Grain) (*sandpiper.Grain, error)
 	CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.UUID) bool
 	View(orm.DB, uuid.UUID) (*sandpiper.Grain, error)
-	Exists(orm.DB, uuid.UUID, string) (*sandpiper.Grain, error)
+	ViewByKeys(orm.DB, uuid.UUID, string, bool) (*sandpiper.Grain, error)
 	List(orm.DB, uuid.UUID, bool, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Grain, error)
 	Delete(orm.DB, uuid.UUID) error
 }

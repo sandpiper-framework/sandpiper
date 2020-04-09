@@ -154,16 +154,18 @@ func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Gra
 	return grain, err
 }
 
-// GetLevel1Grain returns a grain by ID if it is L1
-// todo: this is wrong! We have an api for listing grains in a slice, but it returns an array!!!
+// GetLevel1Grain returns a grain by sliceID if Level1
 func (c *Client) GetLevel1Grain(sliceID uuid.UUID) (*sandpiper.Grain, error) {
-	path := fmt.Sprintf("/grains/%s", sliceID.String())
+	path := fmt.Sprintf("/grains/%s/%s?payload=yes", sliceID.String(), sandpiper.L1GrainKey)
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
 	grain := new(sandpiper.Grain)
-	_, err = c.do(req, grain)
+	resp, err := c.do(req, grain)
+	if resp.StatusCode == 404 {
+		return grain, nil
+	}
 	return grain, err
 }
 
@@ -210,10 +212,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 	}
 	resp := &Response{r} // wrap it in our struct for new methods
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		msg, _ := resp.ToString()
-		return nil, fmt.Errorf("%s: %s", resp.Status, msg)
-	}
+
 	if c.debug {
 		dump, err := httputil.DumpRequestOut(req, true)
 		if err == nil {
@@ -221,6 +220,12 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 		}
 		fmt.Printf("req: %v\n\nresp: %v\n", req, resp)
 	}
+
+	if resp.StatusCode != 200 {
+		msg, _ := resp.ToString()
+		return resp, fmt.Errorf("%s: %s", resp.Status, msg)
+	}
+
 	if v != nil {
 		// convert the json response to the provided structure pointer
 		// consider limits using json.NewDecoder(io.LimitReader(response.Body, SomeSaneConst)).Decode(v)
