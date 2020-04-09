@@ -22,6 +22,12 @@ import (
 const (
 	// DefaultConfigFile can be overridden by command line options
 	DefaultConfigFile = "config.yaml"
+
+	// L1GrainKey is always the same for level-1 grains
+	L1GrainKey = "level-1"
+
+	// L1Encoding for level-1 grains using `sandpiper add`
+	L1Encoding = "z64"
 )
 
 // GlobalParams holds non-command specific params
@@ -59,7 +65,7 @@ func GetGlobalParams(c *args.Context) (*GlobalParams, error) {
 		addr:     addr,
 		user:     c.String("user"),
 		password: passwd,
-		debug:    cfg.Command.Debug,
+		debug:    c.Bool("debug"),
 	}, nil
 }
 

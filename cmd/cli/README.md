@@ -1,79 +1,159 @@
+# Sandpiper CLI utility
+
 ## Introduction
 
-Level 1 implementation of Sandpiper means syncing "file-based" data-objects. The `sandpiper` CLI tool supports the adding and pulling of Level 1 files.
-This functionality will be duplicated in the Admin screens, but is easier to implement than a full admin interface (since there is no UI and it just calls the exposed API)
-and allows for hands-free automation.
+Level 1 implementation of Sandpiper means syncing "file-based" data-objects. These `sandpiper` CLI tools support adding, pulling and listing Level 1 files.
+This functionality is mostly duplicated by web-based Admin screens, but a command line interface allows an important alternative for hands-free automation.
 
-## Add File-Based Objects
-Implement the "add" command to add "file" data-objects to a slice in the pool. This command could be called by an internal PIM, for example, to "publish" completed delivery files.
-
-### For example:
+### Command Syntax
 
 ```
-sandpiper add \
--u user                          \ # database user
--p password                      \ # database password, prompt if not supplied
--slice "aap-brake-pads"          \ # slice-name
--type "aces-file"                \ # grain-type
--key  "brakes"                   \ # grain-key
--noprompt                        \ # don't prompt before over-writing
-acme_brakes_full_2019-12-12.xml    # file to add
+sandpiper [global-options] [add | list | pull | help] [command-options] <arguments>
+
+global-options (also available via [environment variable]):
+   --user name, -u name        server login name [SANDPIPER_USER]
+   --password value, -p value  user password [SANDPIPER_PASSWORD]
+   --config FILE, -c FILE      Load configuration from FILE (default: config.yaml) [SANDPIPER_CONFIG]
+   --debug, -d                 provide some debugging information to stdout
+   --help, -h                  show general help (default: false)
+   --version, -v               print the version (default: false)
+
+commands:
+   add      add a file-based grain from a local file
+   pull     save file-based grains to the file system
+   list     list slices (if no slice provided) or file-based grains by slice_id or slice_name
+   help, h  Shows a list of commands or help for one command
+```
+
+If the password is not provided, you will be prompted for it.
+
+### Configuration file
+
+All commands look for a `config.yml` file in the current directory to determine the sandpiper server address (this can be overridden by the `--config` option or by the SANDPIPER_CONFIG environment variable). 
+
+Here is an example of the config.yml file.
+
+```
+command:
+  url: http://localhost
+  port: 8080
+```
+
+## Add File-Based Objects
+
+The `add` command creates a "file" data-object (i.e. grain) and adds it to a slice. This command could be called by an internal PIM, for example, to "publish" completed delivery files. By convention,
+all L1 grains have a grain_key of "level-1" and use "z85" encoding (gzip/ascii85).
+
+### Usage
+
+```
+sandpiper [global-options] add [command-options] <unzipped-file-to-add>
+
+command-options:
+   --slice value, -s value  either a slice_id (uuid) or slice_name (case-insensitive)
+   --noprompt               do not prompt before over-writing a grain (default is to prompt)
+
+arguments:
+    A single filename (absolute or relative to the command) that should be added to the provided slice.
+    The file should in its native format (e.g. .xml, .txt) and should *not* be zipped. Compression is
+    performed separately by the add command.
+
+Example:
+    sandpiper -u user -p password add --slicename "aap-brake-pads" --noprompt acme_brakes_full_2019-12-12.xml
 ```
 
 This command adds the ACES xml file as a grain as defined by the supplied request body (see below).
-
-The sandpiper server url is pulled from the "config" file. If the password is not provided, it would prompt for it.
-
-Here is an example of a config.yml file.
-
-```
-server:
-  url: localhost
-  port: :4040
-  read_timeout_seconds: 10
-  write_timeout_seconds: 5
-```
   
 ### Sandpiper API
 
 The following api is used to add an object with the sandpiper add command:
 
 ```
-POST /grains
+POST /v1/grains
 ```
 
-The request "body" would look like this:
+The request "body" submitted by `sandpiper add` would look like this:
 
 ```
 {
-	"slice_id": "2bea8308-1840-4802-ad38-72b53e31594c",
-	"grain_key": "disc-brakes",
-	"encoding": "gzipb64"
-    "payload": "--encoded payload data--"
+    "slice_id": "2bea8308-1840-4802-ad38-72b53e31594c",
+    "grain_key": "level-1",
+    "encoding": "z85"
+    "payload": "--gzip/ascii85 encoded data from supplied filename--"
 }
 ```
 
-The response would include the assigned grain "id" (but not the payload)
- 
+The response would include the assigned grain "id" (but not the payload). Use the `sandpiper list --full` command to display all information stored.
+
+```
+{
+  "id": "cb5872d2-6f98-4f23-bd2f-7366b8063523",
+  "slice_id": "1b40204a-7acd-4c78-a3c4-0fa95d2f00f6",
+  "grain_key": "level-1",
+  "source": "acme_brakes_full_2019-12-12.xml",
+  "encoding": "z85",
+  "payload_len": 2696,
+  "created_at": "2020-04-07T15:59:40.5223569-05:00"
+}
+```
+
+## List File-Based Objects
+
+This command displays slice information or grain information for a slice.
+
+#### Syntax:
+
+```
+sandpiper [global-options] list [command-options]
+
+command-options:
+   --slice value, -s value  either a slice_id (uuid) or slice_name (case-insensitive)
+   --full                   provide full listings (default: false)
+   --help, -h               show help (default: false)
+
+    If a slice is not provided, a listing of slices is displayed to stdout.
+    If a slice is provided and a valid UUID, it is interpreted as a slice_id.
+    If a slice is provided and not a valid UUID, it is interpreted as a slice_name. 
+
+Examples:
+    sandpiper -u user -p password list
+    sandpiper -u user -p password list --slice 1b40204a-7acd-4c78-a3c4-0fa95d2f00f6
+    sandpiper -u user -p password list --full --slice aap-brake-pads
+```
+
 ## Pull File-Based Objects
 
 Implement the "pull" command to retrieve "file" data-objects from an optional slice in the pool. If the slice is not supplied it will create a sub-directory for each one it finds.
 
-#### For example:
+#### Syntax:
 
 ```
-sandpiper pull \
--s "aap-slice" \ # optional slice
--t "aces-file" \  # optional file-type
--d "publish"     # required output directory
-```
+sandpiper [global-options] pull [command-options] <root-directory>
 
-The generated file structure might be something like:
+command-options:
+   --slice value, -s value  either a slice_id (uuid) or slice_name (case-insensitive)
+   --help, -h               show help (default: false)
 
-```
-publish
-|-- aces-file
-    |-- aap-slice
+    If a slice is not provided, all level-1 grains are extracted to the local file system.
+    If a slice is provided and a valid UUID, it is interpreted as a slice_id.
+    If a slice is provided and not a valid UUID, it is interpreted as a slice_name.  
+
+arguments:
+   optional output directory (will be created if it doesn't exist)
+
+Examples:
+    sandpiper -u user -p password pull --slice 1b40204a-7acd-4c78-a3c4-0fa95d2f00f6
+    sandpiper -u user -p password pull --slice "aap-brake-pads" /temp/output
+    sandpiper -u uers -p password pull /temp/output
+
+    This last example will create a directory structure under /temp/output with the slice name as the parent
+    for each grain pulled:
+
+    /temp/output
+        |-- slice1
+            |-- grain1
+        |-- slice2
+            |-- grain2 
 ```
     
-Leaving off an option will pull all available.
+Use forward slashes for the output directory even if on Windows.

@@ -1,7 +1,7 @@
 # `sandpiper` command configuration file
+# commands look for a "config.yml" in the current directory
 
 command:
   url: http://localhost
   port: 8080
-  debug: true
 

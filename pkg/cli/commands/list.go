@@ -19,8 +19,8 @@ type listParams struct {
 	addr     *url.URL // our sandpiper server
 	user     string
 	password string
-	argument string
-	nameFlag bool
+	slice    string // optional (empty means show slices)
+	sliceID  uuid.UUID
 	full     bool
 	debug    bool
 }
@@ -28,7 +28,6 @@ type listParams struct {
 // List returns a list of all grains for a slice
 func List(c *args.Context) error {
 	var slice *sandpiper.Slice
-	var sliceID uuid.UUID
 
 	p, err := getListParams(c)
 	if err != nil {
@@ -41,8 +40,8 @@ func List(c *args.Context) error {
 		return err
 	}
 
-	if p.argument == "" {
-		// no argument means to list all slices
+	if p.slice == "" {
+		// no slice provided means to list all slices
 		result, err := api.ListSlices()
 		if err != nil {
 			return err
@@ -55,23 +54,17 @@ func List(c *args.Context) error {
 			}
 		}
 	} else {
-		if p.nameFlag {
+		if p.sliceID == uuid.Nil {
 			// use provided slice-name to get the slice-id
-			slice, err = api.SliceByName(p.argument)
+			slice, err = api.SliceByName(p.slice)
 			if err != nil {
 				return err
 			}
-			sliceID = slice.ID
-		} else {
-			// make sure the provided slice-id is a valid uuid
-			sliceID, err = uuid.Parse(p.argument)
-			if err != nil {
-				return err
-			}
+			p.sliceID = slice.ID
 		}
 		// return a list of paginated grains for the slice-id
 		// todo: add pagination logic
-		result, err := api.ListGrains(sliceID, p.full)
+		result, err := api.ListGrains(p.sliceID, p.full)
 		if err != nil {
 			return err
 		}
@@ -93,13 +86,16 @@ func getListParams(c *args.Context) (*listParams, error) {
 		return nil, err
 	}
 
+	slice := c.String("slice")
+	sliceID, _ := uuid.Parse(slice)
+
 	return &listParams{
 		addr:     g.addr,
 		user:     g.user,
 		password: g.password,
-		nameFlag: c.Bool("name"),
 		full:     c.Bool("full"),
-		argument: c.Args().Get(0), // either slice-id or slice-name
+		slice:    slice,
+		sliceID:  sliceID,
 		debug:    g.debug,
 	}, nil
 }

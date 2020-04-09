@@ -60,7 +60,8 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	var grain = &sandpiper.Grain{ID: id}
 
 	err := db.Model(grain).
-		Column("grain.id", "grain_key", "encoding", "length(payload) as payload_len", "payload", "grain.created_at").
+		Column("grain.id", "grain_key", "encoding", "payload", "grain.created_at").
+		ColumnExpr("length(payload) as payload_len").
 		Relation("Slice").WherePK().Select()
 	if err != nil {
 		return nil, selectError(err)
@@ -141,34 +142,11 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 	return db.Delete(&grain)
 }
 
-/*
-// canAddGrain makes sure we can add this grain
-func canAddGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
-	// attempt to select by unique keys
-	m := new(sandpiper.Grain)
-	err := db.Model(m).
-		Column("id", "slice_id", "grain_key").
-		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
-		Select()
-
-	switch err {
-	case pg.ErrNoRows: // ok to add
-		return nil
-	case nil: // found a row, so a duplicate
-		return ErrAlreadyExists
-	default: // return any other problem found
-		return err
-	}
-}
-*/
-
 // removeExistingGrain will remove a grain by alternate unique key. Only return real errors.
 func removeExistingGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
 	// attempt to delete by unique keys
 	m := new(sandpiper.Grain)
-	_, err := db.Model(m).
-		Where("slice_id = ? and grain_key = ?", sliceID, grainKey).
-		Delete()
+	_, err := db.Model(m).Where("slice_id = ? and grain_key = ?", sliceID, grainKey).Delete()
 	if err != nil && err != pg.ErrNoRows {
 		return err
 	}

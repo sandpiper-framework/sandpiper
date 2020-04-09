@@ -45,25 +45,30 @@ var GlobalFlags = []args.Flag{
 		EnvVars:     []string{"SANDPIPER_CONFIG"},
 		DefaultText: command.DefaultConfigFile,
 	},
+	&args.BoolFlag{
+		Name:    "debug",
+		Aliases: []string{"d"},
+		Usage:   "Show debug information to stdout",
+	},
 }
 
 // Commands defines the valid command line sub-commands
 var Commands = []*args.Command{
 	{
 		/* sandpiper add \
-		-slice "aap-brake-pads"  \ # slice-name
-		-noprompt                \ # don't prompt before over-writing
+		--slice "aap-brake-pads"  \ # argument is a slice name
+		--noprompt                \ # don't prompt before over-writing
 		acme_brakes_full_2019-12-12.xml # file to add (accessed via c.Args().Get(0))
 		*/
 		Name:      "add",
-		Usage:     "add a file-based grain",
+		Usage:     "add a file-based grain from a local file",
 		ArgsUsage: "<unzipped-file-to-add>",
 		Action:    command.Add,
 		Flags: []args.Flag{
 			&args.StringFlag{
 				Name:     "slice",
 				Aliases:  []string{"s"},
-				Usage:    "slice name",
+				Usage:    "either slice_id (uuid) or slice_name (case-insensitive)",
 				Required: true,
 			},
 			&args.BoolFlag{
@@ -73,25 +78,43 @@ var Commands = []*args.Command{
 		},
 	},
 	{
+		/* sandpiper pull   \
+		--slice "aap-slice" \ # required slice_id or slice_name
+		--dir                 # required output directory
+		*/
 		Name:   "pull",
-		Usage:  "retrieve file-based grains",
+		Usage:  "save file-based grains to the file system",
+		ArgsUsage: "<root-directory>",
 		Action: command.Pull,
-		Flags:  []args.Flag{},
+		Flags: []args.Flag{
+			&args.StringFlag{
+				Name:     "slice",
+				Aliases:  []string{"s"},
+				Usage:    "either a slice_id (uuid) or slice_name (case-insensitive)",
+				Required: false,
+			},
+			&args.StringFlag{
+				Name:     "dir",
+				Aliases:  []string{"d"},
+				Usage:    "optional root of output directory",
+				Required: false,
+			},
+		},
 	},
 	{
 		/* sandpiper list \
-		-n  \ # interpret the argument as a slice name
+		--slice "aap-slice" \ # required slice_id or slice_name
 		arg  # either slice_id or slice_name (if empty, list all slices)
 		*/
 		Name:      "list",
-		Usage:     "list slices (with an empty argument) or file-based grains by slice_id or slice_name",
-		ArgsUsage: "[empty | slice_id | slice_name]",
+		Usage:     "list slices (if no slice provided) or file-based grains by slice_id or slice_name",
+		ArgsUsage: " ", // don't show that we accept arguments
 		Action:    command.List,
 		Flags: []args.Flag{
-			&args.BoolFlag{
-				Name:     "name",
-				Aliases:  []string{"n"},
-				Usage:    "argument is a slice-name",
+			&args.StringFlag{
+				Name:     "slice",
+				Aliases:  []string{"s"},
+				Usage:    "either a slice_id (uuid) or slice_name (case-insensitive)",
 				Required: false,
 			},
 			&args.BoolFlag{

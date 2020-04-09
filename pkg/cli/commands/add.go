@@ -21,22 +21,15 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
-const (
-	// L1GrainKey is always the same for level-1 grains
-	L1GrainKey = "level-1"
-
-	// L1Encoding for level-1 grains using `sandpiper add`
-	L1Encoding = "z64"
-)
-
 type addParams struct {
-	addr      *url.URL // our sandpiper server
-	user      string
-	password  string
-	sliceName string
-	fileName  string
-	prompt    bool
-	debug     bool
+	addr     *url.URL // our sandpiper server
+	user     string
+	password string
+	slice    string // required
+	sliceID  uuid.UUID
+	fileName string
+	prompt   bool
+	debug    bool
 }
 
 // Add attempts to add a new file-based grain to a slice
@@ -54,14 +47,17 @@ func Add(c *args.Context) error {
 		return err
 	}
 
-	// lookup sliceID by name
-	slice, err := api.SliceByName(p.sliceName)
-	if err != nil {
-		return err
+	if p.sliceID == uuid.Nil {
+		// lookup sliceID by name
+		slice, err := api.SliceByName(p.slice)
+		if err != nil {
+			return err
+		}
+		p.sliceID = slice.ID
 	}
 
 	// remove the old grain first if it exists
-	err = removeExistingGrain(api, p.prompt, slice.ID, L1GrainKey)
+	err = removeExistingGrain(api, p.prompt, p.sliceID, L1GrainKey)
 	if err != nil {
 		return err
 	}
@@ -74,7 +70,7 @@ func Add(c *args.Context) error {
 
 	// create the new grain
 	grain := &sandpiper.Grain{
-		SliceID:  &slice.ID,
+		SliceID:  &p.sliceID,
 		Key:      L1GrainKey,
 		Source:   filepath.Base(p.fileName),
 		Encoding: L1Encoding,
@@ -97,14 +93,18 @@ func getAddParams(c *args.Context) (*addParams, error) {
 		return nil, err
 	}
 
+	slice := c.String("slice")
+	sliceID, _ := uuid.Parse(slice)
+
 	return &addParams{
-		addr:      g.addr,
-		user:      g.user,
-		password:  g.password,
-		sliceName: c.String("slice"),
-		fileName:  c.Args().Get(0),
-		prompt:    !c.Bool("noprompt"), // avoid double negative
-		debug:     g.debug,
+		addr:     g.addr,
+		user:     g.user,
+		password: g.password,
+		slice:    slice,
+		sliceID:  sliceID,
+		fileName: c.Args().Get(0),
+		prompt:   !c.Bool("noprompt"), // avoid double negative
+		debug:    g.debug,
 	}, nil
 }
 

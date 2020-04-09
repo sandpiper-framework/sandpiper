@@ -99,6 +99,18 @@ func (c *Client) SliceByName(sliceName string) (*sandpiper.Slice, error) {
 	return slice, err
 }
 
+// SliceByID returns a slice by primary key
+func (c *Client) SliceByID(sliceID uuid.UUID) (*sandpiper.Slice, error) {
+	path := "/slices/" + sliceID.String()
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	slice := new(sandpiper.Slice)
+	_, err = c.do(req, slice)
+	return slice, err
+}
+
 // ListGrains returns a list of grains for the supplied slice
 func (c *Client) ListGrains(sliceID uuid.UUID, fullFlag bool) (*sandpiper.GrainsPaginated, error) {
 	var results sandpiper.GrainsPaginated
@@ -133,6 +145,19 @@ func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
 // GrainExists will return basic information about a grain if it exists
 func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
 	path := fmt.Sprintf("/grains/%s/%s", sliceID.String(), grainKey)
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	grain := new(sandpiper.Grain)
+	_, err = c.do(req, grain)
+	return grain, err
+}
+
+// GetLevel1Grain returns a grain by ID if it is L1
+// todo: this is wrong! We have an api for listing grains in a slice, but it returns an array!!!
+func (c *Client) GetLevel1Grain(sliceID uuid.UUID) (*sandpiper.Grain, error) {
+	path := fmt.Sprintf("/grains/%s", sliceID.String())
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
