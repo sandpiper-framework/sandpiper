@@ -73,20 +73,6 @@ func (c *Client) Login(username, password string) error {
 	return err
 }
 
-// Add a grain to a slice with option to overwrite
-func (c *Client) Add(grain *sandpiper.Grain) error {
-	body, err := json.Marshal(grain)
-	if err != nil {
-		return err
-	}
-	req, err := c.newRequest("POST", "/grains", body)
-	if err != nil {
-		return err
-	}
-	_, err = c.do(req, nil)
-	return err
-}
-
 // SliceByName returns a slice by unique key name
 func (c *Client) SliceByName(sliceName string) (*sandpiper.Slice, error) {
 	path := "/slices/name/" + sliceName
@@ -109,23 +95,6 @@ func (c *Client) SliceByID(sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	slice := new(sandpiper.Slice)
 	_, err = c.do(req, slice)
 	return slice, err
-}
-
-// ListGrains returns a list of grains for the supplied slice
-func (c *Client) ListGrains(sliceID uuid.UUID, fullFlag bool) (*sandpiper.GrainsPaginated, error) {
-	var results sandpiper.GrainsPaginated
-	var payloadParam string
-
-	if fullFlag {
-		payloadParam = "?payload=yes"
-	}
-	path := "/grains/slice/" + sliceID.String() + payloadParam
-	req, err := c.newRequest("GET", path, nil)
-	if err != nil {
-		return nil, err
-	}
-	_, err = c.do(req, &results)
-	return &results, err
 }
 
 // ListSlices returns a list of all slices
@@ -164,9 +133,41 @@ func (c *Client) GetLevel1Grain(sliceID uuid.UUID) (*sandpiper.Grain, error) {
 	grain := new(sandpiper.Grain)
 	resp, err := c.do(req, grain)
 	if resp.StatusCode == 404 {
+		// "not found" is not an error
 		return grain, nil
 	}
 	return grain, err
+}
+
+// ListGrains returns a list of grains for the supplied slice
+func (c *Client) ListGrains(sliceID uuid.UUID, fullFlag bool) (*sandpiper.GrainsPaginated, error) {
+	var results sandpiper.GrainsPaginated
+	var payloadParam string
+
+	if fullFlag {
+		payloadParam = "?payload=yes"
+	}
+	path := "/grains/slice/" + sliceID.String() + payloadParam
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, &results)
+	return &results, err
+}
+
+// AddGrain a grain to a slice (without overwrite)
+func (c *Client) AddGrain(grain *sandpiper.Grain) error {
+	body, err := json.Marshal(grain)
+	if err != nil {
+		return err
+	}
+	req, err := c.newRequest("POST", "/grains", body)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, nil)
+	return err
 }
 
 // DeleteGrain deletes a grain by primary key

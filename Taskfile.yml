@@ -15,7 +15,7 @@ vars:
 tasks:
   create-pub-db:
     desc: Create the publishing database from default postgresql installation using "psql"
-    dir: pkg/primary/migrations
+    dir: pkg/api/migrations
     cmds:
       - "{{.PSQLCMD}}"
     vars:
@@ -53,19 +53,19 @@ tasks:
 
   bindata-primary:
     desc: Use go-bindata to encode file migrations in a go source file
-    dir: pkg/primary/migrations
+    dir: pkg/api/migrations
     deps: [go-bindata]
     cmds:
       - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
 
   build-primary:
     desc: Build sandpiper primary server
-    dir: cmd/primary
+    dir: cmd/api
     deps: [bindata-primary]
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/primary/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/api/version.Version={{.VER}}"
     vars:
-      EXE: primary{{exeExt}}
+      EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
 
   bindata-secondary:
@@ -96,7 +96,7 @@ tasks:
 
   build:
     desc: Build all sandpiper executables
-    deps: [build-primary, build-secondary, build-cli]
+    deps: [build-primary, build-cli]
 
   test:
     desc: Run test suite (having trouble with dockertesting under Windows!)
@@ -113,9 +113,9 @@ tasks:
 
   server:
     desc: Launch sandpiper primary (publication) server
-    dir: cmd/primary
+    dir: cmd/api
     cmds:
-      - ./primary
+      - ./api
 
   release-docker:
     desc: Create a docker file for release

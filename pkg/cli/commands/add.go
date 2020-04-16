@@ -78,13 +78,13 @@ func Add(c *args.Context) error {
 	}
 
 	// finally, add the new grain
-	return api.Add(grain)
+	return api.AddGrain(grain)
 }
 
 func getAddParams(c *args.Context) (*addParams, error) {
 	// check for required file argument
 	if c.NArg() != 1 {
-		return nil, fmt.Errorf("missing filename argument (see 'sandpiper --help')")
+		return nil, fmt.Errorf("missing filename argument (see 'sandpiper -u user add --help')")
 	}
 
 	// get sandpiper global params from config file and args

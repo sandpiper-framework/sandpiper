@@ -15,9 +15,17 @@ import (
 	"github.com/go-pg/pg/v9"
 	// DB adapter
 	_ "github.com/lib/pq"
+
+	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 type dbLogger struct{}
+
+// DB is a wrapper around pg.DB so we can add functionality
+type DB struct {
+	*pg.DB
+	Settings map[string]string
+}
 
 // BeforeQuery is an unused stub at this time.
 func (d dbLogger) BeforeQuery(ctx context.Context, _ *pg.QueryEvent) (context.Context, error) {
@@ -31,19 +39,27 @@ func (d dbLogger) AfterQuery(_ context.Context, q *pg.QueryEvent) error {
 }
 
 // New creates new database connection to a postgres database with optional query logging
-func New(psn string, timeout int, enableLog bool) (*pg.DB, error) {
-	u, err := pg.ParseURL(psn)
+func New(psn string, timeout int, enableLog bool) (*DB, error) {
+	uri, err := pg.ParseURL(psn)
 	if err != nil {
 		return nil, err
 	}
 
-	db := pg.Connect(u)
+	// wrap db connection in our struct
+	db := &DB{DB: pg.Connect(uri)}
 
-	_, err = db.Exec("SELECT 1") // test connectivity
+	// test connectivity
+	_, err = db.Exec("SELECT 1")
 	if err != nil {
 		return nil, err
 	}
 
+	// save any database settings in our db object
+	if err := db.settings(); err != nil {
+		return nil, err
+	}
+
+	// make configuration settings
 	if timeout > 0 {
 		db.WithTimeout(time.Second * time.Duration(timeout))
 	}
@@ -53,4 +69,21 @@ func New(psn string, timeout int, enableLog bool) (*pg.DB, error) {
 	}
 
 	return db, nil
+}
+
+// settings retrieves any key/value pairs from the database "settings" table.
+func (db *DB) settings() error {
+	var settings []sandpiper.Setting
+
+	err := db.Model(&settings).Select()
+	if err != nil && err != pg.ErrNoRows {
+		return err
+	}
+
+	db.Settings = make(map[string]string)
+	for _, setting := range settings {
+		db.Settings[setting.Key] = setting.Value
+	}
+
+	return nil
 }

@@ -1,0 +1,653 @@
+openapi: 3.0.0
+info:
+  title: Sandpiper - Product Data Synchronization
+  description: API Docs for Sandpiper 1.0
+  version: "1.0.0"
+  contact:
+    name: Doug Winsby
+    email: dougw@winsbygroup.com
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+servers:
+- url: https://sandpiper.winsbygroup.com/v1
+  description: Reference server
+security:
+  - bearer: []     # use the same name as under securitySchemes  
+paths:
+  /login:
+    post:
+      summary: Logs in user by username and password.
+      description: Uses bearer token generated as a JWT on the password and our secret code. This
+        jwt tokens must be used on all subsequent api calls.
+      tags:
+        - auth
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/credentials"
+      responses:
+        "200":
+          $ref: "#/components/responses/loginResp"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+  /me:
+    get:
+      summary: Gets user's info from session.
+      tags:
+        - auth
+      operationId: meReq
+      responses:
+        "200":
+          $ref: "#/components/responses/userResp"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+  "/refresh/{token}":
+    get:
+      summary: Refreshes jwt token.
+      description: Refreshes jwt token by checking database whether refresh token exists.
+      tags:
+        - auth
+      operationId: refresh
+      parameters:
+        - description: refresh token
+          name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/refreshResp"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+  "/password/{id}":
+    patch:
+      summary: Changes user's password.
+      description: If user's old passowrd is correct, it will be replaced with new password.
+      tags:
+        - password
+      operationId: pwChange
+      parameters:
+        - description: id of user
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/pwChange"
+        description: Request body
+        required: true
+      responses:
+        "200":
+          $ref: "#/components/responses/ok"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+  /users:
+    get:
+      summary: Returns list of users.
+      description: Returns list of users. Depending on the user role requesting it, it may
+        return all users for SuperAdmin/Admin users, all company users for Company admins,
+        and an error for non-admin users.
+      tags:
+        - users
+      operationId: listUsers
+      parameters:
+        - description: number of results
+          name: limit
+          in: query
+          schema:
+            type: integer
+        - description: page number
+          name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/userListResp"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+    post:
+      tags:
+        - users
+      summary: Creates a new user account.
+      operationId: userCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/userCreate"
+        description: Request body
+        required: true      
+      responses:
+        "200":
+          $ref: "#/components/responses/userResp"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+  "/users/{id}":
+    get:
+      description: Returns a single user by its ID.
+      tags:
+        - users
+      summary: Returns a single user.
+      operationId: getUser
+      parameters:
+        - description: id of user
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/userResp"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+    delete:
+      description: Deletes a user with requested ID.
+      tags:
+        - users
+      summary: Deletes a user
+      operationId: userDelete
+      parameters:
+        - description: id of user
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/ok"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+    patch:
+      description: Updates user's contact information -> first name, last name, mobile,
+        phone, address.
+      tags:
+        - users
+      summary: Updates user's contact information
+      operationId: userUpdate
+      parameters:
+        - description: id of user
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/userUpdate"
+        description: Request body
+        required: true
+      responses:
+        "200":
+          $ref: "#/components/responses/userResp"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/GeneralError"
+  /subscribers:
+    get:
+      summary: return a list of all subscribers.
+      description: an admin function to list all subscribers with their status and activity.
+      tags:
+        - subscribers
+      operationId: getSubscriberList
+      responses:
+        '200':
+          description: Array of Subscriber objects
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/Subscribers'
+        '500':
+          $ref: '#/components/responses/GeneralError' 
+    post:
+      summary: Creates a Subscriber.
+      tags:
+        - subscribers      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+               $ref: '#/components/schemas/Subscriber'
+      responses: 
+        '201':
+          description: Created                 
+  /subscribers/{subscriber_id}':
+    get:
+      summary: Get a Subscriber
+      description: Returns a single Subscriber by id    
+      tags:
+        - subscribers
+      operationId: getSubscriberById
+      parameters:
+        - name: subscriber_id
+          in: path
+          required: true
+          description: The subscriber's primary key
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A Subscriber
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/Subscriber'
+        '404':
+          description: The Subscriber does not exist.
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/GeneralError'
+components:
+  securitySchemes:
+    bearer:
+      type: apiKey
+      in: header
+      name: Authorization # name of the header, query parameter or cookie
+  schemas:
+    AccessRole:
+      description: AccessRole represents access role type
+      type: integer
+      format: int64
+      x-go-package: autocare.org/sandpiper/pkg/model
+    HTTP:
+      description: HTTP represents password http transport service
+      type: object
+      x-go-package: autocare.org/sandpiper/pkg/api/password/transport
+    Role:
+      description: Role model
+      type: object
+      properties:
+        access_level:
+          $ref: "#/components/schemas/AccessRole"
+        id:
+          $ref: "#/components/schemas/AccessRole"
+        name:
+          type: string
+          x-go-name: Name
+      x-go-package: autocare.org/sandpiper/pkg/model
+    AuthToken:
+      description: a JWT response
+      type: object
+      properties:
+        token:
+          type: string
+        expires:
+          type: string
+        refresh_token:
+          type: string
+    credentials:
+      type: object
+      properties:
+        password:
+          type: string
+          x-go-name: Password
+        username:
+          type: string
+          x-go-name: Username
+      x-go-package: autocare.org/sandpiper/pkg/api/auth/transport    
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string          
+    Subscriber:
+      description: A user of the api that has a secondary database
+      type: object
+      required:
+        - subscriber_id
+        - company
+      properties:
+        subscriber_id:
+          type: string
+          format: uuid
+        company:
+          type: string
+        status:
+          type: string
+        startdate:
+          type: string
+          format: date
+    Subscribers:
+      description: A collection of Subscriber
+      type: array
+      items:
+        $ref: '#/components/schemas/Subscriber'
+    pwChange:
+      description: Password change request
+      type: object
+      properties:
+        new_password:
+          type: string
+          x-go-name: NewPassword
+        new_password_confirm:
+          type: string
+          x-go-name: NewPasswordConfirm
+        old_password:
+          type: string
+          x-go-name: OldPassword
+      x-go-name: changeReq
+      x-go-package: autocare.org/sandpiper/pkg/api/password/transport
+    userCreate:
+      description: User create request
+      type: object
+      properties:
+        company_id:
+          type: integer
+          format: int64
+          x-go-name: CompanyID
+        email:
+          type: string
+          x-go-name: Email
+        first_name:
+          type: string
+          x-go-name: FirstName
+        last_name:
+          type: string
+          x-go-name: LastName
+        location_id:
+          type: integer
+          format: int64
+          x-go-name: LocationID
+        password:
+          type: string
+          x-go-name: Password
+        password_confirm:
+          type: string
+          x-go-name: PasswordConfirm
+        role_id:
+          $ref: "#/components/schemas/AccessRole"
+        username:
+          type: string
+          x-go-name: Username
+      x-go-name: createReq
+      x-go-package: autocare.org/sandpiper/pkg/api/user/transport
+    userUpdate:
+      description: User update request
+      type: object
+      properties:
+        address:
+          type: string
+          x-go-name: Address
+        first_name:
+          type: string
+          x-go-name: FirstName
+        last_name:
+          type: string
+          x-go-name: LastName
+        mobile:
+          type: string
+          x-go-name: Mobile
+        phone:
+          type: string
+          x-go-name: Phone
+      x-go-name: updateReq
+      x-go-package: autocare.org/sandpiper/pkg/api/user/transport
+    User:
+      description: User represents user domain model
+      type: object
+      properties:
+        active:
+          type: boolean
+          x-go-name: Active
+        address:
+          type: string
+          x-go-name: Address
+        company_id:
+          type: integer
+          format: int64
+          x-go-name: CompanyID
+        created_at:
+          type: string
+          format: date-time
+          x-go-name: CreatedAt
+        deleted_at:
+          type: string
+          format: date-time
+          x-go-name: DeletedAt
+        email:
+          type: string
+          x-go-name: Email
+        first_name:
+          type: string
+          x-go-name: FirstName
+        id:
+          type: integer
+          format: int64
+          x-go-name: ID
+        last_login:
+          type: string
+          format: date-time
+          x-go-name: LastLogin
+        last_name:
+          type: string
+          x-go-name: LastName
+        last_password_change:
+          type: string
+          format: date-time
+          x-go-name: LastPasswordChange
+        location_id:
+          type: integer
+          format: int64
+          x-go-name: LocationID
+        mobile:
+          type: string
+          x-go-name: Mobile
+        phone:
+          type: string
+          x-go-name: Phone
+        role:
+          $ref: "#/components/schemas/Role"
+        updated_at:
+          type: string
+          format: date-time
+          x-go-name: UpdatedAt
+        username:
+          type: string
+          x-go-name: Username
+      x-go-package: autocare.org/sandpiper/pkg/model
+  responses:
+    ok:
+      description: Success response
+    NotFound:
+      description: Entity not found.
+    BadRequest:
+      description: Illegal input for operation.
+    GeneralError:
+      description: An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+           $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: The endpoint cannot be reached because the request is not authorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: unauthorized
+    Forbidden:
+      description: The request's authorizations don't match the required ones needed to access the resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: permissions denied
+    loginResp:
+      description: Login response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              expires:
+                type: string
+                x-go-name: Expires
+              refresh_token:
+                type: string
+                x-go-name: RefreshToken
+              token:
+                type: string
+                x-go-name: Token
+    refreshResp:
+      description: Token refresh response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              expires:
+                type: string
+                x-go-name: Expires
+              token:
+                type: string
+                x-go-name: Token
+    userListResp:
+      description: Users model response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              page:
+                type: integer
+                format: int64
+                x-go-name: Page
+              users:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+                x-go-name: Users
+    userResp:
+      description: User model response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              active:
+                type: boolean
+                x-go-name: Active
+              address:
+                type: string
+                x-go-name: Address
+              company_id:
+                type: integer
+                format: int64
+                x-go-name: CompanyID
+              created_at:
+                type: string
+                format: date-time
+                x-go-name: CreatedAt
+              deleted_at:
+                type: string
+                format: date-time
+                x-go-name: DeletedAt
+              email:
+                type: string
+                x-go-name: Email
+              first_name:
+                type: string
+                x-go-name: FirstName
+              id:
+                type: integer
+                format: int64
+                x-go-name: ID
+              last_login:
+                type: string
+                format: date-time
+                x-go-name: LastLogin
+              last_name:
+                type: string
+                x-go-name: LastName
+              last_password_change:
+                type: string
+                format: date-time
+                x-go-name: LastPasswordChange
+              location_id:
+                type: integer
+                format: int64
+                x-go-name: LocationID
+              mobile:
+                type: string
+                x-go-name: Mobile
+              phone:
+                type: string
+                x-go-name: Phone
+              role:
+                $ref: "#/components/schemas/Role"
+              updated_at:
+                type: string
+                format: date-time
+                x-go-name: UpdatedAt
+              username:
+                type: string
+                x-go-name: Username

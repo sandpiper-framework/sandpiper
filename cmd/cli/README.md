@@ -42,7 +42,7 @@ command:
 ## Add File-Based Objects
 
 The `add` command creates a "file" data-object (i.e. grain) and adds it to a slice. This command could be called by an internal PIM, for example, to "publish" completed delivery files. By convention,
-all L1 grains have a grain_key of "level-1" and use "z85" encoding (gzip/ascii85).
+all L1 grains have a grain_key of "level-1" and use "z64" encoding (gzip/base64).
 
 ### Usage
 
@@ -128,7 +128,7 @@ Implement the "pull" command to retrieve "file" data-objects from an optional sl
 #### Syntax:
 
 ```
-sandpiper [global-options] pull [command-options] <root-directory>
+sandpiper [global-options] pull [command-options] <output-directory>
 
 command-options:
    --slice value, -s value  either a slice_id (uuid) or slice_name (case-insensitive)
@@ -156,4 +156,7 @@ Examples:
             |-- grain2 
 ```
     
-Use forward slashes for the output directory even if on Windows.
+Use forward slashes for the output directory even if on Windows. If an an output directory is not supplied as an argument, the current directory will be used.
+
+The grain `source` field is used as the filename when saving the payload. If this value is empty, the slice-id is used instead.
+

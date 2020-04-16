@@ -84,7 +84,7 @@ var Commands = []*args.Command{
 		*/
 		Name:      "pull",
 		Usage:     "save file-based grains to the file system",
-		ArgsUsage: "<root-directory>",
+		ArgsUsage: "<output-directory>",
 		Action:    command.Pull,
 		Flags: []args.Flag{
 			&args.StringFlag{

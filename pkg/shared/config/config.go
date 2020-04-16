@@ -59,8 +59,19 @@ func (d *Database) URL() string {
 		d.Host,
 		d.Port,
 		d.Database,
-		d.SSLMode,
-	)
+		d.SSLMode)
+}
+
+// SafeURL creates a connection URL from a `database` config and env vars without a password
+func (d *Database) SafeURL() string {
+	// postgres://username@host:port/database?sslmode=disable
+	return fmt.Sprintf("%s://%s@%s:%s/%s?sslmode=%s",
+		d.Dialect,
+		env("DB_USER", d.User),
+		d.Host,
+		d.Port,
+		d.Database,
+		d.SSLMode)
 }
 
 // Server holds data necessary for server configuration

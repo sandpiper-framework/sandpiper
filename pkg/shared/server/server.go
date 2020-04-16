@@ -9,6 +9,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -38,16 +39,17 @@ func New() *echo.Echo {
 	return e
 }
 
-// Config represents server specific config.
-type Config struct {
+// Settings represents server specific configuration
+type Settings struct {
 	Port                string
 	ReadTimeoutSeconds  int
 	WriteTimeoutSeconds int
+	ServerRole          string
 	Debug               bool
 }
 
 // Start starts echo server.
-func Start(srv *echo.Echo, cfg *Config) {
+func Start(srv *echo.Echo, cfg *Settings) {
 	httpServer := &http.Server{
 		Addr:         formatPort(cfg.Port),
 		ReadTimeout:  time.Duration(cfg.ReadTimeoutSeconds) * time.Second,
@@ -59,6 +61,8 @@ func Start(srv *echo.Echo, cfg *Config) {
 	if srv.Debug {
 		srv.GET("/routes", listRoutes)
 	}
+
+	fmt.Printf("Server role: \"%s\"\n\n", cfg.ServerRole)
 
 	// Start server
 	go func() {

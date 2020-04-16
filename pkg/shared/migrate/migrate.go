@@ -76,7 +76,7 @@ func getDatabaseVersion(m *migrate.Migrate) uint {
 
 func migrationMessage(v1, v2 uint) string {
 	if v1 != v2 {
-		return fmt.Sprintf("DB Version: %d (migrated from %d to %d)\n", v2, v1, v2)
+		return fmt.Sprintf("DB Version: %d (migrated from %d to %d)", v2, v1, v2)
 	}
-	return fmt.Sprintf("DB Version: %d\n", v1)
+	return fmt.Sprintf("DB Version: %d", v1)
 }
