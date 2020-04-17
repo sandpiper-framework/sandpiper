@@ -77,8 +77,17 @@ func Add(c *args.Context) error {
 		Payload:  data,
 	}
 
-	// finally, add the new grain
-	return api.AddGrain(grain)
+	// add the new grain
+	if err := api.AddGrain(grain); err != nil {
+		return err
+	}
+
+	// finally, update slice content information
+	if err := api.RefreshSlice(p.sliceID); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func getAddParams(c *args.Context) (*addParams, error) {

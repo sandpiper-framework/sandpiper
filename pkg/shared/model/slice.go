@@ -21,7 +21,7 @@ type Slice struct {
 	Name         string     `json:"slice_name"`
 	SliceType    string     `json:"slice_type"`
 	ContentHash  string     `json:"content_hash"`
-	ContentCount uint       `json:"content_count"`
+	ContentCount int        `json:"content_count"`
 	ContentDate  time.Time  `json:"content_date"`
 	CreatedAt    time.Time  `json:"created_at"`
 	UpdatedAt    time.Time  `json:"updated_at"`

@@ -69,7 +69,7 @@ type Update struct {
 	Name         string
 	SliceType    string
 	ContentHash  string
-	ContentCount uint
+	ContentCount int
 	ContentDate  time.Time
 }
 

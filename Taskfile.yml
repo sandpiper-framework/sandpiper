@@ -56,7 +56,7 @@ tasks:
     dir: pkg/api/migrations
     deps: [go-bindata]
     cmds:
-      - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
+      - go-bindata -ignore "^[^0-9]{4}.+$" -pkg migrations .
 
   build-primary:
     desc: Build sandpiper primary server
@@ -73,7 +73,7 @@ tasks:
     dir: pkg/secondary/migrations
     deps: [go-bindata]
     cmds:
-      - go-bindata -ignore ".*md$|.*go$" -pkg migrations .
+      - go-bindata -ignore "^[^0-9]{4}.+$" -pkg migrations .
 
   build-secondary:
     desc: Build sandpiper secondary server

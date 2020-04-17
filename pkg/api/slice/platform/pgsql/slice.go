@@ -8,8 +8,12 @@ package pgsql
 // Manage slices and related metadata, but not which companies subscribe to the slice.
 
 import (
+	"bytes"
+	"crypto/sha1"
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
@@ -21,7 +25,6 @@ import (
 
 // Custom errors
 var (
-	// ErrAlreadyExists indicates the slice name is already used
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Slice name already exists.")
 	ErrSliceNotFound = echo.NewHTTPError(http.StatusNotFound, "Slice not found.")
 )
@@ -116,22 +119,10 @@ func (s *Slice) Create(db orm.DB, slice sandpiper.Slice) (*sandpiper.Slice, erro
 	return &slice, nil
 }
 
-//todo: consider combining View() and ViewBySub() as we did with ViewByName() using a nil companyID
-
 // View returns a single slice by ID with metadata and subscribed companies
 func (s *Slice) View(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
-	var slice = &sandpiper.Slice{ID: sliceID}
-
-	// get slice by primary key with subscribed companies
-	err := db.Model(slice).Relation("Companies").WherePK().Select()
-	if err != nil {
-		return nil, selectError(err)
-	}
-
-	// insert any metadata for the slice as a map
-	slice.Metadata, err = metaDataMap(db, sliceID)
-
-	return slice, nil
+	// call view by subscription without a company
+	return s.ViewBySub(db, uuid.Nil, sliceID)
 }
 
 // ViewBySub returns a single slice by ID if included in provided company subscriptions.
@@ -140,6 +131,9 @@ func (s *Slice) ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*s
 
 	// this filter function adds a condition to the "companies" relationship
 	var filterFn = func(q *orm.Query) (*orm.Query, error) {
+		if companyID == uuid.Nil {
+			return q, nil
+		}
 		return q.Where("company_id = ?", companyID), nil
 	}
 
@@ -246,7 +240,23 @@ func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
 
 // Refresh a slice's content information
 func (s *Slice) Refresh(db orm.DB, sliceID uuid.UUID) error {
-	panic("implement me")
+
+	// calculate hash of all grains in the slice
+	hash, count, err := HashSliceGrains(db, sliceID)
+	if err != nil {
+		return err
+	}
+
+	// update slice with new information
+	slice := sandpiper.Slice{
+		ID:           sliceID,
+		ContentHash:  hash,
+		ContentCount: count,
+		ContentDate:  time.Now(),
+	}
+	_, err = db.Model(&slice).Column("content_hash", "content_count", "content_date").WherePK().Update()
+
+	return err
 }
 
 // metaDataMap returns a map of slice metadata. We use this separate query instead of
@@ -285,4 +295,33 @@ func selectError(err error) error {
 		return ErrSliceNotFound
 	}
 	return err
+}
+
+// HashSliceGrains returns an sha1 hash of all grains in a slice
+func HashSliceGrains(db orm.DB, sliceID uuid.UUID) (string, int, error) {
+	type result struct {
+		ID uuid.UUID
+	}
+	var (
+		rows []result
+		b    bytes.Buffer
+	)
+
+	var hashIDs = func(rs []result) string {
+		if len(rs) == 0 {
+			return ""
+		}
+		for _, r := range rs {
+			b.Write(r.ID[:])
+		}
+		return fmt.Sprintf("%x", sha1.Sum(b.Bytes()))
+	}
+
+	// get grain ids for the slice (sorted)
+	err := db.Model().Table("grains").Column("id").Where("slice_id = ?", sliceID).Order("id").Select(&rows)
+	if err != nil {
+		return "", 0, err
+	}
+
+	return hashIDs(rows), len(rows), nil
 }

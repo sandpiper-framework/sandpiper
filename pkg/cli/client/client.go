@@ -111,6 +111,17 @@ func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
 	return &results, err
 }
 
+// RefreshSlice updates the content information about a slice
+func (c *Client) RefreshSlice(sliceID uuid.UUID) error {
+	path := fmt.Sprintf("/slices/refresh/%s", sliceID.String())
+	req, err := c.newRequest("POST", path, nil)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, nil)
+	return err
+}
+
 // GrainExists will return basic information about a grain if it exists
 func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
 	path := fmt.Sprintf("/grains/%s/%s", sliceID.String(), grainKey)

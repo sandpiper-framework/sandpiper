@@ -48,7 +48,7 @@ type createReq struct {
 	Name         string            `json:"name" validate:"required,min=3"`
 	SLiceType    string            `json:"slice_type" validate:"required"`
 	ContentHash  string            `json:"content_hash"`
-	ContentCount uint              `json:"content_count"`
+	ContentCount int               `json:"content_count"`
 	ContentDate  time.Time         `json:"content_date"`
 	Metadata     sandpiper.MetaMap `json:"metadata"`
 }
@@ -147,7 +147,7 @@ type updateReq struct {
 	ID           uuid.UUID `json:"-"`
 	Name         string    `json:"name,omitempty" validate:"omitempty,min=3"`
 	ContentHash  string    `json:"content_hash,omitempty" validate:"omitempty,min=2"`
-	ContentCount uint      `json:"content_count,omitempty"`
+	ContentCount int       `json:"content_count,omitempty"`
 	ContentDate  time.Time `json:"content_date,omitempty"`
 }
 
