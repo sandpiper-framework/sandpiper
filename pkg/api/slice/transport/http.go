@@ -30,9 +30,11 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 	sr.POST("/refresh/:id", h.refresh)
 	sr.GET("", h.list) // filter by tags (/slices?tags=aaa,bbb or /slices?tags-all=aaa,bbb)
 	sr.GET("/:id", h.view)
-	sr.PATCH("/:id", h.update)
+	sr.PATCH("/:id", h.update) // only update supplied fields
 	sr.DELETE("/:id", h.delete)
 	sr.GET("/name/:name", h.viewByName)
+	sr.PUT("/lock/:id", h.lock)
+	sr.PUT("/unlock/:id", h.unlock)
 }
 
 // Custom errors
@@ -146,6 +148,7 @@ func (h *HTTP) list(c echo.Context) error {
 type updateReq struct {
 	ID           uuid.UUID `json:"-"`
 	Name         string    `json:"name,omitempty" validate:"omitempty,min=3"`
+	SLiceType    string    `json:"slice_type" validate:"required"`
 	ContentHash  string    `json:"content_hash,omitempty" validate:"omitempty,min=2"`
 	ContentCount int       `json:"content_count,omitempty"`
 	ContentDate  time.Time `json:"content_date,omitempty"`
@@ -165,6 +168,7 @@ func (h *HTTP) update(c echo.Context) error {
 	result, err := h.svc.Update(c, &slice.Update{
 		ID:           id,
 		Name:         req.Name,
+		SliceType:    req.SLiceType,
 		ContentHash:  req.ContentHash,
 		ContentCount: req.ContentCount,
 		ContentDate:  req.ContentDate,
@@ -184,6 +188,32 @@ func (h *HTTP) delete(c echo.Context) error {
 	}
 
 	if err := h.svc.Delete(c, id); err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *HTTP) lock(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+
+	if err := h.svc.Lock(c, id); err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *HTTP) unlock(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+
+	if err := h.svc.Unlock(c, id); err != nil {
 		return err
 	}
 

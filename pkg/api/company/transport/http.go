@@ -28,7 +28,7 @@ func NewHTTP(svc company.Service, er *echo.Group) {
 	sr.POST("", h.create)
 	sr.GET("", h.list)
 	sr.GET("/:id", h.view)
-	sr.PATCH("/:id", h.update)
+	sr.PUT("/:id", h.update) // not a PATCH, body must include *all* fields
 	sr.DELETE("/:id", h.delete)
 }
 

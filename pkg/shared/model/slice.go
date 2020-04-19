@@ -20,6 +20,7 @@ type Slice struct {
 	ID           uuid.UUID  `json:"id" pg:",pk"`
 	Name         string     `json:"slice_name"`
 	SliceType    string     `json:"slice_type"`
+	AllowSync    bool       `json:"allow_sync"`
 	ContentHash  string     `json:"content_hash"`
 	ContentCount int        `json:"content_count"`
 	ContentDate  time.Time  `json:"content_date"`

@@ -24,7 +24,7 @@ type HTTP struct {
 func NewHTTP(svc password.Service, er *echo.Group) {
 	h := HTTP{svc}
 	pr := er.Group("/password")
-	pr.PATCH("/:id", h.change)
+	pr.PATCH("/:id", h.change) // only changes provided fields
 }
 
 // Custom errors

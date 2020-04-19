@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS "slices" (
   "id"            uuid PRIMARY KEY,
   "name"          text NOT NULL,
   "slice_type"    slice_type_enum NOT NULL,
+  "allow_sync"    boolean,
   "content_hash"  text,
   "content_count" integer,
   "content_date"  timestamp,

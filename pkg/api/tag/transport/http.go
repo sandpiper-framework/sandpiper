@@ -30,7 +30,7 @@ func NewHTTP(svc tag.Service, er *echo.Group) {
 	er.POST("/tags/:tagid/slices/:sliceid", h.assign)
 	er.GET("/tags", h.list)
 	er.GET("/tags/:id", h.view)
-	er.PATCH("/tags/:id", h.update)
+	er.PATCH("/tags/:id", h.update)  // only update supplied fields
 	er.DELETE("/tags/:id", h.delete)
 	er.DELETE("/tags/:id/slices/:id", h.remove)
 }

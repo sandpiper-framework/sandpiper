@@ -112,3 +112,19 @@ func (s *Slice) Refresh(c echo.Context, id uuid.UUID) error {
 	}
 	return s.sdb.Refresh(s.db, id)
 }
+
+// Lock keeps a sync from starting
+func (s *Slice) Lock(c echo.Context, id uuid.UUID) error {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+		return err
+	}
+	return s.sdb.Lock(s.db, id)
+}
+
+// Unlock allows a sync to start
+func (s *Slice) Unlock(c echo.Context, id uuid.UUID) error {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+		return err
+	}
+	return s.sdb.Unlock(s.db, id)
+}

@@ -61,7 +61,7 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 
 	err := db.Model(grain).
 		Column("grain.id", "grain_key", "encoding", "payload", "grain.created_at").
-		ColumnExpr("length(payload) as payload_len").
+		ColumnExpr("length(payload) AS payload_len").
 		Relation("Slice").WherePK().Select()
 	if err != nil {
 		return nil, selectError(err)
@@ -72,7 +72,7 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 // ViewByKeys returns minimal grain information if found, an empty grain if not found
 func (s *Grain) ViewByKeys(db orm.DB, sliceID uuid.UUID, grainKey string, payloadFlag bool) (*sandpiper.Grain, error) {
 	// columns to select (optionally returning payload)
-	cols := "id, slice_id, grain_key, source, encoding, created_at, length(payload) as payload_len"
+	cols := "id, slice_id, grain_key, source, encoding, created_at, length(payload) AS payload_len"
 	if payloadFlag {
 		cols = cols + ", payload"
 	}
@@ -106,7 +106,7 @@ func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpip
 	var q *orm.Query
 
 	// columns to select (optionally returning payload)
-	cols := "grain.id, grain.slice_id, grain_key, source, encoding, grain.created_at, length(payload) as payload_len"
+	cols := "grain.id, grain.slice_id, grain_key, source, encoding, grain.created_at, length(payload) AS payload_len"
 	if payloadFlag {
 		cols = cols + ", payload"
 	}
@@ -152,7 +152,7 @@ func (s *Grain) Delete(db orm.DB, id uuid.UUID) error {
 func removeExistingGrain(db orm.DB, sliceID uuid.UUID, grainKey string) error {
 	// attempt to delete by unique keys
 	m := new(sandpiper.Grain)
-	_, err := db.Model(m).Where("slice_id = ? and grain_key = ?", sliceID, grainKey).Delete()
+	_, err := db.Model(m).Where("slice_id = ? AND grain_key = ?", sliceID, grainKey).Delete()
 	if err != nil && err != pg.ErrNoRows {
 		return err
 	}

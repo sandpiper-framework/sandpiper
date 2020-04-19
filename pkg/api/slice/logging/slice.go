@@ -142,3 +142,33 @@ func (ls *LogService) Refresh(c echo.Context, req uuid.UUID) (err error) {
 	}(time.Now())
 	return ls.Service.Refresh(c, req)
 }
+
+// Lock logging
+func (ls *LogService) Lock(c echo.Context, req uuid.UUID) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "Lock slice request", err,
+			map[string]interface{}{
+				"slice_id": req,
+				"took":     time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Refresh(c, req)
+}
+
+// UnLock logging
+func (ls *LogService) Unlock(c echo.Context, req uuid.UUID) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "UnLock slice request", err,
+			map[string]interface{}{
+				"slice_id": req,
+				"took":     time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Refresh(c, req)
+}

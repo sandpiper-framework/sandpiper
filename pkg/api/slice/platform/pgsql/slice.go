@@ -259,6 +259,20 @@ func (s *Slice) Refresh(db orm.DB, sliceID uuid.UUID) error {
 	return err
 }
 
+// Lock disallows sync operations on this slice
+func (s *Slice) Lock(db orm.DB, sliceID uuid.UUID) error {
+	slice := sandpiper.Slice{ID: sliceID, AllowSync: false}
+	_, err := db.Model(&slice).Column("allow_sync").WherePK().Update()
+	return err
+}
+
+// Unlock allows sync operations on this slice
+func (s *Slice) Unlock(db orm.DB, sliceID uuid.UUID) error {
+	slice := sandpiper.Slice{ID: sliceID, AllowSync: true}
+	_, err := db.Model(&slice).Column("allow_sync").WherePK().Update()
+	return err
+}
+
 // metaDataMap returns a map of slice metadata. We use this separate query instead of
 // an orm relationship because we don't want array of structs in json here.
 // Maps marshal as {"key1": "value1", "key2": "value2", ...}
@@ -297,7 +311,7 @@ func selectError(err error) error {
 	return err
 }
 
-// HashSliceGrains returns an sha1 hash of all grains in a slice
+// HashSliceGrains returns a sha1 hash of all grains in a slice
 func HashSliceGrains(db orm.DB, sliceID uuid.UUID) (string, int, error) {
 	type result struct {
 		ID uuid.UUID

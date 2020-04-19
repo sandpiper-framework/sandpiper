@@ -32,7 +32,7 @@ func NewHTTP(svc subscription.Service, er *echo.Group) {
 	er.POST("/subscriptions", h.create)
 	er.GET("/subscriptions", h.list)
 	er.GET("/subscriptions/:id", h.view)
-	er.PATCH("/subscriptions/:id", h.update)
+	er.PUT("/subscriptions/:id", h.update) // not a PATCH, body must include *all* fields
 	er.DELETE("/subscriptions/:id", h.delete)
 }
 

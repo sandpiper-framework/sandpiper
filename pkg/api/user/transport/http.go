@@ -27,9 +27,9 @@ func NewHTTP(svc user.Service, er *echo.Group) {
 	h := HTTP{svc}
 	ur := er.Group("/users")
 	ur.POST("", h.create)
-	ur.GET("", h.list)
+	ur.GET("", h.list) // .../users?$sort="last_name ASC"&$filter="active":false
 	ur.GET("/:id", h.view)
-	ur.PATCH("/:id", h.update)
+	ur.PATCH("/:id", h.update)  // only update supplied fields
 	ur.DELETE("/:id", h.delete)
 }
 
