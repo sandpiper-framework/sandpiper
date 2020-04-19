@@ -7,6 +7,8 @@
 package api
 
 import (
+	"errors"
+
 	"autocare.org/sandpiper/pkg/shared/config"
 	"autocare.org/sandpiper/pkg/shared/database"
 	"autocare.org/sandpiper/pkg/shared/middleware/jwt"
@@ -16,13 +18,13 @@ import (
 
 	// One import for each service to register (with identifying alias).
 	// Must use a register subdirectory to avoid "import cycle" errors.
+	sy "autocare.org/sandpiper/pkg/api/activity/register"
 	au "autocare.org/sandpiper/pkg/api/auth/register"
 	co "autocare.org/sandpiper/pkg/api/company/register"
 	gr "autocare.org/sandpiper/pkg/api/grain/register"
 	pa "autocare.org/sandpiper/pkg/api/password/register"
 	sl "autocare.org/sandpiper/pkg/api/slice/register"
 	su "autocare.org/sandpiper/pkg/api/subscription/register"
-	sy "autocare.org/sandpiper/pkg/api/sync/register"
 	ta "autocare.org/sandpiper/pkg/api/tag/register"
 	us "autocare.org/sandpiper/pkg/api/user/register"
 )
@@ -39,6 +41,12 @@ func Start(cfg *config.Configuration) error {
 	db, err := database.New(cfg.DB.URL(), cfg.DB.Timeout, cfg.DB.LogQueries)
 	if err != nil {
 		return err
+	}
+
+	// check required db setting
+	role := db.Settings[ServerRoleKey]
+	if role == "" {
+		return errors.New("missing db setting: \"" + ServerRoleKey + "\"")
 	}
 
 	// setup token, security and logging available for all services
@@ -72,7 +80,7 @@ func Start(cfg *config.Configuration) error {
 		Port:                cfg.Server.Port,
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,
 		WriteTimeoutSeconds: cfg.Server.WriteTimeout,
-		ServerRole:          db.Settings[ServerRoleKey],
+		ServerRole:          role,
 		Debug:               cfg.Server.Debug,
 	})
 

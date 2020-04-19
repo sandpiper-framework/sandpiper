@@ -111,45 +111,6 @@ func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
 	return &results, err
 }
 
-// RefreshSlice updates the content information about a slice
-func (c *Client) RefreshSlice(sliceID uuid.UUID) error {
-	path := fmt.Sprintf("/slices/refresh/%s", sliceID.String())
-	req, err := c.newRequest("POST", path, nil)
-	if err != nil {
-		return err
-	}
-	_, err = c.do(req, nil)
-	return err
-}
-
-// GrainExists will return basic information about a grain if it exists
-func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
-	path := fmt.Sprintf("/grains/%s/%s", sliceID.String(), grainKey)
-	req, err := c.newRequest("GET", path, nil)
-	if err != nil {
-		return nil, err
-	}
-	grain := new(sandpiper.Grain)
-	_, err = c.do(req, grain)
-	return grain, err
-}
-
-// GetLevel1Grain returns a grain by sliceID if Level1
-func (c *Client) GetLevel1Grain(sliceID uuid.UUID) (*sandpiper.Grain, error) {
-	path := fmt.Sprintf("/grains/%s/%s?payload=yes", sliceID.String(), sandpiper.L1GrainKey)
-	req, err := c.newRequest("GET", path, nil)
-	if err != nil {
-		return nil, err
-	}
-	grain := new(sandpiper.Grain)
-	resp, err := c.do(req, grain)
-	if resp.StatusCode == 404 {
-		// "not found" is not an error
-		return grain, nil
-	}
-	return grain, err
-}
-
 // ListGrains returns a list of grains for the supplied slice
 func (c *Client) ListGrains(sliceID uuid.UUID, fullFlag bool) (*sandpiper.GrainsPaginated, error) {
 	var results sandpiper.GrainsPaginated

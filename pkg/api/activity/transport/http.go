@@ -4,7 +4,7 @@
 
 package transport
 
-// sync routing functions
+// activity routing functions
 
 import (
 	"net/http"
@@ -14,19 +14,19 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/sync"
+	"autocare.org/sandpiper/pkg/api/activity"
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
 // HTTP represents user http service
 type HTTP struct {
-	svc sync.Service
+	svc activity.Service
 }
 
-// NewHTTP creates new sync http service
-func NewHTTP(svc sync.Service, er *echo.Group) {
+// NewHTTP creates new activity http service
+func NewHTTP(svc activity.Service, er *echo.Group) {
 	h := HTTP{svc}
-	sr := er.Group("/sync")
+	sr := er.Group("/activity")
 	sr.POST("", h.create)
 	sr.GET("", h.list)
 	sr.GET("/:id", h.view)
@@ -36,10 +36,10 @@ func NewHTTP(svc sync.Service, er *echo.Group) {
 // Custom errors
 var (
 	// ErrInvalidID indicates a malformed uuid
-	ErrInvalidID = echo.NewHTTPError(http.StatusBadRequest, "Invalid numeric sync id")
+	ErrInvalidID = echo.NewHTTPError(http.StatusBadRequest, "Invalid numeric activity id")
 )
 
-// Sync create request
+// activity create request
 type createReq struct {
 	ID       int       `json:"id"` // optional
 	SliceID  uuid.UUID `json:"slice_id" validate:"required"`
@@ -54,7 +54,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	result, err := h.svc.Create(c, sandpiper.Sync{
+	result, err := h.svc.Create(c, sandpiper.Activity{
 		SliceID:  &r.SliceID,
 		Message:  r.Message,
 		Duration: r.Duration,
@@ -68,8 +68,8 @@ func (h *HTTP) create(c echo.Context) error {
 }
 
 type listResponse struct {
-	Slices []sandpiper.Sync `json:"syncs"`
-	Page   int              `json:"page"`
+	Activity []sandpiper.Activity `json:"activity"`
+	Page     int                  `json:"page"`
 }
 
 func (h *HTTP) list(c echo.Context) error {

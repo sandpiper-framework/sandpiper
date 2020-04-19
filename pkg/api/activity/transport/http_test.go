@@ -4,7 +4,7 @@
 
 package transport_test
 
-// sync service
+// Activity service
 
 import (
 	"bytes"
@@ -19,8 +19,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/api/sync"
-	"autocare.org/sandpiper/pkg/api/sync/transport"
+	"autocare.org/sandpiper/pkg/api/activity"
+	"autocare.org/sandpiper/pkg/api/activity/transport"
 	"autocare.org/sandpiper/pkg/shared/mock"
 	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
 	"autocare.org/sandpiper/pkg/shared/model"
@@ -32,8 +32,8 @@ func TestCreate(t *testing.T) {
 		name       string
 		req        string
 		wantStatus int
-		wantResp   *sandpiper.Sync
-		udb        *mockdb.Sync
+		wantResp   *sandpiper.Activity
+		udb        *mockdb.Activity
 		rbac       *mock.RBAC
 	}{
 		{
@@ -75,15 +75,15 @@ func TestCreate(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.Sync{
-				CreateFn: func(db orm.DB, sync sandpiper.Sync) (*sandpiper.Sync, error) {
-					sync.ID = mock.TestUUID(1)
-					sync.CreatedAt = mock.TestTime(2018)
-					sync.UpdatedAt = mock.TestTime(2018)
-					return &sync, nil
+			udb: &mockdb.Activity{
+				CreateFn: func(db orm.DB, Activity sandpiper.Activity) (*sandpiper.Activity, error) {
+					Activity.ID = mock.TestUUID(1)
+					Activity.CreatedAt = mock.TestTime(2018)
+					Activity.UpdatedAt = mock.TestTime(2018)
+					return &Activity, nil
 				},
 			},
-			wantResp: &sandpiper.Sync{
+			wantResp: &sandpiper.Activity{
 				ID:        mock.TestUUID(1),
 				Name:      "AAP Brakes",
 				CreatedAt: mock.TestTime(2018),
@@ -97,17 +97,17 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(sync.New(nil, tt.udb, tt.rbac, nil), rg)
+			transport.NewHTTP(activity.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/syncs"
+			path := ts.URL + "/Activitys"
 			res, err := http.Post(path, "application/json", bytes.NewBufferString(tt.req))
 			if err != nil {
 				t.Fatal(err)
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.Sync)
+				response := new(sandpiper.Activity)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -120,7 +120,7 @@ func TestCreate(t *testing.T) {
 
 func TestList(t *testing.T) {
 	type listResponse struct {
-		Syncs []sandpiper.Sync `json:"syncs"`
+		Activitys []sandpiper.Activity `json:"Activitys"`
 		Page  int              `json:"page"`
 	}
 	cases := []struct {
@@ -128,7 +128,7 @@ func TestList(t *testing.T) {
 		req        string
 		wantStatus int
 		wantResp   *listResponse
-		udb        *mockdb.Sync
+		udb        *mockdb.Activity
 		rbac       *mock.RBAC
 	}{
 		{
@@ -162,10 +162,10 @@ func TestList(t *testing.T) {
 						Email:     "john@mail.com",
 					}
 				}},
-			udb: &mockdb.Sync{
-				ListFn: func(db orm.DB, q *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Sync, error) {
+			udb: &mockdb.Activity{
+				ListFn: func(db orm.DB, q *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Activity, error) {
 					if p.Limit == 100 && p.Offset == 100 {
-						return []sandpiper.Sync{
+						return []sandpiper.Activity{
 							{
 								ID:        mock.TestUUID(1),
 								Name:      "AAP Brakes",
@@ -185,7 +185,7 @@ func TestList(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &listResponse{
-				Syncs: []sandpiper.Sync{
+				Activitys: []sandpiper.Activity{
 					{
 						ID:        mock.TestUUID(1),
 						Name:      "AAP Brakes",
@@ -206,10 +206,10 @@ func TestList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(sync.New(nil, tt.udb, tt.rbac, nil), rg)
+			transport.NewHTTP(activity.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/syncs" + tt.req
+			path := ts.URL + "/Activitys" + tt.req
 			res, err := http.Get(path)
 			if err != nil {
 				t.Fatal(err)
@@ -232,8 +232,8 @@ func TestView(t *testing.T) {
 		name       string
 		req        string
 		wantStatus int
-		wantResp   *sandpiper.Sync
-		udb        *mockdb.Sync
+		wantResp   *sandpiper.Activity
+		udb        *mockdb.Activity
 		rbac       *mock.RBAC
 	}{
 		{
@@ -259,9 +259,9 @@ func TestView(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.Sync{
-				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Sync, error) {
-					return &sandpiper.Sync{
+			udb: &mockdb.Activity{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Activity, error) {
+					return &sandpiper.Activity{
 						ID:        mock.TestUUID(1),
 						Name:      "AAP Brakes",
 						CreatedAt: mock.TestTime(2000),
@@ -270,7 +270,7 @@ func TestView(t *testing.T) {
 				},
 			},
 			wantStatus: http.StatusOK,
-			wantResp: &sandpiper.Sync{
+			wantResp: &sandpiper.Activity{
 				ID:        mock.TestUUID(1),
 				Name:      "AAP Brakes",
 				CreatedAt: mock.TestTime(2000),
@@ -283,17 +283,17 @@ func TestView(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(sync.New(nil, tt.udb, tt.rbac, nil), rg)
+			transport.NewHTTP(activity.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/syncs/" + tt.req
+			path := ts.URL + "/Activitys/" + tt.req
 			res, err := http.Get(path)
 			if err != nil {
 				t.Fatal(err)
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.Sync)
+				response := new(sandpiper.Activity)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -310,8 +310,8 @@ func TestUpdate(t *testing.T) {
 		req        string
 		id         string
 		wantStatus int
-		wantResp   *sandpiper.Sync
-		udb        *mockdb.Sync
+		wantResp   *sandpiper.Activity
+		udb        *mockdb.Activity
 		rbac       *mock.RBAC
 	}{
 		{
@@ -345,9 +345,9 @@ func TestUpdate(t *testing.T) {
 					return nil
 				},
 			},
-			udb: &mockdb.Sync{
-				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Sync, error) {
-					return &sandpiper.Sync{
+			udb: &mockdb.Activity{
+				ViewFn: func(db orm.DB, id uuid.UUID) (*sandpiper.Activity, error) {
+					return &sandpiper.Activity{
 						ID:           mock.TestUUID(1),
 						Name:         "AAP Brakes",
 						ContentCount: 1,
@@ -355,14 +355,14 @@ func TestUpdate(t *testing.T) {
 						UpdatedAt:    mock.TestTime(2000),
 					}, nil
 				},
-				UpdateFn: func(db orm.DB, sync *sandpiper.Sync) error {
-					sync.UpdatedAt = mock.TestTime(2010)
-					sync.ContentCount = 2
+				UpdateFn: func(db orm.DB, Activity *sandpiper.Activity) error {
+					Activity.UpdatedAt = mock.TestTime(2010)
+					Activity.ContentCount = 2
 					return nil
 				},
 			},
 			wantStatus: http.StatusOK,
-			wantResp: &sandpiper.Sync{
+			wantResp: &sandpiper.Activity{
 				ID:           mock.TestUUID(1),
 				Name:         "AAP Brakes",
 				ContentCount: 1,
@@ -378,10 +378,10 @@ func TestUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(sync.New(nil, tt.udb, tt.rbac, nil), rg)
+			transport.NewHTTP(activity.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/syncs/" + tt.id
+			path := ts.URL + "/Activitys/" + tt.id
 			req, _ := http.NewRequest("PATCH", path, bytes.NewBufferString(tt.req))
 			req.Header.Set("Content-Type", "application/json")
 			res, err := client.Do(req)
@@ -390,7 +390,7 @@ func TestUpdate(t *testing.T) {
 			}
 			defer res.Body.Close()
 			if tt.wantResp != nil {
-				response := new(sandpiper.Sync)
+				response := new(sandpiper.Activity)
 				if err := json.NewDecoder(res.Body).Decode(response); err != nil {
 					t.Fatal(err)
 				}
@@ -407,7 +407,7 @@ func TestDelete(t *testing.T) {
 		id         string // to allow testing a bad request
 		cid        uuid.UUID
 		wantStatus int
-		mdb        *mockdb.Sync
+		mdb        *mockdb.Activity
 		rbac       *mock.RBAC
 	}{
 		{
@@ -419,9 +419,9 @@ func TestDelete(t *testing.T) {
 			name: "Fail on RBAC",
 			id:   mock.TestUUID(1).String(),
 			cid:  mock.TestUUID(1),
-			mdb: &mockdb.Sync{
-				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Sync, error) {
-					return &sandpiper.Sync{
+			mdb: &mockdb.Activity{
+				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Activity, error) {
+					return &sandpiper.Activity{
 						Name: "AAP Brakes",
 					}, nil
 				},
@@ -437,13 +437,13 @@ func TestDelete(t *testing.T) {
 			name: "Success",
 			id:   mock.TestUUID(1).String(),
 			cid:  mock.TestUUID(1),
-			mdb: &mockdb.Sync{
-				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Sync, error) {
-					return &sandpiper.Sync{
+			mdb: &mockdb.Activity{
+				ViewBySubFn: func(db orm.DB, cid uuid.UUID, id uuid.UUID) (*sandpiper.Activity, error) {
+					return &sandpiper.Activity{
 						Name: "AAP Brakes",
 					}, nil
 				},
-				DeleteFn: func(orm.DB, *sandpiper.Sync) error {
+				DeleteFn: func(orm.DB, *sandpiper.Activity) error {
 					return nil
 				},
 			},
@@ -462,10 +462,10 @@ func TestDelete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := server.New()
 			rg := r.Group("")
-			transport.NewHTTP(sync.New(nil, tt.mdb, tt.rbac, nil), rg)
+			transport.NewHTTP(activity.New(nil, tt.mdb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/syncs/" + tt.id
+			path := ts.URL + "/Activitys/" + tt.id
 			req, _ := http.NewRequest("DELETE", path, nil)
 			res, err := client.Do(req)
 			if err != nil {

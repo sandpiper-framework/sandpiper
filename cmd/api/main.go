@@ -45,7 +45,7 @@ func main() {
 
 	err = api.Start(cfg)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal("ERROR: ", err)
 	}
 }
 

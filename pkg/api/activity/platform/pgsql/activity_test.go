@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/api/sync/platform/pgsql"
+	"autocare.org/sandpiper/pkg/api/activity/platform/pgsql"
 	"autocare.org/sandpiper/pkg/shared/mock"
 	"autocare.org/sandpiper/pkg/shared/model"
 )
@@ -19,13 +19,13 @@ func TestCreate(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		req      sandpiper.Sync
-		wantData *sandpiper.Sync
+		req      sandpiper.Activity
+		wantData *sandpiper.Activity
 	}{
 		{
 			name:    "Fail on insert duplicate ID",
 			wantErr: true,
-			req: sandpiper.Sync{
+			req: sandpiper.Activity{
 				ID:       mock.TestUUID(1),
 				SliceID:  mock.TestUUID(1),
 				Type:     "aces-file",
@@ -37,7 +37,7 @@ func TestCreate(t *testing.T) {
 		{
 			name:    "Fail on slice_id not found",
 			wantErr: true,
-			req: sandpiper.Sync{
+			req: sandpiper.Activity{
 				ID:       mock.TestUUID(1),
 				SliceID:  mock.TestUUID(0),
 				Type:     "aces-file",
@@ -48,14 +48,14 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "Success",
-			req: sandpiper.Sync{
+			req: sandpiper.Activity{
 				ID:           mock.TestUUID(2),
 				Key:          "AAP Premium Brakes",
 				ContentHash:  mock.TestHash(1),
 				ContentCount: 1,
 				LastUpdate:   mock.TestTime(2019),
 			},
-			wantData: &sandpiper.Sync{
+			wantData: &sandpiper.Activity{
 				ID:           mock.TestUUID(2),
 				Key:          "AAP Premium Brakes",
 				ContentHash:  mock.TestHash(1),
@@ -68,15 +68,15 @@ func TestCreate(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Sync{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Activity{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Sync{
+	if err := mock.InsertMultiple(db, &sandpiper.Activity{
 		ID:  mock.TestUUID(1),
 		Key: "Acme Brakes"}, &cases[1].req); err != nil {
 		t.Error(err)
 	}
 
-	mdb := pgsql.NewSync()
+	mdb := pgsql.NewActivity()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -99,17 +99,17 @@ func TestView(t *testing.T) {
 		name     string
 		wantErr  bool
 		id       uuid.UUID
-		wantData *sandpiper.Sync
+		wantData *sandpiper.Activity
 	}{
 		{
-			name:    "VIEW Sync does not exist",
+			name:    "VIEW Activity does not exist",
 			wantErr: true,
 			id:      mock.TestUUID(2),
 		},
 		{
 			name: "VIEW Success",
 			id:   mock.TestUUID(1),
-			wantData: &sandpiper.Sync{
+			wantData: &sandpiper.Activity{
 				ID:           mock.TestUUID(1),
 				Key:          "AAP Premium Brakes",
 				ContentHash:  mock.TestHash(1),
@@ -121,15 +121,15 @@ func TestView(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Sync{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Activity{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Sync{
+	if err := mock.InsertMultiple(db, &sandpiper.Activity{
 		ID:  mock.TestUUID(1),
 		Key: "Acme Brakes"}, cases[1].wantData); err != nil {
 		t.Error(err)
 	}
 
-	udb := pgsql.NewSync()
+	udb := pgsql.NewActivity()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -153,7 +153,7 @@ func TestList(t *testing.T) {
 		wantErr  bool
 		qp       *sandpiper.Scope
 		pg       *sandpiper.Pagination
-		wantData []sandpiper.Sync
+		wantData []sandpiper.Activity
 	}{
 		{
 			name:    "Invalid pagination values",
@@ -172,7 +172,7 @@ func TestList(t *testing.T) {
 				ID:        mock.TestUUID(1),
 				Condition: "id = ?",
 			},
-			wantData: []sandpiper.Sync{
+			wantData: []sandpiper.Activity{
 				{
 					ID:           mock.TestUUID(1),
 					Key:          "Brakes",
@@ -194,9 +194,9 @@ func TestList(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Sync{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Activity{})
 
-	mdb := pgsql.NewSync()
+	mdb := pgsql.NewActivity()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -216,15 +216,15 @@ func TestDelete(t *testing.T) {
 	cases := []struct {
 		name     string
 		wantErr  bool
-		usr      *sandpiper.Sync
-		wantData *sandpiper.Sync
+		usr      *sandpiper.Activity
+		wantData *sandpiper.Activity
 	}{
 		{
 			name: "Success",
-			usr: &sandpiper.Sync{
+			usr: &sandpiper.Activity{
 				ID: mock.TestUUID(1),
 			},
-			wantData: &sandpiper.Sync{
+			wantData: &sandpiper.Activity{
 				ID:           mock.TestUUID(1),
 				Key:          "Brakes",
 				ContentHash:  mock.TestHash(1),
@@ -237,15 +237,15 @@ func TestDelete(t *testing.T) {
 	dbCon := mock.NewPGContainer(t)
 	defer dbCon.Shutdown()
 
-	db := mock.NewDB(t, dbCon, &sandpiper.Sync{})
+	db := mock.NewDB(t, dbCon, &sandpiper.Activity{})
 
-	if err := mock.InsertMultiple(db, &sandpiper.Sync{
+	if err := mock.InsertMultiple(db, &sandpiper.Activity{
 		ID:  mock.TestUUID(1),
 		Key: "Acme Brakes"}, cases[0].wantData); err != nil {
 		t.Error(err)
 	}
 
-	mdb := pgsql.NewSync()
+	mdb := pgsql.NewActivity()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {

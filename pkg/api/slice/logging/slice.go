@@ -158,7 +158,7 @@ func (ls *LogService) Lock(c echo.Context, req uuid.UUID) (err error) {
 	return ls.Service.Refresh(c, req)
 }
 
-// UnLock logging
+// Unlock logging
 func (ls *LogService) Unlock(c echo.Context, req uuid.UUID) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(

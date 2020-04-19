@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS "grains" (
   CONSTRAINT "grains_sliceid_grainkey_key" UNIQUE("slice_id", "grain_key")
 );
 
-CREATE TABLE IF NOT EXISTS "syncs" (
+CREATE TABLE IF NOT EXISTS "activity" (
   "id"         serial PRIMARY KEY,
   "slice_id"   uuid REFERENCES "slices" ON DELETE CASCADE,
   "message"    text,

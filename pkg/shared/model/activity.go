@@ -12,8 +12,9 @@ import (
 	"github.com/google/uuid"
 )
 
-// Sync logs sync requests
-type Sync struct {
+// Activity logs sync requests
+type Activity struct {
+	tableName struct{}   `pg:"activity"` // we didn't use the plural activities
 	ID        int        `json:"id" pg:",pk"`
 	SliceID   *uuid.UUID `json:"slice_id,omitempty"` // must be pointer for omitempty to work here!
 	Message   string     `json:"message"`
@@ -23,10 +24,10 @@ type Sync struct {
 }
 
 // compile-time check variables for model hooks (which take no memory)
-var _ orm.BeforeInsertHook = (*Sync)(nil)
+var _ orm.BeforeInsertHook = (*Activity)(nil)
 
 // BeforeInsert hooks into insert operations, setting createdAt and updatedAt to current time
-func (b *Sync) BeforeInsert(ctx context.Context) (context.Context, error) {
+func (b *Activity) BeforeInsert(ctx context.Context) (context.Context, error) {
 	b.CreatedAt = time.Now()
 	return ctx, nil
 }

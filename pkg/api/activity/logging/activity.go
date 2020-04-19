@@ -2,9 +2,9 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-package sync
+package activity
 
-// sync service logger
+// activity service logger
 
 import (
 	"fmt"
@@ -12,33 +12,32 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/sync"
+	"autocare.org/sandpiper/pkg/api/activity"
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
-// ServiceLogger creates new logger wrapping the sync service
-func ServiceLogger(svc sync.Service, logger sandpiper.Logger) *LogService {
+// ServiceLogger creates new logger wrapping the activity service
+func ServiceLogger(svc activity.Service, logger sandpiper.Logger) *LogService {
 	return &LogService{
 		Service: svc,
 		logger:  logger,
 	}
 }
 
-// LogService represents sync logging service
+// LogService represents activity logging service
 type LogService struct {
-	sync.Service
+	activity.Service
 	logger sandpiper.Logger
 }
 
-const source = "sync"
+const source = "activity"
 
 // Create logging
-func (ls *LogService) Create(c echo.Context, req sandpiper.Sync) (resp *sandpiper.Sync, err error) {
-	// todo: consider a "debug" level that shows entire req/resp
+func (ls *LogService) Create(c echo.Context, req sandpiper.Activity) (resp *sandpiper.Activity, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "Create sync request", err,
+			source, "Create activity request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -50,12 +49,12 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Sync) (resp *sandpipe
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Sync, err error) {
+func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Activity, err error) {
 	// todo: consider a "debug" level that shows entire resp
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "List sync request", err,
+			source, "List activity request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": fmt.Sprintf("Count: %d", len(resp)),
@@ -67,12 +66,12 @@ func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sa
 }
 
 // View logging
-func (ls *LogService) View(c echo.Context, req int) (resp *sandpiper.Sync, err error) {
+func (ls *LogService) View(c echo.Context, req int) (resp *sandpiper.Activity, err error) {
 	// todo: consider a "debug" level that shows entire resp
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "View sync request", err,
+			source, "View activity request", err,
 			map[string]interface{}{
 				"req":  req,
 				"resp": resp,
@@ -88,7 +87,7 @@ func (ls *LogService) Delete(c echo.Context, req int) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "Delete sync request", err,
+			source, "Delete activity request", err,
 			map[string]interface{}{
 				"req":  req,
 				"took": time.Since(begin),
