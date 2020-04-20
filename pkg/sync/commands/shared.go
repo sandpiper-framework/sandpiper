@@ -7,13 +7,14 @@ package command
 
 import (
 	"fmt"
-	"github.com/howeyc/gopass"
-	args "github.com/urfave/cli/v2"
 	"net/url"
 	"os"
 
-	"autocare.org/sandpiper/pkg/cli/client"
+	"github.com/howeyc/gopass"
+	args "github.com/urfave/cli/v2"
+
 	"autocare.org/sandpiper/pkg/shared/config"
+	"autocare.org/sandpiper/pkg/sync/client"
 )
 
 const (

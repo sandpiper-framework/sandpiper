@@ -17,5 +17,5 @@ var Version = "unknown"
 func Banner() string {
 	const copyright = "Copyright 2020 The Sandpiper Authors. All rights reserved."
 
-	return fmt.Sprintf("sandpiper (%s)\n%s\n", Version, copyright)
+	return fmt.Sprintf("Sandpiper sync (%s)\n%s\n", Version, copyright)
 }

@@ -56,45 +56,45 @@ var GlobalFlags = []args.Flag{
 var Commands = []*args.Command{
 	{
 		/* sync run \
-		--slice "aap-brake-pads"  \ # argument is a slice name
-		--noupdate                \ # perform the sync without actually changing anything
+		--slice "aap-brake-pads"  \ # an optional slice-id or slice-name
+		--noupdate                  # perform the sync without actually changing anything
 		*/
 		Name:      "run",
-		Usage:     "begin a sync process on all active subscriptions",
-		ArgsUsage: " ",
+		Usage:     "Start the sync process on all active subscriptions",
+		ArgsUsage: " ", // no arguments
 		Action:    command.Run,
 		Flags: []args.Flag{
 			&args.StringFlag{
 				Name:     "slice",
 				Aliases:  []string{"s"},
-				Usage:    "either a slice_id (uuid) or slice_name (case-insensitive)",
+				Usage:    "Either a slice_id (uuid) or slice_name (case-insensitive)",
 				Required: false,
 			},
 			&args.BoolFlag{
 				Name:  "noupdate",
-				Usage: "perform the sync without actually changing anything",
+				Usage: "Perform the sync without actually changing anything",
 			},
 		},
 	},
 	{
 		/* sync show \
-		--slice "aap-slice" \ # required slice_id or slice_name
-		arg  # either slice_id or slice_name (if empty, list all slices)
+		--slice "aap-slice" \ # slice_id or slice_name
+		--full                # detailed information
 		*/
 		Name:      "show",
-		Usage:     "list slices (if no slice provided) or file-based grains by slice_id or slice_name",
+		Usage:     "Display sync information for all slices (if none provided) or a single slice by slice_id or slice_name",
 		ArgsUsage: " ", // don't show that we accept arguments
 		Action:    command.Show,
 		Flags: []args.Flag{
 			&args.StringFlag{
 				Name:     "slice",
 				Aliases:  []string{"s"},
-				Usage:    "either a slice_id (uuid) or slice_name (case-insensitive)",
+				Usage:    "Either a slice_id (uuid) or slice_name (case-insensitive)",
 				Required: false,
 			},
 			&args.BoolFlag{
 				Name:  "full",
-				Usage: "provide full listings",
+				Usage: "Provide detailed information",
 			},
 		},
 	},

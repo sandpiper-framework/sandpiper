@@ -33,7 +33,7 @@ func main() {
 		},
 		Copyright:       "Copyright The Sandpiper Authors. All rights reserved.",
 		HelpName:        "sync",
-		Usage:           "perform a Sandpiper `sync` operation with all trading partners",
+		Usage:           "Perform a Sandpiper `sync` operation with all trading partners",
 		Flags:           sync.GlobalFlags,
 		Commands:        sync.Commands,
 		CommandNotFound: sync.CommandNotFound,

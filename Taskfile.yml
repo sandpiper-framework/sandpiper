@@ -51,38 +51,30 @@ tasks:
       - go get -u github.com/go-bindata/go-bindata/...
     silent: true
 
-  bindata-primary:
+  bindata-api:
     desc: Use go-bindata to encode file migrations in a go source file
     dir: pkg/api/migrations
     deps: [go-bindata]
     cmds:
       - go-bindata -ignore "^[^0-9]{4}.+$" -pkg migrations .
 
-  build-primary:
+  build-api:
     desc: Build sandpiper primary server
     dir: cmd/api
-    deps: [bindata-primary]
+    deps: [bindata-api]
     cmds:
       - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/api/version.Version={{.VER}}"
     vars:
       EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
 
-  bindata-secondary:
-    desc: Use go-bindata to encode file migrations in a go source file
-    dir: pkg/secondary/migrations
-    deps: [go-bindata]
-    cmds:
-      - go-bindata -ignore "^[^0-9]{4}.+$" -pkg migrations .
-
-  build-secondary:
+  build-sync:
     desc: Build sandpiper secondary server
-    deps: [bindata-secondary]
-    dir: cmd/secondary
+    dir: cmd/sync
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/secondary/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/sync/version.Version={{.VER}}"
     vars:
-      EXE: secondary{{exeExt}}
+      EXE: sync{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
 
   build-cli:
@@ -96,7 +88,7 @@ tasks:
 
   build:
     desc: Build all sandpiper executables
-    deps: [build-primary, build-cli]
+    deps: [build-api, build-sync, build-cli]
 
   test:
     desc: Run test suite (having trouble with dockertesting under Windows!)

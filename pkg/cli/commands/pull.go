@@ -34,6 +34,27 @@ type pullParams struct {
 	debug    bool
 }
 
+func getPullParams(c *args.Context) (*pullParams, error) {
+	// get sandpiper global params from config file and args
+	g, err := GetGlobalParams(c)
+	if err != nil {
+		return nil, err
+	}
+
+	slice := c.String("slice")
+	sliceID, _ := uuid.Parse(slice) // ignore error because it might be a slice-name
+
+	return &pullParams{
+		addr:     g.addr,
+		user:     g.user,
+		password: g.password,
+		basePath: c.Args().Get(0),
+		slice:    slice,
+		sliceID:  sliceID,
+		debug:    g.debug,
+	}, nil
+}
+
 type pullCmd struct {
 	*pullParams
 	api *client.Client
@@ -53,43 +74,6 @@ func newPullCmd(c *args.Context) (*pullCmd, error) {
 	}
 
 	return &pullCmd{pullParams: p, api: api}, nil
-}
-
-// Pull saves file-based grains to the file system
-func Pull(c *args.Context) error {
-
-	pull, err := newPullCmd(c)
-	if err != nil {
-		return err
-	}
-
-	if pull.slice == "" {
-		return pull.allSlices()
-	} else {
-		return pull.oneSlice()
-	}
-
-}
-
-func getPullParams(c *args.Context) (*pullParams, error) {
-	// get sandpiper global params from config file and args
-	g, err := GetGlobalParams(c)
-	if err != nil {
-		return nil, err
-	}
-
-	slice := c.String("slice")
-	sliceID, _ := uuid.Parse(slice)
-
-	return &pullParams{
-		addr:     g.addr,
-		user:     g.user,
-		password: g.password,
-		basePath: c.Args().Get(0),
-		slice:    slice,
-		sliceID:  sliceID,
-		debug:    g.debug,
-	}, nil
 }
 
 func (cmd *pullCmd) allSlices() error {
@@ -138,6 +122,22 @@ func (cmd *pullCmd) oneSlice() error {
 		return err
 	}
 	return nil
+}
+
+// Pull saves file-based grains to the file system
+func Pull(c *args.Context) error {
+
+	pull, err := newPullCmd(c)
+	if err != nil {
+		return err
+	}
+
+	if pull.slice == "" {
+		return pull.allSlices()
+	} else {
+		return pull.oneSlice()
+	}
+
 }
 
 func saveGrainToFile(basePath string, slice *sandpiper.Slice, grain *sandpiper.Grain) error {

@@ -47,6 +47,7 @@ func Add(c *args.Context) error {
 		return err
 	}
 
+	// make sure we have a slice_id to work with
 	if p.sliceID == uuid.Nil {
 		// lookup sliceID by name
 		slice, err := api.SliceByName(p.slice)
@@ -56,15 +57,19 @@ func Add(c *args.Context) error {
 		p.sliceID = slice.ID
 	}
 
-	// remove the old grain first if it exists
-	err = removeExistingGrain(api, p.prompt, p.sliceID, sandpiper.L1GrainKey)
+	// encode supplied file for grain's payload
+	data, err := payload.FromFile(p.fileName, L1Encoding)
 	if err != nil {
 		return err
 	}
 
-	// encode supplied file for grain's payload
-	data, err := payload.FromFile(p.fileName, L1Encoding)
-	if err != nil {
+	// lock the slice
+	if err := api.LockSlice(p.sliceID); err != nil {
+		return err
+	}
+
+	// remove the old grain first if it exists
+	if err := removeExistingGrain(api, p.prompt, p.sliceID, sandpiper.L1GrainKey); err != nil {
 		return err
 	}
 
@@ -84,6 +89,11 @@ func Add(c *args.Context) error {
 
 	// finally, update slice content information
 	if err := api.RefreshSlice(p.sliceID); err != nil {
+		return err
+	}
+
+	// unlock the slice here
+	if err := api.UnlockSlice(p.sliceID); err != nil {
 		return err
 	}
 

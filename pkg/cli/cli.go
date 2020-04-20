@@ -56,9 +56,9 @@ var GlobalFlags = []args.Flag{
 var Commands = []*args.Command{
 	{
 		/* sandpiper add \
-		--slice "aap-brake-pads"  \ # argument is a slice name
-		--noprompt                \ # don't prompt before over-writing
-		acme_brakes_full_2019-12-12.xml # file to add (accessed via c.Args().Get(0))
+		   --slice "aap-brake-pads"  \ # argument is a slice name
+		   --noprompt                \ # don't prompt before over-writing
+		   acme_brakes_full_2019-12-12.xml # file to add (accessed via c.Args().Get(0))
 		*/
 		Name:      "add",
 		Usage:     "add a file-based grain from a local file",
@@ -78,9 +78,9 @@ var Commands = []*args.Command{
 		},
 	},
 	{
-		/* sandpiper pull   \
-		--slice "aap-slice" \ # required slice_id or slice_name
-		--dir                 # required output directory
+		/* sandpiper pull \
+		   --slice "aap-slice" \ # required slice_id or slice_name
+		   --dir                 # required output directory
 		*/
 		Name:      "pull",
 		Usage:     "save file-based grains to the file system",
@@ -103,8 +103,7 @@ var Commands = []*args.Command{
 	},
 	{
 		/* sandpiper list \
-		--slice "aap-slice" \ # required slice_id or slice_name
-		arg  # either slice_id or slice_name (if empty, list all slices)
+		   --slice "aap-slice"  # slice_id or slice_name
 		*/
 		Name:      "list",
 		Usage:     "list slices (if no slice provided) or file-based grains by slice_id or slice_name",

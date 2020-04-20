@@ -14,7 +14,7 @@ import (
 
 // Activity logs sync requests
 type Activity struct {
-	tableName struct{}   `pg:"activity"` // we didn't use the plural activities
+	tableName struct{}   `pg:"activity"` // we don't want the plural `activities`
 	ID        int        `json:"id" pg:",pk"`
 	SliceID   *uuid.UUID `json:"slice_id,omitempty"` // must be pointer for omitempty to work here!
 	Message   string     `json:"message"`

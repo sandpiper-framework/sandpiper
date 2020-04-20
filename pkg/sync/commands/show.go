@@ -15,9 +15,10 @@ import (
 	args "github.com/urfave/cli/v2"
 
 	"autocare.org/sandpiper/pkg/shared/model"
+	"autocare.org/sandpiper/pkg/sync/client"
 )
 
-type cmdParams struct {
+type showParams struct {
 	addr     *url.URL // our sandpiper server
 	user     string
 	password string
@@ -27,71 +28,16 @@ type cmdParams struct {
 	debug    bool
 }
 
-// Show returns a list of all slices that will be synced
-func Show(c *args.Context) error {
-	var slice *sandpiper.Slice
-
-	p, err := getCmdParams(c)
-	if err != nil {
-		return err
-	}
-
-	// connect to the api server (saving token)
-	api, err := Connect(p.addr, p.user, p.password, p.debug)
-	if err != nil {
-		return err
-	}
-
-	if p.slice == "" {
-		// no slice provided means to list all slices
-		result, err := api.ListSlices()
-		if err != nil {
-			return err
-		}
-		for i, slice := range result.Slices {
-			if p.full {
-				printSliceFull(i, slice)
-			} else {
-				printSliceBrief(slice)
-			}
-		}
-	} else {
-		if p.sliceID == uuid.Nil {
-			// use provided slice-name to get the slice-id
-			slice, err = api.SliceByName(p.slice)
-			if err != nil {
-				return err
-			}
-			p.sliceID = slice.ID
-		}
-		// return a list of paginated grains for the slice-id
-		// todo: add pagination logic
-		result, err := api.ListGrains(p.sliceID, p.full)
-		if err != nil {
-			return err
-		}
-		for _, grain := range result.Grains {
-			if p.full {
-				printGrainFull(&grain)
-			} else {
-				printGrainBrief(&grain)
-			}
-		}
-	}
-	return nil
-}
-
-func getCmdParams(c *args.Context) (*cmdParams, error) {
+func getShowParams(c *args.Context) (*showParams, error) {
 	// get sandpiper global params from config file and args
 	g, err := GetGlobalParams(c)
 	if err != nil {
 		return nil, err
 	}
-
 	slice := c.String("slice")
-	sliceID, _ := uuid.Parse(slice)
+	sliceID, _ := uuid.Parse(slice) // ignore error because it might be a slice-name
 
-	return &cmdParams{
+	return &showParams{
 		addr:     g.addr,
 		user:     g.user,
 		password: g.password,
@@ -102,23 +48,82 @@ func getCmdParams(c *args.Context) (*cmdParams, error) {
 	}, nil
 }
 
-func printSliceFull(i int, slice sandpiper.Slice) {
-	fmt.Printf(
-		"%d: %s\nName: %s (%s)\nHash: %s\nGrains: %d\n",
-		i+1, slice.ID.String(), slice.Name, slice.SliceType, slice.ContentHash, slice.ContentCount,
-	)
-	fmt.Printf("Metadata: %v\n", slice.Metadata)
-	fmt.Printf("Subscriptions: %v\n\n", slice.Companies)
+type showCmd struct {
+	*showParams
+	api *client.Client
 }
 
-func printSliceBrief(slice sandpiper.Slice) {
-	fmt.Printf("%s (%s) \"%s\" Grains: %d\n", slice.Name, slice.ID.String(), slice.SliceType, slice.ContentCount)
+// newShowCmd initiates a show command
+func newShowCmd(c *args.Context) (*showCmd, error) {
+	p, err := getShowParams(c)
+	if err != nil {
+		return nil, err
+	}
+	// connect to the api server (saving token)
+	api, err := Connect(p.addr, p.user, p.password, p.debug)
+	if err != nil {
+		return nil, err
+	}
+	return &showCmd{showParams: p, api: api}, nil
 }
 
-func printGrainFull(grain *sandpiper.Grain) {
-	fmt.Println(grain.DisplayFull())
+func (cmd *showCmd) allSlices() error {
+	result, err := cmd.api.ListSlices()
+	if err != nil {
+		return err
+	}
+	for _, slice := range result.Slices {
+		// show slice information
+		cmd.printSlice(&slice)
+	}
+	return nil
 }
 
-func printGrainBrief(grain *sandpiper.Grain) {
-	fmt.Println(grain.Display())
+func (cmd *showCmd) oneSlice() error {
+	var slice *sandpiper.Slice
+	var err error
+
+	if cmd.sliceID == uuid.Nil {
+		// use provided slice-name to get the slice
+		slice, err = cmd.api.SliceByName(cmd.slice)
+		if err != nil {
+			return err
+		}
+	} else {
+		// use provided slice-id to get the slice
+		slice, err = cmd.api.SliceByID(cmd.sliceID)
+		if err != nil {
+			return err
+		}
+	}
+	// show slice information
+	cmd.printSlice(slice)
+	return nil
+}
+
+func (cmd *showCmd) printSlice(slice *sandpiper.Slice) {
+	if cmd.full {
+		fmt.Printf(
+			"%s\nName: %s (%s)\nHash: %s\nGrains: %d\n",
+			slice.ID.String(), slice.Name, slice.SliceType, slice.ContentHash, slice.ContentCount,
+		)
+		fmt.Printf("Metadata: %v\n", slice.Metadata)
+		fmt.Printf("Subscriptions: %v\n\n", slice.Companies)
+	} else {
+		fmt.Printf("%s (%s) \"%s\" Grains: %d\n", slice.Name, slice.ID.String(), slice.SliceType, slice.ContentCount)
+	}
+}
+
+// Show displays a list of all slices that will be synced
+func Show(c *args.Context) error {
+	show, err := newShowCmd(c)
+	if err != nil {
+		return err
+	}
+
+	if show.slice == "" {
+		return show.allSlices()
+	} else {
+		return show.oneSlice()
+	}
 }

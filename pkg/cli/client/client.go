@@ -122,6 +122,28 @@ func (c *Client) RefreshSlice(sliceID uuid.UUID) error {
 	return err
 }
 
+// LockSlice suspends sync operations from starting
+func (c *Client) LockSlice(sliceID uuid.UUID) error {
+	path := fmt.Sprintf("/slices/lock/%s", sliceID.String())
+	req, err := c.newRequest("PUT", path, nil)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, nil)
+	return err
+}
+
+// UnlockSlice suspends sync operations from starting
+func (c *Client) UnlockSlice(sliceID uuid.UUID) error {
+	path := fmt.Sprintf("/slices/unlock/%s", sliceID.String())
+	req, err := c.newRequest("PUT", path, nil)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, nil)
+	return err
+}
+
 // GrainExists will return basic information about a grain if it exists
 func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
 	path := fmt.Sprintf("/grains/%s/%s", sliceID.String(), grainKey)

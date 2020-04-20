@@ -100,7 +100,7 @@ func TestCreate(t *testing.T) {
 			transport.NewHTTP(activity.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/Activitys"
+			path := ts.URL + "/Activity"
 			res, err := http.Post(path, "application/json", bytes.NewBufferString(tt.req))
 			if err != nil {
 				t.Fatal(err)
@@ -120,8 +120,8 @@ func TestCreate(t *testing.T) {
 
 func TestList(t *testing.T) {
 	type listResponse struct {
-		Activitys []sandpiper.Activity `json:"Activitys"`
-		Page  int              `json:"page"`
+		Acts []sandpiper.Activity `json:"Activity"`
+		Page int                  `json:"page"`
 	}
 	cases := []struct {
 		name       string
@@ -185,7 +185,7 @@ func TestList(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantResp: &listResponse{
-				Activitys: []sandpiper.Activity{
+				Acts: []sandpiper.Activity{
 					{
 						ID:        mock.TestUUID(1),
 						Name:      "AAP Brakes",
@@ -209,7 +209,7 @@ func TestList(t *testing.T) {
 			transport.NewHTTP(activity.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/Activitys" + tt.req
+			path := ts.URL + "/Activity" + tt.req
 			res, err := http.Get(path)
 			if err != nil {
 				t.Fatal(err)
@@ -286,7 +286,7 @@ func TestView(t *testing.T) {
 			transport.NewHTTP(activity.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/Activitys/" + tt.req
+			path := ts.URL + "/Activity/" + tt.req
 			res, err := http.Get(path)
 			if err != nil {
 				t.Fatal(err)
@@ -381,7 +381,7 @@ func TestUpdate(t *testing.T) {
 			transport.NewHTTP(activity.New(nil, tt.udb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/Activitys/" + tt.id
+			path := ts.URL + "/Activity/" + tt.id
 			req, _ := http.NewRequest("PATCH", path, bytes.NewBufferString(tt.req))
 			req.Header.Set("Content-Type", "application/json")
 			res, err := client.Do(req)
@@ -465,7 +465,7 @@ func TestDelete(t *testing.T) {
 			transport.NewHTTP(activity.New(nil, tt.mdb, tt.rbac, nil), rg)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
-			path := ts.URL + "/Activitys/" + tt.id
+			path := ts.URL + "/Activity/" + tt.id
 			req, _ := http.NewRequest("DELETE", path, nil)
 			res, err := client.Do(req)
 			if err != nil {
