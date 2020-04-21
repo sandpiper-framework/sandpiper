@@ -8,8 +8,14 @@ package rbac
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"net/http"
 
 	"autocare.org/sandpiper/pkg/shared/model"
+)
+
+var (
+	// ErrServerRole indicates a server is attempting to use a resource not allowed for its role
+	ErrServerRole = echo.NewHTTPError(http.StatusForbidden, "resource is not allowed with this server-role")
 )
 
 // New creates new RBAC service
@@ -22,6 +28,7 @@ func New() *Service {
 // Service is RBAC enforcement service
 type Service struct {
 	ScopingField string // company id field name for scoping
+	ServerRole   string // "primary" or "secondary"
 }
 
 // CurrentUser returns login data stored in jwt token
@@ -81,6 +88,14 @@ func (s *Service) EnforceSubscription(c echo.Context, sub sandpiper.Subscription
 func (s *Service) EnforceScope(c echo.Context) (*sandpiper.Scope, error) {
 	au := s.CurrentUser(c)
 	return au.ApplyScope(s.ScopingField)
+}
+
+// EnforceServerRole makes sure the server role is as expected
+func (s *Service) EnforceServerRole(role string) error {
+	if s.ServerRole != role {
+		return ErrServerRole
+	}
+	return nil
 }
 
 // IsLowerRole checks whether the requesting user has supplied level access

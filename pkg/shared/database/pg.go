@@ -24,7 +24,8 @@ type dbLogger struct{}
 // DB is a wrapper around pg.DB so we can add functionality
 type DB struct {
 	*pg.DB
-	Settings map[string]string
+	Settings   map[string]string
+	ServerRole string
 }
 
 // BeforeQuery is an unused stub at this time.

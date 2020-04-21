@@ -5,7 +5,7 @@
 // Package command implements the sync commands
 package command
 
-// sync run
+// sync start
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ import (
 	"autocare.org/sandpiper/pkg/sync/client"
 )
 
-type runParams struct {
+type startParams struct {
 	addr     *url.URL // our sandpiper server
 	user     string
 	password string
@@ -28,7 +28,7 @@ type runParams struct {
 	debug    bool
 }
 
-func getRunParams(c *args.Context) (*runParams, error) {
+func getStartParams(c *args.Context) (*startParams, error) {
 	// get global params from config file and args
 	g, err := GetGlobalParams(c)
 	if err != nil {
@@ -37,7 +37,7 @@ func getRunParams(c *args.Context) (*runParams, error) {
 	slice := c.String("slice")
 	sliceID, _ := uuid.Parse(slice) // ignore error because it might be a slice-name
 
-	return &runParams{
+	return &startParams{
 		addr:     g.addr,
 		user:     g.user,
 		password: g.password,
@@ -48,14 +48,14 @@ func getRunParams(c *args.Context) (*runParams, error) {
 	}, nil
 }
 
-type runCmd struct {
-	*runParams
+type startCmd struct {
+	*startParams
 	api *client.Client
 }
 
-// newRunCmd initiates a run command
-func newRunCmd(c *args.Context) (*runCmd, error) {
-	p, err := getRunParams(c)
+// newStartCmd initiates a run command
+func newStartCmd(c *args.Context) (*startCmd, error) {
+	p, err := getStartParams(c)
 	if err != nil {
 		return nil, err
 	}
@@ -64,10 +64,10 @@ func newRunCmd(c *args.Context) (*runCmd, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &runCmd{runParams: p, api: api}, nil
+	return &startCmd{startParams: p, api: api}, nil
 }
 
-func (cmd *runCmd) allSlices() error {
+func (cmd *startCmd) allSlices() error {
 	result, err := cmd.api.ListSlices()
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (cmd *runCmd) allSlices() error {
 	return nil
 }
 
-func (cmd *runCmd) oneSlice() error {
+func (cmd *startCmd) oneSlice() error {
 	var slice *sandpiper.Slice
 	var err error
 
@@ -103,17 +103,17 @@ func (cmd *runCmd) oneSlice() error {
 	return nil
 }
 
-// Run initiates the sync process on one or all slices
-func Run(c *args.Context) error {
-
-	run, err := newRunCmd(c)
+// Start initiates the sync process on one or all subscriptions
+func Start(c *args.Context) error {
+	// initiate the command
+	start, err := newStartCmd(c)
 	if err != nil {
 		return err
 	}
 
-	if run.slice == "" {
-		return run.allSlices()
+	if start.slice == "" {
+		return start.allSlices()
 	} else {
-		return run.oneSlice()
+		return start.oneSlice()
 	}
 }

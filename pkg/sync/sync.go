@@ -55,14 +55,14 @@ var GlobalFlags = []args.Flag{
 // Commands defines the valid command line sub-commands
 var Commands = []*args.Command{
 	{
-		/* sync run \
+		/* sync start \
 		--slice "aap-brake-pads"  \ # an optional slice-id or slice-name
 		--noupdate                  # perform the sync without actually changing anything
 		*/
-		Name:      "run",
+		Name:      "start",
 		Usage:     "Start the sync process on all active subscriptions",
 		ArgsUsage: " ", // no arguments
-		Action:    command.Run,
+		Action:    command.Start,
 		Flags: []args.Flag{
 			&args.StringFlag{
 				Name:     "slice",

@@ -18,13 +18,14 @@ import (
 
 	// One import for each service to register (with identifying alias).
 	// Must use a register subdirectory to avoid "import cycle" errors.
-	sy "autocare.org/sandpiper/pkg/api/activity/register"
+	ac "autocare.org/sandpiper/pkg/api/activity/register"
 	au "autocare.org/sandpiper/pkg/api/auth/register"
 	co "autocare.org/sandpiper/pkg/api/company/register"
 	gr "autocare.org/sandpiper/pkg/api/grain/register"
 	pa "autocare.org/sandpiper/pkg/api/password/register"
 	sl "autocare.org/sandpiper/pkg/api/slice/register"
 	su "autocare.org/sandpiper/pkg/api/subscription/register"
+	sy "autocare.org/sandpiper/pkg/api/sync/register"
 	ta "autocare.org/sandpiper/pkg/api/tag/register"
 	us "autocare.org/sandpiper/pkg/api/user/register"
 )
@@ -44,8 +45,8 @@ func Start(cfg *config.Configuration) error {
 	}
 
 	// check required db setting
-	role := db.Settings[ServerRoleKey]
-	if role == "" {
+	db.ServerRole = db.Settings[ServerRoleKey]
+	if db.ServerRole == "" {
 		return errors.New("missing db setting: \"" + ServerRoleKey + "\"")
 	}
 
@@ -73,6 +74,7 @@ func Start(cfg *config.Configuration) error {
 	gr.Register(db, sec, log, v1)                     // grain service
 	su.Register(db, sec, log, v1)                     // subscription service
 	ta.Register(db, sec, log, v1)                     // tagging service
+	ac.Register(db, sec, log, v1)                     // activity service
 	sy.Register(db, sec, log, v1)                     // sync (exchange) service
 
 	// listen for requests
@@ -80,7 +82,7 @@ func Start(cfg *config.Configuration) error {
 		Port:                cfg.Server.Port,
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,
 		WriteTimeoutSeconds: cfg.Server.WriteTimeout,
-		ServerRole:          role,
+		ServerRole:          db.ServerRole,
 		Debug:               cfg.Server.Debug,
 	})
 
