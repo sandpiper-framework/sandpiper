@@ -26,14 +26,15 @@ type HTTP struct {
 func NewHTTP(svc subscription.Service, er *echo.Group) {
 	h := HTTP{svc}
 
-	er.GET("/companies/:id/subscriptions", h.listByCompany)
-	er.GET("/companies/:id/subscriptions/:sliceid", h.viewByCompany)
+	er.GET("/companies/:id/subs", h.listByCompany)
+	er.GET("/companies/:id/subs/:sliceid", h.viewByCompany)
 
-	er.POST("/subscriptions", h.create)
-	er.GET("/subscriptions", h.list)
-	er.GET("/subscriptions/:id", h.view)
-	er.PUT("/subscriptions/:id", h.update) // not a PATCH, body must include *all* fields
-	er.DELETE("/subscriptions/:id", h.delete)
+	er.POST("/subs", h.create)
+	er.GET("/subs", h.list)
+	er.GET("/subs/:id", h.view)
+	er.GET("/subs/name/:name", h.viewByName)
+	er.PUT("/subs/:id", h.update) // not a PATCH, body must include *all* fields
+	er.DELETE("/subs/:id", h.delete)
 }
 
 // Custom errors
@@ -41,6 +42,7 @@ var (
 	ErrInvalidCompanyUUID       = echo.NewHTTPError(http.StatusBadRequest, "malformed company uuid")
 	ErrInvalidSliceUUID         = echo.NewHTTPError(http.StatusBadRequest, "malformed slice uuid")
 	ErrNonNumericSubscriptionID = echo.NewHTTPError(http.StatusBadRequest, "non-numeric subscription id")
+	ErrMissingSubscriptionName  = echo.NewHTTPError(http.StatusBadRequest, "missing required subscription name")
 )
 
 // Subscription create request
@@ -71,11 +73,6 @@ func (h *HTTP) create(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-type listResponse struct {
-	Subscriptions []sandpiper.Subscription `json:"subscriptions"`
-	Page          int                      `json:"page"`
-}
-
 func (h *HTTP) list(c echo.Context) error {
 	p := new(sandpiper.PaginationReq)
 	if err := c.Bind(p); err != nil {
@@ -85,7 +82,7 @@ func (h *HTTP) list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, listResponse{result, p.Page})
+	return c.JSON(http.StatusOK, sandpiper.SubsPaginated{Subs: result, Page: p.Page})
 }
 
 func (h *HTTP) listByCompany(c echo.Context) error {
@@ -102,7 +99,7 @@ func (h *HTTP) listByCompany(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, listResponse{result, p.Page})
+	return c.JSON(http.StatusOK, sandpiper.SubsPaginated{Subs: result, Page: p.Page})
 }
 
 func (h *HTTP) view(c echo.Context) error {
@@ -129,6 +126,19 @@ func (h *HTTP) viewByCompany(c echo.Context) error {
 		return ErrInvalidSliceUUID
 	}
 	sub := sandpiper.Subscription{CompanyID: id, SliceID: sliceID}
+	result, err := h.svc.View(c, sub)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, result)
+}
+
+func (h *HTTP) viewByName(c echo.Context) error {
+	name := c.Param("name")
+	if name == "" {
+		return ErrMissingSubscriptionName
+	}
+	sub := sandpiper.Subscription{Name: name}
 	result, err := h.svc.View(c, sub)
 	if err != nil {
 		return err

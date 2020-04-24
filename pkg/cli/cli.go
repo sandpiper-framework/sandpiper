@@ -117,8 +117,32 @@ var Commands = []*args.Command{
 				Required: false,
 			},
 			&args.BoolFlag{
-				Name:  "full",
-				Usage: "provide full listings",
+				Name:     "full",
+				Usage:    "provide full listings",
+				Required: false,
+			},
+		},
+	},
+	{
+		/* sandpiper sync \
+		   --sub "acme-brake-pads"  \ # an optional subscription name (case-insensitive) or company_id
+		   --noupdate                 # perform the sync without actually changing anything
+		*/
+		Name:      "sync",
+		Usage:     "Start the sync process on active subscriptions",
+		ArgsUsage: " ", // no arguments
+		Action:    command.StartSync,
+		Flags: []args.Flag{
+			&args.StringFlag{
+				Name:     "sub",
+				Aliases:  []string{"s"},
+				Usage:    "limit to subscription name (case-insensitive) or company_id",
+				Required: false,
+			},
+			&args.BoolFlag{
+				Name:     "noupdate",
+				Usage:    "Perform the sync without actually changing anything locally",
+				Required: false,
 			},
 		},
 	},

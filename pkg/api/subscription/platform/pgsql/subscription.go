@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/shared/model"
@@ -27,8 +28,8 @@ func NewSubscription() *Subscription {
 
 // Custom errors
 var (
-	// ErrAlreadyExists indicates the subscription name is already used
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Subscription name already exists.")
+	ErrMissingQueryParams = echo.NewHTTPError(http.StatusInternalServerError, "no query params supplied")
 )
 
 // Create creates a new Subscription in database (assumes allowed to do this)
@@ -47,11 +48,18 @@ func (s *Subscription) Create(db orm.DB, sub sandpiper.Subscription) (*sandpiper
 func (s *Subscription) View(db orm.DB, sub sandpiper.Subscription) (*sandpiper.Subscription, error) {
 	var q *orm.Query
 
-	if sub.SubID != 0 {
+	// support several ways to query the subscription
+	switch {
+	case sub.SubID != 0:
 		q = queryByPrimaryKey(db, &sub)
-	} else {
+	case sub.Name != "":
+		q = queryByName(db, &sub)
+	case sub.SliceID != uuid.Nil && sub.CompanyID != uuid.Nil:
 		q = queryByJunctionKeys(db, &sub)
+	default:
+		return nil, ErrMissingQueryParams
 	}
+
 	err := q.Select()
 	if err != nil {
 		return nil, err
@@ -118,4 +126,10 @@ func queryByPrimaryKey(db orm.DB, sub *sandpiper.Subscription) *orm.Query {
 func queryByJunctionKeys(db orm.DB, sub *sandpiper.Subscription) *orm.Query {
 	return db.Model(sub).Relation("Company").Relation("Slice").
 		Where("slice_id = ? and company_id = ?", sub.SliceID, sub.CompanyID)
+}
+
+// queryByName returns a query for a subscription by name (including company and slice)
+func queryByName(db orm.DB, sub *sandpiper.Subscription) *orm.Query {
+	return db.Model(sub).Relation("Company").Relation("Slice").
+		Where("lower(name) = ?", strings.ToLower(sub.Name))
 }

@@ -73,6 +73,7 @@ func (ls *LogService) View(c echo.Context, req sandpiper.Subscription) (resp *sa
 				"req-id":         req.SubID,
 				"req-slice_id":   req.SliceID,
 				"req-company_id": req.CompanyID,
+				"req-name":       req.Name,
 				"resp":           resp,
 				"took":           time.Since(begin),
 			},

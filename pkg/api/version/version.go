@@ -8,6 +8,8 @@ package version
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 )
 
 // Version identification is updated by `go build` task from latest github tag
@@ -15,7 +17,8 @@ var Version = "unknown"
 
 // Banner prints identifying information about the server.
 func Banner() string {
-	const copyright = "Copyright (c) The Sandpiper Authors. All rights reserved."
+	y := strconv.Itoa(time.Now().Year())
+	copyright := "Copyright 2019-" + y + " The Sandpiper Authors. All rights reserved."
 
 	return fmt.Sprintf("%s\nSandpiper API Server (%s)\n%s\n", product(), Version, copyright)
 }

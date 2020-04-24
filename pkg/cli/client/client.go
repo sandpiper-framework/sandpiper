@@ -73,6 +73,8 @@ func (c *Client) Login(username, password string) error {
 	return err
 }
 
+//region ** Slice Routines **
+
 // SliceByName returns a slice by unique key name
 func (c *Client) SliceByName(sliceName string) (*sandpiper.Slice, error) {
 	path := "/slices/name/" + sliceName
@@ -102,8 +104,7 @@ func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
 	var results sandpiper.SlicesPaginated
 
 	// todo: add paging support as an argument
-	path := "/slices"
-	req, err := c.newRequest("GET", path, nil)
+	req, err := c.newRequest("GET", "/slices", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -144,6 +145,10 @@ func (c *Client) UnlockSlice(sliceID uuid.UUID) error {
 	return err
 }
 
+//endregion
+
+//region ** Grain Routines **
+
 // GrainExists will return basic information about a grain if it exists
 func (c *Client) GrainExists(sliceID uuid.UUID, grainKey string) (*sandpiper.Grain, error) {
 	path := fmt.Sprintf("/grains/%s/%s", sliceID.String(), grainKey)
@@ -165,7 +170,7 @@ func (c *Client) GetLevel1Grain(sliceID uuid.UUID) (*sandpiper.Grain, error) {
 	}
 	grain := new(sandpiper.Grain)
 	resp, err := c.do(req, grain)
-	if resp.StatusCode == 404 {
+	if resp != nil && resp.StatusCode == 404 {
 		// "not found" is not an error
 		return grain, nil
 	}
@@ -214,7 +219,54 @@ func (c *Client) DeleteGrain(grainID uuid.UUID) error {
 	return err
 }
 
-/* Utility Routines */
+//endregion
+
+//region ** Sync Routines **
+
+// AllSubs returns a list of all slices
+func (c *Client) AllSubs() ([]sandpiper.Subscription, error) {
+	var results []sandpiper.Subscription
+
+	// todo: add paging support (looping to retrieve everything)
+	req, err := c.newRequest("GET", "/subs", nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, results)
+	return results, err
+}
+
+// SubsByCompany returns a list of slices for supplied company_id
+func (c *Client) SubsByCompany(companyID uuid.UUID) ([]sandpiper.Subscription, error) {
+	var results []sandpiper.Subscription
+
+	// todo: add paging support (looping to retrieve everything)
+	path := fmt.Sprintf("/companies/%s/subs", companyID.String())
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, results)
+	return results, err
+}
+
+// SubsByName returns a list of slices for supplied subscription name
+func (c *Client) SubsByName(name string) ([]sandpiper.Subscription, error) {
+	var results []sandpiper.Subscription
+
+	// todo: add paging support (looping to retrieve everything)
+	path := fmt.Sprintf("/subs/name/%s", name)
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, results)
+	return results, err
+}
+
+//endregion
+
+//region ** Utility Routines **
 
 // newRequest prepares a request for an api call
 // any `body` must be valid json
@@ -282,3 +334,5 @@ func toReader(v interface{}) *bytes.Reader {
 		panic("Invalid value")
 	}
 }
+
+//endregion

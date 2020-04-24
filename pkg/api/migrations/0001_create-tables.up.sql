@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS "settings" (
 CREATE TABLE IF NOT EXISTS companies (
   "id"         uuid PRIMARY KEY,
   "name"       text NOT NULL,
-  "sync_addr"  text,
+  "sync_addr"  text UNIQUE NOT NULL,
   "active"     boolean,
   "created_at" timestamp,
   "updated_at" timestamp

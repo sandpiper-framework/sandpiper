@@ -68,15 +68,6 @@ tasks:
       EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
 
-  build-sync:
-    desc: Build sandpiper secondary server
-    dir: cmd/sync
-    cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/sync/version.Version={{.VER}}"
-    vars:
-      EXE: sync{{exeExt}}
-      VER: {sh: git describe --always --long --dirty}
-
   build-cli:
     desc: Build sandpiper cli command
     dir: cmd/cli
@@ -88,7 +79,7 @@ tasks:
 
   build:
     desc: Build all sandpiper executables
-    deps: [build-api, build-sync, build-cli]
+    deps: [build-api, build-cli]
 
   test:
     desc: Run test suite (having trouble with dockertesting under Windows!)

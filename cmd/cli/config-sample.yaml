@@ -4,4 +4,6 @@
 command:
   url: http://localhost
   port: 8080
+  retry_count: 3
+  retry_delay: 5  # seconds
 

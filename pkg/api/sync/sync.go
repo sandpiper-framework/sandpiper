@@ -7,8 +7,9 @@
 package sync
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/url"
+
+	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/shared/model"
 )

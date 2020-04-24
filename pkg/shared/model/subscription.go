@@ -26,6 +26,12 @@ type Subscription struct {
 	Slice       *Slice    `json:"slice"`
 }
 
+// SubsPaginated adds pagination
+type SubsPaginated struct {
+	Subs []Subscription `json:"subs"`
+	Page int            `json:"page"`
+}
+
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*Subscription)(nil)
 var _ orm.BeforeUpdateHook = (*Subscription)(nil)

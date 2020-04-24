@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	args "github.com/urfave/cli/v2" // conflicts with our package name
@@ -21,6 +22,8 @@ import (
 func main() {
 	fmt.Println(version.Banner())
 
+	y := strconv.Itoa(time.Now().Year())
+
 	app := &args.App{
 		Name:     "sandpiper",
 		Version:  version.Version,
@@ -31,9 +34,9 @@ func main() {
 				Email: "dougw@winsbygroup.com",
 			},
 		},
-		Copyright:       "Copyright The Sandpiper Authors. All rights reserved.",
+		Copyright:       "Copyright 2019-" + y + " The Sandpiper Authors. All rights reserved.",
 		HelpName:        "sandpiper",
-		Usage:           "Store & retrieve \"level-1\" (file-based) sandpiper objects",
+		Usage:           "Store, retrieve and sync \"level-1\" (file-based) sandpiper objects",
 		Flags:           cli.GlobalFlags,
 		Commands:        cli.Commands,
 		CommandNotFound: cli.CommandNotFound,

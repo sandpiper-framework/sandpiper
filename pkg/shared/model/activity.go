@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Activity logs sync requests
+// Activity logs for sync requests
 type Activity struct {
 	tableName struct{}   `pg:"activity"` // we don't want the plural `activities`
 	ID        int        `json:"id" pg:",pk"`
