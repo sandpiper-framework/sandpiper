@@ -23,16 +23,14 @@ func (s *Activity) Create(c echo.Context, req sandpiper.Activity) (*sandpiper.Ac
 func (s *Activity) View(c echo.Context, activityID int) (*sandpiper.Activity, error) {
 	au := s.rbac.CurrentUser(c)
 	if !au.AtLeast(sandpiper.AdminRole) {
-		// make sure the activity is subscribed to this user's company
-		//if !s.sdb.CompanySubscribed(s.db, au.CompanyID, activityID) {
-		//	return nil, echo.ErrForbidden
-		//}
+		return nil, echo.ErrForbidden
 	}
 	return s.sdb.View(s.db, activityID)
 }
 
 // List returns list of sync activity scoped by user
 func (s *Activity) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Activity, error) {
+	// todo: should this only allow admin role (with no scoping)?
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err

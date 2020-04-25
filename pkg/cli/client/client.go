@@ -269,7 +269,7 @@ func (c *Client) SubsByName(name string) ([]sandpiper.Subscription, error) {
 //region ** Utility Routines **
 
 // newRequest prepares a request for an api call
-// any `body` must be valid json
+// `body` (if not nil) must be valid json
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
 	u, err := c.baseURL.Parse(c.apiPrefix + path)
 	if err != nil {

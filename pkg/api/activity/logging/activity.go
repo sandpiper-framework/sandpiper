@@ -67,7 +67,6 @@ func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sa
 
 // View logging
 func (ls *LogService) View(c echo.Context, req int) (resp *sandpiper.Activity, err error) {
-	// todo: consider a "debug" level that shows entire resp
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,

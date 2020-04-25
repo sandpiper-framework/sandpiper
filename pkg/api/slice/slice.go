@@ -68,6 +68,7 @@ type Update struct {
 	ID           uuid.UUID
 	Name         string
 	SliceType    string
+	AllowSync    bool
 	ContentHash  string
 	ContentCount int
 	ContentDate  time.Time
@@ -82,6 +83,7 @@ func (s *Slice) Update(c echo.Context, r *Update) (*sandpiper.Slice, error) {
 		ID:           r.ID,
 		Name:         r.Name,
 		SliceType:    r.SliceType,
+		AllowSync:    r.AllowSync,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
 		ContentDate:  r.ContentDate,

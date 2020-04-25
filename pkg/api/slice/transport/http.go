@@ -48,7 +48,8 @@ var (
 type createReq struct {
 	ID           uuid.UUID         `json:"id"` // optional
 	Name         string            `json:"name" validate:"required,min=3"`
-	SLiceType    string            `json:"slice_type" validate:"required"`
+	SliceType    string            `json:"slice_type" validate:"required"`
+	AllowSync    bool              `json:"allow_sync"`
 	ContentHash  string            `json:"content_hash"`
 	ContentCount int               `json:"content_count"`
 	ContentDate  time.Time         `json:"content_date"`
@@ -73,7 +74,8 @@ func (h *HTTP) create(c echo.Context) error {
 	rec := sandpiper.Slice{
 		ID:           r.id(),
 		Name:         r.Name,
-		SliceType:    r.SLiceType,
+		SliceType:    r.SliceType,
+		AllowSync:    r.AllowSync,
 		ContentHash:  r.ContentHash,
 		ContentCount: r.ContentCount,
 		ContentDate:  r.ContentDate,
@@ -141,6 +143,7 @@ func (h *HTTP) list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	return c.JSON(http.StatusOK, sandpiper.SlicesPaginated{Slices: result, Page: p.Page})
 }
 
@@ -149,6 +152,7 @@ type updateReq struct {
 	ID           uuid.UUID `json:"-"`
 	Name         string    `json:"name,omitempty" validate:"omitempty,min=3"`
 	SLiceType    string    `json:"slice_type" validate:"required"`
+	AllowSync    bool      `json:"allow_sync"`
 	ContentHash  string    `json:"content_hash,omitempty" validate:"omitempty,min=2"`
 	ContentCount int       `json:"content_count,omitempty"`
 	ContentDate  time.Time `json:"content_date,omitempty"`
@@ -169,6 +173,7 @@ func (h *HTTP) update(c echo.Context) error {
 		ID:           id,
 		Name:         req.Name,
 		SliceType:    req.SLiceType,
+		AllowSync:    req.AllowSync,
 		ContentHash:  req.ContentHash,
 		ContentCount: req.ContentCount,
 		ContentDate:  req.ContentDate,

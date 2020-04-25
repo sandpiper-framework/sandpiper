@@ -4,7 +4,7 @@
 
 package transport
 
-// activity routing functions
+// activity routing
 
 import (
 	"net/http"
@@ -41,10 +41,11 @@ var (
 
 // activity create request
 type createReq struct {
-	ID       int       `json:"id"` // optional
-	SliceID  uuid.UUID `json:"slice_id" validate:"required"`
-	Message  string    `json:"message" validate:"required"`
-	Duration time.Time `json:"duration" validate:"required"`
+	CompanyID uuid.UUID `json:"company_id" validate:"required"`
+	SliceID   uuid.UUID `json:"slice_id" validate:"required"`
+	Success   bool      `json:"success" validate:"required"`
+	Message   string    `json:"message" validate:"required"`
+	Duration  time.Time `json:"duration" validate:"required"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -55,9 +56,11 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	result, err := h.svc.Create(c, sandpiper.Activity{
-		SliceID:  &r.SliceID,
-		Message:  r.Message,
-		Duration: r.Duration,
+		CompanyID: r.CompanyID,
+		SliceID:   r.SliceID,
+		Success:   r.Success,
+		Message:   r.Message,
+		Duration:  r.Duration,
 	})
 
 	if err != nil {
@@ -65,11 +68,6 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
-}
-
-type listResponse struct {
-	Activity []sandpiper.Activity `json:"activity"`
-	Page     int                  `json:"page"`
 }
 
 func (h *HTTP) list(c echo.Context) error {
@@ -84,7 +82,7 @@ func (h *HTTP) list(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, listResponse{result, p.Page})
+	return c.JSON(http.StatusOK, sandpiper.ActivityPaginated{Syncs: result, Page: p.Page})
 }
 
 func (h *HTTP) view(c echo.Context) error {

@@ -28,7 +28,7 @@ func NewSubscription() *Subscription {
 
 // Custom errors
 var (
-	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Subscription name already exists.")
+	ErrAlreadyExists      = echo.NewHTTPError(http.StatusInternalServerError, "Subscription name already exists.")
 	ErrMissingQueryParams = echo.NewHTTPError(http.StatusInternalServerError, "no query params supplied")
 )
 

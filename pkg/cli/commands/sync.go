@@ -8,6 +8,8 @@ package command
 // sandpiper sync command
 
 import (
+	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/google/uuid"
@@ -74,7 +76,7 @@ func newSyncCmd(c *args.Context) (*syncCmd, error) {
 func (cmd *syncCmd) subscriptions() (subsArray, error) {
 	var (
 		subs subsArray
-		err error
+		err  error
 	)
 
 	switch {
@@ -91,14 +93,46 @@ func (cmd *syncCmd) subscriptions() (subsArray, error) {
 	return subs, err
 }
 
-func (subs subsArray) sync() error {
-	for _, sub := range subs {
-		if sub.Active {
+// sync organizes the work to do and calls the sync routine for each subscription
+func (subs subsArray) sync(debugFlag bool) error {
+	var result error
 
+	// organize active subs by syncAddr using a "multimap" [syncAddr: subs]
+	work := make(map[string]subsArray)
+	for _, sub := range subs {
+		if sub.Active && sub.Company.Active {
+			// add to the list of subscriptions to sync for this sync_addr
+			addr := sub.Company.SyncAddr
+			work[addr] = append(work[addr], sub)
 		}
 	}
 
-	panic("implement me")
+	// sync each syncAddr, sync subscriptions
+	for addr, subs := range work {
+		if err := subs.syncServer(addr); err != nil {
+			// log error, but continue
+			if debugFlag {
+				fmt.Printf("%v", err)
+			}
+			result = errors.New("sync completed with errors")
+		}
+	}
+
+	return result
+}
+
+// syncServer performs the actual sync on a server
+func (subs subsArray) syncServer(addr string) error {
+	// open websocket with primary server
+
+	//
+	for _, sub := range subs {
+		slice := sub.Slice
+		if !slice.AllowSync {
+			// just log that it is locked
+		}
+
+	}
 	return nil
 }
 
@@ -112,5 +146,5 @@ func StartSync(c *args.Context) error {
 	if err != nil {
 		return err
 	}
-	return subs.sync()
+	return subs.sync(sync.debug)
 }

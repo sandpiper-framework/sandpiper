@@ -49,7 +49,6 @@ type Securer interface {
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
 	Create(orm.DB, sandpiper.Activity) (*sandpiper.Activity, error)
-	/* CompanySubscribed(db orm.DB, companyID uuid.UUID, activityID int) bool */
 	View(orm.DB, int) (*sandpiper.Activity, error)
 	List(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Activity, error)
 	Delete(orm.DB, int) error

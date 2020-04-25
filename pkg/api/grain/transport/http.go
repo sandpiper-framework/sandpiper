@@ -4,7 +4,7 @@
 
 package transport
 
-// grain routing functions
+// grain routing
 
 import (
 	"net/http"
