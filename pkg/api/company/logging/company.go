@@ -110,3 +110,35 @@ func (ls *LogService) Update(c echo.Context, req *company.Update) (resp *sandpip
 	}(time.Now())
 	return ls.Service.Update(c, req)
 }
+
+// Server logging
+func (ls *LogService) Server(c echo.Context, req uuid.UUID) (resp *sandpiper.Company, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "Server request", err,
+			map[string]interface{}{
+				"req":  req,
+				"resp": resp,
+				"took": time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Server(c, req)
+}
+
+// Servers logging
+func (ls *LogService) Servers(c echo.Context, req string) (resp []sandpiper.Company, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "Servers request", err,
+			map[string]interface{}{
+				"req-name": req,
+				"resp": resp,
+				"took": time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Servers(c, req)
+}

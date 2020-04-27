@@ -14,7 +14,7 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
-// Start sends a sync request to a primary sandpiper server
+// Start sends a sync request to a primary sandpiper server from our server
 func (s *Sync) Start(c echo.Context, primary *url.URL) error {
 	// must be a secondary server to start the sync
 	if err := s.rbac.EnforceServerRole("secondary"); err != nil {

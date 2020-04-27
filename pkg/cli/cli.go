@@ -125,7 +125,7 @@ var Commands = []*args.Command{
 	},
 	{
 		/* sandpiper sync \
-		   --sub "acme-brake-pads"  \ # an optional subscription name (case-insensitive) or company_id
+		   --company "acme-brakes"  \ # an optional company name (case-insensitive) or company_id
 		   --noupdate                 # perform the sync without actually changing anything
 		*/
 		Name:      "sync",
@@ -134,9 +134,9 @@ var Commands = []*args.Command{
 		Action:    command.StartSync,
 		Flags: []args.Flag{
 			&args.StringFlag{
-				Name:     "sub",
-				Aliases:  []string{"s"},
-				Usage:    "limit to subscription name (case-insensitive) or company_id",
+				Name:     "partner",
+				Aliases:  []string{"p"},
+				Usage:    "limit to company name (case-insensitive) or company_id",
 				Required: false,
 			},
 			&args.BoolFlag{

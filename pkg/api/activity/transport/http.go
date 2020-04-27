@@ -67,7 +67,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusCreated, result)
 }
 
 func (h *HTTP) list(c echo.Context) error {

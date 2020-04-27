@@ -83,7 +83,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusCreated, usr)
 }
 
 type listResponse struct {

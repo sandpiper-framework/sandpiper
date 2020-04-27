@@ -24,6 +24,8 @@ type Service interface {
 	View(echo.Context, uuid.UUID) (*sandpiper.Company, error)
 	Delete(echo.Context, uuid.UUID) error
 	Update(echo.Context, *Update) (*sandpiper.Company, error)
+	Server(echo.Context, uuid.UUID) (*sandpiper.Company, error)
+	Servers(echo.Context, string) ([]sandpiper.Company, error)
 }
 
 // New creates new company application service
@@ -56,6 +58,8 @@ type Repository interface {
 	List(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Company, error)
 	Update(orm.DB, *sandpiper.Company) error
 	Delete(orm.DB, *sandpiper.Company) error
+	Server(orm.DB, uuid.UUID) (*sandpiper.Company, error)
+	Servers(orm.DB, uuid.UUID, string) ([]sandpiper.Company, error)
 }
 
 // RBAC represents role-based-access-control interface

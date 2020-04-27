@@ -24,12 +24,16 @@ type HTTP struct {
 // NewHTTP creates new company http service
 func NewHTTP(svc company.Service, er *echo.Group) {
 	h := HTTP{svc}
+
 	sr := er.Group("/companies")
 	sr.POST("", h.create)
 	sr.GET("", h.list)
 	sr.GET("/:id", h.view)
 	sr.PUT("/:id", h.update) // not a PATCH, body must include *all* fields
 	sr.DELETE("/:id", h.delete)
+
+	er.GET("/servers", h.servers) // ?name={text}
+	er.GET("/servers/:id", h.server)
 }
 
 // Custom errors
@@ -68,7 +72,7 @@ func (h *HTTP) create(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusCreated, result)
 }
 
 type listResponse struct {
@@ -138,4 +142,26 @@ func (h *HTTP) delete(c echo.Context) error {
 		return err
 	}
 	return c.NoContent(http.StatusOK)
+}
+
+func (h *HTTP) server(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return ErrInvalidCompanyUUID
+	}
+	result, err := h.svc.Server(c, id)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, result)
+}
+
+func (h *HTTP) servers(c echo.Context) error {
+	// no pagination
+	name := c.QueryParam("name")
+	results, err := h.svc.Servers(c, name)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, results)
 }

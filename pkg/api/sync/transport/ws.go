@@ -15,7 +15,7 @@ var (
 	upgrader = websocket.Upgrader{}
 )
 
-func hello(c echo.Context) error {
+func wsSync(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return err

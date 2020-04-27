@@ -45,11 +45,11 @@ type startReq struct {
 }
 
 func (h *HTTP) start(c echo.Context) error {
-	u, err := url.ParseRequestURI(c.Param("url"))
+	addr, err := url.ParseRequestURI(c.Param("url"))
 	if err != nil {
 		return ErrInvalidURL
 	}
-	if err := h.svc.Start(c, u); err != nil {
+	if err := h.svc.Start(c, addr); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusOK)

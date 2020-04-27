@@ -80,6 +80,38 @@ func (s *Company) Delete(db orm.DB, company *sandpiper.Company) error {
 	return db.Delete(company)
 }
 
+// Server returns a single active company by ID for the sync process
+func (s *Company) Server(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
+	company := new(sandpiper.Company)
+	err := db.Model(company).
+		Column("id", "name", "sync_addr").
+		Where("id = ?", id).Where("active = true").
+		Select()
+	if err != nil {
+		return nil, err
+	}
+	return company, nil
+}
+
+// Servers returns a list of active companies (except ours) for the sync process
+// optionally limited by "name"
+func (s *Company) Servers(db orm.DB, ourCompanyID uuid.UUID, name string) ([]sandpiper.Company, error) {
+	var companies []sandpiper.Company
+
+	q := db.Model(&companies).
+		Column("id", "name", "sync_addr").
+		Where("id <> ?", ourCompanyID).
+		Where("sync_addr <> ''").Where("active = true")
+	if name != "" {
+		q = q.Where("lower(name) = ?", strings.ToLower(name))
+	}
+	err := q.Order("name").Select()
+	if err != nil {
+		return nil, err
+	}
+	return companies, nil
+}
+
 // checkDuplicate returns true if name found in database
 func checkDuplicate(db orm.DB, name string) error {
 	// attempt to select by unique key

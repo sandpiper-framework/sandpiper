@@ -21,8 +21,6 @@ import (
 
 const apiVer = "/v1"
 
-/* Use "github.com/ddliu/go-httpclient" for a sample client reference */
-
 // Client represents the http client
 type Client struct {
 	baseURL    *url.URL // basePath holds the path to prepend to the requests.
@@ -223,7 +221,26 @@ func (c *Client) DeleteGrain(grainID uuid.UUID) error {
 
 //region ** Sync Routines **
 
-// AllSubs returns a list of all slices
+// ActiveServers returns a list of syncable servers
+func (c *Client) ActiveServers(companyID uuid.UUID, name string) ([]sandpiper.Company, error) {
+	var results []sandpiper.Company
+
+	path := "/servers"
+	if companyID != uuid.Nil {
+		path = fmt.Sprintf("/servers/%s", companyID.String())
+	}
+	if name != "" {
+		path = path + "?name=" + name
+	}
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, results)
+	return results, err
+}
+
+// AllSubs returns a list of all slices (that we have access to)
 func (c *Client) AllSubs() ([]sandpiper.Subscription, error) {
 	var results []sandpiper.Subscription
 
@@ -250,18 +267,18 @@ func (c *Client) SubsByCompany(companyID uuid.UUID) ([]sandpiper.Subscription, e
 	return results, err
 }
 
-// SubsByName returns a list of slices for supplied subscription name
-func (c *Client) SubsByName(name string) ([]sandpiper.Subscription, error) {
-	var results []sandpiper.Subscription
 
-	// todo: add paging support (looping to retrieve everything)
+// SubByName returns the subscription matching the supplied name
+func (c *Client) SubByName(name string) (*sandpiper.Subscription, error) {
+	sub := new(sandpiper.Subscription)
+
 	path := fmt.Sprintf("/subs/name/%s", name)
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.do(req, results)
-	return results, err
+	_, err = c.do(req, sub)
+	return sub, err
 }
 
 //endregion

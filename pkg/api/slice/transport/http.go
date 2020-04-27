@@ -91,7 +91,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusCreated, result)
 }
 
 // refresh content information after slice grains are changed
