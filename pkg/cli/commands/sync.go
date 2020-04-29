@@ -7,22 +7,6 @@ package command
 
 // sandpiper sync command
 
-/*
-	The Primary adds subscriptions (slices assigned to companies) and the Secondary asks for
-	those assigned to them. This means that the Secondary (who currently initiates the sync)
-	begins a sync session by asking for their subscriptions. It then adds any new ones to their
-	local database.
-
-  There is also an "active" subscription flag that can be changed (on either side). If disabled
-	on the Primary, it will update the Secondary and log the activity. If enabled on the Primary,
-	it will not change the Secondary. The active flag on the Secondary controls if it tries to sync
-	that subscription, but changes are not propagated to the Primary. So, all of this means that
-	the Primary controls what can be synced, but the Secondary can turn the sync off.
-
-	The sync process will also observe the "active" company flag (on both sides) and the "allow_sync"
-	slice updating flag (on the Primary).
-*/
-
 import (
 	"errors"
 	"fmt"
@@ -42,13 +26,13 @@ type serverList []sandpiper.Company
 //type subsArray []sandpiper.Subscription
 
 type syncParams struct {
-	addr         *url.URL // our sandpiper server
-	user         string
-	password     string
-	partner      string
-	partnerID    uuid.UUID
-	noupdate     bool
-	debug        bool
+	addr      *url.URL // our sandpiper server
+	user      string
+	password  string
+	partner   string
+	partnerID uuid.UUID
+	noupdate  bool
+	debug     bool
 }
 
 func getSyncParams(c *args.Context) (*syncParams, error) {
@@ -57,18 +41,18 @@ func getSyncParams(c *args.Context) (*syncParams, error) {
 	if err != nil {
 		return nil, err
 	}
-	// save optional "subscription" param, and determine its type
+	// save optional "partner" param, and determine its type
 	p := c.String("partner")
 	id, _ := uuid.Parse(p) // valid id means companyID, otherwise company-name
 
 	return &syncParams{
-		addr:         g.addr,
-		user:         g.user,
-		password:     g.password,
-		partner: 			p,
-		partnerID:    id,
-		noupdate:     c.Bool("noupdate"),
-		debug:        g.debug,
+		addr:      g.addr,
+		user:      g.user,
+		password:  g.password,
+		partner:   p,
+		partnerID: id,
+		noupdate:  c.Bool("noupdate"),
+		debug:     g.debug,
 	}, nil
 }
 
@@ -93,10 +77,8 @@ func newSyncCmd(c *args.Context) (*syncCmd, error) {
 
 // getServers returns list of servers to sync with
 func (cmd *syncCmd) getServers() (serverList, error) {
-	var (
-		srvs serverList
-		err  error
-	)
+	var srvs serverList
+	var err error
 
 	switch {
 	case cmd.partner == "":
@@ -117,23 +99,7 @@ func (cmd *syncCmd) syncServer(c sandpiper.Company) error {
 	if cmd.debug {
 		fmt.Printf("syncing %s...", c.Name)
 	}
-	// open websocket with primary server (/sync/{url})
-
-	// ask for our subscriptions
-
-	// add any new subscriptions
-
-	/*
-	for _, sub := range subs {
-		slice := sub.Slice
-		if !slice.AllowSync {
-			// just log that it is locked
-		}
-
-	}
-	*/
-
-	return nil
+	return cmd.api.Sync(c)
 }
 
 // StartSync initiates the sync process on one or all subscriptions
@@ -151,9 +117,36 @@ func StartSync(c *args.Context) error {
 		return err
 	}
 
+	// todo: make each sync a go routine (https://gobyexample.com/worker-pools)
+	/* COMMENT:
+
+	I think most of the time you probably don't really need a pool. But maybe you do want to limit the number of goroutines
+	running at once.
+
+	E.g. if each goroutine is CPU intensive and you want to echo progress on the tasks in a reasonable manner, rather than
+	having all of them complete around the same time.
+
+	An easy way to limit how many goroutines are running at once is to use a channel as a semaphore. E.g. something like
+
+	sema := make(chan struct{}, numCores)
+	and then in your worker goroutines:
+
+	sema <- struct{}{} // blocks if more than numCores threads doing  work
+	// ... do work ... //
+	<-sema
+
+	That'll ensure you don't have more than numCores goroutines running at once. IMO much easier than a pool, but you
+	still have the nice property that you're not making tiny progress on many tasks at once, rather just completing tasks
+	as quickly as possible.
+
+	If you really do want a pool, then using a channel to send in the work seems reasonable. If you want to get a response,
+	you can actually include a response channel in your message on the input channel.
+
+	*/
+
 	// sync each server
 	for _, srv := range srvs {
-		if err := sync.syncServer(srv); err != nil{
+		if err := sync.syncServer(srv); err != nil {
 			// log error, but continue
 			if sync.debug {
 				fmt.Printf("%v", err)
@@ -240,4 +233,3 @@ func (subs subsArray) sync(debugFlag bool) error {
 }
 
 */
-

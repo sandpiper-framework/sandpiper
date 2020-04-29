@@ -135,8 +135,8 @@ func (ls *LogService) Servers(c echo.Context, req string) (resp []sandpiper.Comp
 			source, "Servers request", err,
 			map[string]interface{}{
 				"req-name": req,
-				"resp": resp,
-				"took": time.Since(begin),
+				"resp":     resp,
+				"took":     time.Since(begin),
 			},
 		)
 	}(time.Now())

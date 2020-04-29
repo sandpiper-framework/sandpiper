@@ -3,8 +3,9 @@ package secure_test
 import (
 	"testing"
 
-	"autocare.org/sandpiper/pkg/shared/secure"
 	"github.com/stretchr/testify/assert"
+
+	"autocare.org/sandpiper/pkg/shared/secure"
 )
 
 func TestPassword(t *testing.T) {

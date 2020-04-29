@@ -154,7 +154,7 @@ func TestList(t *testing.T) {
 					return &sandpiper.AuthUser{
 						ID:        1,
 						CompanyID: mock.TestUUID(1),
-						Role:      sandpiper.UserRole,
+						Role:      sandpiper.SyncRole,
 						Email:     "john@mail.com",
 					}
 				}},

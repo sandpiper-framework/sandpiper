@@ -34,12 +34,13 @@ CREATE TABLE IF NOT EXISTS "settings" (
 );
 
 CREATE TABLE IF NOT EXISTS companies (
-  "id"         uuid PRIMARY KEY,
-  "name"       text NOT NULL,
-  "sync_addr"  text UNIQUE NOT NULL,  /* primary servers only */
-  "active"     boolean,
-  "created_at" timestamp,
-  "updated_at" timestamp
+  "id"           uuid PRIMARY KEY,
+  "name"         text NOT NULL,
+  "sync_addr"    text UNIQUE NOT NULL,  /* primary server's sync_addr */
+  "sync_api_key" text,                  /* used by secondary server */
+  "active"       boolean,
+  "created_at"   timestamp,
+  "updated_at"   timestamp
 );
 CREATE UNIQUE INDEX ON companies (lower(name));
 

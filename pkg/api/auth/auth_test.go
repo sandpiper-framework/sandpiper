@@ -280,7 +280,7 @@ func TestMe(t *testing.T) {
 						UpdatedAt: mock.TestTime(2000),
 						FirstName: "John",
 						LastName:  "Doe",
-						Role:      sandpiper.UserRole,
+						Role:      sandpiper.SyncRole,
 					}, nil
 				},
 			},
@@ -290,7 +290,7 @@ func TestMe(t *testing.T) {
 				UpdatedAt: mock.TestTime(2000),
 				FirstName: "John",
 				LastName:  "Doe",
-				Role:      sandpiper.UserRole,
+				Role:      sandpiper.SyncRole,
 			},
 		},
 	}

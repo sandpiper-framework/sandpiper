@@ -73,7 +73,7 @@ func TestEnforceUser(t *testing.T) {
 	}{
 		{
 			name:    "Not same user, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"id", "role"}, 15, sandpiper.UserRole), id: 122},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"id", "role"}, 15, sandpiper.SyncRole), id: 122},
 			wantErr: true,
 		},
 		{
@@ -108,12 +108,12 @@ func TestEnforceCompany(t *testing.T) {
 	}{
 		{
 			name:    "Not same company, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.UserRole), id: mock.TestUUID(2)},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.SyncRole), id: mock.TestUUID(2)},
 			wantErr: true,
 		},
 		{
 			name:    "Same company, not company admin or admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.UserRole), id: mock.TestUUID(1)},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.SyncRole), id: mock.TestUUID(1)},
 			wantErr: true,
 		},
 		{
@@ -149,7 +149,7 @@ func TestAccountCreate(t *testing.T) {
 	}{
 		{
 			name:    "Different company, creating user role, not an admin",
-			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.UserRole), role: 200, company_id: mock.TestUUID(2)},
+			args:    args{ctx: mock.EchoCtxWithKeys([]string{"company_id", "role"}, mock.TestUUID(1), sandpiper.SyncRole), role: 200, company_id: mock.TestUUID(2)},
 			wantErr: true,
 		},
 		{

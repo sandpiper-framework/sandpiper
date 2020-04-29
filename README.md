@@ -182,7 +182,7 @@ Let's say you have a table named 'cars' that handles employee's cars. To impleme
 
 ### Implementing other platforms
 
-Similarly to implementing APIs relying only on a database, you can implement other platforms by:
+Similar to implementing APIs relying only on a database, you can implement other platforms by:
 
 1. In the service package, in car.go add interface that corresponds to the platform, for example, Indexer or Reporter.
 
@@ -204,7 +204,7 @@ Instead of passing database client as `s.db` , inside this function pass it as `
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests.
 
 ## Versioning
 

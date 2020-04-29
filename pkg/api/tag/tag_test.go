@@ -39,7 +39,7 @@ func TestCreate(t *testing.T) {
 			}},
 		wantErr: true,
 		args: args{
-			ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
+			ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.SyncRole),
 			req: sandpiper.Company{
 				Name:   "Acme Brakes",
 				Active: true,
@@ -101,7 +101,7 @@ func TestView(t *testing.T) {
 		{
 			name: "Fails with User Permissions",
 			args: args{
-				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
+				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.SyncRole),
 				mock.TestUUID(1),
 			},
 			rbac: &mock.RBAC{

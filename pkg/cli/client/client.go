@@ -267,7 +267,6 @@ func (c *Client) SubsByCompany(companyID uuid.UUID) ([]sandpiper.Subscription, e
 	return results, err
 }
 
-
 // SubByName returns the subscription matching the supplied name
 func (c *Client) SubByName(name string) (*sandpiper.Subscription, error) {
 	sub := new(sandpiper.Subscription)
@@ -279,6 +278,17 @@ func (c *Client) SubByName(name string) (*sandpiper.Subscription, error) {
 	}
 	_, err = c.do(req, sub)
 	return sub, err
+}
+
+// Sync performs sync with a server
+func (c *Client) Sync(company sandpiper.Company) error {
+	path := fmt.Sprintf("/sync/%s", company.SyncAddr)
+	req, err := c.newRequest("POST", path, nil)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, nil)
+	return err
 }
 
 //endregion

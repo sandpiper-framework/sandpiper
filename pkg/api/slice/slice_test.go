@@ -40,7 +40,7 @@ func TestCreate(t *testing.T) {
 			}},
 		wantErr: true,
 		args: args{
-			ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
+			ctx: mock.EchoCtxWithKeys([]string{"role"}, sandpiper.SyncRole),
 			req: sandpiper.Slice{
 				Name:         "AAP Brake Friction",
 				ContentHash:  "4468e5deabf5e6d0740cd1a77df56f67093ec943",
@@ -103,7 +103,7 @@ func TestView(t *testing.T) {
 		{
 			name: "VIEW Fails with User Permissions",
 			args: args{
-				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.UserRole),
+				mock.EchoCtxWithKeys([]string{"role"}, sandpiper.SyncRole),
 				mock.TestUUID(1),
 			},
 			rbac: &mock.RBAC{

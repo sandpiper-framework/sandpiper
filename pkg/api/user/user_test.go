@@ -181,7 +181,7 @@ func TestList(t *testing.T) {
 					return &sandpiper.AuthUser{
 						ID:        1,
 						CompanyID: mock.TestUUID(1),
-						Role:      sandpiper.UserRole,
+						Role:      sandpiper.SyncRole,
 					}
 				}}},
 		{
@@ -289,7 +289,7 @@ func TestDelete(t *testing.T) {
 						UpdatedAt: mock.TestTime(2000),
 						FirstName: "John",
 						LastName:  "Doe",
-						Role:      sandpiper.UserRole,
+						Role:      sandpiper.SyncRole,
 					}, nil
 				},
 			},
@@ -417,7 +417,7 @@ func TestUpdate(t *testing.T) {
 						CreatedAt: mock.TestTime(1990),
 						UpdatedAt: mock.TestTime(2000),
 						CompanyID: mock.TestUUID(1),
-						Role:      sandpiper.UserRole,
+						Role:      sandpiper.SyncRole,
 						FirstName: "John",
 						LastName:  "Doe",
 						Phone:     "234567",

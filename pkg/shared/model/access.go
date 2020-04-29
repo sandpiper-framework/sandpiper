@@ -19,17 +19,17 @@ const (
 	// AdminRole has admin specific permissions
 	AdminRole AccessLevel = 110
 
-	// CompanyAdminRole can edit company specific things
+	// CompanyAdminRole can maintain company-specific things
 	CompanyAdminRole AccessLevel = 120
 
-	// UserRole is a standard user (should this be "sync role"??)
-	UserRole AccessLevel = 200
+	// SyncRole is a special limited-access user for the sync process
+	SyncRole AccessLevel = 200
 )
 
 // RoleIsValid validates against available access levels
 func RoleIsValid(role AccessLevel) bool {
 	switch role {
-	case SuperAdminRole, AdminRole, CompanyAdminRole, UserRole:
+	case SuperAdminRole, AdminRole, CompanyAdminRole, SyncRole:
 		return true
 	default:
 		return false
