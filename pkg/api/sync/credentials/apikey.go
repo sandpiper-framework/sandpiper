@@ -6,40 +6,55 @@
 package credentials
 
 import (
+	"encoding/hex"
+	"encoding/json"
 	"errors"
-	"strings"
 
 	"autocare.org/sandpiper/pkg/shared/secure"
 )
 
 // SyncLogin is used to manage credentials for the sync_api_key
 type SyncLogin struct {
-	User     string
-	Password string
+	User     string `json:"user"`
+	Password string `json:"password"`
 }
 
-// New returns a SyncLogin decoded from the supplied api_key and secret
+// New returns a SyncLogin decoded from the supplied api_key (base64) and secret
 func New(APIKey, secret string) (*SyncLogin, error) {
-	data, err := secure.Decrypt([]byte(APIKey), secret)
+	b, err := fromHex(APIKey)
 	if err != nil {
 		return nil, err
 	}
-	a := strings.Split(string(data), " ")
-	if len(a) != 2 {
+	data, err := secure.Decrypt(b, secret)
+	if err != nil {
+		return nil, err
+	}
+	login := new(SyncLogin)
+	if err := json.Unmarshal(data, login); err != nil {
 		return nil, errors.New("improper format of api-key")
 	}
-	return &SyncLogin{
-		User:     a[0],
-		Password: a[1],
-	}, nil
+	return login, nil
 }
 
-// APIKey returns a sync_api_key from the encrypted sync login credentials
+// APIKey returns an encrypted sync_api_key (base64) from sync login credentials
 func (s *SyncLogin) APIKey(secret string) ([]byte, error) {
-	b := []byte(s.User + " " + s.Password)
-	data, err := secure.Encrypt(b, secret)
+	login, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
 	}
-	return data, nil
+	data, err := secure.Encrypt(login, secret)
+	if err != nil {
+		return nil, err
+	}
+	return toHex(data), nil
+}
+
+func toHex(src []byte) []byte {
+	buf := make([]byte, hex.EncodedLen(len(src)))
+	_ = hex.Encode(buf, src)
+	return buf
+}
+
+func fromHex(s string) ([]byte, error) {
+	return hex.DecodeString(s)
 }

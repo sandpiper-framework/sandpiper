@@ -7,9 +7,9 @@ package sync
 // sync service logger
 
 import (
-	"net/url"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/sync"
@@ -33,7 +33,7 @@ type LogService struct {
 const source = "sync"
 
 // Start logging
-func (ls *LogService) Start(c echo.Context, req *url.URL) (err error) {
+func (ls *LogService) Start(c echo.Context, req uuid.UUID) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
@@ -47,16 +47,16 @@ func (ls *LogService) Start(c echo.Context, req *url.URL) (err error) {
 	return ls.Service.Start(c, req)
 }
 
-// Connect logging
-func (ls *LogService) Connect(c echo.Context) (err error) {
+// Process logging
+func (ls *LogService) Process(c echo.Context) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "Connect sync request", err,
+			source, "Process sync request", err,
 			map[string]interface{}{
 				"took": time.Since(begin),
 			},
 		)
 	}(time.Now())
-	return ls.Service.Connect(c)
+	return ls.Service.Process(c)
 }

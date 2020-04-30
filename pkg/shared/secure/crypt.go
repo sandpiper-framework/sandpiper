@@ -16,7 +16,7 @@ import (
 // The following encrypt/decrypt functions are based partially on:
 // https://www.thepolyglotdeveloper.com/2018/02/encrypt-decrypt-data-golang-application-crypto-packages/
 
-// Encrypt creates ciphered text from supplied data using AES
+// Encrypt creates ciphered binary data from supplied plain-text data using AES-256
 func Encrypt(data []byte, keyB64 string) ([]byte, error) {
 
 	key, err := binaryKey(keyB64)

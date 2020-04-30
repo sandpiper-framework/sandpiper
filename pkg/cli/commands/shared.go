@@ -15,7 +15,6 @@ import (
 	"github.com/howeyc/gopass"
 	args "github.com/urfave/cli/v2"
 
-	"autocare.org/sandpiper/pkg/cli/client"
 	"autocare.org/sandpiper/pkg/shared/config"
 )
 
@@ -64,15 +63,6 @@ func GetGlobalParams(c *args.Context) (*GlobalParams, error) {
 		password: passwd,
 		debug:    c.Bool("debug"),
 	}, nil
-}
-
-// Connect to the sandpiper api server (saving token in the client struct)
-func Connect(addr *url.URL, user, password string, debug bool) (*client.Client, error) {
-	http := client.New(addr, debug)
-	if err := http.Login(user, password); err != nil {
-		return nil, err
-	}
-	return http, nil
 }
 
 // AllowOverwrite prompts the user for permission to overwrite something

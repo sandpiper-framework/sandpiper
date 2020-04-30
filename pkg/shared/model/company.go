@@ -17,6 +17,7 @@ type Company struct {
 	ID            uuid.UUID       `json:"id"`
 	Name          string          `json:"name"`
 	SyncAddr      string          `json:"sync_addr"`
+	SyncAPIKey    string          `json:"sync_api_key"`
 	Active        bool            `json:"active"`
 	CreatedAt     time.Time       `json:"created_at"`
 	UpdatedAt     time.Time       `json:"updated_at"`

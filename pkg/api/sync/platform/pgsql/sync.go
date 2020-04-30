@@ -8,6 +8,7 @@ package pgsql
 
 import (
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/pkg/shared/model"
 )
@@ -24,4 +25,15 @@ func NewSync() *Sync {
 func (s *Sync) LogActivity(db orm.DB, req sandpiper.SyncRequest) error {
 
 	return nil
+}
+
+// Primary returns a single (primary) company by ID (assumes allowed to do this)
+func (s *Sync) Primary(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
+	var company = &sandpiper.Company{ID: id}
+
+	err := db.Model(company).WherePK().Select()
+	if err != nil {
+		return nil, err
+	}
+	return company, nil
 }

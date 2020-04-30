@@ -20,11 +20,16 @@ import (
 type Service struct {
 	minScore int // 0,1,2,3,4
 	h        hash.Hash
+	key      string
 }
 
 // New initializes security service.
-func New(minPasswordScore int) *Service {
-	return &Service{minScore: minPasswordScore, h: sha1.New()}
+func New(minPasswordScore int, apiKeySecret string) *Service {
+	return &Service{
+		minScore: minPasswordScore,
+		h:        sha1.New(),
+		key:      apiKeySecret,
+	}
 }
 
 // Password checks whether password is secure enough using zxcvbn library.
@@ -49,4 +54,9 @@ func (s *Service) Token(str string) string {
 	s.h.Reset()
 	_, _ = fmt.Fprintf(s.h, "%s%s", str, strconv.Itoa(time.Now().Nanosecond()))
 	return fmt.Sprintf("%x", s.h.Sum(nil))
+}
+
+// APIKeySecret getter
+func (s *Service) APIKeySecret() string {
+	return s.key
 }

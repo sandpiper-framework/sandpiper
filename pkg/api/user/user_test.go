@@ -32,21 +32,22 @@ func TestCreate(t *testing.T) {
 		udb      *mockdb.User
 		rbac     *mock.RBAC
 		sec      *mock.Secure
-	}{{
-		name: "Fail on is lower role",
-		rbac: &mock.RBAC{
-			AccountCreateFn: func(echo.Context, sandpiper.AccessLevel, uuid.UUID) error {
-				return errors.New("generic error")
+	}{
+		{
+			name: "Fail on is lower role",
+			rbac: &mock.RBAC{
+				AccountCreateFn: func(echo.Context, sandpiper.AccessLevel, uuid.UUID) error {
+					return errors.New("generic error")
+				}},
+			wantErr: true,
+			args: args{req: sandpiper.User{
+				FirstName: "John",
+				LastName:  "Doe",
+				Username:  "JohnDoe",
+				Role:      sandpiper.SuperAdminRole,
+				Password:  "Thranduil8822",
 			}},
-		wantErr: true,
-		args: args{req: sandpiper.User{
-			FirstName: "John",
-			LastName:  "Doe",
-			Username:  "JohnDoe",
-			Role:      sandpiper.SuperAdminRole,
-			Password:  "Thranduil8822",
-		}},
-	},
+		},
 		{
 			name: "Success",
 			args: args{req: sandpiper.User{
@@ -82,7 +83,8 @@ func TestCreate(t *testing.T) {
 				Username:  "JohnDoe",
 				Role:      sandpiper.SuperAdminRole,
 				Password:  "h4$h3d",
-			}}}
+			}},
+	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			s := user.New(nil, tt.udb, tt.rbac, tt.sec)

@@ -76,11 +76,13 @@ func (d *Database) SafeURL() string {
 
 // Server holds data necessary for server configuration
 type Server struct {
-	URL          string `yaml:"url,omitempty"`
+	URL          string `yaml:"url,omitempty"` // is this being used?
 	Port         string `yaml:"port,omitempty"`
 	Debug        bool   `yaml:"debug,omitempty"`
 	ReadTimeout  int    `yaml:"read_timeout_seconds,omitempty"`
 	WriteTimeout int    `yaml:"write_timeout_seconds,omitempty"`
+	SyncPool     int    `yaml:"sync_pool,omitempty"`
+	APIKeySecret string `yaml:"api_key_secret,omitempty"`
 }
 
 // JWT holds data necessary for JWT configuration

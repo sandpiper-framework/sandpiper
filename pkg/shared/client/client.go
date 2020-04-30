@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -53,8 +54,17 @@ func New(baseURL *url.URL, debugFlag bool) *Client {
 	return c
 }
 
-// Login to the sandpiper server
-func (c *Client) Login(username, password string) error {
+// Login to the sandpiper api server (saving token in the client struct)
+func Login(addr *url.URL, user, password string, debug bool) (*Client, error) {
+	c := New(addr, debug)
+	if err := c.login(user, password); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+// login to the sandpiper server
+func (c *Client) login(username, password string) error {
 	body := fmt.Sprintf("{\"username\": \"%s\", \"password\": \"%s\"}", username, password)
 	req, err := c.newRequest("POST", "/login", body)
 	if err != nil {
@@ -280,10 +290,20 @@ func (c *Client) SubByName(name string) (*sandpiper.Subscription, error) {
 	return sub, err
 }
 
-// Sync performs sync with a server
+// Sync initiates a sync with a server
 func (c *Client) Sync(company sandpiper.Company) error {
 	path := fmt.Sprintf("/sync/%s", company.SyncAddr)
 	req, err := c.newRequest("POST", path, nil)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, nil)
+	return err
+}
+
+// Process performs receives a sync request and acts on it
+func (c *Client) Process() error {
+	req, err := c.newRequestWS("GET", "/sync", nil)
 	if err != nil {
 		return err
 	}
@@ -311,6 +331,34 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", c.userAgent)
+	if c.auth.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+c.auth.Token)
+	}
+	return req, nil
+}
+
+// newRequestWS prepares a websocket request for an api call
+// `body` (if not nil) must be valid json
+func (c *Client) newRequestWS(method, path string, body interface{}) (*http.Request, error) {
+	u, err := c.baseURL.Parse(c.apiPrefix + path)
+	if err != nil {
+		return nil, err
+	}
+	u.Scheme = strings.Replace(u.Scheme, "http", "ws", 1)
+
+	req, err := http.NewRequest(method, u.String(), toReader(body))
+	if err != nil {
+		return nil, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("Connection", "upgrade")
+	req.Header.Set("Upgrade", "websocket")
+	req.Header.Set("Sec-WebSocket-Version", "13")
+	req.Header.Set("Sec-WebSocket-Key", "??what to put here??")
 	if c.auth.Token != "" {
 		req.Header.Set("Authorization", "Bearer "+c.auth.Token)
 	}

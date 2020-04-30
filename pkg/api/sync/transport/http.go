@@ -8,7 +8,6 @@ package transport
 
 import (
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,14 +25,14 @@ type HTTP struct {
 func NewHTTP(svc sync.Service, er *echo.Group) {
 	h := HTTP{svc}
 	sr := er.Group("/sync")
-	sr.POST("/:url", h.start) // for secondary servers only
-	sr.GET("", h.connect)     // for primary servers only
+	sr.POST("/:compid", h.start) // for secondary servers only
+	sr.GET("", h.process)        // for primary servers only
 }
 
 // Custom errors
 var (
 	// ErrInvalidURL indicates a malformed url
-	ErrInvalidURL = echo.NewHTTPError(http.StatusBadRequest, "Invalid url address")
+	ErrInvalidURL = echo.NewHTTPError(http.StatusBadRequest, "Invalid uuid")
 )
 
 // Sync start request
@@ -45,18 +44,18 @@ type startReq struct {
 }
 
 func (h *HTTP) start(c echo.Context) error {
-	addr, err := url.ParseRequestURI(c.Param("url"))
+	id, err := uuid.Parse(c.Param("compid"))
 	if err != nil {
 		return ErrInvalidURL
 	}
-	if err := h.svc.Start(c, addr); err != nil {
+	if err := h.svc.Start(c, id); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *HTTP) connect(c echo.Context) error {
-	if err := h.svc.Connect(c); err != nil {
+func (h *HTTP) process(c echo.Context) error {
+	if err := h.svc.Process(c); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusOK)

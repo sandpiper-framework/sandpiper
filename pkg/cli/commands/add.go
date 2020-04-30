@@ -16,8 +16,8 @@ import (
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"autocare.org/sandpiper/pkg/cli/client"
 	"autocare.org/sandpiper/pkg/cli/payload"
+	"autocare.org/sandpiper/pkg/shared/client"
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
@@ -42,7 +42,7 @@ func Add(c *args.Context) error {
 	}
 
 	// connect to the api server (saving token)
-	api, err := Connect(p.addr, p.user, p.password, p.debug)
+	api, err := client.Login(p.addr, p.user, p.password, p.debug)
 	if err != nil {
 		return err
 	}

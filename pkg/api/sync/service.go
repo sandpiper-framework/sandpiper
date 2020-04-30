@@ -6,10 +6,10 @@ package sync
 
 import (
 	"autocare.org/sandpiper/pkg/shared/database"
-	"net/url"
 
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/sync/platform/pgsql"
@@ -18,8 +18,8 @@ import (
 
 // Service represents sync application interface
 type Service interface {
-	Start(echo.Context, *url.URL) error
-	Connect(echo.Context) error
+	Start(echo.Context, uuid.UUID) error
+	Process(echo.Context) error
 }
 
 // New creates new sync application service
@@ -38,15 +38,18 @@ type Sync struct {
 	sdb  Repository
 	rbac RBAC
 	sec  Securer
+	key  string
 }
 
 // Securer represents security interface
 type Securer interface {
 	Hash(string) string
+	APIKeySecret() string
 }
 
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
+	Primary(orm.DB, uuid.UUID) (*sandpiper.Company, error)
 	LogActivity(orm.DB, sandpiper.SyncRequest) error
 }
 

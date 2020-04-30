@@ -6,6 +6,7 @@
 package command
 
 import (
+	"autocare.org/sandpiper/pkg/shared/client"
 	"fmt"
 	"net/url"
 
@@ -34,8 +35,8 @@ func List(c *args.Context) error {
 		return err
 	}
 
-	// connect to the api server (saving token)
-	api, err := Connect(p.addr, p.user, p.password, p.debug)
+	// Login to the api server (saving token)
+	api, err := client.Login(p.addr, p.user, p.password, p.debug)
 	if err != nil {
 		return err
 	}
