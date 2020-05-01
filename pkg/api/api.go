@@ -51,7 +51,7 @@ func Start(cfg *config.Configuration) error {
 	}
 
 	// setup token, security and logging available for all services
-	sec := secure.New(cfg.App.MinPasswordStr, cfg.Server.APIKeySecret)
+	sec := secure.New(cfg.App.MinPasswordStr, cfg.Server.APIKeySecretCode())
 	tok, err := jwt.New(cfg.JWT.SecretKey(), cfg.JWT.SigningAlgorithm, cfg.JWT.Duration, cfg.JWT.MinSecretLength)
 	if err != nil {
 		return err

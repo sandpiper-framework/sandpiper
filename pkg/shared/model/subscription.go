@@ -14,7 +14,7 @@ import (
 
 // Subscription represents subscription model (also a m2m junction table between companies and slices)
 type Subscription struct {
-	SubID       int       `json:"id" pg:",pk"`
+	SubID       uuid.UUID `json:"id" pg:",pk"`
 	SliceID     uuid.UUID `json:"-" pg:",unique:altkey"`
 	CompanyID   uuid.UUID `json:"-" pg:",unique:altkey"`
 	Name        string    `json:"name"`

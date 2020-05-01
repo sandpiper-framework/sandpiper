@@ -51,6 +51,8 @@ type Securer interface {
 type Repository interface {
 	Primary(orm.DB, uuid.UUID) (*sandpiper.Company, error)
 	LogActivity(orm.DB, sandpiper.SyncRequest) error
+	Subscriptions(orm.DB, uuid.UUID) ([]sandpiper.Subscription, error)
+	AddSubscription(orm.DB, sandpiper.Subscription) error
 }
 
 // RBAC represents role-based-access-control interface

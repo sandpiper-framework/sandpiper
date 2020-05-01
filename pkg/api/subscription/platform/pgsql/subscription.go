@@ -50,7 +50,7 @@ func (s *Subscription) View(db orm.DB, sub sandpiper.Subscription) (*sandpiper.S
 
 	// support several ways to query the subscription
 	switch {
-	case sub.SubID != 0:
+	case sub.SubID != uuid.Nil:
 		q = queryByPrimaryKey(db, &sub)
 	case sub.Name != "":
 		q = queryByName(db, &sub)

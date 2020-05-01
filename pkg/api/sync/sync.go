@@ -35,8 +35,13 @@ import (
 	"autocare.org/sandpiper/pkg/shared/model"
 )
 
+type subsArray []sandpiper.Subscription
+
 // Start sends a sync request to a primary sandpiper server from our secondary server
 func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) error {
+	// get current user info from our login token
+	our := s.rbac.CurrentUser(c)
+
 	// must be a secondary server to start the sync
 	if err := s.rbac.EnforceServerRole("secondary"); err != nil {
 		return err
@@ -45,19 +50,16 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) error {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return err
 	}
-
 	// get company information for the primary server we're syncing
 	p, err := s.sdb.Primary(s.db, primaryID)
 	if err != nil {
 		return err
 	}
-
 	// get login credentials from company's sync_api_key
 	creds, err := credentials.New(p.SyncAPIKey, s.sec.APIKeySecret())
 	if err != nil {
 		return err
 	}
-
 	// login to the primary server (saving token)
 	addr, err := url.ParseRequestURI(p.SyncAddr)
 	if err != nil {
@@ -68,12 +70,20 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) error {
 		return err
 	}
 
-	// upgrade to websocket (as a client) and perform the sync process
-	if err := api.Process(); err != nil {
+	// todo: use a websocket connection instead of separate sync http calls to perform the sync process
+
+	// get our subscriptions from the primary server and add any new ones found
+	primSubs, err := api.AllSubs()
+	if err != nil {
 		return err
 	}
-
-	// ask for our subscriptions
+	localSubs, err := s.sdb.Subscriptions(s.db, our.CompanyID)
+	if err != nil {
+		return nil
+	}
+	if err := s.updateOurSubs(localSubs, primSubs, primaryID); err != nil {
+		return err
+	}
 
 	// add any new subscriptions
 
@@ -105,7 +115,26 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) error {
 	return nil
 }
 
-// Process responds to a sync start request and "upgrades" http to a websocket
+func (s *Sync) updateOurSubs(ours, prims subsArray, primaryID uuid.UUID) error {
+	// create a map on ours subs for faster lookups [sub_id: sub]
+	subs := make(map[uuid.UUID]sandpiper.Subscription)
+	for _, sub := range ours {
+		subs[sub.SubID] = sub
+	}
+	// run through primary subs and add to ours if missing
+	for _, sub := range prims {
+		if _, found := subs[sub.SubID]; !found {
+			sub.CompanyID = primaryID
+			err := s.sdb.AddSubscription(s.db, sub)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// Process (NOT USED) responds to a sync start request and "upgrades" http to a websocket
 func (s *Sync) Process(c echo.Context) error {
 	var (
 		upgrader = websocket.Upgrader{}

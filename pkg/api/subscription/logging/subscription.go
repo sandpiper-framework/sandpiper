@@ -9,6 +9,7 @@ package subscription
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"autocare.org/sandpiper/pkg/api/subscription"
@@ -83,7 +84,7 @@ func (ls *LogService) View(c echo.Context, req sandpiper.Subscription) (resp *sa
 }
 
 // Delete logging
-func (ls *LogService) Delete(c echo.Context, req int) (err error) {
+func (ls *LogService) Delete(c echo.Context, req uuid.UUID) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,

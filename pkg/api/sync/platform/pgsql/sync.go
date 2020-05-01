@@ -7,10 +7,19 @@ package pgsql
 // sync service database access
 
 import (
+	"github.com/labstack/echo/v4"
+	"net/http"
+	"strings"
+
+	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 
 	"autocare.org/sandpiper/pkg/shared/model"
+)
+
+var (
+	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Subscription name already exists.")
 )
 
 // Sync represents the client for sync table
@@ -36,4 +45,49 @@ func (s *Sync) Primary(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 		return nil, err
 	}
 	return company, nil
+}
+
+// Subscriptions returns list of all local subscriptions for a company
+func (s *Sync) Subscriptions(db orm.DB, companyID uuid.UUID) ([]sandpiper.Subscription, error) {
+	var subs []sandpiper.Subscription
+
+	err := db.Model(&subs).Where("company_id = ?", companyID).Select()
+	if err != nil {
+		return nil, err
+	}
+	return subs, nil
+}
+
+// AddSubscription creates a new Subscription in database
+func (s *Sync) AddSubscription(db orm.DB, sub sandpiper.Subscription) error {
+	// make sure the name is not a duplicate
+	if err := checkDuplicate(db, sub.Name); err != nil {
+		if err != ErrAlreadyExists {
+			return err
+		}
+		sub.Name = sub.Name + " (" + sub.SubID.String() + ")"
+	}
+	if err := db.Insert(&sub); err != nil {
+		return err
+	}
+	return nil
+}
+
+// checkDuplicate returns true if name found in database
+func checkDuplicate(db orm.DB, name string) error {
+	// attempt to select by unique key
+	m := new(sandpiper.Subscription)
+	err := db.Model(m).
+		Column("sub_id").
+		Where("lower(name) = ?", strings.ToLower(name)).
+		Select()
+
+	switch err {
+	case pg.ErrNoRows: // ok to add
+		return nil
+	case nil: // found a row, so a duplicate
+		return ErrAlreadyExists
+	default: // return any other problem found
+		return err
+	}
 }

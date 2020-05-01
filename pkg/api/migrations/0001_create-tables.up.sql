@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS "slice_tags" (
 );
 
 CREATE TABLE IF NOT EXISTS "subscriptions" (
-  "sub_id"       serial PRIMARY KEY,
+  "sub_id"       uuid PRIMARY KEY,
   "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
   "company_id"   uuid REFERENCES "companies" ON DELETE CASCADE,
   "name"         text NOT NULL,

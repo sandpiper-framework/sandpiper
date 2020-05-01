@@ -22,7 +22,7 @@ type Service interface {
 	Create(echo.Context, sandpiper.Subscription) (*sandpiper.Subscription, error)
 	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Subscription, error)
 	View(echo.Context, sandpiper.Subscription) (*sandpiper.Subscription, error)
-	Delete(echo.Context, int) error
+	Delete(echo.Context, uuid.UUID) error
 	Update(echo.Context, *Update) (*sandpiper.Subscription, error)
 }
 

@@ -16,21 +16,21 @@ var (
 )
 
 func wsSync(c echo.Context) error {
-	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return err
 	}
-	defer ws.Close()
+	defer conn.Close()
 
 	for {
 		// Write
-		err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
+		err := conn.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
 		if err != nil {
 			c.Logger().Error(err)
 		}
 
 		// Read
-		_, msg, err := ws.ReadMessage()
+		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			c.Logger().Error(err)
 		}

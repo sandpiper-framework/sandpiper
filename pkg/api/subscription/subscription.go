@@ -43,7 +43,7 @@ func (s *Subscription) View(c echo.Context, sub sandpiper.Subscription) (*sandpi
 }
 
 // Delete deletes a subscription if administrator
-func (s *Subscription) Delete(c echo.Context, id int) error {
+func (s *Subscription) Delete(c echo.Context, id uuid.UUID) error {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (s *Subscription) Delete(c echo.Context, id int) error {
 
 // Update contains subscription field request used for updating
 type Update struct {
-	SubID       int
+	SubID       uuid.UUID
 	SliceID     uuid.UUID
 	CompanyID   uuid.UUID
 	Name        string
@@ -71,9 +71,9 @@ func (s *Subscription) Update(c echo.Context, r *Update) (*sandpiper.Subscriptio
 		return nil, err
 	}
 	sub := sandpiper.Subscription{
-		SubID: r.SubID,
-		//SliceID:     r.SliceID,
-		//CompanyID:   r.CompanyID,
+		SubID:       r.SubID,
+		SliceID:     r.SliceID,
+		CompanyID:   r.CompanyID,
 		Name:        r.Name,
 		Description: r.Description,
 		Active:      r.Active,

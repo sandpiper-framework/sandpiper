@@ -8,7 +8,6 @@ package transport
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -39,19 +38,27 @@ func NewHTTP(svc subscription.Service, er *echo.Group) {
 
 // Custom errors
 var (
-	ErrInvalidCompanyUUID       = echo.NewHTTPError(http.StatusBadRequest, "malformed company uuid")
-	ErrInvalidSliceUUID         = echo.NewHTTPError(http.StatusBadRequest, "malformed slice uuid")
-	ErrNonNumericSubscriptionID = echo.NewHTTPError(http.StatusBadRequest, "non-numeric subscription id")
-	ErrMissingSubscriptionName  = echo.NewHTTPError(http.StatusBadRequest, "missing required subscription name")
+	ErrInvalidCompanyUUID      = echo.NewHTTPError(http.StatusBadRequest, "malformed company uuid")
+	ErrInvalidSliceUUID        = echo.NewHTTPError(http.StatusBadRequest, "malformed slice uuid")
+	ErrInvalidSubscriptionUUID = echo.NewHTTPError(http.StatusBadRequest, "invalid subscription uuid")
+	ErrMissingSubscriptionName = echo.NewHTTPError(http.StatusBadRequest, "missing required subscription name")
 )
 
 // Subscription create request
 type createReq struct {
+	ID          uuid.UUID `json:"id"` // optional
 	SliceID     uuid.UUID `json:"slice_id" validate:"required"`
 	CompanyID   uuid.UUID `json:"company_id" validate:"required"`
 	Name        string    `json:"name" validate:"required,min=3"`
 	Description string    `json:"description"`
 	Active      bool      `json:"active"`
+}
+
+func (r createReq) id() uuid.UUID {
+	if r.ID == uuid.Nil {
+		return uuid.New()
+	}
+	return r.ID
 }
 
 // create populates createReq from supplied json body
@@ -61,6 +68,7 @@ func (h *HTTP) create(c echo.Context) error {
 		return err
 	}
 	result, err := h.svc.Create(c, sandpiper.Subscription{
+		SubID:       r.id(),
 		SliceID:     r.SliceID,
 		CompanyID:   r.CompanyID,
 		Name:        r.Name,
@@ -103,9 +111,9 @@ func (h *HTTP) listByCompany(c echo.Context) error {
 }
 
 func (h *HTTP) view(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return ErrNonNumericSubscriptionID
+		return ErrInvalidSubscriptionUUID
 	}
 
 	sub := sandpiper.Subscription{SubID: id}
@@ -148,27 +156,27 @@ func (h *HTTP) viewByName(c echo.Context) error {
 
 // Subscription update request
 type updateReq struct {
-	SubID int `json:"sub_id" validate:"required"`
-	//SliceID     uuid.UUID `json:"slice_id" validate:"required"`
-	//CompanyID   uuid.UUID `json:"company_id" validate:"required"`
-	Name        string `json:"name,omitempty" validate:"omitempty,min=3"`
-	Description string `json:"description,omitempty" validate:"omitempty"`
-	Active      bool   `json:"active,omitempty" validate:"omitempty"`
+	SubID       uuid.UUID `json:"sub_id" validate:"required"`
+	SliceID     uuid.UUID `json:"slice_id" validate:"required"`
+	CompanyID   uuid.UUID `json:"company_id" validate:"required"`
+	Name        string    `json:"name,omitempty" validate:"omitempty,min=3"`
+	Description string    `json:"description,omitempty" validate:"omitempty"`
+	Active      bool      `json:"active,omitempty" validate:"omitempty"`
 }
 
 func (h *HTTP) update(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return ErrNonNumericSubscriptionID
+		return ErrInvalidSubscriptionUUID
 	}
 	req := new(updateReq)
 	if err := c.Bind(req); err != nil {
 		return err
 	}
 	result, err := h.svc.Update(c, &subscription.Update{
-		SubID: id,
-		//SliceID:     req.SliceID,
-		//CompanyID:   req.CompanyID,
+		SubID:       id,
+		SliceID:     req.SliceID,
+		CompanyID:   req.CompanyID,
 		Name:        req.Name,
 		Description: req.Description,
 		Active:      req.Active,
@@ -180,9 +188,9 @@ func (h *HTTP) update(c echo.Context) error {
 }
 
 func (h *HTTP) delete(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return ErrNonNumericSubscriptionID
+		return ErrInvalidSubscriptionUUID
 	}
 	if err := h.svc.Delete(c, id); err != nil {
 		return err

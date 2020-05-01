@@ -22,7 +22,7 @@ import (
 // serverList defines a list of active primary servers
 type serverList []sandpiper.Company
 
-// subArray defines a list of subscription
+// subsArray defines a list of subscription
 //type subsArray []sandpiper.Subscription
 
 type syncParams struct {

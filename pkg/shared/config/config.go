@@ -85,6 +85,11 @@ type Server struct {
 	APIKeySecret string `yaml:"api_key_secret,omitempty"`
 }
 
+// APIKeySecretCode allows overriding the config value with APIKEY_SECRET environment variable
+func (s *Server) APIKeySecretCode() string {
+	return env("APIKEY_SECRET", s.APIKeySecret)
+}
+
 // JWT holds data necessary for JWT configuration
 type JWT struct {
 	Secret           string `yaml:"secret,omitempty"`
