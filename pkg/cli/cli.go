@@ -13,7 +13,7 @@ import (
 
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"autocare.org/sandpiper/pkg/cli/commands"
+	"sandpiper/pkg/cli/commands"
 )
 
 // sandpiper [global options] command [command options] [arguments]

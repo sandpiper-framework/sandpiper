@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	creds "autocare.org/sandpiper/pkg/api/sync/credentials"
+	creds "sandpiper/pkg/api/sync/credentials"
 )
 
 // We can't test the results one-way because the AES algorithm is not deterministic. (A new

@@ -12,8 +12,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/activity"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/activity"
+	"sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the activity service

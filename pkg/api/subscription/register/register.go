@@ -7,13 +7,13 @@ package subscription
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/subscription"
-	"autocare.org/sandpiper/pkg/shared/model"
-	"autocare.org/sandpiper/pkg/shared/rbac"
+	"sandpiper/pkg/api/subscription"
+	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/rbac"
 
-	sl "autocare.org/sandpiper/pkg/api/subscription/logging"
-	st "autocare.org/sandpiper/pkg/api/subscription/transport"
-	"autocare.org/sandpiper/pkg/shared/database"
+	sl "sandpiper/pkg/api/subscription/logging"
+	st "sandpiper/pkg/api/subscription/transport"
+	"sandpiper/pkg/shared/database"
 )
 
 // Register ties the subscription service to its logger and transport mechanisms

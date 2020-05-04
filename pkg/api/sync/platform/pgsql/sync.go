@@ -15,7 +15,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 var (

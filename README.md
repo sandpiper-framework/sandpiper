@@ -112,20 +112,17 @@ A step by step series of examples that tell you how to get a development env run
 git clone https://github.com/dougwinsby/sandpiper.git
 ```
 
-## Endpoints
+## Authentication Endpoints
 
-The application runs as an HTTP server at port 8080. It provides the following RESTful endpoints:
+The application runs as an HTTP server at port 8080. It provides the following RESTful endpoints for authentication:
 
 * `POST /login`: accepts username/passwords and returns jwt token and refresh token
 * `GET /refresh/:token`: refreshes sessions and returns jwt token
 * `GET /me`: returns info about currently logged in user
-* `GET /v1/users`: returns list of users
-* `GET /v1/users/:id`: returns single user
-* `POST /v1/users`: creates a new user
-* `PATCH /v1/password/:id`: changes password for a user
-* `DELETE /v1/users/:id`: deletes a user
 
-You can log in as admin to the application by sending a post request to localhost:8080/login with username `admin` and password `admin` in JSON body.
+An administrator is created as part of the database initialization process. To login to the API, send a POST request to localhost:8080/login with username "admin" and password "admin" in JSON body. **This password must be changed before moving to production.**
+
+Upon a successful login, the response body will include a java web token for subsequent API authentication. These tokens will expire and so must be refreshed (by the client) using the `/refresh` endpoint. 
 
 ## Project Structure
 
@@ -149,9 +146,6 @@ You can log in as admin to the application by sending a post request to localhos
 
 ... Explain how to run automated tests ...
 
-```
-Give an example
-```
 
 ## Development
 

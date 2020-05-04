@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/shared/secure"
+	"sandpiper/pkg/shared/secure"
 )
 
 func TestPassword(t *testing.T) {

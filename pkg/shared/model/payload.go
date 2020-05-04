@@ -16,7 +16,7 @@ import (
 
 /* Utility routines to support our encoding types
  * Usage:
- *   import "autocare.org/sandpiper/pkg/shared/payload"
+ *   import "sandpiper/pkg/shared/payload"
  *
  *   data := bytes.NewReader([]byte("payload data to store"))
  *   payloadData, err := sandpiper.Encode(data, "b64")

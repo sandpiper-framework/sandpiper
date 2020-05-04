@@ -3,7 +3,7 @@ package mockdb
 import (
 	"github.com/go-pg/pg/v9/orm"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // User database mock

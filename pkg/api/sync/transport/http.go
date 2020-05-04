@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/sync"
+	"sandpiper/pkg/api/sync"
 )
 
 // HTTP represents user http service

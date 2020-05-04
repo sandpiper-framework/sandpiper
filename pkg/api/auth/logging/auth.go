@@ -11,8 +11,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/auth"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/auth"
+	"sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the auth service

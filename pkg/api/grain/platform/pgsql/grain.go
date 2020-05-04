@@ -18,7 +18,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // Grain represents the client for grain table

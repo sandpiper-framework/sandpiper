@@ -12,8 +12,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/tag"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/tag"
+	"sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the subscription service

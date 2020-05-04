@@ -14,8 +14,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/activity"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/activity"
+	"sandpiper/pkg/shared/model"
 )
 
 // HTTP represents user http service

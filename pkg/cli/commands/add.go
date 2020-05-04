@@ -16,9 +16,9 @@ import (
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"autocare.org/sandpiper/pkg/cli/payload"
-	"autocare.org/sandpiper/pkg/shared/client"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/cli/payload"
+	"sandpiper/pkg/shared/client"
+	"sandpiper/pkg/shared/model"
 )
 
 type addParams struct {

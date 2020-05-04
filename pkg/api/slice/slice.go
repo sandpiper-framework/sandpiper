@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // Custom errors

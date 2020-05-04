@@ -7,13 +7,13 @@ package user
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/user"
-	"autocare.org/sandpiper/pkg/shared/database"
-	"autocare.org/sandpiper/pkg/shared/model"
-	"autocare.org/sandpiper/pkg/shared/rbac"
+	"sandpiper/pkg/api/user"
+	"sandpiper/pkg/shared/database"
+	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/rbac"
 
-	ul "autocare.org/sandpiper/pkg/api/user/logging"
-	ut "autocare.org/sandpiper/pkg/api/user/transport"
+	ul "sandpiper/pkg/api/user/logging"
+	ut "sandpiper/pkg/api/user/transport"
 )
 
 // Register ties the user service to its logger and transport mechanisms

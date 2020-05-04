@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // GrainExists will return basic information about a grain if it exists

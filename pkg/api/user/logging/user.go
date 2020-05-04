@@ -11,8 +11,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/user"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/user"
+	"sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the user service

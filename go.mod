@@ -1,4 +1,4 @@
-module autocare.org/sandpiper
+module sandpiper
 
 go 1.14
 

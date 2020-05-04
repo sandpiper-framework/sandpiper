@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/shared/config"
+	"sandpiper/pkg/shared/config"
 )
 
 func TestLoadConfig(t *testing.T) {

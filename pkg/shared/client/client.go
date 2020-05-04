@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 const apiVer = "/v1"

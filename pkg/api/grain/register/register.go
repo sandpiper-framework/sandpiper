@@ -7,13 +7,13 @@ package grain
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/grain"
-	"autocare.org/sandpiper/pkg/shared/model"
-	"autocare.org/sandpiper/pkg/shared/rbac"
+	"sandpiper/pkg/api/grain"
+	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/rbac"
 
-	gl "autocare.org/sandpiper/pkg/api/grain/logging"
-	gt "autocare.org/sandpiper/pkg/api/grain/transport"
-	"autocare.org/sandpiper/pkg/shared/database"
+	gl "sandpiper/pkg/api/grain/logging"
+	gt "sandpiper/pkg/api/grain/transport"
+	"sandpiper/pkg/shared/database"
 )
 
 // Register ties the grain service to its logger and transport mechanisms

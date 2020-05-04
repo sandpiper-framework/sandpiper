@@ -13,10 +13,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/api/company"
-	"autocare.org/sandpiper/pkg/shared/mock"
-	"autocare.org/sandpiper/pkg/shared/mock/mockdb"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/company"
+	"sandpiper/pkg/shared/mock"
+	"sandpiper/pkg/shared/mock/mockdb"
+	"sandpiper/pkg/shared/model"
 )
 
 func TestCreate(t *testing.T) {

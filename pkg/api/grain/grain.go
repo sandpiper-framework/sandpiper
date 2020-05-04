@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // Create makes a new grain to hold our syncable data-objects. Must be a sandpiper admin.

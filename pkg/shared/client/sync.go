@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // ActiveServers returns a list of syncable servers

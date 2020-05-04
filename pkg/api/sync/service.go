@@ -5,15 +5,15 @@
 package sync
 
 import (
-	"autocare.org/sandpiper/pkg/shared/database"
+	"sandpiper/pkg/shared/database"
 
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/sync/platform/pgsql"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/sync/platform/pgsql"
+	"sandpiper/pkg/shared/model"
 )
 
 // Service represents sync application interface

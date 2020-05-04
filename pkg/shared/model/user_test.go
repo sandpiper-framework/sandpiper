@@ -7,7 +7,7 @@ package sandpiper_test
 import (
 	"testing"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 func TestChangePassword(t *testing.T) {

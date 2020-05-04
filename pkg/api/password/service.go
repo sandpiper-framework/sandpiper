@@ -5,13 +5,13 @@
 package password
 
 import (
-	"autocare.org/sandpiper/pkg/shared/database"
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
+	"sandpiper/pkg/shared/database"
 
-	"autocare.org/sandpiper/pkg/api/password/platform/pgsql"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/password/platform/pgsql"
+	"sandpiper/pkg/shared/model"
 )
 
 // Service represents password application interface

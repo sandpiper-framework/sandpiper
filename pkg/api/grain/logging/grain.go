@@ -13,8 +13,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/grain"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/grain"
+	"sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the grain service

@@ -13,8 +13,8 @@ import (
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2"
 
-	"autocare.org/sandpiper/pkg/shared/client"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/client"
+	"sandpiper/pkg/shared/model"
 )
 
 /*

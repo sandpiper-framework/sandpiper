@@ -12,7 +12,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 
-	"autocare.org/sandpiper/pkg/shared/database"
+	"sandpiper/pkg/shared/database"
 )
 
 // NewPGContainer instantiates new postgresql docker container

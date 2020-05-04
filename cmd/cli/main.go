@@ -15,8 +15,8 @@ import (
 
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"autocare.org/sandpiper/pkg/cli"
-	"autocare.org/sandpiper/pkg/cli/version"
+	"sandpiper/pkg/cli"
+	"sandpiper/pkg/cli/version"
 )
 
 func main() {

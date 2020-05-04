@@ -12,9 +12,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
-	"autocare.org/sandpiper/pkg/shared/database"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/company/platform/pgsql"
+	"sandpiper/pkg/shared/database"
+	"sandpiper/pkg/shared/model"
 )
 
 // Service represents company application interface

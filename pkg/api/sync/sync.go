@@ -28,9 +28,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/sync/credentials"
-	"autocare.org/sandpiper/pkg/shared/client"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/sync/credentials"
+	"sandpiper/pkg/shared/client"
+	"sandpiper/pkg/shared/model"
 )
 
 type subsArray []sandpiper.Subscription

@@ -14,7 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/shared/server"
+	"sandpiper/pkg/shared/server"
 )
 
 type Req struct {

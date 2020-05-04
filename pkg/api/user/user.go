@@ -8,7 +8,7 @@ package user
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // Create creates a new user account

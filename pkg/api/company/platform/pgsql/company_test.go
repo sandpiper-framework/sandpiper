@@ -10,9 +10,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/api/company/platform/pgsql"
-	"autocare.org/sandpiper/pkg/shared/mock"
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/api/company/platform/pgsql"
+	"sandpiper/pkg/shared/mock"
+	"sandpiper/pkg/shared/model"
 )
 
 func TestCreate(t *testing.T) {

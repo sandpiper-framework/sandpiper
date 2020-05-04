@@ -11,7 +11,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/auth"
+	"sandpiper/pkg/api/auth"
 )
 
 // HTTP represents auth http service

@@ -8,7 +8,7 @@ package activity
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // Create makes a new sync activity record. Must be a sandpiper admin.

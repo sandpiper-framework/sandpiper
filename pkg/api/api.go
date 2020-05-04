@@ -9,25 +9,25 @@ package api
 import (
 	"errors"
 
-	"autocare.org/sandpiper/pkg/shared/config"
-	"autocare.org/sandpiper/pkg/shared/database"
-	"autocare.org/sandpiper/pkg/shared/middleware/jwt"
-	"autocare.org/sandpiper/pkg/shared/secure"
-	"autocare.org/sandpiper/pkg/shared/server"
-	"autocare.org/sandpiper/pkg/shared/zlog"
+	"sandpiper/pkg/shared/config"
+	"sandpiper/pkg/shared/database"
+	"sandpiper/pkg/shared/middleware/jwt"
+	"sandpiper/pkg/shared/secure"
+	"sandpiper/pkg/shared/server"
+	"sandpiper/pkg/shared/zlog"
 
 	// One import for each service to register (with identifying alias).
 	// Must use a register subdirectory to avoid "import cycle" errors.
-	ac "autocare.org/sandpiper/pkg/api/activity/register"
-	au "autocare.org/sandpiper/pkg/api/auth/register"
-	co "autocare.org/sandpiper/pkg/api/company/register"
-	gr "autocare.org/sandpiper/pkg/api/grain/register"
-	pa "autocare.org/sandpiper/pkg/api/password/register"
-	sl "autocare.org/sandpiper/pkg/api/slice/register"
-	su "autocare.org/sandpiper/pkg/api/subscription/register"
-	sy "autocare.org/sandpiper/pkg/api/sync/register"
-	ta "autocare.org/sandpiper/pkg/api/tag/register"
-	us "autocare.org/sandpiper/pkg/api/user/register"
+	ac "sandpiper/pkg/api/activity/register"
+	au "sandpiper/pkg/api/auth/register"
+	co "sandpiper/pkg/api/company/register"
+	gr "sandpiper/pkg/api/grain/register"
+	pa "sandpiper/pkg/api/password/register"
+	sl "sandpiper/pkg/api/slice/register"
+	su "sandpiper/pkg/api/subscription/register"
+	sy "sandpiper/pkg/api/sync/register"
+	ta "sandpiper/pkg/api/tag/register"
+	us "sandpiper/pkg/api/user/register"
 )
 
 const (

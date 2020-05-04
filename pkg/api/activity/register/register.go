@@ -7,13 +7,13 @@ package sync
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/activity"
-	"autocare.org/sandpiper/pkg/shared/model"
-	"autocare.org/sandpiper/pkg/shared/rbac"
+	"sandpiper/pkg/api/activity"
+	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/rbac"
 
-	sl "autocare.org/sandpiper/pkg/api/activity/logging"
-	st "autocare.org/sandpiper/pkg/api/activity/transport"
-	"autocare.org/sandpiper/pkg/shared/database"
+	sl "sandpiper/pkg/api/activity/logging"
+	st "sandpiper/pkg/api/activity/transport"
+	"sandpiper/pkg/shared/database"
 )
 
 // Register ties the sync service to its logger and transport mechanisms

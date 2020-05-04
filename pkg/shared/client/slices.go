@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // SliceByName returns a slice by unique key name

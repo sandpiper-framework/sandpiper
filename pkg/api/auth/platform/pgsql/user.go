@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 var (

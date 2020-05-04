@@ -7,13 +7,13 @@ package slice
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/slice"
-	"autocare.org/sandpiper/pkg/shared/model"
-	"autocare.org/sandpiper/pkg/shared/rbac"
+	"sandpiper/pkg/api/slice"
+	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/rbac"
 
-	sl "autocare.org/sandpiper/pkg/api/slice/logging"
-	st "autocare.org/sandpiper/pkg/api/slice/transport"
-	"autocare.org/sandpiper/pkg/shared/database"
+	sl "sandpiper/pkg/api/slice/logging"
+	st "sandpiper/pkg/api/slice/transport"
+	"sandpiper/pkg/shared/database"
 )
 
 // Register ties the slice service to its logger and transport mechanisms

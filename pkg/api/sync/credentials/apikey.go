@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"autocare.org/sandpiper/pkg/shared/secure"
+	"sandpiper/pkg/shared/secure"
 )
 
 // SyncLogin is used to manage credentials for the sync_api_key

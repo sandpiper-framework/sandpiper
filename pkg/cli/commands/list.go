@@ -6,14 +6,14 @@
 package command
 
 import (
-	"autocare.org/sandpiper/pkg/shared/client"
 	"fmt"
 	"net/url"
+	"sandpiper/pkg/shared/client"
 
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 type listParams struct {

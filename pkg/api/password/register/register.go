@@ -7,13 +7,13 @@ package password
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/password"
-	"autocare.org/sandpiper/pkg/shared/model"
-	"autocare.org/sandpiper/pkg/shared/rbac"
+	"sandpiper/pkg/api/password"
+	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/rbac"
 
-	pl "autocare.org/sandpiper/pkg/api/password/logging"
-	pt "autocare.org/sandpiper/pkg/api/password/transport"
-	"autocare.org/sandpiper/pkg/shared/database"
+	pl "sandpiper/pkg/api/password/logging"
+	pt "sandpiper/pkg/api/password/transport"
+	"sandpiper/pkg/shared/database"
 )
 
 // Register ties the company service to its logger and transport mechanisms

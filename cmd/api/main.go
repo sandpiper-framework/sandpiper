@@ -13,11 +13,11 @@ import (
 
 	"github.com/golang-migrate/migrate/v4/source/go_bindata"
 
-	"autocare.org/sandpiper/pkg/api"
-	"autocare.org/sandpiper/pkg/api/migrations"
-	"autocare.org/sandpiper/pkg/api/version"
-	"autocare.org/sandpiper/pkg/shared/config"
-	"autocare.org/sandpiper/pkg/shared/migrate"
+	"sandpiper/pkg/api"
+	"sandpiper/pkg/api/migrations"
+	"sandpiper/pkg/api/version"
+	"sandpiper/pkg/shared/config"
+	"sandpiper/pkg/shared/migrate"
 )
 
 const (

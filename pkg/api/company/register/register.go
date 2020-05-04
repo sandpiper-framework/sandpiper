@@ -7,13 +7,13 @@ package company
 import (
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/company"
-	"autocare.org/sandpiper/pkg/shared/model"
-	"autocare.org/sandpiper/pkg/shared/rbac"
+	"sandpiper/pkg/api/company"
+	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/rbac"
 
-	cl "autocare.org/sandpiper/pkg/api/company/logging"
-	ct "autocare.org/sandpiper/pkg/api/company/transport"
-	"autocare.org/sandpiper/pkg/shared/database"
+	cl "sandpiper/pkg/api/company/logging"
+	ct "sandpiper/pkg/api/company/transport"
+	"sandpiper/pkg/shared/database"
 )
 
 // Register ties the company service to its logger and transport mechanisms

@@ -5,8 +5,8 @@
 package sandpiper_test
 
 import (
-	"autocare.org/sandpiper/pkg/shared/model"
 	"bytes"
+	"sandpiper/pkg/shared/model"
 	"testing"
 )
 

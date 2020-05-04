@@ -11,9 +11,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"autocare.org/sandpiper/pkg/shared/mock"
-	"autocare.org/sandpiper/pkg/shared/model"
-	"autocare.org/sandpiper/pkg/shared/rbac"
+	"sandpiper/pkg/shared/mock"
+	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/rbac"
 )
 
 func TestUser(t *testing.T) {

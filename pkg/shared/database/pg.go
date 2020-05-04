@@ -16,7 +16,7 @@ import (
 	// DB adapter
 	_ "github.com/lib/pq"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 type dbLogger struct{}

@@ -14,7 +14,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // User represents the client for user table

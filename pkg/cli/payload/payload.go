@@ -8,7 +8,7 @@ package payload
 import (
 	"os"
 
-	"autocare.org/sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/model"
 )
 
 // FromFile encodes a filesystem file for storing in the database

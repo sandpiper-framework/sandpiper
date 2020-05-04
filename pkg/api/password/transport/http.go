@@ -12,7 +12,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"autocare.org/sandpiper/pkg/api/password"
+	"sandpiper/pkg/api/password"
 )
 
 // HTTP represents password http transport service
