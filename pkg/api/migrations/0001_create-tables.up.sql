@@ -104,8 +104,7 @@ CREATE TABLE IF NOT EXISTS "grains" (
 
 CREATE TABLE IF NOT EXISTS "activity" (
   "id"         serial PRIMARY KEY,
-  "company_id" uuid REFERENCES "companies" ON DELETE CASCADE,
-  "slice_id"   uuid REFERENCES "slices" ON DELETE CASCADE,
+  "sub_id"     uuid REFERENCES "subscriptions" ON DELETE CASCADE,
   "success"    boolean,
   "message"    text NOT NULL,
   "duration"   timestamp,

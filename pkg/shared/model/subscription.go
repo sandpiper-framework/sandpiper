@@ -32,6 +32,9 @@ type SubsPaginated struct {
 	Page int            `json:"page"`
 }
 
+// SubsMap allows fast lookups by SubID
+type SubsMap map[uuid.UUID]Subscription
+
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*Subscription)(nil)
 var _ orm.BeforeUpdateHook = (*Subscription)(nil)
@@ -54,4 +57,11 @@ func init() {
 	// Register many to many model so ORM can better recognize m2m relation.
 	// This should be done before dependant models are used.
 	orm.RegisterTable((*Subscription)(nil))
+}
+
+// Load fills a map of subs for fast lookup [sub_id: sub]
+func (m SubsMap) Load(subs []Subscription) {
+	for _, sub := range subs {
+		m[sub.SubID] = sub
+	}
 }

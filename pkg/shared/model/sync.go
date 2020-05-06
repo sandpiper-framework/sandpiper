@@ -17,8 +17,3 @@ type SyncResponse struct {
 	Message string `json:"message"`
 	Slice   Slice  `json:"slice"`
 }
-
-/* Actions:
-slices: return slices I'm subscribed to and are available for sync
-
-*/

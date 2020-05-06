@@ -5,7 +5,7 @@
 package sync
 
 import (
-	"sandpiper/pkg/shared/database"
+	"time"
 
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"sandpiper/pkg/api/sync/platform/pgsql"
+	"sandpiper/pkg/shared/database"
 	"sandpiper/pkg/shared/model"
 )
 
@@ -38,7 +39,7 @@ type Sync struct {
 	sdb  Repository
 	rbac RBAC
 	sec  Securer
-	key  string
+	key  string		// secret key for en/decrypting sync credentials
 }
 
 // Securer represents security interface
@@ -50,9 +51,10 @@ type Securer interface {
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
 	Primary(orm.DB, uuid.UUID) (*sandpiper.Company, error)
-	LogActivity(orm.DB, sandpiper.SyncRequest) error
+	LogActivity(orm.DB, uuid.UUID, *sandpiper.Slice, time.Duration) error
 	Subscriptions(orm.DB, uuid.UUID) ([]sandpiper.Subscription, error)
 	AddSubscription(orm.DB, sandpiper.Subscription) error
+	DeactivateSubscription(orm.DB, uuid.UUID) error
 }
 
 // RBAC represents role-based-access-control interface

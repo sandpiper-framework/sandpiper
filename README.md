@@ -109,7 +109,7 @@ A step by step series of examples that tell you how to get a development env run
 1. Clone the project under the current directory (e.g. $HOME/source/)
 
 ```
-git clone https://github.com/dougwinsby/sandpiper.git
+git clone https://github.com/sandpiper-framework/sandpiper.git
 ```
 
 ## Authentication Endpoints
@@ -198,7 +198,7 @@ Instead of passing database client as `s.db` , inside this function pass it as `
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests.
+Please read [CONTRIBUTING](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
 ## Versioning
 
@@ -208,7 +208,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 * **Doug Winsby** - *Initial work* - [Winsby Group LLC](https://winsbygroup.com)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/orgs/sandpiper-framework/people) who participated in this project.
 
 ## License
 

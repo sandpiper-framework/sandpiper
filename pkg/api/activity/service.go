@@ -50,13 +50,11 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.Activity) (*sandpiper.Activity, error)
 	View(orm.DB, int) (*sandpiper.Activity, error)
-	List(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Activity, error)
+	List(orm.DB, *sandpiper.Pagination) ([]sandpiper.Activity, error)
 	Delete(orm.DB, int) error
 }
 
 // RBAC represents role-based-access-control interface
 type RBAC interface {
-	CurrentUser(echo.Context) *sandpiper.AuthUser
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
-	EnforceScope(echo.Context) (*sandpiper.Scope, error)
 }

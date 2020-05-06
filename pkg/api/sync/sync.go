@@ -24,6 +24,7 @@ package sync
 
 import (
 	"net/url"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -59,48 +60,22 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) error {
 		return err
 	}
 
-	// todo: change sync process to a websocket connection instead of separate sync http calls
+	// todo: change sync process to a websocket connection instead of separate http calls
 
-	// get our subscriptions from the primary server and add any new ones found
+	// get our subscriptions from the primary server
 	primSubs, err := api.AllSubs()
 	if err != nil {
 		return err
 	}
-	// get the subscriptions we have for this primary company
+	// get the local subscriptions we have as a receiver for this primary company
 	localSubs, err := s.sdb.Subscriptions(s.db, primaryID)
 	if err != nil {
 		return nil
 	}
-	// add any new subscriptions
-	if err := s.updateOurSubs(localSubs, primSubs, primaryID); err != nil {
+	// sync all active subscriptions
+	if err := s.syncSubscriptions(localSubs, primSubs, primaryID); err != nil {
 		return err
 	}
-
-	// send a "GET /sync" request to the primary server address
-	// ask for subscriptions (add any not already in our database -- with empty contents)
-
-	/*
-		for _, sub := range subs {
-			slice := sub.Slice
-			if !slice.AllowSync {
-				// just log that it is locked
-			}
-
-		}
-	*/
-
-	/*
-		for each slice in my.slices
-			get slice.hash    // sha1 hash representing slice oids
-			if slice.hash <> local.slice.hash    // saved from last sync or must we recalc?
-					get slice.oid_list
-			compare slice.oid_list with local.slice.oid_list
-			for each new_oid in slice.oid_list
-				get object.new_oid     // this object contains the payload
-				store object in local.slice
-			remove all obsolete local.slice.objects
-		put slice.sync_completed   // for activity reporting purposes
-	*/
 
 	return nil
 }
@@ -122,31 +97,70 @@ func (s *Sync) connect(addr, key, secret string) (*client.Client, error) {
 	return api, nil
 }
 
-// updateOurSubs makes sure our subscriptions are up-to-date with what the primary has assigned.
-// If a subscription is disabled on the Primary, it will update the Secondary and log the activity.
-// If enabled on the Primary, it will not change the Secondary.
-func (s *Sync) updateOurSubs(ours, prims subsArray, primaryID uuid.UUID) error {
-	// create a map on our subs for fast lookup [sub_id: sub]
-	subs := make(map[uuid.UUID]sandpiper.Subscription)
-	for _, sub := range ours {
-		subs[sub.SubID] = sub
-	}
+// syncSubscriptions makes sure our local subscriptions match primary ones. If we don't
+// have a subscription, add it locally. If disabled on the Primary, disable it on the
+// Secondary and log the activity. If enabled on the Primary but not on the secondary,
+// it will do nothing. Finally, perform a data sync on all unlocked active slices.
+func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) error {
+	// active subs will be ones we sync
+	activeSubs := make(subsArray, 0, len(prims))
+
+	// save our subscriptions in a dictionary
+	subs := make(sandpiper.SubsMap)
+	subs.Load(locals)
+
 	// run through primary (remote) subs and add to ours (local) if missing
 	for _, remote := range prims {
-		if local, found := subs[remote.SubID]; !found {
-			remote.CompanyID = primaryID // change to our frame of reference for the add
-			err := s.sdb.AddSubscription(s.db, remote)
+		local, found := subs[remote.SubID]
+		if !found {
+			local = remote
+			local.CompanyID = primaryID // change to our frame of reference for the add
+			err := s.sdb.AddSubscription(s.db, local)
 			if err != nil {
 				return err
 			}
 		} else {
+			// see if we should deactivate our active subscription (and so not process it)
 			if !remote.Active && local.Active {
+				if err := s.sdb.DeactivateSubscription(s.db, local.SubID); err != nil {
+					return err
+				}
 				local.Active = false
-				// todo: update our subscription and log it
-				// err := s.sdb.UpdateSubscription(s.db, local)
 			}
 		}
+		if local.Active {
+			activeSubs = append(activeSubs, local)
+		}
+	} /* for */
+
+	// run through our active subs and sync each slice
+	for _, sub := range activeSubs {
+		t0 := time.Now()
+		slice := sub.Slice
+		if slice.AllowSync {
+			if err := s.syncSlice(slice); err != nil {
+				return err
+			}
+		}
+		if err := s.sdb.LogActivity(s.db, sub.SubID, slice, time.Since(t0)); err != nil {
+		 	 return err
+		 }
 	}
+
+	return nil
+}
+
+func (s *Sync) syncSlice(slice *sandpiper.Slice) error {
+	/*
+		get slice.hash    // sha1 hash representing slice oids
+		if slice.hash <> local.slice.hash    // saved from last sync or must we recalc?
+				get slice.oid_list
+		compare slice.oid_list with local.slice.oid_list
+		for each new_oid in slice.oid_list
+			get object.new_oid     // this object contains the payload
+			store object in local.slice
+		remove all obsolete local.slice.objects
+	*/
 	return nil
 }
 

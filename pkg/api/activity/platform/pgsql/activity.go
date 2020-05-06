@@ -8,7 +8,6 @@ package pgsql
 
 import (
 	"github.com/go-pg/pg/v9/orm"
-	"github.com/google/uuid"
 
 	"sandpiper/pkg/shared/model"
 )
@@ -33,50 +32,19 @@ func (s *Activity) Create(db orm.DB, activity sandpiper.Activity) (*sandpiper.Ac
 func (s *Activity) View(db orm.DB, id int) (*sandpiper.Activity, error) {
 	var activity = &sandpiper.Activity{ID: id}
 
-	err := db.Model(activity).
-		Column("activity.id", "message", "duration", "activity.created_at").
-		Relation("Slice").WherePK().Select()
+	err := db.Model(activity).Relation("Subscription").WherePK().Select()
 	if err != nil {
 		return nil, err
 	}
 	return activity, nil
 }
 
-// CompanySubscribed checks if activity is included in a company's subscriptions.
-func (s *Activity) CompanySubscribed(db orm.DB, companyID uuid.UUID, activityID uuid.UUID) bool {
-	activity := new(sandpiper.Activity)
-	err := db.Model(activity).Column("activity.id").
-		Join("JOIN slices AS sl ON activity.slice_id = sl.id").
-		Join("JOIN subscriptions AS sub ON sl.id = sub.slice_id").
-		Where("sub.company_id = ?", companyID).
-		Where("activity.id = ?", activityID).Select()
-	if err == nil {
-		return true
-	}
-	return false
-}
-
 // List returns a list of all activity with scoping and pagination
-func (s *Activity) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Activity, error) {
+func (s *Activity) List(db orm.DB, p *sandpiper.Pagination) ([]sandpiper.Activity, error) {
 	var acts []sandpiper.Activity
 	var err error
 
-	// columns to select
-	cols := "activity.id, message, duration, activity.created_at"
-
-	if sc != nil {
-		// Use CTE query to get all subscriptions for the scope (i.e. the company)
-		err = db.Model((*sandpiper.Subscription)(nil)).
-			Column("subscription.slice_id").
-			Where(sc.Condition, sc.ID).
-			WrapWith("scope").Table("scope").
-			Join("JOIN activity ON activity.slice_id = scope.slice_id").
-			ColumnExpr(cols).
-			Limit(p.Limit).Offset(p.Offset).Select(&acts)
-	} else {
-		// simple case with no scoping
-		err = db.Model(&acts).ColumnExpr(cols).Limit(p.Limit).Offset(p.Offset).Select()
-	}
+	err = db.Model(&acts).Relation("Subscription").Limit(p.Limit).Offset(p.Offset).Select()
 	if err != nil {
 		return nil, err
 	}

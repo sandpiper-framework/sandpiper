@@ -41,11 +41,10 @@ var (
 
 // activity create request
 type createReq struct {
-	CompanyID uuid.UUID `json:"company_id" validate:"required"`
-	SliceID   uuid.UUID `json:"slice_id" validate:"required"`
-	Success   bool      `json:"success" validate:"required"`
-	Message   string    `json:"message" validate:"required"`
-	Duration  time.Time `json:"duration" validate:"required"`
+	SubID    uuid.UUID `json:"company_id" validate:"required"`
+	Success  bool      `json:"success" validate:"required"`
+	Message  string    `json:"message" validate:"required"`
+	Duration time.Time `json:"duration" validate:"required"`
 }
 
 func (h *HTTP) create(c echo.Context) error {
@@ -56,11 +55,10 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	result, err := h.svc.Create(c, sandpiper.Activity{
-		CompanyID: r.CompanyID,
-		SliceID:   r.SliceID,
-		Success:   r.Success,
-		Message:   r.Message,
-		Duration:  r.Duration,
+		SubID:    r.SubID,
+		Success:  r.Success,
+		Message:  r.Message,
+		Duration: r.Duration,
 	})
 
 	if err != nil {
@@ -77,7 +75,6 @@ func (h *HTTP) list(c echo.Context) error {
 	}
 
 	result, err := h.svc.List(c, p.Transform())
-
 	if err != nil {
 		return err
 	}

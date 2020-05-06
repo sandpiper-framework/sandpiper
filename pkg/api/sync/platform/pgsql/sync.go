@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
@@ -19,6 +20,7 @@ import (
 )
 
 var (
+	// ErrAlreadyExists indicates that the name already exists
 	ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Subscription name already exists.")
 )
 
@@ -30,9 +32,22 @@ func NewSync() *Sync {
 	return &Sync{}
 }
 
-// LogActivity permanently removes a sync by primary key (id)
-func (s *Sync) LogActivity(db orm.DB, req sandpiper.SyncRequest) error {
-
+// LogActivity adds a sync log entry to the activity table
+func (s *Sync) LogActivity(db orm.DB, subID uuid.UUID, slice *sandpiper.Slice, d time.Duration) error {
+	msg := "synced " + slice.Name
+	if !slice.AllowSync {
+		msg = "locked on primary"
+	}
+	// log this event in our activity table
+	activity := sandpiper.Activity{
+		SubID:   subID,
+		Success: slice.AllowSync,
+		Message: msg,
+		Duration: d,
+	}
+	if err := db.Insert(&activity); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -68,6 +83,24 @@ func (s *Sync) AddSubscription(db orm.DB, sub sandpiper.Subscription) error {
 		sub.Name = sub.Name + " (" + sub.SubID.String() + ")"
 	}
 	if err := db.Insert(&sub); err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeactivateSubscription turns off the active flag and logs the event in our activity
+func (s *Sync) DeactivateSubscription(db orm.DB, subID uuid.UUID) error {
+	sub := &sandpiper.Subscription{SubID: subID, Active: false}
+	if _, err := db.Model(sub).Column("active").WherePK().Update(); err != nil {
+		return err
+	}
+	// log this event in our activity table
+	activity := sandpiper.Activity{
+		SubID:   subID,
+		Success: false,
+		Message: "deactivated by primary",
+	}
+	if err := db.Insert(&activity); err != nil {
 		return err
 	}
 	return nil

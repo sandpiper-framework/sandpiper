@@ -8,7 +8,7 @@ version: '2'
 
 vars:
   REPO:
-    github.com/dougwinsby/sandpiper
+    github.com/sandpiper-framework/sandpiper
   GO_PACKAGES:
     sh: go list ./...
 

@@ -21,21 +21,18 @@ func (s *Activity) Create(c echo.Context, req sandpiper.Activity) (*sandpiper.Ac
 
 // View returns a single sync activity if allowed
 func (s *Activity) View(c echo.Context, activityID int) (*sandpiper.Activity, error) {
-	au := s.rbac.CurrentUser(c)
-	if !au.AtLeast(sandpiper.AdminRole) {
-		return nil, echo.ErrForbidden
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+		return nil, err
 	}
 	return s.sdb.View(s.db, activityID)
 }
 
 // List returns list of sync activity scoped by user
 func (s *Activity) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Activity, error) {
-	// todo: should this only allow admin role (with no scoping)?
-	q, err := s.rbac.EnforceScope(c)
-	if err != nil {
+	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}
-	return s.sdb.List(s.db, q, p)
+	return s.sdb.List(s.db, p)
 }
 
 // Delete deletes a sync activity by id, if allowed

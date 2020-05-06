@@ -14,15 +14,14 @@ import (
 
 // Activity logs for sync requests
 type Activity struct {
-	tableName struct{}  `pg:"activity"` // we don't want the plural `activities`
-	ID        int       `json:"id" pg:",pk"`
-	CompanyID uuid.UUID `json:"company_id"`
-	SliceID   uuid.UUID `json:"slice_id"`
-	Success   bool      `json:"success"`
-	Message   string    `json:"message"`
-	Duration  time.Time `json:"duration"`
-	CreatedAt time.Time `json:"created_at"`
-	Slice     *Slice    `json:"slice,omitempty"` // has-one relation
+	tableName    struct{}      `pg:"activity"` // we don't want the plural `activities`
+	ID           int           `json:"id" pg:",pk"`
+	SubID        uuid.UUID     `json:"sub_id"`
+	Success      bool          `json:"success"`
+	Message      string        `json:"message"`
+	Duration     time.Duration `json:"duration"`
+	CreatedAt    time.Time     `json:"created_at"`
+	Subscription *Subscription `json:"subscription"` // has one
 }
 
 // ActivityPaginated adds pagination
