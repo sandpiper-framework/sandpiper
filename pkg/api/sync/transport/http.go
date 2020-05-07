@@ -7,11 +7,9 @@ package transport
 // sync routing functions
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"net/http"
 
 	"sandpiper/pkg/api/sync"
 )
@@ -27,6 +25,7 @@ func NewHTTP(svc sync.Service, er *echo.Group) {
 	sr := er.Group("/sync")
 	sr.POST("/:compid", h.start) // for secondary servers only
 	sr.GET("", h.process)        // for primary servers only
+	sr.GET("/subs", h.subs)
 }
 
 // Custom errors
@@ -34,14 +33,6 @@ var (
 	// ErrInvalidURL indicates a malformed url
 	ErrInvalidURL = echo.NewHTTPError(http.StatusBadRequest, "Invalid uuid")
 )
-
-// Sync start request
-type startReq struct {
-	ID       int       `json:"id"` // optional
-	SliceID  uuid.UUID `json:"slice_id" validate:"required"`
-	Message  string    `json:"message" validate:"required"`
-	Duration time.Time `json:"duration" validate:"required"`
-}
 
 func (h *HTTP) start(c echo.Context) error {
 	id, err := uuid.Parse(c.Param("compid"))
@@ -59,4 +50,12 @@ func (h *HTTP) process(c echo.Context) error {
 		return err
 	}
 	return c.NoContent(http.StatusOK)
+}
+
+func (h *HTTP) subs(c echo.Context) error {
+	result, err := h.svc.Subscriptions(c)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, result)
 }

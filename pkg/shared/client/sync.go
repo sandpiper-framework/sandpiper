@@ -31,12 +31,11 @@ func (c *Client) ActiveServers(companyID uuid.UUID, name string) ([]sandpiper.Co
 	return results, err
 }
 
-// AllSubs returns a list of all slices (that we have access to)
+// AllSubs returns a list of all information we need for a sync
 func (c *Client) AllSubs() ([]sandpiper.Subscription, error) {
 	var results []sandpiper.Subscription
 
-	// todo: add paging support (looping to retrieve everything)
-	req, err := c.newRequest("GET", "/subs", nil)
+	req, err := c.newRequest("GET", "/sync/subs", nil)
 	if err != nil {
 		return nil, err
 	}

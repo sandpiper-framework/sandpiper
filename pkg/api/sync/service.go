@@ -21,6 +21,7 @@ import (
 type Service interface {
 	Start(echo.Context, uuid.UUID) error
 	Process(echo.Context) error
+	Subscriptions(c echo.Context) ([]sandpiper.Subscription, error)
 }
 
 // New creates new sync application service
@@ -39,7 +40,7 @@ type Sync struct {
 	sdb  Repository
 	rbac RBAC
 	sec  Securer
-	key  string		// secret key for en/decrypting sync credentials
+	key  string // secret key for en/decrypting sync credentials
 }
 
 // Securer represents security interface
@@ -51,9 +52,10 @@ type Securer interface {
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
 	Primary(orm.DB, uuid.UUID) (*sandpiper.Company, error)
-	LogActivity(orm.DB, uuid.UUID, *sandpiper.Slice, time.Duration) error
+	LogActivity(orm.DB, uuid.UUID, string, time.Duration, error) error
 	Subscriptions(orm.DB, uuid.UUID) ([]sandpiper.Subscription, error)
 	AddSubscription(orm.DB, sandpiper.Subscription) error
+	AddSlice(orm.DB, *sandpiper.Slice) error
 	DeactivateSubscription(orm.DB, uuid.UUID) error
 }
 

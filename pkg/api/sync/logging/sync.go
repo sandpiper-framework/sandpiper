@@ -47,6 +47,20 @@ func (ls *LogService) Start(c echo.Context, req uuid.UUID) (err error) {
 	return ls.Service.Start(c, req)
 }
 
+// Subscriptions logging
+func (ls *LogService) Subscriptions(c echo.Context) (subs []sandpiper.Subscription, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "Subscriptions request", err,
+			map[string]interface{}{
+				"took": time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Subscriptions(c)
+}
+
 // Process logging
 func (ls *LogService) Process(c echo.Context) (err error) {
 	defer func(begin time.Time) {

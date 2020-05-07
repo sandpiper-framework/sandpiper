@@ -23,6 +23,8 @@ package sync
 */
 
 import (
+	"errors"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -37,9 +39,8 @@ import (
 type subsArray []sandpiper.Subscription
 
 // Start sends a sync request to a primary sandpiper server from our secondary server
-func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) error {
-	// get current user info from our login token
-	// our := s.rbac.CurrentUser(c)
+func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
+	var p *sandpiper.Company
 
 	// must be a secondary server to start the sync
 	if err := s.rbac.EnforceServerRole("secondary"); err != nil {
@@ -49,8 +50,15 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) error {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return err
 	}
+
+	// log activity even if an error occurs
+	defer func(begin time.Time) {
+		msg := fmt.Sprintf("Syncing \"%s\" (%s)", p.Name, p.SyncAddr)
+		_ = s.sdb.LogActivity(s.db, uuid.Nil, msg, time.Since(begin), err)
+	}(time.Now())
+
 	// get company information for the primary server we're syncing
-	p, err := s.sdb.Primary(s.db, primaryID)
+	p, err = s.sdb.Primary(s.db, primaryID)
 	if err != nil {
 		return err
 	}
@@ -62,12 +70,12 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) error {
 
 	// todo: change sync process to a websocket connection instead of separate http calls
 
-	// get our subscriptions from the primary server
+	// get our subscriptions (with slices) from the primary server
 	primSubs, err := api.AllSubs()
 	if err != nil {
 		return err
 	}
-	// get the local subscriptions we have as a receiver for this primary company
+	// get local subscriptions (with slices) as a receiver for this primary company
 	localSubs, err := s.sdb.Subscriptions(s.db, primaryID)
 	if err != nil {
 		return nil
@@ -101,22 +109,23 @@ func (s *Sync) connect(addr, key, secret string) (*client.Client, error) {
 // have a subscription, add it locally. If disabled on the Primary, disable it on the
 // Secondary and log the activity. If enabled on the Primary but not on the secondary,
 // it will do nothing. Finally, perform a data sync on all unlocked active slices.
-func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) error {
-	// active subs will be ones we sync
-	activeSubs := make(subsArray, 0, len(prims))
-
-	// save our subscriptions in a dictionary
+func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (err error) {
+	// save our local subscriptions in a dictionary
 	subs := make(sandpiper.SubsMap)
 	subs.Load(locals)
 
 	// run through primary (remote) subs and add to ours (local) if missing
+	// (the slice for a new subscription is also added, but not the slice metadata,
+	// which is added during the sync process)
 	for _, remote := range prims {
 		local, found := subs[remote.SubID]
 		if !found {
 			local = remote
 			local.CompanyID = primaryID // change to our frame of reference for the add
-			err := s.sdb.AddSubscription(s.db, local)
-			if err != nil {
+			if err := s.sdb.AddSubscription(s.db, local); err != nil {
+				return err
+			}
+			if err := s.sdb.AddSlice(s.db, remote.Slice); err != nil {
 				return err
 			}
 		} else {
@@ -129,44 +138,56 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) e
 			}
 		}
 		if local.Active {
-			activeSubs = append(activeSubs, local)
-		}
-	} /* for */
-
-	// run through our active subs and sync each slice
-	for _, sub := range activeSubs {
-		t0 := time.Now()
-		slice := sub.Slice
-		if slice.AllowSync {
-			if err := s.syncSlice(slice); err != nil {
+			if err := s.syncSlice(local.SubID, local.Slice, remote.Slice); err != nil {
 				return err
 			}
 		}
-		if err := s.sdb.LogActivity(s.db, sub.SubID, slice, time.Since(t0)); err != nil {
-		 	 return err
-		 }
+	}
+	return nil
+}
+
+func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Slice) (err error) {
+	// log activity a slice level *only* if an error occurs
+	defer func(begin time.Time) {
+		if err != nil {
+			msg := "Slice \"" + localSlice.Name + "\""
+			_ = s.sdb.LogActivity(s.db, subID, msg, time.Since(begin), err)
+		}
+	}(time.Now())
+
+	if !remoteSlice.AllowSync {
+		return errors.New("locked on server")
+	}
+
+	// todo: do we need to recalc local hash or can we just use the last one saved?
+	if remoteSlice.ContentHash != localSlice.ContentHash {
+		// update local metadata
+		// get remote grain list
+		// compare remote grain list with local grain list
+		// for each new_oid in slice.oid_list
+		//   get object.new_oid     // this object contains the payload
+		//   store object in local.slice
+		//   remove all obsolete local.slice.objects
 	}
 
 	return nil
 }
 
-func (s *Sync) syncSlice(slice *sandpiper.Slice) error {
-	/*
-		get slice.hash    // sha1 hash representing slice oids
-		if slice.hash <> local.slice.hash    // saved from last sync or must we recalc?
-				get slice.oid_list
-		compare slice.oid_list with local.slice.oid_list
-		for each new_oid in slice.oid_list
-			get object.new_oid     // this object contains the payload
-			store object in local.slice
-		remove all obsolete local.slice.objects
-	*/
-	return nil
+// Subscriptions returns all subscriptions with slices and metadata (not paginated)
+// for the current user's company
+func (s *Sync) Subscriptions(c echo.Context) ([]sandpiper.Subscription, error) {
+	if err := s.rbac.EnforceServerRole("primary"); err != nil {
+		return nil, err
+	}
+	if err := s.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
+		return nil, err
+	}
+	companyID := s.rbac.CurrentUser(c).CompanyID
+	return s.sdb.Subscriptions(s.db, companyID)
 }
 
 // Process (NOT CURRENTLY USED) responds to a sync start request and "upgrades" http to a websocket
 func (s *Sync) Process(c echo.Context) error {
-
 	if err := s.rbac.EnforceServerRole("primary"); err != nil {
 		return err
 	}
