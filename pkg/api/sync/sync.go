@@ -148,57 +148,66 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	// log activity at slice level *only* if an error occurs
 	defer func(begin time.Time) {
 		if err != nil {
-			msg := "Slice \"" + localSlice.Name + "\""
+			msg := "Slice \"" + localSlice.Name + "\" sync error."
 			_ = s.sdb.LogActivity(s.db, subID, msg, time.Since(begin), err)
 		}
 	}(time.Now())
 
 	if !remoteSlice.AllowSync {
-		return errors.New("locked on server")
+		return errors.New("slice locked on server")
 	}
 
-	// todo: should we recalc local hash or can we just use the last one saved?
-	if remoteSlice.ContentHash != localSlice.ContentHash {
-		// get remote grain list of ids
-		remoteIDs, err := s.api.GrainList(remoteSlice.ID)
+	if !slicesInSync(remoteSlice, localSlice) {
+		return nil
+	}
+
+	// get remote grain list of ids
+	remoteIDs, err := s.api.GrainList(remoteSlice.ID)
+	if err != nil {
+		return err
+	}
+
+	// get local grain list of just the ids
+	localIDs, err := s.sdb.Grains(s.db, localSlice.ID, true)
+	if err != nil {
+		return err
+	}
+
+	// determine local changes required to make local grains match remote grains
+	adds, deletes := compareSlices(remoteIDs, localIDs)
+
+	// add new grains
+	// todo: add in one big batched transaction... could be important for level-2+
+	for _, grainID := range adds {
+		grain, err := s.api.Grain(grainID)
 		if err != nil {
 			return err
 		}
-		// get local grain list of ids
-		// todo: implement this
-		localIDs := []sandpiper.Grain{}
-
-		// compare remote grain list with local grain list
-		adds, deletes := compareSlices(remoteIDs, localIDs)
-
-		// add all the new grains
-		// todo: add in one big batch... could be important for level-2+
-		for _, grainID := range adds {
-			grain, err := s.api.Grain(grainID)
-			if err != nil {
-				return err
-			}
-			if err := s.sdb.AddGrain(s.db, grain); err != nil {
-				return err
-			}
-		}
-		// remove all obsolete local.slice.objects
-		if err := s.sdb.DeleteGrains(s.db, deletes); err != nil {
-			return err
-		}
-		// update ContentHash, ContentCount & ContentDate
-
-		// update local metadata
-		if err := s.sdb.UpdateSliceMetadata(s.db, localSlice, remoteSlice); err != nil {
+		if err := s.sdb.AddGrain(s.db, grain); err != nil {
 			return err
 		}
 	}
-	return nil
+	// remove obsolete grains
+	if err := s.sdb.DeleteGrains(s.db, deletes); err != nil {
+		return err
+	}
+	// update local metadata
+	if err := s.sdb.UpdateSliceMetadata(s.db, localSlice, remoteSlice); err != nil {
+		return err
+	}
+	// Update ContentHash, ContentCount & ContentDate and verify against remote
+	err = s.sdb.RefreshSlice(s.db, remoteSlice)
+	return err
 }
 
-func compareSlices(primary, secondary []sandpiper.Grain) ([]uuid.UUID, []uuid.UUID) {
-	var adds, dels []uuid.UUID
+// slicesInSync checks if slice has chanced and so needs to be updated
+func slicesInSync(remoteSlice, localSlice *sandpiper.Slice) bool {
+	// todo: should we recalc local hash or can we just use the last one saved?
+	return remoteSlice.ContentHash != localSlice.ContentHash
+}
 
+// compareSlices returns adds and deletes necessary to make the secondary match primary
+func compareSlices(primary, secondary []sandpiper.Grain) (adds []uuid.UUID, dels []uuid.UUID) {
 	// load primary grain ids into a set (marked as not matched)
 	p := make(map[uuid.UUID]bool)
 	for _, grain := range primary {
@@ -249,7 +258,7 @@ func (s *Sync) Grains(c echo.Context, sliceID uuid.UUID, briefFlag bool) ([]sand
 	if err := s.sdb.SliceAccess(s.db, companyID, sliceID); err != nil {
 		return nil, err
 	}
-	return s.sdb.Grains(s.db, companyID, sliceID, briefFlag)
+	return s.sdb.Grains(s.db, sliceID, briefFlag)
 }
 
 // Process (NOT CURRENTLY USED) responds to a sync start request and "upgrades" http to a websocket

@@ -99,8 +99,8 @@ func (a MetaMap) Equals(b MetaMap) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for k, v := range a {
-		if w, ok := b[k]; !ok || v != w {
+	for k, v1 := range a {
+		if v2, ok := b[k]; !ok || v1 != v2 {
 			return false
 		}
 	}

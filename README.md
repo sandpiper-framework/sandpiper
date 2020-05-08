@@ -1,7 +1,7 @@
 # Sandpiper
 
-The Sandpiper framework provides a standard decentralized model to classify, distribute, and synchronize shared product
-data sets between an originating sender (the "publisher") and a secondary receiver (the "subscriber").
+The Sandpiper framework provides a standard decentralized model to distribute and synchronize shared product
+data sets between a primary sender (the "publisher") and a secondary receiver (the "subscriber").
 
 ## Getting Started
 

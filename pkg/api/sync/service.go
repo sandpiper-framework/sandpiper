@@ -58,13 +58,14 @@ type Repository interface {
 	LogActivity(orm.DB, uuid.UUID, string, time.Duration, error) error
 	Subscriptions(orm.DB, uuid.UUID) ([]sandpiper.Subscription, error)
 	AddSubscription(orm.DB, sandpiper.Subscription) error
-	AddSlice(orm.DB, *sandpiper.Slice) error
 	DeactivateSubscription(orm.DB, uuid.UUID) error
+	SliceAccess(orm.DB, uuid.UUID, uuid.UUID) error
+	AddSlice(orm.DB, *sandpiper.Slice) error
+	RefreshSlice(orm.DB, *sandpiper.Slice) error
 	UpdateSliceMetadata(orm.DB, *sandpiper.Slice, *sandpiper.Slice) error
-	Grains(orm.DB, uuid.UUID, uuid.UUID, bool) ([]sandpiper.Grain, error)
+	Grains(orm.DB, uuid.UUID, bool) ([]sandpiper.Grain, error)
 	AddGrain(orm.DB, *sandpiper.Grain) error
 	DeleteGrains(orm.DB, []uuid.UUID) error
-	SliceAccess(orm.DB, uuid.UUID, uuid.UUID) error
 }
 
 // RBAC represents role-based-access-control interface

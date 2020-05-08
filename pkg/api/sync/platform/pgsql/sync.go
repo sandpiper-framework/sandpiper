@@ -7,6 +7,7 @@ package pgsql
 // sync service database access
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -17,6 +18,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
+	slicesvc "sandpiper/pkg/api/slice/platform/pgsql"
 	"sandpiper/pkg/shared/model"
 )
 
@@ -133,8 +135,37 @@ func (s *Sync) Slice(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
 	}
 	// insert any metadata for the slice as a map
 	slice.Metadata, err = metaDataMap(db, slice.ID)
-
 	return slice, nil
+}
+
+// RefreshSlice updates the content fields and checks against source slice to make
+// sure the sync agrees
+func (s *Sync) RefreshSlice(db orm.DB, slice *sandpiper.Slice) error {
+
+	// use a public function from the slice service to get our slice information
+	hash, count, err := slicesvc.HashSliceGrains(db, slice.ID)
+	if err != nil {
+		return err
+	}
+
+	// update slice with new information
+	m := sandpiper.Slice{
+		ID:           slice.ID,
+		ContentHash:  hash,
+		ContentCount: count,
+		ContentDate:  slice.ContentDate, // keep source's date
+	}
+	_, err = db.Model(&m).Column("content_hash", "content_count", "content_date").WherePK().Update()
+	if err != nil {
+		return err
+	}
+
+	// see if the sync worked (hash values match, etc.)
+	if slice.ContentHash != hash || slice.ContentCount != count {
+		return errors.New("content hash or count do not match after sync")
+	}
+
+	return err
 }
 
 // metaDataMap returns a map of slice metadata. We use this separate query instead of
@@ -191,7 +222,7 @@ func (s *Sync) UpdateSliceMetadata(db orm.DB, target, source *sandpiper.Slice) e
 
 // Grains returns a list of grains for a slice (with brief or all fields)
 // assumes allowed to do this
-func (s *Sync) Grains(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID, briefFlag bool) ([]sandpiper.Grain, error) {
+func (s *Sync) Grains(db orm.DB, sliceID uuid.UUID, briefFlag bool) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
 
 	// columns to select
