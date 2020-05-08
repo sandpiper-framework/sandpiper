@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -36,6 +36,8 @@ import (
 	"sandpiper/pkg/shared/model"
 )
 
+// todo: change sync process to a websocket connection instead of separate http calls
+
 type subsArray []sandpiper.Subscription
 
 // Start sends a sync request to a primary sandpiper server from our secondary server
@@ -51,7 +53,7 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 		return err
 	}
 
-	// log activity even if an error occurs
+	// log activity even if early exit
 	defer func(begin time.Time) {
 		msg := fmt.Sprintf("Syncing \"%s\" (%s)", p.Name, p.SyncAddr)
 		_ = s.sdb.LogActivity(s.db, uuid.Nil, msg, time.Since(begin), err)
@@ -63,15 +65,12 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 		return err
 	}
 	// connect to the primary server (saving token)
-	api, err := s.connect(p.SyncAddr, p.SyncAPIKey, s.sec.APIKeySecret())
+	s.api, err = s.connect(p.SyncAddr, p.SyncAPIKey, s.sec.APIKeySecret())
 	if err != nil {
 		return err
 	}
-
-	// todo: change sync process to a websocket connection instead of separate http calls
-
 	// get our subscriptions (with slices) from the primary server
-	primSubs, err := api.AllSubs()
+	primSubs, err := s.api.AllSubs()
 	if err != nil {
 		return err
 	}
@@ -84,7 +83,6 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	if err := s.syncSubscriptions(localSubs, primSubs, primaryID); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -108,7 +106,7 @@ func (s *Sync) connect(addr, key, secret string) (*client.Client, error) {
 // syncSubscriptions makes sure our local subscriptions match primary ones. If we don't
 // have a subscription, add it locally. If disabled on the Primary, disable it on the
 // Secondary and log the activity. If enabled on the Primary but not on the secondary,
-// it will do nothing. Finally, perform a data sync on all unlocked active slices.
+// do not make any changes. Perform a grain sync on all unlocked active slices.
 func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (err error) {
 	// save our local subscriptions in a dictionary
 	subs := make(sandpiper.SubsMap)
@@ -147,7 +145,7 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (
 }
 
 func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Slice) (err error) {
-	// log activity a slice level *only* if an error occurs
+	// log activity at slice level *only* if an error occurs
 	defer func(begin time.Time) {
 		if err != nil {
 			msg := "Slice \"" + localSlice.Name + "\""
@@ -159,18 +157,68 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 		return errors.New("locked on server")
 	}
 
-	// todo: do we need to recalc local hash or can we just use the last one saved?
+	// todo: should we recalc local hash or can we just use the last one saved?
 	if remoteSlice.ContentHash != localSlice.ContentHash {
-		// update local metadata
-		// get remote grain list
-		// compare remote grain list with local grain list
-		// for each new_oid in slice.oid_list
-		//   get object.new_oid     // this object contains the payload
-		//   store object in local.slice
-		//   remove all obsolete local.slice.objects
-	}
+		// get remote grain list of ids
+		remoteIDs, err := s.api.GrainList(remoteSlice.ID)
+		if err != nil {
+			return err
+		}
+		// get local grain list of ids
+		// todo: implement this
+		localIDs := []sandpiper.Grain{}
 
+		// compare remote grain list with local grain list
+		adds, deletes := compareSlices(remoteIDs, localIDs)
+
+		// add all the new grains
+		// todo: add in one big batch... could be important for level-2+
+		for _, grainID := range adds {
+			grain, err := s.api.Grain(grainID)
+			if err != nil {
+				return err
+			}
+			if err := s.sdb.AddGrain(s.db, grain); err != nil {
+				return err
+			}
+		}
+		// remove all obsolete local.slice.objects
+		if err := s.sdb.DeleteGrains(s.db, deletes); err != nil {
+			return err
+		}
+		// update ContentHash, ContentCount & ContentDate
+
+		// update local metadata
+		if err := s.sdb.UpdateSliceMetadata(s.db, localSlice, remoteSlice); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+func compareSlices(primary, secondary []sandpiper.Grain) ([]uuid.UUID, []uuid.UUID) {
+	var adds, dels []uuid.UUID
+
+	// load primary grain ids into a set (marked as not matched)
+	p := make(map[uuid.UUID]bool)
+	for _, grain := range primary {
+		p[grain.ID] = false
+	}
+	// create a list of secondary grain ids not in primary (marking matches)
+	for _, grain := range secondary {
+		if _, ok := p[grain.ID]; ok {
+			p[grain.ID] = true
+		} else {
+			dels = append(dels, grain.ID)
+		}
+	}
+	// all ids in primary not matched (still false) should be added
+	for k, matched := range p {
+		if !matched {
+			adds = append(adds, k)
+		}
+	}
+	return adds, dels
 }
 
 // Subscriptions returns all subscriptions with slices and metadata (not paginated)
@@ -184,6 +232,24 @@ func (s *Sync) Subscriptions(c echo.Context) ([]sandpiper.Subscription, error) {
 	}
 	companyID := s.rbac.CurrentUser(c).CompanyID
 	return s.sdb.Subscriptions(s.db, companyID)
+}
+
+// Grains returns all grains for a slice without pagination (with option to limit fields returned)
+// Too bad we need to check company access to this slice again, but this is a public endpoint
+// with no state beyond the user token. At least it uses a unique key for the check.
+// Websockets should allow a more efficient approach.
+func (s *Sync) Grains(c echo.Context, sliceID uuid.UUID, briefFlag bool) ([]sandpiper.Grain, error) {
+	if err := s.rbac.EnforceServerRole("primary"); err != nil {
+		return nil, err
+	}
+	if err := s.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
+		return nil, err
+	}
+	companyID := s.rbac.CurrentUser(c).CompanyID
+	if err := s.sdb.SliceAccess(s.db, companyID, sliceID); err != nil {
+		return nil, err
+	}
+	return s.sdb.Grains(s.db, companyID, sliceID, briefFlag)
 }
 
 // Process (NOT CURRENTLY USED) responds to a sync start request and "upgrades" http to a websocket

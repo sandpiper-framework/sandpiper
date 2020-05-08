@@ -93,3 +93,16 @@ func (a MetaArray) ToMap(sliceID uuid.UUID) MetaMap {
 	}
 	return mm
 }
+
+// Equals checks if two MetaMaps have identical key/value pairs
+func (a MetaMap) Equals(b MetaMap) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for k, v := range a {
+		if w, ok := b[k]; !ok || v != w {
+			return false
+		}
+	}
+	return true
+}

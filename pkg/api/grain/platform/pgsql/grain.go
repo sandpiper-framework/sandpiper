@@ -39,7 +39,6 @@ var (
 
 // Create creates a new grain in database (assumes allowed to do this).
 func (s *Grain) Create(db orm.DB, replaceFlag bool, grain *sandpiper.Grain) (*sandpiper.Grain, error) {
-
 	// key is always lowercase to allow faster lookups without a function index
 	grain.Key = strings.ToLower(grain.Key)
 

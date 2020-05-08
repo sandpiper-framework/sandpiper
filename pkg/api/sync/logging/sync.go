@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -7,6 +7,7 @@ package sync
 // sync service logger
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -52,13 +53,30 @@ func (ls *LogService) Subscriptions(c echo.Context) (subs []sandpiper.Subscripti
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
-			source, "Subscriptions request", err,
+			source, "Sync Subscriptions request", err,
 			map[string]interface{}{
 				"took": time.Since(begin),
 			},
 		)
 	}(time.Now())
 	return ls.Service.Subscriptions(c)
+}
+
+// Grains logging
+func (ls *LogService) Grains(c echo.Context, sliceID uuid.UUID, briefFlag bool) (resp []sandpiper.Grain, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "Sync Grains request", err,
+			map[string]interface{}{
+				"slice-id": sliceID,
+				"brief":    briefFlag,
+				"resp":     fmt.Sprintf("Count: %d", len(resp)),
+				"took":     time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Grains(c, sliceID, briefFlag)
 }
 
 // Process logging

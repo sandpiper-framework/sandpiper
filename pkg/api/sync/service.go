@@ -1,4 +1,4 @@
-// Copyright Auto Care Association. All rights reserved.
+// Copyright The Sandpiper Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"sandpiper/pkg/api/sync/platform/pgsql"
+	"sandpiper/pkg/shared/client"
 	"sandpiper/pkg/shared/database"
 	"sandpiper/pkg/shared/model"
 )
@@ -22,6 +23,7 @@ type Service interface {
 	Start(echo.Context, uuid.UUID) error
 	Process(echo.Context) error
 	Subscriptions(c echo.Context) ([]sandpiper.Subscription, error)
+	Grains(echo.Context, uuid.UUID, bool) ([]sandpiper.Grain, error)
 }
 
 // New creates new sync application service
@@ -41,6 +43,7 @@ type Sync struct {
 	rbac RBAC
 	sec  Securer
 	key  string // secret key for en/decrypting sync credentials
+	api  *client.Client
 }
 
 // Securer represents security interface
@@ -57,6 +60,11 @@ type Repository interface {
 	AddSubscription(orm.DB, sandpiper.Subscription) error
 	AddSlice(orm.DB, *sandpiper.Slice) error
 	DeactivateSubscription(orm.DB, uuid.UUID) error
+	UpdateSliceMetadata(orm.DB, *sandpiper.Slice, *sandpiper.Slice) error
+	Grains(orm.DB, uuid.UUID, uuid.UUID, bool) ([]sandpiper.Grain, error)
+	AddGrain(orm.DB, *sandpiper.Grain) error
+	DeleteGrains(orm.DB, []uuid.UUID) error
+	SliceAccess(orm.DB, uuid.UUID, uuid.UUID) error
 }
 
 // RBAC represents role-based-access-control interface

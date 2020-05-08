@@ -70,6 +70,31 @@ func (c *Client) SubByName(name string) (*sandpiper.Subscription, error) {
 	return sub, err
 }
 
+// GrainList returns grain-ids for a slice
+func (c *Client) GrainList(sliceID uuid.UUID) ([]sandpiper.Grain, error) {
+	var results []sandpiper.Grain
+
+	path := fmt.Sprintf("/sync/slice/%s?brief=yes", sliceID.String())
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, results)
+	return results, err
+}
+
+// Grain returns grain (including payload) by id
+func (c *Client) Grain(grainID uuid.UUID) (*sandpiper.Grain, error) {
+	results := new(sandpiper.Grain)
+	path := fmt.Sprintf("/grains/%s", grainID.String())
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, results)
+	return results, err
+}
+
 // Sync initiates a sync with a server
 func (c *Client) Sync(company sandpiper.Company) error {
 	path := fmt.Sprintf("/sync/%s", company.SyncAddr)
