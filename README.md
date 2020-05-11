@@ -198,7 +198,10 @@ Instead of passing database client as `s.db` , inside this function pass it as `
 
 ## Contributing
 
-Please read [CONTRIBUTING](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
+Please read [CONTRIBUTING](CONTRIBUTING.md) for details on our process for submitting pull requests. Note also that this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
+
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](code_of_conduct.md)
+
 
 ## Versioning
 

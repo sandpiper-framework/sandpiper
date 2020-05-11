@@ -6,10 +6,13 @@
 package secure
 
 import (
+	"crypto/rand"
 	"crypto/sha1"
 	"fmt"
 	"hash"
+	"math/big"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/nbutton23/zxcvbn-go"
@@ -59,4 +62,23 @@ func (s *Service) Token(str string) string {
 // APIKeySecret getter
 func (s *Service) APIKeySecret() string {
 	return s.key
+}
+
+// RandomPassword creates an n character plain-text password using random upper/lower/special chars
+func (s *Service) RandomPassword(n int) (string, error) {
+	var generated string
+
+	// exclude back-slash and double-quote
+	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_+{}:@[];'#<>?,./|-=?"
+	charSet := strings.Split(chars, "")
+	max := big.NewInt(int64(len(charSet)))
+
+	for i := 0; i < n; i++ {
+		val, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return "", err
+		}
+		generated += charSet[val.Int64()]
+	}
+	return generated, nil
 }

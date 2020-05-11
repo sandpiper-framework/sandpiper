@@ -7,7 +7,7 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
-
+	"sandpiper/pkg/api/sync/credentials"
 	"sandpiper/pkg/shared/model"
 )
 
@@ -75,4 +75,41 @@ func (u *User) Update(c echo.Context, r *Update) (*sandpiper.User, error) {
 	}
 
 	return u.sdb.View(u.db, r.ID)
+}
+
+// CreateAPIKey creates a sync user for a company (if necessary) and generates an apikey
+func (u *User) CreateAPIKey(c echo.Context) (*sandpiper.APIKey, error) {
+	// must be an api call on primary server
+	if err := u.rbac.EnforceServerRole("primary"); err != nil {
+		return nil, err
+	}
+	// caller must be companyAdmin
+	if err := u.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
+		return nil, err
+	}
+	// get the company sync user (or create one)
+	companyID := u.rbac.CurrentUser(c).CompanyID
+	usr, err := u.sdb.CompanySyncUser(u.db, companyID)
+	if err != nil {
+		return nil, err
+	}
+
+	// generate a new plain-text password for the sync_user and update the user record
+	pw, err := u.sec.RandomPassword(26)
+	if err != nil {
+		return nil, err
+	}
+	usr.ChangePassword(u.sec.Hash(pw))
+	if err := u.sdb.UpdateSyncUser(u.db, usr); err != nil {
+		return nil, err
+	}
+
+	// encrypt these credentials in an api_key
+	creds := &credentials.SyncLogin{
+		User:     usr.Username,
+		Password: pw,
+	}
+	key, err := creds.APIKey(u.sec.APIKeySecret())
+
+	return &sandpiper.APIKey{Key: string(key)}, err
 }

@@ -20,7 +20,7 @@ import (
 
 // Custom errors
 var (
-	ErrInvalidGrainUUID = echo.NewHTTPError(http.StatusBadRequest, "Invalid grain uuid")
+	// ErrInvalidSliceUUID indicates an improperly formed UUID
 	ErrInvalidSliceUUID = echo.NewHTTPError(http.StatusBadRequest, "Invalid slice uuid")
 )
 

@@ -29,3 +29,8 @@ type AuthUser struct {
 	Email     string
 	Role      AccessLevel
 }
+
+// APIKey is used to  authenticate a sync process
+type APIKey struct {
+	Key string `json:"key"`
+}

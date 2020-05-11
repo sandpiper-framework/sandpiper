@@ -162,7 +162,7 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	}
 
 	// get remote grain list of ids
-	remoteIDs, err := s.api.GrainList(remoteSlice.ID)
+	remoteIDs, err := s.api.GrainIDs(remoteSlice.ID)
 	if err != nil {
 		return err
 	}

@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"sandpiper/pkg/shared/model"
@@ -78,6 +79,51 @@ func (u *User) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]
 // Delete permanently removes a user record from the database (not just making inactive)
 func (u *User) Delete(db orm.DB, user *sandpiper.User) error {
 	return db.Delete(user)
+}
+
+// CompanySyncUser returns a company's sync_user. If one is not assigned, it creates one and links
+// it to the company. Always change the username. Only need to return User.ID, User.Username.
+func (u *User) CompanySyncUser(db orm.DB, companyID uuid.UUID) (*sandpiper.User, error) {
+	usr := sandpiper.User{
+		Username: uuid.New().String(), // randomly unique, changed each time called
+	}
+
+	// get (secondary) company sync_user_id
+	company := sandpiper.Company{ID: companyID}
+	err := db.Model(&company).Column("sync_user_id").WherePK().Select()
+	if err != nil {
+		return nil, err
+	}
+
+	// If company doesn't have a sync_user, create one and assign it to the company
+	if company.SyncUserID == 0 {
+		// add the sync user without password
+		if err := db.Insert(&sandpiper.User{
+			Username:  usr.Username,
+			FirstName: "sync",
+			LastName:  "sync",
+			Email:     "sync",
+			Role:      sandpiper.SyncRole,
+			CompanyID: companyID,
+		}); err != nil {
+			return nil, err
+		}
+		// update company with new sync user
+		company.SyncUserID = usr.ID
+		_, err = db.Model(&company).Column("sync_user_id").WherePK().Update()
+		if err != nil {
+			return nil, err
+		}
+	}
+	usr.ID = company.SyncUserID
+
+	return &usr, err
+}
+
+// UpdateSyncUser updates database with changed password data from the model values (by primary key)
+func (u *User) UpdateSyncUser(db orm.DB, user *sandpiper.User) error {
+	_, err := db.Model(user).Column("username", "password", "last_password_change").WherePK().Update()
+	return err
 }
 
 // checkDuplicate returns true if name found in database

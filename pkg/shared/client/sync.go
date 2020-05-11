@@ -70,8 +70,8 @@ func (c *Client) SubByName(name string) (*sandpiper.Subscription, error) {
 	return sub, err
 }
 
-// GrainList returns grain-ids for a slice
-func (c *Client) GrainList(sliceID uuid.UUID) ([]sandpiper.Grain, error) {
+// GrainIDs returns grain-ids for a slice
+func (c *Client) GrainIDs(sliceID uuid.UUID) ([]sandpiper.Grain, error) {
 	var results []sandpiper.Grain
 
 	path := fmt.Sprintf("/sync/slice/%s?brief=yes", sliceID.String())

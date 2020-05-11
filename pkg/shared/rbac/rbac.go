@@ -108,9 +108,9 @@ func (s *Service) isAdmin(c echo.Context) bool {
 	return !(c.Get("role").(sandpiper.AccessLevel) > sandpiper.AdminRole)
 }
 
-func (s *Service) isCompanyAdmin(c echo.Context) bool {
-	return !(c.Get("role").(sandpiper.AccessLevel) > sandpiper.CompanyAdminRole)
-}
+//func (s *Service) isCompanyAdmin(c echo.Context) bool {
+//	return !(c.Get("role").(sandpiper.AccessLevel) > sandpiper.CompanyAdminRole)
+//}
 
 func checkBool(b bool) error {
 	if b {

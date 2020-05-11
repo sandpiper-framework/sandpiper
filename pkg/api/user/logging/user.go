@@ -110,3 +110,18 @@ func (ls *LogService) Update(c echo.Context, req *user.Update) (resp *sandpiper.
 	}(time.Now())
 	return ls.Service.Update(c, req)
 }
+
+// CreateAPIKey logging
+func (ls *LogService) CreateAPIKey(c echo.Context) (resp *sandpiper.APIKey, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			source, "Create apikey request", err,
+			map[string]interface{}{
+				"resp": "** redacted **",
+				"took": time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.CreateAPIKey(c)
+}

@@ -17,11 +17,13 @@ type Company struct {
 	ID            uuid.UUID       `json:"id"`
 	Name          string          `json:"name"`
 	SyncAddr      string          `json:"sync_addr"`
-	SyncAPIKey    string          `json:"sync_api_key"`
+	SyncAPIKey    string          `json:"sync_api_key"` // only on secondary
+	SyncUserID    int             `json:"sync_user_id"` // NULL marshalls as 0
 	Active        bool            `json:"active"`
 	CreatedAt     time.Time       `json:"created_at"`
 	UpdatedAt     time.Time       `json:"updated_at"`
 	Users         []*User         `json:"users,omitempty"`         // has-many relation
+	SyncUser      *User           `json:"sync_user,omitempty"`     // has-one relation
 	Subscriptions []*Subscription `json:"subscriptions,omitempty"` // has-many relation
 }
 

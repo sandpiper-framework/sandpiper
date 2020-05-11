@@ -22,6 +22,7 @@ type Service interface {
 	View(echo.Context, int) (*sandpiper.User, error)
 	Delete(echo.Context, int) error
 	Update(echo.Context, *Update) (*sandpiper.User, error)
+	CreateAPIKey(echo.Context) (*sandpiper.APIKey, error)
 }
 
 // User represents user application service
@@ -45,6 +46,8 @@ func Initialize(db *database.DB, rbac RBAC, sec Securer) *User {
 // Securer represents security interface
 type Securer interface {
 	Hash(string) string
+	APIKeySecret() string
+	RandomPassword(int) (string, error)
 }
 
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
@@ -54,6 +57,8 @@ type Repository interface {
 	List(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.User, error)
 	Update(orm.DB, *sandpiper.User) error
 	Delete(orm.DB, *sandpiper.User) error
+	CompanySyncUser(orm.DB, uuid.UUID) (*sandpiper.User, error)
+	UpdateSyncUser(orm.DB, *sandpiper.User) error
 }
 
 // RBAC represents role-based-access-control interface
@@ -63,4 +68,6 @@ type RBAC interface {
 	AccountCreate(echo.Context, sandpiper.AccessLevel, uuid.UUID) error
 	IsLowerRole(echo.Context, sandpiper.AccessLevel) error
 	EnforceScope(echo.Context) (*sandpiper.Scope, error)
+	EnforceRole(echo.Context, sandpiper.AccessLevel) error
+	EnforceServerRole(string) error
 }
