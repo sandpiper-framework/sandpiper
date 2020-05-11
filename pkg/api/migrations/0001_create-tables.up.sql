@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS companies (
   "name"         text NOT NULL,
   "sync_addr"    text UNIQUE NOT NULL,   /* primary server's sync_addr */
   "sync_api_key" text,                   /* used by secondary server */
-  "sync_user_id" int REFERENCES "users" ON DELETE RESTRICT, /* can be NULL */
+  "sync_user_id" int,   /* can be NULL */
   "active"       boolean,
   "created_at"   timestamp,
   "updated_at"   timestamp
@@ -129,5 +129,8 @@ CREATE TABLE IF NOT EXISTS users (
   "created_at"       timestamp,
   "updated_at"       timestamp
 );
+
+ALTER TABLE companies
+    ADD CONSTRAINT sync_user_fk FOREIGN KEY (sync_user_id) REFERENCES "users" ON DELETE RESTRICT;
 
 COMMIT;

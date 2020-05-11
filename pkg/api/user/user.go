@@ -87,7 +87,7 @@ func (u *User) CreateAPIKey(c echo.Context) (*sandpiper.APIKey, error) {
 	if err := u.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
 		return nil, err
 	}
-	// get the company sync user (or create one)
+	// get the company's sync user (or create one)
 	companyID := u.rbac.CurrentUser(c).CompanyID
 	usr, err := u.sdb.CompanySyncUser(u.db, companyID)
 	if err != nil {
@@ -111,5 +111,5 @@ func (u *User) CreateAPIKey(c echo.Context) (*sandpiper.APIKey, error) {
 	}
 	key, err := creds.APIKey(u.sec.APIKeySecret())
 
-	return &sandpiper.APIKey{Key: string(key)}, err
+	return &sandpiper.APIKey{PrimaryID: u.rbac.OurServerID(), SyncAPIKey: string(key)}, err
 }

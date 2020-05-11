@@ -23,7 +23,7 @@ type User struct {
 	Phone           string      `json:"phone,omitempty"`
 	Active          bool        `json:"active"`
 	LastLogin       time.Time   `json:"last_login,omitempty"`
-	PasswordChanged time.Time   `json:"last_password_change,omitempty"`
+	PasswordChanged time.Time   `json:"password_changed,omitempty"`
 	Token           string      `json:"-"`
 	Role            AccessLevel `json:"role,omitempty"`
 	CompanyID       uuid.UUID   `json:"company_id"` // belongs-to company

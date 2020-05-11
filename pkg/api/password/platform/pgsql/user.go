@@ -33,6 +33,6 @@ func (u *User) View(db orm.DB, id int) (*sandpiper.User, error) {
 // Update updates database with changed password data from the model values (by primary key)
 func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 	//return db.Update(user)
-	_, err := db.Model(user).Column("password", "last_password_change").WherePK().Update()
+	_, err := db.Model(user).Column("password", "password_changed").WherePK().Update()
 	return err
 }

@@ -22,6 +22,7 @@ VALUES
 INSERT INTO settings
     (id, key, value)
 VALUES
-    (DEFAULT, 'server-role', 'primary');
+    (DEFAULT, 'server-role', 'primary'),
+    (DEFAULT, 'server-id', '10000000-0000-0000-0000-000000000000');
 
 COMMIT;

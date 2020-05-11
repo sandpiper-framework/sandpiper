@@ -8,6 +8,7 @@ package api
 
 import (
 	"errors"
+	"github.com/google/uuid"
 
 	"sandpiper/pkg/shared/config"
 	"sandpiper/pkg/shared/database"
@@ -33,6 +34,8 @@ import (
 const (
 	// ServerRoleKey accesses the server role setting ("primary" or "secondary")
 	ServerRoleKey = "server-role"
+	// ServerIDKey accesses the server id setting (company_id of this server)
+	ServerIDKey = "server-id"
 )
 
 // Start configures and launches the API services
@@ -44,10 +47,9 @@ func Start(cfg *config.Configuration) error {
 		return err
 	}
 
-	// check required db setting
-	db.ServerRole = db.Settings[ServerRoleKey]
-	if db.ServerRole == "" {
-		return errors.New("missing db setting: \"" + ServerRoleKey + "\"")
+	// check required db settings
+	if err := validateSettings(db); err != nil {
+		return err
 	}
 
 	// setup token, security and logging available for all services
@@ -86,5 +88,19 @@ func Start(cfg *config.Configuration) error {
 		Debug:               cfg.Server.Debug,
 	})
 
+	return nil
+}
+
+func validateSettings(db *database.DB) error {
+	var err error
+
+	db.ServerRole = db.Settings[ServerRoleKey]
+	if db.ServerRole == "" {
+		return errors.New("missing db setting: \"" + ServerRoleKey + "\"")
+	}
+	db.ServerID, err = uuid.Parse(db.Settings[ServerIDKey])
+	if err != nil {
+		return errors.New("missing or invalid db setting: \"" + ServerIDKey + "\" (expects uuid)")
+	}
 	return nil
 }

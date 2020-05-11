@@ -6,7 +6,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fortytw2/dockertest v0.0.0-20171126212657-a73397bdeff4
-	github.com/go-bindata/go-bindata v1.0.0 // indirect
+	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/go-pg/pg/v9 v9.1.5
 	github.com/go-pg/urlstruct v0.4.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect

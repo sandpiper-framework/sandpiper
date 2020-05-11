@@ -64,6 +64,7 @@ type Repository interface {
 // RBAC represents role-based-access-control interface
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
+	OurServerID() uuid.UUID
 	EnforceUser(echo.Context, int) error
 	AccountCreate(echo.Context, sandpiper.AccessLevel, uuid.UUID) error
 	IsLowerRole(echo.Context, sandpiper.AccessLevel) error

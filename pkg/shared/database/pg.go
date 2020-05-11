@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/go-pg/pg/v9"
+	"github.com/google/uuid"
+
 	// DB adapter
 	_ "github.com/lib/pq"
 
@@ -24,8 +26,10 @@ type dbLogger struct{}
 // DB is a wrapper around pg.DB so we can add functionality
 type DB struct {
 	*pg.DB
-	Settings   map[string]string
+	Settings map[string]string
+	// the following are required settings
 	ServerRole string
+	ServerID   uuid.UUID
 }
 
 // BeforeQuery is an unused stub at this time.

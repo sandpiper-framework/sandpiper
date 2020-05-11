@@ -32,5 +32,6 @@ type AuthUser struct {
 
 // APIKey is used to  authenticate a sync process
 type APIKey struct {
-	Key string `json:"key"`
+	PrimaryID  uuid.UUID `json:"primary_id"`
+	SyncAPIKey string    `json:"sync_api_key"`
 }

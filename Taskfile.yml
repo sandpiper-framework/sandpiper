@@ -24,12 +24,12 @@ tasks:
 
   create-sub-db:
     desc: Create the subscribing database from default postgresql installation using "psql"
-    dir: pkg/secondary/migrations
+    dir: pkg/api/migrations
     cmds:
       - "{{.PSQLCMD}}"
     vars:
       PSQLCMD:
-        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql --quiet'
+        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create_sub.sql --quiet'
 
   create-both-db:
     desc: Create both databases

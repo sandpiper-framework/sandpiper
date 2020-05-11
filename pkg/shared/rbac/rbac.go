@@ -6,9 +6,10 @@
 package rbac
 
 import (
+	"net/http"
+
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"net/http"
 
 	"sandpiper/pkg/shared/model"
 )
@@ -19,16 +20,18 @@ var (
 )
 
 // New creates new RBAC service
-func New() *Service {
+func New(serverRole string) *Service {
 	return &Service{
 		ScopingField: "company_id", // default, but is just "id" for company model
+		ServerRole:   serverRole,
 	}
 }
 
 // Service is RBAC enforcement service
 type Service struct {
-	ScopingField string // company id field name for scoping
-	ServerRole   string // "primary" or "secondary"
+	ScopingField string    // company id field name for scoping
+	ServerRole   string    // "primary" or "secondary"
+	ServerID     uuid.UUID // company id of this server
 }
 
 // CurrentUser returns login data stored in jwt token
@@ -40,6 +43,11 @@ func (s *Service) CurrentUser(c echo.Context) *sandpiper.AuthUser {
 		Email:     c.Get("email").(string),
 		Role:      c.Get("role").(sandpiper.AccessLevel),
 	}
+}
+
+// OurServerID returns our server's companyID
+func (s *Service) OurServerID() uuid.UUID {
+	return s.ServerID
 }
 
 // AccountCreate performs auth check when creating a new account

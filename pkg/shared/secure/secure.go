@@ -65,6 +65,7 @@ func (s *Service) APIKeySecret() string {
 }
 
 // RandomPassword creates an n character plain-text password using random upper/lower/special chars
+// Concept extracted from https://github.com/m1/go-generate-password
 func (s *Service) RandomPassword(n int) (string, error) {
 	var generated string
 
@@ -74,11 +75,11 @@ func (s *Service) RandomPassword(n int) (string, error) {
 	max := big.NewInt(int64(len(charSet)))
 
 	for i := 0; i < n; i++ {
-		val, err := rand.Int(rand.Reader, max)
+		c, err := rand.Int(rand.Reader, max)
 		if err != nil {
 			return "", err
 		}
-		generated += charSet[val.Int64()]
+		generated += charSet[c.Int64()]
 	}
 	return generated, nil
 }

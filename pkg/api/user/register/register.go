@@ -18,7 +18,9 @@ import (
 
 // Register ties the user service to its logger and transport mechanisms
 func Register(db *database.DB, sec user.Securer, log sandpiper.Logger, v1 *echo.Group) {
-	svc := user.Initialize(db, rbac.New(), sec)
+	rba := rbac.New(db.ServerRole)
+	rba.ServerID = db.ServerID
+	svc := user.Initialize(db, rba, sec)
 	ls := ul.ServiceLogger(svc, log)
 	ut.NewHTTP(ls, v1)
 }
