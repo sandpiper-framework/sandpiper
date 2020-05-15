@@ -35,3 +35,9 @@ type APIKey struct {
 	PrimaryID  uuid.UUID `json:"primary_id"`
 	SyncAPIKey string    `json:"sync_api_key"`
 }
+
+// Server contains information about the current server
+type Server struct {
+	ID   uuid.UUID `json:"server-id"`
+	Role string    `json:"server-role"`
+}

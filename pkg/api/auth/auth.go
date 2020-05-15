@@ -11,12 +11,14 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/secure"
 )
 
 // Custom errors
 var (
 	ErrInvalidCredentials = echo.NewHTTPError(http.StatusUnauthorized, "Authentication Error.")
 	ErrNotAuthorized      = echo.NewHTTPError(http.StatusUnauthorized, "User is not authorized")
+	ErrMissingCredentials = echo.NewHTTPError(http.StatusBadRequest, "missing required credentials")
 )
 
 // Authenticate tries to authenticate the user provided by username and password
@@ -70,4 +72,31 @@ func (a *Auth) Refresh(c echo.Context, refreshToken string) (*sandpiper.RefreshT
 func (a *Auth) Me(c echo.Context) (*sandpiper.User, error) {
 	au := a.rbac.CurrentUser(c)
 	return a.sdb.View(a.db, au.ID)
+}
+
+// Server returns info about the server
+func (a *Auth) Server(c echo.Context) *sandpiper.Server {
+	return a.rbac.OurServer()
+}
+
+// ParseCredentials extracts username/password from a request body (in plain text). If
+// api-key is supplied, it decrypts the api-key into those plain text values instead
+func (a *Auth) ParseCredentials(c echo.Context) (*secure.Credentials, error) {
+	var err error
+
+	creds := new(secure.Credentials)
+	if err := c.Bind(creds); err != nil {
+		return nil, err
+	}
+	if creds.SyncAPIKey != "" {
+		// extract username and password from api-key
+		creds, err = secure.NewCredentials(creds.SyncAPIKey, a.sec.APIKeySecret())
+		if err != nil {
+			return nil, err
+		}
+	}
+	if creds.Username == "" || creds.Password == "" {
+		return nil, ErrMissingCredentials
+	}
+	return creds, nil
 }

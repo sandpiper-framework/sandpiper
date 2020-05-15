@@ -31,7 +31,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/sync/credentials"
 	"sandpiper/pkg/shared/client"
 	"sandpiper/pkg/shared/model"
 )
@@ -64,8 +63,8 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	if err != nil {
 		return err
 	}
-	// connect to the primary server (saving token)
-	s.api, err = s.connect(p.SyncAddr, p.SyncAPIKey, s.sec.APIKeySecret())
+	// connect to the primary server using our api-key (saving token)
+	s.api, err = s.connect(p.SyncAddr, p.SyncAPIKey)
 	if err != nil {
 		return err
 	}
@@ -86,17 +85,12 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	return nil
 }
 
-func (s *Sync) connect(addr, key, secret string) (*client.Client, error) {
-	// get login credentials from company's sync_api_key
-	creds, err := credentials.New(key, secret)
-	if err != nil {
-		return nil, err
-	}
+func (s *Sync) connect(addr, key string) (*client.Client, error) {
 	server, err := url.ParseRequestURI(addr)
 	if err != nil {
 		return nil, err
 	}
-	api, err := client.Login(server, creds.User, creds.Password, false)
+	api, err := client.SyncLogin(server, key)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +148,7 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	}(time.Now())
 
 	if !remoteSlice.AllowSync {
-		return errors.New("slice locked on server")
+		return errors.New("slice locked (being updated) on server")
 	}
 
 	if !slicesInSync(remoteSlice, localSlice) {

@@ -25,16 +25,12 @@ func NewHTTP(svc auth.Service, e *echo.Echo, mw echo.MiddlewareFunc) {
 	e.POST("/login", h.login)
 	e.GET("/refresh/:token", h.refresh)
 	e.GET("/me", h.me, mw)
-}
-
-type credentials struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	e.GET("/server", h.server, mw)
 }
 
 func (h *HTTP) login(c echo.Context) error {
-	creds := new(credentials)
-	if err := c.Bind(creds); err != nil {
+	creds, err := h.svc.ParseCredentials(c)
+	if err != nil {
 		return err
 	}
 	r, err := h.svc.Authenticate(c, creds.Username, creds.Password)
@@ -58,4 +54,9 @@ func (h *HTTP) me(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h *HTTP) server(c echo.Context) error {
+	server := h.svc.Server(c)
+	return c.JSON(http.StatusOK, server)
 }

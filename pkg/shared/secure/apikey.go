@@ -2,47 +2,46 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package credentials handles authorization with primary server
-package credentials
+// Package secure handles security and login routines
+package secure
 
 import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-
-	"sandpiper/pkg/shared/secure"
 )
 
-// SyncLogin is used to manage credentials for the sync_api_key
-type SyncLogin struct {
-	User     string `json:"user"`
-	Password string `json:"password"`
+// Credentials is used to manage credentials for user and sync logins
+type Credentials struct {
+	Username   string `json:"user"`
+	Password   string `json:"password"`
+	SyncAPIKey string `json:"sync-api-key"`
 }
 
-// New returns a SyncLogin decoded from the supplied api_key (base64) and secret
-func New(APIKey, secret string) (*SyncLogin, error) {
+// NewCredentials returns Credentials decoded from the supplied api_key (base64) and secret
+func NewCredentials(APIKey, secret string) (*Credentials, error) {
 	b, err := fromHex(APIKey)
 	if err != nil {
 		return nil, err
 	}
-	data, err := secure.Decrypt(b, secret)
+	data, err := Decrypt(b, secret)
 	if err != nil {
 		return nil, err
 	}
-	login := new(SyncLogin)
-	if err := json.Unmarshal(data, login); err != nil {
+	creds := new(Credentials)
+	if err := json.Unmarshal(data, creds); err != nil {
 		return nil, errors.New("improper format of api-key")
 	}
-	return login, nil
+	return creds, nil
 }
 
 // APIKey returns an encrypted sync_api_key (base64) from sync login credentials
-func (s *SyncLogin) APIKey(secret string) ([]byte, error) {
+func (s *Credentials) APIKey(secret string) ([]byte, error) {
 	login, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
 	}
-	data, err := secure.Encrypt(login, secret)
+	data, err := Encrypt(login, secret)
 	if err != nil {
 		return nil, err
 	}

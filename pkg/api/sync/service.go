@@ -49,7 +49,6 @@ type Sync struct {
 // Securer represents security interface
 type Securer interface {
 	Hash(string) string
-	APIKeySecret() string
 }
 
 // Repository represents available resource actions using a repository-abstraction-pattern interface.

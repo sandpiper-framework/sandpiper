@@ -36,7 +36,7 @@ func main() {
 		},
 		Copyright:       "Copyright 2019-" + y + " The Sandpiper Authors. All rights reserved.",
 		HelpName:        "sandpiper",
-		Usage:           "Store, retrieve and sync \"level-1\" (file-based) sandpiper objects",
+		Usage:           "Store, extract, list and sync \"level-1\" (file-based) sandpiper objects",
 		Flags:           cli.GlobalFlags,
 		Commands:        cli.Commands,
 		CommandNotFound: cli.CommandNotFound,

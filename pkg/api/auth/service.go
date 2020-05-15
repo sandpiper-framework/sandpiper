@@ -12,6 +12,7 @@ import (
 	"sandpiper/pkg/api/auth/platform/pgsql"
 	"sandpiper/pkg/shared/database"
 	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/secure"
 )
 
 // Auth represents auth application service
@@ -44,6 +45,8 @@ type Service interface {
 	Authenticate(echo.Context, string, string) (*sandpiper.AuthToken, error)
 	Refresh(echo.Context, string) (*sandpiper.RefreshToken, error)
 	Me(echo.Context) (*sandpiper.User, error)
+	Server(echo.Context) *sandpiper.Server
+	ParseCredentials(echo.Context) (*secure.Credentials, error)
 }
 
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
@@ -63,9 +66,11 @@ type TokenGenerator interface {
 type Securer interface {
 	HashMatchesPassword(string, string) bool
 	Token(string) string
+	APIKeySecret() string
 }
 
 // RBAC represents role-based-access-control interface
 type RBAC interface {
 	CurrentUser(echo.Context) *sandpiper.AuthUser
+	OurServer() *sandpiper.Server
 }

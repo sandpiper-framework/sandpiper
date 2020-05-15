@@ -45,9 +45,9 @@ func (s *Service) CurrentUser(c echo.Context) *sandpiper.AuthUser {
 	}
 }
 
-// OurServerID returns our server's companyID
-func (s *Service) OurServerID() uuid.UUID {
-	return s.ServerID
+// OurServer returns information about our server (ServerID is a company_id)
+func (s *Service) OurServer() *sandpiper.Server {
+	return &sandpiper.Server{ID: s.ServerID, Role: s.ServerRole}
 }
 
 // AccountCreate performs auth check when creating a new account

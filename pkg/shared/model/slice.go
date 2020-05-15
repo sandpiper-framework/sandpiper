@@ -56,7 +56,6 @@ func (s *Slice) BeforeUpdate(ctx context.Context) (context.Context, error) {
 
 // Validate checks slice_type enum
 func (s Slice) Validate() bool {
-	// todo: pull values from database at system start
 	// using `select enum_range(null::slice_type_enum)`
 	switch s.SliceType {
 	case "aces-file",

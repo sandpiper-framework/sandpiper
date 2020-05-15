@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/secure"
 )
 
 const apiVer = "/v1"
@@ -26,6 +27,7 @@ type Client struct {
 	apiPrefix  string   // prepended to endpoint after successful /login
 	userAgent  string
 	auth       *sandpiper.AuthToken
+	server     *sandpiper.Server
 	httpClient *http.Client // client used to send and receive http requests.
 	debug      bool
 }
@@ -46,6 +48,7 @@ func New(baseURL *url.URL, debugFlag bool) *Client {
 		baseURL:    baseURL,
 		userAgent:  "Sandpiper",
 		auth:       &sandpiper.AuthToken{},
+		server:     &sandpiper.Server{},
 		httpClient: netClient,
 		debug:      debugFlag,
 	}
@@ -55,28 +58,55 @@ func New(baseURL *url.URL, debugFlag bool) *Client {
 // Login to the sandpiper api server (saving token in the client struct)
 func Login(addr *url.URL, user, password string, debug bool) (*Client, error) {
 	c := New(addr, debug)
-	if err := c.login(user, password); err != nil {
+	if err := c.login(secure.Credentials{Username: user, Password: password}); err != nil {
 		return nil, err
 	}
 	return c, nil
 }
 
+// SyncLogin to the sandpiper api server using api-key (saving token in the client struct)
+func SyncLogin(addr *url.URL, key string) (*Client, error) {
+	c := New(addr, false)
+	if err := c.login(secure.Credentials{SyncAPIKey: key}); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+// ServerRole returns the current server role
+func (c *Client) ServerRole() string {
+	return c.server.Role
+}
+
 // login to the sandpiper server
-func (c *Client) login(username, password string) error {
-	body := fmt.Sprintf("{\"username\": \"%s\", \"password\": \"%s\"}", username, password)
+func (c *Client) login(creds secure.Credentials) error {
+
+	// POST /login
+	jsonTemplate := `{"username": "%s", "password": "%s", "sync-api-key": "%s"}`
+	body := fmt.Sprintf(jsonTemplate, creds.Username, creds.Password, creds.SyncAPIKey)
 	req, err := c.newRequest("POST", "/login", body)
 	if err != nil {
 		return err
 	}
 	resp, err := c.do(req, c.auth)
-	if err == nil && resp.StatusCode != 200 {
+	if err != nil || resp.StatusCode != 200 {
+		return fmt.Errorf("login failed (%d)", resp.StatusCode)
+	}
+
+	// GET /server
+	req, err = c.newRequest("GET", "/server", nil)
+	if err != nil {
+		return err
+	}
+	resp, err = c.do(req, c.server)
+	if err != nil || resp.StatusCode != 200 {
 		return fmt.Errorf("login failed (%d)", resp.StatusCode)
 	}
 
 	// add api version to all subsequent api calls
 	c.apiPrefix = apiVer
 
-	return err
+	return nil
 }
 
 // newRequest prepares a request for an api call

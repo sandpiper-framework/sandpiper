@@ -7,8 +7,9 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
-	"sandpiper/pkg/api/sync/credentials"
+
 	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/secure"
 )
 
 // Create creates a new user account
@@ -105,11 +106,14 @@ func (u *User) CreateAPIKey(c echo.Context) (*sandpiper.APIKey, error) {
 	}
 
 	// encrypt these credentials in an api_key
-	creds := &credentials.SyncLogin{
-		User:     usr.Username,
+	creds := &secure.Credentials{
+		Username: usr.Username,
 		Password: pw,
 	}
 	key, err := creds.APIKey(u.sec.APIKeySecret())
+	if err != nil {
+		return nil, err
+	}
 
-	return &sandpiper.APIKey{PrimaryID: u.rbac.OurServerID(), SyncAPIKey: string(key)}, err
+	return &sandpiper.APIKey{PrimaryID: u.rbac.OurServer().ID, SyncAPIKey: string(key)}, err
 }

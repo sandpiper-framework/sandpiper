@@ -15,8 +15,7 @@ CREATE TYPE slice_type_enum AS ENUM (
   'pies-items',
   'pies-marketcopy',
   'pies-pricesheet',
-  'partspro-file',
-  'partspro-items'
+  'partspro-file'
 );
 
 CREATE TYPE encoding_enum AS ENUM (

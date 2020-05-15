@@ -7,6 +7,7 @@ package client
 
 import (
 	"fmt"
+
 	"github.com/google/uuid"
 
 	"sandpiper/pkg/shared/model"

@@ -76,3 +76,18 @@ func (ls *LogService) Me(c echo.Context) (resp *sandpiper.User, err error) {
 	}(time.Now())
 	return ls.Service.Me(c)
 }
+
+// Server logging
+func (ls *LogService) Server(c echo.Context) (resp *sandpiper.Server) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			c,
+			svc, "Server request", nil,
+			map[string]interface{}{
+				"resp": resp,
+				"took": time.Since(begin),
+			},
+		)
+	}(time.Now())
+	return ls.Service.Server(c)
+}

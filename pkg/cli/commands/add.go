@@ -41,10 +41,15 @@ func Add(c *args.Context) error {
 		return err
 	}
 
-	// connect to the api server (saving token)
+	// connect to our api server (saving token)
 	api, err := client.Login(p.addr, p.user, p.password, p.debug)
 	if err != nil {
 		return err
+	}
+
+	// make sure we are on a primary-server
+	if api.ServerRole() != "primary" {
+		return errors.New("must be a \"primary\" server for `add` command")
 	}
 
 	// make sure we have a slice_id to work with
