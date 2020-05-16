@@ -8,7 +8,7 @@ This functionality is mostly duplicated by web-based Admin screens, but a comman
 ### Command Syntax
 
 ```
-sandpiper [global-options] [add | list | pull | help] [command-options] <arguments>
+sandpiper [global-options] [add | list | pull | sync | help] [command-options] <arguments>
 
 global-options (also available via [environment variable]):
    --user name, -u name        server login name [SANDPIPER_USER]
@@ -22,6 +22,7 @@ commands:
    add      add a file-based grain from a local file
    pull     save file-based grains to the file system
    list     list slices (if no slice provided) or file-based grains by slice_id or slice_name
+   sync     start the sync process on active subscriptions
    help, h  Shows a list of commands or help for one command
 ```
 
@@ -37,6 +38,7 @@ Here is an example of the config.yml file.
 command:
   url: http://localhost
   port: 8080
+  max_sync_proceses: 5
 ```
 
 ## Add File-Based Objects
@@ -60,6 +62,7 @@ arguments:
 
 Example:
     sandpiper -u user -p password add --slicename "aap-brake-pads" --noprompt acme_brakes_full_2019-12-12.xml
+    sandpiper -u admin -p admin add --slice 2bea8308-1840-4802-ad38-72b53e31594c testdata\aces-file.xml
 ```
 
 This command adds the ACES xml file as a grain as defined by the supplied request body (see below).
@@ -160,3 +163,19 @@ Use forward slashes for the output directory even if on Windows. If an an output
 
 The grain `source` field is used as the filename when saving the payload. If this value is empty, the slice-id is used instead.
 
+## Sync Our Subscriptions
+
+The sync command is run by an admin from a secondary server. It connects to each company with a sync_addr and retrieves our subscriptions. If a new subscription
+is found we add it locally. If a subscription is disabled on the Primary, disable it locally and log the activity. If enabled on the Primary but not on our server,
+we do not make any changes. We then perform a grain sync on all unlocked active slices assigned to that subscription.  
+
+#### Syntax:
+
+```
+sandpiper [global-options] sync [command-options]
+
+command-options:
+   --partner value, -p value  limit to company name (case-insensitive) or company_id
+   --noupdate                 Perform the sync without actually changing anything locally (default: false)
+   --help, -h                 show help (default: false)
+```

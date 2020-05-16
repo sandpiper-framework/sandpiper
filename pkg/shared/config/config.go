@@ -81,7 +81,7 @@ type Server struct {
 	Debug        bool   `yaml:"debug,omitempty"`
 	ReadTimeout  int    `yaml:"read_timeout_seconds,omitempty"`
 	WriteTimeout int    `yaml:"write_timeout_seconds,omitempty"`
-	SyncPool     int    `yaml:"sync_pool,omitempty"`
+	MaxSyncProcs int    `yaml:"sync_pool,omitempty"`
 	APIKeySecret string `yaml:"api_key_secret,omitempty"`
 }
 
@@ -113,9 +113,10 @@ type Application struct {
 
 // Command holds configuration options for the `sandpiper` command
 type Command struct {
-	URL   string `yaml:"url,omitempty"`
-	Port  string `yaml:"port,omitempty"`
-	Debug bool   `yaml:"debug,omitempty"`
+	URL          string `yaml:"url,omitempty"`
+	Port         string `yaml:"port,omitempty"`
+	MaxSyncProcs int    `yaml:"max_sync_procs,omitempty"`
+	Debug        bool   `yaml:"debug,omitempty"`
 }
 
 func env(key, defValue string) string {

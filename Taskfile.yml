@@ -13,27 +13,14 @@ vars:
     sh: go list ./...
 
 tasks:
-  create-pub-db:
-    desc: Create the publishing database from default postgresql installation using "psql"
+  create-db:
+    desc: Create the database(s) from default postgresql installation using "psql"
     dir: pkg/api/migrations
     cmds:
       - "{{.PSQLCMD}}"
     vars:
       PSQLCMD:
         '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql --quiet'
-
-  create-sub-db:
-    desc: Create the subscribing database from default postgresql installation using "psql"
-    dir: pkg/api/migrations
-    cmds:
-      - "{{.PSQLCMD}}"
-    vars:
-      PSQLCMD:
-        '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create_sub.sql --quiet'
-
-  create-both-db:
-    desc: Create both databases
-    deps: [create-pub-db, create-sub-db]
 
   update:
     desc: Get the latest Sandpiper server repo
@@ -63,7 +50,7 @@ tasks:
     dir: cmd/api
     deps: [bindata-api]
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/api/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X sandpiper/pkg/api/version.Version={{.VER}}"
     vars:
       EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
@@ -72,7 +59,7 @@ tasks:
     desc: Build sandpiper cli command
     dir: cmd/cli
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X autocare.org/sandpiper/pkg/cli/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X sandpiper/pkg/cli/version.Version={{.VER}}"
     vars:
       EXE: sandpiper{{exeExt}}
       VER: {sh: git describe --always --long --dirty}

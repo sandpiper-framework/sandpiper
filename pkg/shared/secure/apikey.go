@@ -13,7 +13,7 @@ import (
 
 // Credentials is used to manage credentials for user and sync logins
 type Credentials struct {
-	Username   string `json:"user"`
+	Username   string `json:"username"`
 	Password   string `json:"password"`
 	SyncAPIKey string `json:"sync-api-key"`
 }

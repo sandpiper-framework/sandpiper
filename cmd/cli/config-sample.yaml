@@ -6,4 +6,4 @@ command:
   port: 8080
   retry_count: 3
   retry_delay: 5  # seconds
-  sync_pool: 5
+  max_sync_procs: 5

@@ -1,3 +1,8 @@
+# Creating a Primary or Secondary Database
+
+Change the dbname, dbuser and variables in the `db_create.sql` file and remove either database (primary or secondary) that is not required in your
+environment. Run `task db-build` to actually create the database.
+
 # Database Migrations
 
 This directory contains SQL files for migrating the database from one version to the next.

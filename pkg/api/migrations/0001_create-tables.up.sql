@@ -21,8 +21,8 @@ CREATE TYPE slice_type_enum AS ENUM (
 CREATE TYPE encoding_enum AS ENUM (
   'raw',
   'b64',
-  'z64'
-  'a85'
+  'z64',
+  'a85',
   'z85'
 );
 

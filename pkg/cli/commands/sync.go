@@ -26,13 +26,14 @@ type serverList []sandpiper.Company
 //type subsArray []sandpiper.Subscription
 
 type syncParams struct {
-	addr      *url.URL // our sandpiper server
-	user      string
-	password  string
-	partner   string
-	partnerID uuid.UUID
-	noupdate  bool
-	debug     bool
+	addr         *url.URL // our sandpiper server
+	user         string
+	password     string
+	partner      string
+	partnerID    uuid.UUID
+	noupdate     bool
+	maxSyncProcs int
+	debug        bool
 }
 
 func getSyncParams(c *args.Context) (*syncParams, error) {
@@ -46,13 +47,14 @@ func getSyncParams(c *args.Context) (*syncParams, error) {
 	id, _ := uuid.Parse(p) // valid id means companyID, otherwise company-name
 
 	return &syncParams{
-		addr:      g.addr,
-		user:      g.user,
-		password:  g.password,
-		partner:   p,
-		partnerID: id,
-		noupdate:  c.Bool("noupdate"),
-		debug:     g.debug,
+		addr:         g.addr,
+		user:         g.user,
+		password:     g.password,
+		partner:      p,
+		partnerID:    id,
+		noupdate:     c.Bool("noupdate"),
+		maxSyncProcs: g.maxSyncProcs,
+		debug:        g.debug,
 	}, nil
 }
 
@@ -61,13 +63,17 @@ type syncCmd struct {
 	api *client.Client
 }
 
-// newSyncCmd initiates a run command
+// newSyncCmd initiates a sync command
 func newSyncCmd(c *args.Context) (*syncCmd, error) {
 	p, err := getSyncParams(c)
 	if err != nil {
 		return nil, err
 	}
-	// connect to the api server (saving token)
+	// make sure we allow at least one concurrent sync process
+	if p.maxSyncProcs <= 0 {
+		p.maxSyncProcs = 1
+	}
+	// connect to our api server (saving token)
 	api, err := client.Login(p.addr, p.user, p.password, p.debug)
 	if err != nil {
 		return nil, err
@@ -91,6 +97,12 @@ func (cmd *syncCmd) getServers() (serverList, error) {
 		// use provided partner-name to get the company's server info
 		srvs, err = cmd.api.ActiveServers(uuid.Nil, cmd.partner)
 	}
+
+	if cmd.debug && err != nil && srvs != nil {
+		// display the list of sync servers to console
+		srvs.display()
+	}
+
 	return srvs, err
 }
 
@@ -105,47 +117,32 @@ func (cmd *syncCmd) syncServer(c sandpiper.Company) error {
 // StartSync initiates the sync process on one or all subscriptions
 func StartSync(c *args.Context) error {
 	var result error
+	var errCount int
 
+	// sync holds params and connected client (to our server)
 	sync, err := newSyncCmd(c)
 	if err != nil {
 		return err
 	}
 
-	// get list of primary servers to sync (depending on run params)
+	// get list of primary servers to sync (depending on params)
 	srvs, err := sync.getServers()
 	if err != nil {
 		return err
 	}
 
-	// todo: make each sync a go routine (https://gobyexample.com/worker-pools)
-	/* COMMENT:
+	// setup a simple waitgroup (using channel as a semaphore)
+	// https://stackoverflow.com/questions/39776481/how-to-wait-until-buffered-channel-semaphore-is-empty
+	wg := make(chan struct{}, sync.maxSyncProcs)
+	wgAdd := func() { wg <- struct{}{} }
+	wgDone := func() { <-wg }
+	wgWait := func() {
+		for i := 0; i < sync.maxSyncProcs; i++ {
+			wgAdd()
+		}
+	}
 
-	I think most of the time you probably don't really need a pool. But maybe you do want to limit the number of goroutines
-	running at once.
-
-	E.g. if each goroutine is CPU intensive and you want to echo progress on the tasks in a reasonable manner, rather than
-	having all of them complete around the same time.
-
-	An easy way to limit how many goroutines are running at once is to use a channel as a semaphore. E.g. something like
-
-	sema := make(chan struct{}, numCores)
-	and then in your worker goroutines:
-
-	sema <- struct{}{} // blocks if more than numCores threads doing  work
-	// ... do work ... //
-	<-sema
-
-	That'll ensure you don't have more than numCores goroutines running at once. IMO much easier than a pool, but you
-	still have the nice property that you're not making tiny progress on many tasks at once, rather just completing tasks
-	as quickly as possible.
-
-	If you really do want a pool, then using a channel to send in the work seems reasonable. If you want to get a response,
-	you can actually include a response channel in your message on the input channel.
-
-	*/
-
-	// sync each server
-	for _, srv := range srvs {
+	syncFunc := func(srv sandpiper.Company) {
 		if err := sync.syncServer(srv); err != nil {
 			// log error, but continue
 			if sync.debug {
@@ -153,83 +150,25 @@ func StartSync(c *args.Context) error {
 			}
 			// todo: log error to activity
 			result = errors.New("sync completed with errors")
+			errCount++
 		}
+		wgDone() // release semaphore
 	}
 
+	// sync each server in a separate go routine
+	for _, srv := range srvs {
+		wgAdd() // acquire a semaphore
+		go syncFunc(srv)
+	}
+	wgWait() // wait for all to finish
+
+	fmt.Printf("Successful: %d, Errors: %d\n", len(srvs)-errCount, errCount)
 	return result
 }
 
-//********************** dead code we may want ****************
-
-/*
-
-// updateSubs asks a server for all of our subscriptions so we can keep them updated
-func (cmd *syncCmd) updateSubs() error {
-
-	subs, err := cmd.api.AllSubs()
-	if err != nil {
-		return err
+func (sl serverList) display() {
+	fmt.Println("SERVER LIST:")
+	for _, srv := range sl {
+		fmt.Printf("%s: (%s)\n", srv.Name, srv.SyncAddr)
 	}
-	for _, sub := range subs {
-		slice := sub.Slice
-		if !slice.AllowSync {
-			// just log that it is locked
-		}
-
-	}
-
-	return nil
 }
-
-// subscriptions returns an array of subscriptions to sync
-func (cmd *syncCmd) subscriptions() (subsArray, error) {
-	var (
-		subs subsArray
-		err  error
-	)
-
-	switch {
-	case cmd.subscription == "":
-		// retrieve all subscriptions
-		subs, err = cmd.api.AllSubs()
-	case cmd.companyID != uuid.Nil:
-		// use provided company_id to get the subscription(s)
-		subs, err = cmd.api.SubsByCompany(cmd.companyID)
-	default:
-		// use provided subscription-name to get the subscription
-		sub, err := cmd.api.SubByName(cmd.subscription)
-		if err != nil {
-			return nil, err
-		}
-		subs = append(subs, *sub)
-	}
-	return subs, err
-}
-
-// sync organizes the work to do and calls the sync routine for each subscription
-func (subs subsArray) sync(debugFlag bool) error {
-	var result error
-
-	// organize active subs by syncAddr using a "multimap" [syncAddr: subs]
-	work := make(map[string]subsArray)
-	for _, sub := range subs {
-		if sub.Active && sub.Company.Active {
-			// add to the list of subscriptions to sync for this sync_addr
-			addr := sub.Company.SyncAddr
-			work[addr] = append(work[addr], sub)
-		}
-	}
-	// sync each syncAddr, sync subscriptions
-	for addr, subs := range work {
-		if err := subs.syncServer(addr); err != nil {
-			// log error, but continue
-			if debugFlag {
-				fmt.Printf("%v", err)
-			}
-			result = errors.New("sync completed with errors")
-		}
-	}
-	return result
-}
-
-*/

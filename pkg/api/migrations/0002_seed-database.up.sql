@@ -3,7 +3,6 @@
  * Migration: Fill the initial tables with minimal required data
  * Direction: up
  * Date: 2019-11-16
- *
  */
  
 BEGIN;

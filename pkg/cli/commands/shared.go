@@ -7,6 +7,7 @@ package command
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -28,10 +29,11 @@ const (
 
 // GlobalParams holds non-command specific params
 type GlobalParams struct {
-	addr     *url.URL
-	user     string
-	password string
-	debug    bool
+	addr         *url.URL
+	user         string
+	password     string
+	maxSyncProcs int
+	debug        bool
 }
 
 // GetGlobalParams parses global parameters from command line
@@ -47,6 +49,10 @@ func GetGlobalParams(c *args.Context) (*GlobalParams, error) {
 		return nil, err
 	}
 
+	if cfg.Command == nil {
+		return nil, errors.New("config file must have a \"command\" section")
+	}
+
 	addr, err := getServerAddr(cfg.Command.URL, cfg.Command.Port)
 	if err != nil {
 		return nil, err
@@ -58,10 +64,11 @@ func GetGlobalParams(c *args.Context) (*GlobalParams, error) {
 	}
 
 	return &GlobalParams{
-		addr:     addr,
-		user:     c.String("user"),
-		password: passwd,
-		debug:    c.Bool("debug"),
+		addr:         addr,
+		user:         c.String("user"),
+		password:     passwd,
+		maxSyncProcs: cfg.Command.MaxSyncProcs,
+		debug:        c.Bool("debug"),
 	}, nil
 }
 

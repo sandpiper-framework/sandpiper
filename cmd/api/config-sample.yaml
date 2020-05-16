@@ -19,7 +19,7 @@ server:
   port: 8080
   read_timeout_seconds: 10
   write_timeout_seconds: 5
-  sync_pool: 5
+  max_sync_procs: 5
   debug: false   # WARNING: debug creates non-JSON responses (but shows underlying errors). Not for production!
   # ** Change this sample secret!!! **
   # Only used by a "primary" server. Can override with "APIKEY_SECRET" env variable

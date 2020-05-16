@@ -90,6 +90,9 @@ func (s *Sync) connect(addr, key string) (*client.Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	if key == "" {
+		return nil, errors.New("api-key is empty")
+	}
 	api, err := client.SyncLogin(server, key)
 	if err != nil {
 		return nil, err
