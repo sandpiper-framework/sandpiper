@@ -18,7 +18,7 @@ import (
 
 // Register ties the grain service to its logger and transport mechanisms
 func Register(db *database.DB, sec grain.Securer, log sandpiper.Logger, v1 *echo.Group) {
-	svc := grain.Initialize(db, rbac.New(db.ServerRole), sec)
+	svc := grain.Initialize(db, rbac.New(db.Settings.ServerRole), sec)
 	ls := gl.ServiceLogger(svc, log)
 	gt.NewHTTP(ls, v1)
 }

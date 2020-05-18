@@ -18,7 +18,7 @@ import (
 
 // Register ties the subscription service to its logger and transport mechanisms
 func Register(db *database.DB, sec tag.Securer, log sandpiper.Logger, v1 *echo.Group) {
-	svc := tag.Initialize(db, rbac.New(db.ServerRole), sec)
+	svc := tag.Initialize(db, rbac.New(db.Settings.ServerRole), sec)
 	ls := tl.ServiceLogger(svc, log)
 	tt.NewHTTP(ls, v1)
 }

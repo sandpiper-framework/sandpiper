@@ -57,6 +57,7 @@ type Update struct {
 	LastName  string
 	Email     string
 	Phone     string
+	Active    bool
 }
 
 // Update updates user's contact information

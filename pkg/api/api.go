@@ -7,9 +7,6 @@
 package api
 
 import (
-	"errors"
-	"github.com/google/uuid"
-
 	"sandpiper/pkg/shared/config"
 	"sandpiper/pkg/shared/database"
 	"sandpiper/pkg/shared/middleware/jwt"
@@ -24,18 +21,12 @@ import (
 	co "sandpiper/pkg/api/company/register"
 	gr "sandpiper/pkg/api/grain/register"
 	pa "sandpiper/pkg/api/password/register"
+	se "sandpiper/pkg/api/setting/register"
 	sl "sandpiper/pkg/api/slice/register"
 	su "sandpiper/pkg/api/subscription/register"
 	sy "sandpiper/pkg/api/sync/register"
 	ta "sandpiper/pkg/api/tag/register"
 	us "sandpiper/pkg/api/user/register"
-)
-
-const (
-	// ServerRoleKey accesses the server role setting ("primary" or "secondary")
-	ServerRoleKey = "server-role"
-	// ServerIDKey accesses the server id setting (company_id of this server)
-	ServerIDKey = "server-id"
 )
 
 // Start configures and launches the API services
@@ -44,11 +35,6 @@ func Start(cfg *config.Configuration) error {
 	// setup database connection (with optional query logging using standard "log")
 	db, err := database.New(cfg.DB.URL(), cfg.DB.Timeout, cfg.DB.LogQueries)
 	if err != nil {
-		return err
-	}
-
-	// check required db settings
-	if err := validateSettings(db); err != nil {
 		return err
 	}
 
@@ -69,38 +55,25 @@ func Start(cfg *config.Configuration) error {
 
 	// register each service (using proper import alias)
 	au.Register(db, sec, log, srv, tok, tok.MWFunc()) // auth service (no version group)
-	pa.Register(db, sec, log, v1)                     // password service
-	us.Register(db, sec, log, v1)                     // user service
-	co.Register(db, sec, log, v1)                     // company service
-	sl.Register(db, sec, log, v1)                     // slice service
-	gr.Register(db, sec, log, v1)                     // grain service
-	su.Register(db, sec, log, v1)                     // subscription service
-	ta.Register(db, sec, log, v1)                     // tagging service
 	ac.Register(db, sec, log, v1)                     // activity service
+	co.Register(db, sec, log, v1)                     // company service
+	gr.Register(db, sec, log, v1)                     // grain service
+	pa.Register(db, sec, log, v1)                     // password service
+	se.Register(db, sec, log, v1)                     // setting service
+	sl.Register(db, sec, log, v1)                     // slice service
+	su.Register(db, sec, log, v1)                     // subscription service
 	sy.Register(db, sec, log, v1)                     // sync (exchange) service
+	ta.Register(db, sec, log, v1)                     // tagging service
+	us.Register(db, sec, log, v1)                     // user service
 
 	// listen for requests
 	server.Start(srv, &server.Settings{
 		Port:                cfg.Server.Port,
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,
 		WriteTimeoutSeconds: cfg.Server.WriteTimeout,
-		ServerRole:          db.ServerRole,
+		ServerRole:          db.Settings.ServerRole,
 		Debug:               cfg.Server.Debug,
 	})
 
-	return nil
-}
-
-func validateSettings(db *database.DB) error {
-	var err error
-
-	db.ServerRole = db.Settings[ServerRoleKey]
-	if db.ServerRole == "" {
-		return errors.New("missing db setting: \"" + ServerRoleKey + "\"")
-	}
-	db.ServerID, err = uuid.Parse(db.Settings[ServerIDKey])
-	if err != nil {
-		return errors.New("missing or invalid db setting: \"" + ServerIDKey + "\" (expects uuid)")
-	}
 	return nil
 }

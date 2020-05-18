@@ -4,6 +4,8 @@
 
 package mock
 
+// todo: change to https://github.com/ory/dockertest
+
 import (
 	"database/sql"
 	"testing"

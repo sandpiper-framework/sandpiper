@@ -18,7 +18,7 @@ import (
 
 // Register ties the company service to its logger and transport mechanisms
 func Register(db *database.DB, sec company.Securer, log sandpiper.Logger, v1 *echo.Group) {
-	rba := rbac.New(db.ServerRole)
+	rba := rbac.New(db.Settings.ServerRole)
 	rba.ScopingField = "id" // company service so scoping is simply "id"
 	svc := company.Initialize(db, rba, sec)
 	ls := cl.ServiceLogger(svc, log)

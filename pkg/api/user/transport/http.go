@@ -148,6 +148,7 @@ func (h *HTTP) update(c echo.Context) error {
 		LastName:  req.LastName,
 		Email:     req.Email,
 		Phone:     req.Phone,
+		Active:    req.Active,
 	})
 
 	if err != nil {

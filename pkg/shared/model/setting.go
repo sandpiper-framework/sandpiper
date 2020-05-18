@@ -4,9 +4,11 @@
 
 package sandpiper
 
+import "github.com/google/uuid"
+
 // Setting represents the setting domain model
 type Setting struct {
-	ID    int    `json:"id" pg:",pk"`
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	ID         bool      `json:"id" pg:",pk"`
+	ServerRole string    `json:"server_role"`
+	ServerID   uuid.UUID `json:"server_id"`
 }

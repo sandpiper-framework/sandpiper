@@ -58,6 +58,7 @@ tasks:
   build-cli:
     desc: Build sandpiper cli command
     dir: cmd/cli
+    deps: [bindata-api]
     cmds:
       - go build -v -o {{.EXE}} -ldflags="-X sandpiper/pkg/cli/version.Version={{.VER}}"
     vars:

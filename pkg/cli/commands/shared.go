@@ -58,9 +58,14 @@ func GetGlobalParams(c *args.Context) (*GlobalParams, error) {
 		return nil, err
 	}
 
-	passwd, err := getPassword(c.String("password"))
+	user := c.String("user")
+	if user == "" {
+		return nil, errors.New("user not supplied")
+	}
+
+	passwd := getPassword(c.String("password"))
 	if passwd == "" {
-		return nil, fmt.Errorf("password not supplied")
+		return nil, errors.New("password not supplied")
 	}
 
 	return &GlobalParams{
@@ -74,21 +79,39 @@ func GetGlobalParams(c *args.Context) (*GlobalParams, error) {
 
 // AllowOverwrite prompts the user for permission to overwrite something
 func AllowOverwrite() bool {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Overwrite (y/n)? ")
-	ans, _ := reader.ReadString('\n')
-	return strings.ToLower(strings.TrimSpace(ans)) == "y"
+	ans := Prompt("Overwrite (y/n)? ", "y")
+	return strings.ToLower(ans) == "y"
 }
 
-func getPassword(pw string) (string, error) {
-	if pw == "" {
-		password, err := gopass.GetPasswdPrompt("Password: ", true, os.Stdin, os.Stdout)
-		if err != nil {
-			return "", err
-		}
-		pw = string(password)
+// Prompt for an answer given a question
+func Prompt(question, defaultAns string) string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(question)
+	ans, err := reader.ReadString('\n')
+	if err != nil {
+		return ""
 	}
-	return pw, nil
+	ans = strings.TrimSpace(ans)
+	if ans == "" {
+		ans = defaultAns
+	}
+	return ans
+}
+
+// GetPassword accepts console input masking typed characters
+func GetPassword(prompt string) string {
+	pw, err := gopass.GetPasswdPrompt(prompt, true, os.Stdin, os.Stdout)
+	if err != nil {
+		return ""
+	}
+	return string(pw)
+}
+
+func getPassword(pw string) string {
+	if pw == "" {
+		pw = GetPassword("Password: ")
+	}
+	return pw
 }
 
 func getServerAddr(addr, port string) (*url.URL, error) {

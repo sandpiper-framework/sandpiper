@@ -7,6 +7,11 @@
  
 BEGIN;
 
+CREATE TYPE server_role_enum AS ENUM (
+  'primary',
+  'secondary'
+);
+
 CREATE TYPE slice_type_enum AS ENUM (
   'aces-file',
   'aces-items',
@@ -24,12 +29,6 @@ CREATE TYPE encoding_enum AS ENUM (
   'z64',
   'a85',
   'z85'
-);
-
-CREATE TABLE IF NOT EXISTS "settings" (
-  "id"    SERIAL PRIMARY KEY,
-  "key"   text UNIQUE NOT NULL,
-  "value" text NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS companies (
@@ -131,5 +130,12 @@ CREATE TABLE IF NOT EXISTS users (
 
 ALTER TABLE companies
     ADD CONSTRAINT sync_user_fk FOREIGN KEY (sync_user_id) REFERENCES "users" ON DELETE RESTRICT;
+
+CREATE TABLE IF NOT EXISTS "settings" (
+  "id" bool PRIMARY KEY DEFAULT TRUE, /* only allow one row */
+  "server_role" server_role_enum,
+  "server_id" uuid REFERENCES "companies" ON DELETE RESTRICT,
+  CONSTRAINT "settings_singleton" CHECK (id) /* only TRUE allowed */
+);
 
 COMMIT;

@@ -9,12 +9,11 @@ package database
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
 	"github.com/go-pg/pg/v9"
-	"github.com/google/uuid"
-
 	// DB adapter
 	_ "github.com/lib/pq"
 
@@ -26,10 +25,7 @@ type dbLogger struct{}
 // DB is a wrapper around pg.DB so we can add functionality
 type DB struct {
 	*pg.DB
-	Settings map[string]string
-	// the following are required settings
-	ServerRole string
-	ServerID   uuid.UUID
+	Settings *sandpiper.Setting // database settings
 }
 
 // BeforeQuery is an unused stub at this time.
@@ -78,17 +74,11 @@ func New(psn string, timeout int, enableLog bool) (*DB, error) {
 
 // settings retrieves any key/value pairs from the database "settings" table.
 func (db *DB) settings() error {
-	var settings []sandpiper.Setting
+	db.Settings = &sandpiper.Setting{ID: true}
 
-	err := db.Model(&settings).Select()
-	if err != nil && err != pg.ErrNoRows {
-		return err
+	err := db.Select(db.Settings)
+	if err == pg.ErrNoRows {
+		return errors.New("missing db settings: database not initialized")
 	}
-
-	db.Settings = make(map[string]string)
-	for _, setting := range settings {
-		db.Settings[setting.Key] = setting.Value
-	}
-
-	return nil
+	return err
 }

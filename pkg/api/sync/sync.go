@@ -63,7 +63,7 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	if err != nil {
 		return err
 	}
-	// connect to the primary server using our api-key (saving token)
+	// connect to the primary server using their api-key (saving token)
 	s.api, err = s.connect(p.SyncAddr, p.SyncAPIKey)
 	if err != nil {
 		return err

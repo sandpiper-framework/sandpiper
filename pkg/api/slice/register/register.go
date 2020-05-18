@@ -18,7 +18,7 @@ import (
 
 // Register ties the slice service to its logger and transport mechanisms
 func Register(db *database.DB, sec slice.Securer, log sandpiper.Logger, v1 *echo.Group) {
-	svc := slice.Initialize(db, rbac.New(db.ServerRole), sec)
+	svc := slice.Initialize(db, rbac.New(db.Settings.ServerRole), sec)
 	ls := sl.ServiceLogger(svc, log)
 	st.NewHTTP(ls, v1)
 }

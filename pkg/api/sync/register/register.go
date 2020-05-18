@@ -18,7 +18,7 @@ import (
 
 // Register ties the sync service to its logger and transport mechanisms
 func Register(db *database.DB, sec sync.Securer, log sandpiper.Logger, v1 *echo.Group) {
-	svc := sync.Initialize(db, rbac.New(db.ServerRole), sec)
+	svc := sync.Initialize(db, rbac.New(db.Settings.ServerRole), sec)
 	ls := sl.ServiceLogger(svc, log)
 	st.NewHTTP(ls, v1)
 }

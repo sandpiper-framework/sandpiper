@@ -22,9 +22,6 @@ import (
 // serverList defines a list of active primary servers
 type serverList []sandpiper.Company
 
-// subsArray defines a list of subscription
-//type subsArray []sandpiper.Subscription
-
 type syncParams struct {
 	addr         *url.URL // our sandpiper server
 	user         string
@@ -131,8 +128,7 @@ func StartSync(c *args.Context) error {
 		return err
 	}
 
-	// setup a simple waitgroup (using channel as a semaphore)
-	// https://stackoverflow.com/questions/39776481/how-to-wait-until-buffered-channel-semaphore-is-empty
+	// setup a simple waitgroup (using channel as a semaphore and max queue size)
 	wg := make(chan struct{}, sync.maxSyncProcs)
 	wgAdd := func() { wg <- struct{}{} }
 	wgDone := func() { <-wg }
@@ -143,6 +139,7 @@ func StartSync(c *args.Context) error {
 	}
 
 	syncFunc := func(srv sandpiper.Company) {
+		defer wgDone() // release semaphore
 		if err := sync.syncServer(srv); err != nil {
 			// log error, but continue
 			if sync.debug {
@@ -152,7 +149,6 @@ func StartSync(c *args.Context) error {
 			result = errors.New("sync completed with errors")
 			errCount++
 		}
-		wgDone() // release semaphore
 	}
 
 	// sync each server in a separate go routine
