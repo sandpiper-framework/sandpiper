@@ -2,27 +2,36 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-package sandpiper_test
+package payload_test
 
 import (
 	"bytes"
-	"sandpiper/pkg/shared/model"
+	"fmt"
 	"testing"
+
+	"sandpiper/pkg/shared/payload"
 )
 
 func TestEncode(t *testing.T) {
 	tests := []struct {
 		name    string
 		src     []byte
+		enc     string
 		want    string
 		wantErr bool
 	}{
-		{"Good Conversion", []byte("sandpiper rocks!"), "H4sIAAAAAAAC/ypOzEspyCxILVIoyk/OLlYEAAAA//8BAAD//451mN4QAAAA", false},
+		{
+			name:    "Good Conversion",
+			src:     []byte("sandpiper rocks!"),
+			enc:     "z64",
+			want:    "H4sIAAAAAAAC/ypOzEspyCxILVIoyk/OLlYEAAAA//8BAAD//451mN4QAAAA",
+			wantErr: false,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			data := bytes.NewReader(test.src)
-			got, err := sandpiper.Encode(data)
+			got, err := payload.Encode(data, test.enc)
 			if (err != nil) != test.wantErr {
 				t.Errorf("error = %v, wantErr %v", err, test.wantErr)
 				return
@@ -37,15 +46,21 @@ func TestEncode(t *testing.T) {
 func TestDecode(t *testing.T) {
 	tests := []struct {
 		name    string
-		data    sandpiper.PayloadData
+		data    payload.PayloadData
+		enc     string
 		want    string
 		wantErr bool
 	}{
-		{"Good Conversion", []byte("H4sIAAAAAAAC/ypOzEspyCxILVIoyk/OLlYEAAAA//8BAAD//451mN4QAAAA"), "sandpiper rocks!", false},
+		{
+			name:    "Good Conversion",
+			data:    "H4sIAAAAAAAC/ypOzEspyCxILVIoyk/OLlYEAAAA//8BAAD//451mN4QAAAA",
+			enc:     "z64",
+			want:    "sandpiper rocks!",
+			wantErr: false},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := test.data.Decode()
+			got, err := test.data.Decode(test.enc)
 			if (err != nil) != test.wantErr {
 				t.Errorf("error = %v, wantErr %v", err, test.wantErr)
 				return
@@ -62,18 +77,20 @@ func TestPayloadData(t *testing.T) {
 
 	t.Run("Back & Forth", func(t *testing.T) {
 		data := bytes.NewReader(src)
-		in, err := sandpiper.Encode(data)
+		in, err := payload.Encode(data, "b64")
 		if err != nil {
 			t.Errorf("error = %v", err)
 			return
 		}
-		out, err := in.Decode()
+		out, err := in.Decode("b64")
 		if err != nil {
 			t.Errorf("error = %v", err)
 			return
 		}
-		if string(src) != string(out) {
-			t.Errorf("got \"%s\" want \"%s\"\n", string(src), string(out))
+		if string(src) != out {
+			t.Errorf("got \"%s\" want \"%s\"\n", src, out)
+			b := []byte(out)
+			fmt.Printf("out: %v", b)
 			return
 		}
 	})

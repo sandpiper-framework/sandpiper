@@ -54,20 +54,6 @@ var GlobalFlags = []args.Flag{
 // Commands defines the valid command line sub-commands
 var Commands = []*args.Command{
 	{
-		/* sandpiper init
-		 */
-		Name:      "init",
-		Usage:     "initialize a sandpiper primary or secondary database",
-		ArgsUsage: " ", // don't show that we accept arguments
-		Action:    command.Init,
-		Flags: []args.Flag{
-			&args.StringFlag{
-				Name:  "id",
-				Usage: "assign this server-id (for testing only)",
-			},
-		},
-	},
-	{
 		/* sandpiper add \
 		   --slice "aap-brake-pads"  \ # argument is a slice name
 		   --noprompt                \ # don't prompt before over-writing
@@ -158,6 +144,28 @@ var Commands = []*args.Command{
 				Required: false,
 			},
 		},
+	},
+	{
+		/* sandpiper init
+		 */
+		Name:      "init",
+		Usage:     "initialize a sandpiper primary or secondary database",
+		ArgsUsage: " ", // don't show that we accept arguments
+		Action:    command.Init,
+		Flags: []args.Flag{
+			&args.StringFlag{
+				Name:  "id",
+				Usage: "assign this server-id (for testing only)",
+			},
+		},
+	},
+	{
+		/* sandpiper secrets
+		 */
+		Name:      "secrets",
+		Usage:     "generate new random secrets for env vars and config.yaml file",
+		ArgsUsage: " ", // don't show that we accept arguments
+		Action:    command.Secrets,
 	},
 }
 

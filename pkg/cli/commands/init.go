@@ -8,8 +8,9 @@ package command
 // sandpiper init
 
 import (
+	"errors"
 	"fmt"
-	database "sandpiper/pkg/shared/migrate"
+	"strings"
 
 	"github.com/go-pg/pg/v9"
 	"github.com/golang-migrate/migrate/v4/source/go_bindata"
@@ -18,6 +19,7 @@ import (
 
 	"sandpiper/pkg/api/migrations"
 	"sandpiper/pkg/shared/config"
+	database "sandpiper/pkg/shared/migrate"
 	"sandpiper/pkg/shared/model"
 	"sandpiper/pkg/shared/secure"
 )
@@ -30,6 +32,7 @@ type Conn struct {
 // Init seeds the database for initial use
 func Init(c *args.Context) error {
 	id := c.String("id")
+	fmt.Printf("INITIALIZE A SANDPIPER DATABASE\n\n")
 
 	// connect to master (template) database on server
 	mc := masterConfig()
@@ -37,6 +40,7 @@ func Init(c *args.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("connected to host\n\n")
 
 	// create the sandpiper database
 	sc := sandpiperConfig(mc)
@@ -45,8 +49,9 @@ func Init(c *args.Context) error {
 	}
 
 	// Update the database if necessary (from bindata embedded files)
+	fmt.Printf("\napplying migrations...\n")
 	msg := database.Migrate(sc.URL(), embeddedFiles())
-	fmt.Printf("Database: \"%s\"\n%s\n", sc.Database, msg)
+	fmt.Printf("Database: \"%s\"\n%s\n\n", sc.Database, msg)
 
 	// connect to the new sandpiper database
 	sdb, err := connectDB(sc)
@@ -59,6 +64,7 @@ func Init(c *args.Context) error {
 		return err
 	}
 
+	fmt.Printf("\ninitialization complete for \"%s\"\n\n", sc.Database)
 	return nil
 }
 
@@ -66,10 +72,10 @@ func masterConfig() config.Database {
 	return config.Database{
 		Dialect:  "postgres",
 		Database: "template1", // every postgres sever has this database
-		Host:     Prompt("Database Server Address (localhost): ", "localhost"),
-		Port:     Prompt("Database Server Port (5432): ", "5432"),
-		User:     Prompt("Database Server Superuser (postgres): ", "postgres"),
-		Password: GetPassword("Superuser Password: "),
+		Host:     Prompt("PostgreSQL Address (localhost): ", "localhost"),
+		Port:     Prompt("PostgreSQL Port (5432): ", "5432"),
+		User:     Prompt("PostgreSQL Superuser (postgres): ", "postgres"),
+		Password: GetPassword("PostgreSQL Superuser Password: "),
 		SSLMode:  Prompt("SSL Mode (disable): ", "disable"),
 	}
 }
@@ -77,7 +83,7 @@ func masterConfig() config.Database {
 func sandpiperConfig(c config.Database) config.Database {
 	return config.Database{
 		Dialect:  "postgres",
-		Database: Prompt("New Database Name (sandpiper): ", "sandpiper"),
+		Database: strings.ToLower(Prompt("New Database Name (sandpiper): ", "sandpiper")),
 		User:     Prompt("Database Owner (sandpiper): ", "sandpiper"),
 		Password: Prompt("Database Owner Password: ", ""),
 		Host:     c.Host,
@@ -109,31 +115,47 @@ func (db *Conn) createDatabase(c config.Database) error {
 	var s string
 
 	s = fmt.Sprintf("CREATE DATABASE %s;", c.Database)
-	if _, err := db.Exec(s); err != nil {
-		return err
-	}
 	fmt.Println(s)
+	if _, err := db.Exec(s); err != nil {
+		pgErr, ok := err.(pg.Error)
+		// allow duplicate role errors
+		if ok && pgErr.Field('C') != "42P04" {
+			return err
+		} else {
+			fmt.Printf("database \"%s\" already exists\n", c.Database)
+		}
+	}
 
 	s = fmt.Sprintf("CREATE USER %s WITH ENCRYPTED PASSWORD '%s';", c.User, c.Password)
+	fmt.Println(s)
 	if _, err := db.Exec(s); err != nil {
 		pgErr, ok := err.(pg.Error)
 		// allow duplicate role errors
 		if ok && pgErr.Field('C') != "42710" {
 			return err
+		} else {
+			fmt.Printf("user \"%s\" already exists\n", c.User)
 		}
 	}
-	fmt.Println(s)
 
 	s = fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE %s TO %s;", c.Database, c.User)
+	fmt.Println(s)
 	if _, err := db.Exec(s); err != nil {
 		return err
 	}
-	fmt.Println(s)
 
 	return nil
 }
 
 func (db *Conn) seedDatabase(id string) error {
+	settings, err := db.getSettings()
+	if err != nil && err != pg.ErrNoRows {
+		return err
+	}
+	if settings != nil {
+		fmt.Printf("%s\n", settings.Display())
+		return errors.New("ERROR: database is already initialized")
+	}
 	company, err := db.addCompany(id)
 	if err != nil {
 		return err
@@ -145,12 +167,19 @@ func (db *Conn) seedDatabase(id string) error {
 }
 
 func (db *Conn) addCompany(companyID string) (*sandpiper.Company, error) {
-	var syncAddr string
+	var syncAddr, serverRole string
 
 	companyName := Prompt("Company Name: ", "")
-	serverRole := Prompt("Server-Role (primary/secondary): ", "primary")
-	if serverRole == "primary" {
-		syncAddr = Prompt("Public Sync URL: ", "")
+	for syncAddr == "" {
+		serverRole = Prompt("Server-Role (primary*/secondary): ", "primary")
+		switch serverRole {
+		case "primary":
+			syncAddr = Prompt("Public Sync URL: ", "")
+		case "secondary":
+			syncAddr = "(none)"
+		default:
+			fmt.Println("error: expected \"primary\" or \"secondary\"")
+		}
 	}
 
 	id, err := uuid.Parse(companyID)
@@ -174,6 +203,14 @@ func (db *Conn) addCompany(companyID string) (*sandpiper.Company, error) {
 
 	fmt.Printf("Added Company \"%s\"\n", company.Name)
 	return &company, nil
+}
+
+func (db *Conn) getSettings() (*sandpiper.Setting, error) {
+	setting := sandpiper.Setting{ID: true}
+	if err := db.Select(&setting); err != nil {
+		return nil, err
+	}
+	return &setting, nil
 }
 
 func (db *Conn) addSettings(companyID uuid.UUID, role string) error {

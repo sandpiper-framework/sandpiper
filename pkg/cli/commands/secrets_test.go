@@ -6,6 +6,6 @@ package command
 
 import "testing"
 
-func TestInit(t *testing.T) {
+func TestSecrets(t *testing.T) {
 	// Write your code here
 }

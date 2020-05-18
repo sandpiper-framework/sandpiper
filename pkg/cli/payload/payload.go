@@ -8,22 +8,22 @@ package payload
 import (
 	"os"
 
-	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/payload"
 )
 
 // FromFile encodes a filesystem file for storing in the database
-func FromFile(fileName string, enc string) (sandpiper.PayloadData, error) {
+func FromFile(fileName string, enc string) (payload.PayloadData, error) {
 	// get a reader for the file to add
 	file, err := os.Open(fileName)
 	if err != nil {
-		return sandpiper.PayloadNil, err
+		return payload.Nil, err
 	}
 	defer file.Close()
 
 	// encode file contents for grain's payload
-	payload, err := sandpiper.Encode(file, enc)
+	data, err := payload.Encode(file, enc)
 	if err != nil {
-		return sandpiper.PayloadNil, err
+		return payload.Nil, err
 	}
-	return payload, nil
+	return data, nil
 }

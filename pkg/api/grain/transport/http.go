@@ -14,6 +14,7 @@ import (
 
 	"sandpiper/pkg/api/grain"
 	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/payload"
 )
 
 // HTTP represents user http service
@@ -41,12 +42,12 @@ var (
 
 // Grain create request
 type createReq struct {
-	ID       uuid.UUID             `json:"id"` // optional
-	SliceID  uuid.UUID             `json:"slice_id" validate:"required"`
-	Key      string                `json:"grain_key" validate:"required"`
-	Source   string                `json:"source"`
-	Encoding string                `json:"encoding" validate:"required"`
-	Payload  sandpiper.PayloadData `json:"payload" validate:"required"`
+	ID       uuid.UUID           `json:"id"` // optional
+	SliceID  uuid.UUID           `json:"slice_id" validate:"required"`
+	Key      string              `json:"grain_key" validate:"required"`
+	Source   string              `json:"source"`
+	Encoding string              `json:"encoding" validate:"required"`
+	Payload  payload.PayloadData `json:"payload" validate:"required"`
 }
 
 func (r createReq) id() uuid.UUID {

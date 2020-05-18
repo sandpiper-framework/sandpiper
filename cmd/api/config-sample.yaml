@@ -21,17 +21,16 @@ server:
   write_timeout_seconds: 5
   max_sync_procs: 5
   debug: false   # WARNING: debug creates non-JSON responses (but shows underlying errors). Not for production!
-  # ** Change this sample secret!!! **
-  # Only used by a "primary" server. Can override with "APIKEY_SECRET" env variable
+  # ** Change this sample secret!!! (required only on "primary" server) **
+  # Can override with "APIKEY_SECRET" env variable
   # This should be a Base64 Encoded AES-256 key (44 chars)
-  # For example, https://www.digitalsanctuary.com/aes-key-generator-free, or
-  # node -e "console.log(require('crypto').randomBytes(32).toString('base64'));"
+  # generate with `sandpiper secrets`
   api_key_secret: u7WJ3kpqyvAkKb7HIfYJoSok2DoqTa9YhaCUhUujqb8=
 
 jwt:
-  # ** Change this sample secret!!! **
+  # ** Change this sample secret!!! (required on all servers) **
   # Can override secret with "JWT_SECRET" env variable
-  # node -e "console.log(require('crypto').randomBytes(64).toString('base64'));"
+  # generate with `sandpiper secrets`
   secret: WuBF5X3FS8IYGb5BblKPJxfrDHAHJYWqG649C+qAafmXy0fow0IX8NpDPQXuHRuUbLSlX/L0IjdD5Lu2dWQOMw
   duration_minutes: 15
   refresh_duration_minutes: 15

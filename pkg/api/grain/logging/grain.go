@@ -15,6 +15,7 @@ import (
 
 	"sandpiper/pkg/api/grain"
 	"sandpiper/pkg/shared/model"
+	"sandpiper/pkg/shared/payload"
 )
 
 // ServiceLogger creates new logger wrapping the grain service
@@ -39,7 +40,7 @@ func (ls *LogService) Create(c echo.Context, replaceFlag bool, req *sandpiper.Gr
 	defer func(begin time.Time) {
 		var g *sandpiper.Grain
 		// suppress payload in log for req and resp
-		req.Payload = sandpiper.PayloadNil
+		req.Payload = payload.Nil
 		if resp != nil {
 			g = &sandpiper.Grain{
 				ID:       resp.ID,

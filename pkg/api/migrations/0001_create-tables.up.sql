@@ -34,9 +34,9 @@ CREATE TYPE encoding_enum AS ENUM (
 CREATE TABLE IF NOT EXISTS companies (
   "id"           uuid PRIMARY KEY,
   "name"         text NOT NULL,
-  "sync_addr"    text UNIQUE NOT NULL,   /* primary server's sync_addr */
-  "sync_api_key" text,                   /* used by secondary server */
-  "sync_user_id" int,   /* can be NULL */
+  "sync_addr"    text UNIQUE NOT NULL, /* primary server's sync_addr */
+  "sync_api_key" text,                 /* used by secondary server */
+  "sync_user_id" int,                  /* sync_user_fk constraint (can be NULL) */
   "active"       boolean,
   "created_at"   timestamp,
   "updated_at"   timestamp
@@ -128,14 +128,16 @@ CREATE TABLE IF NOT EXISTS users (
   "updated_at"       timestamp
 );
 
-ALTER TABLE companies
-    ADD CONSTRAINT sync_user_fk FOREIGN KEY (sync_user_id) REFERENCES "users" ON DELETE RESTRICT;
-
 CREATE TABLE IF NOT EXISTS "settings" (
   "id" bool PRIMARY KEY DEFAULT TRUE, /* only allow one row */
   "server_role" server_role_enum,
   "server_id" uuid REFERENCES "companies" ON DELETE RESTRICT,
+  "created_at"       timestamp,
+  "updated_at"       timestamp,
   CONSTRAINT "settings_singleton" CHECK (id) /* only TRUE allowed */
 );
+
+ALTER TABLE companies
+    ADD CONSTRAINT sync_user_fk FOREIGN KEY (sync_user_id) REFERENCES "users" ON DELETE RESTRICT;
 
 COMMIT;

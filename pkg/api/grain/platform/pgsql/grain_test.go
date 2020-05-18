@@ -30,7 +30,7 @@ func TestCreate(t *testing.T) {
 				SliceID:  mock.TestUUIDp(1),
 				Key:      "AAP Premium Brakes",
 				Encoding: "raw",
-				Payload:  sandpiper.PayloadData("payload data"),
+				Payload:  payload.PayloadData("payload data"),
 			},
 		},
 		{
@@ -41,7 +41,7 @@ func TestCreate(t *testing.T) {
 				SliceID:  mock.TestUUIDp(0),
 				Key:      "AAP Premium Brakes",
 				Encoding: "raw",
-				Payload:  sandpiper.PayloadData("payload data"),
+				Payload:  payload.PayloadData("payload data"),
 			},
 		},
 		{

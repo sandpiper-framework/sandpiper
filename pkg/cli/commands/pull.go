@@ -180,7 +180,7 @@ func saveGrainToFile(basePath string, slice *sandpiper.Slice, grain *sandpiper.G
 		return nil
 	}
 
-	if _, err := f.WriteString(string(s)); err != nil {
+	if _, err := f.WriteString(s); err != nil {
 		return err
 	}
 
