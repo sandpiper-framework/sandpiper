@@ -10,6 +10,7 @@ package command
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/go-pg/pg/v9"
@@ -27,6 +28,8 @@ import (
 // Conn creates a receiver struct for a database connection
 type Conn struct {
 	*pg.DB
+	conf       config.Database
+	serverRole string
 }
 
 // Init seeds the database for initial use
@@ -65,6 +68,13 @@ func Init(c *args.Context) error {
 	}
 
 	fmt.Printf("\ninitialization complete for \"%s\"\n\n", sc.Database)
+
+	filename, err := sdb.createConfigFile()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("A server config file \"%s\" was created in this folder\n\n", filename)
+
 	return nil
 }
 
@@ -108,7 +118,7 @@ func connectDB(conf config.Database) (*Conn, error) {
 		return nil, err
 	}
 
-	return &Conn{db}, nil
+	return &Conn{DB: db, conf: conf}, nil
 }
 
 func (db *Conn) createDatabase(c config.Database) error {
@@ -167,12 +177,12 @@ func (db *Conn) seedDatabase(id string) error {
 }
 
 func (db *Conn) addCompany(companyID string) (*sandpiper.Company, error) {
-	var syncAddr, serverRole string
+	var syncAddr string
 
 	companyName := Prompt("Company Name: ", "")
 	for syncAddr == "" {
-		serverRole = Prompt("Server-Role (primary*/secondary): ", "primary")
-		switch serverRole {
+		db.serverRole = Prompt("Server-Role (primary*/secondary): ", "primary")
+		switch db.serverRole {
 		case "primary":
 			syncAddr = Prompt("Public Sync URL: ", "")
 		case "secondary":
@@ -197,7 +207,7 @@ func (db *Conn) addCompany(companyID string) (*sandpiper.Company, error) {
 		return nil, err
 	}
 
-	if err := db.addSettings(company.ID, serverRole); err != nil {
+	if err := db.addSettings(company.ID, db.serverRole); err != nil {
 		return nil, err
 	}
 
@@ -243,6 +253,66 @@ func (db *Conn) addUser(companyID uuid.UUID) error {
 	return nil
 }
 
+func (db *Conn) createConfigFile() (string, error) {
+	name := db.serverRole + ".yaml"
+	if fileExists(name) {
+		if err := os.Rename(name, name+".bak"); err != nil {
+			return "", err
+		}
+	}
+	c := config.Configuration{
+		Server: configServer(db.serverRole),
+		DB:     &db.conf,
+		JWT:    configJWT(),
+		App:    configApp(),
+	}
+	if err := config.Save(&c, name); err != nil {
+		return "", err
+	}
+	return name, nil
+}
+
+func configServer(role string) *config.Server {
+	port := "8080"
+	if role != "primary" {
+		port = "8081"
+	}
+	key, err := APISecret()
+	if err != nil {
+		key = "(generate a suitable key using the `sandpiper secret` command)"
+	}
+	return &config.Server{
+		Port:         port,
+		ReadTimeout:  10,
+		WriteTimeout: 5,
+		MaxSyncProcs: 5,
+		Debug:        false,
+		APIKeySecret: key,
+	}
+}
+
+func configJWT() *config.JWT {
+	key, err := JWTSecret()
+	if err != nil {
+		key = "(generate a suitable key using the `sandpiper secret` command)"
+	}
+	return &config.JWT{
+		Secret:           key,
+		Duration:         15,
+		RefreshDuration:  15,
+		MaxRefresh:       1440,
+		SigningAlgorithm: "HS256",
+		MinSecretLength:  64,
+	}
+}
+
+func configApp() *config.Application {
+	return &config.Application{
+		MinPasswordStr: 1,
+		ServiceLogging: true,
+	}
+}
+
 // embeddedFiles returns a pointer to the structure that manages access to embedded database migration files.
 // It uses an "import" specific to the pkg we are building (so this function must be local for each executable).
 func embeddedFiles() *bindata.AssetSource {
@@ -251,4 +321,12 @@ func embeddedFiles() *bindata.AssetSource {
 			return migrations.Asset(name)
 		})
 	return r
+}
+
+func fileExists(f string) bool {
+	_, err := os.Stat(f)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return err == nil
 }

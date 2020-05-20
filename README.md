@@ -12,7 +12,7 @@ There are only a few prerequisites for getting a Sandpiper installation up and r
 Sandpiper requires access to a PostgreSQL sever for its data storage (for both primary and secondary roles). This can be an existing installation (either on premises or in the cloud) or follow
 the instructions below to install locally for your desired platform.
 
-Download binary from official download site (or use package manager for your platform such as apt or scoop).
+Download the binary from the official download site (or use package manager for your platform such as apt or scoop).
 
 ```
 https://www.postgresql.org/download/
@@ -24,40 +24,27 @@ To start/stop service, run `pg_ctl start`, `pg_ctl stop`.
 
 ##### Linux
 
-To start the service, run
+To start the service manually, run:
 
 ```
 sudo service postgresql start
 ```
 
+#### Sandpiper Binaries
+
+Download the latest Sandpiper Release which contains compiled binaries for both Windows and Linux.
+
+```
+https://github.com/sandpiper-framework/sandpiper/releases
+```
+
+There are two programs included in the release, the `api` server and the `sandpiper` command line interface. Put both of them in a directory along with the `config-sample.yaml` file.
+
+*todo:* change `sandpiper init` to automatically create the config.yaml file
+
 ##### Create Database (for each desired role)
 
-*todo:* Database creation is automated with 'task', but we don't want that dependency for standard production installations. Create .bat and .sh files to handle this for those not running from source.
 
-```
-task create-pub-db | create-sub-db | create-both-db
-```
-
-```
-win64: psql --username=postgres --file=db_create.sql
-linux: sudo -u postgres psql --username=postgres --file=db_create.sql
-```
-
-Enter the master postgresql user password when prompted. The following commands should be included in the db_create.sql file (depending on desired role).
-
-*Primary:*
-```
-CREATE DATABASE sandpiper;
-CREATE USER admin WITH ENCRYPTED PASSWORD '--password here--';
-GRANT ALL PRIVILEGES ON DATABASE sandpiper TO admin;
-```
-
-*Secondary:*
-```
-CREATE DATABASE tidepool;
-CREATE USER admin WITH ENCRYPTED PASSWORD '--password here--';
-GRANT ALL PRIVILEGES ON DATABASE tidepool TO admin;
-```
 
 ### Running in Production
 

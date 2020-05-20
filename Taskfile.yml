@@ -14,7 +14,7 @@ vars:
 
 tasks:
   create-db:
-    desc: Create the database(s) from default postgresql installation using "psql"
+    desc: Create the database(s) from default postgresql installation using "psql" (*obsoleted* by `sandpiper init`)
     dir: pkg/api/migrations
     cmds:
       - "{{.PSQLCMD}}"

@@ -6,12 +6,21 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
 
 	"gopkg.in/yaml.v2"
 )
+
+const header = `# Copyright The Sandpiper Authors. All rights reserved.
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE.md file.
+
+# sandpiper configuration file (rename to "config.yaml" for default use by api server)
+
+`
 
 // Load returns Configuration struct
 func Load(path string) (*Configuration, error) {
@@ -25,6 +34,19 @@ func Load(path string) (*Configuration, error) {
 		return nil, fmt.Errorf("unable to decode into struct, %v", err)
 	}
 	return cfg, nil
+}
+
+// Save creates a config file from a struct to a file
+func Save(c *Configuration, filename string) error {
+	b, err := yaml.Marshal(c)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBufferString(header)
+	if _, err := buf.Write(b); err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filename, buf.Bytes(), 0644)
 }
 
 // Configuration defines available config sections with pointers to their structs
@@ -76,7 +98,6 @@ func (d *Database) SafeURL() string {
 
 // Server holds data necessary for server configuration
 type Server struct {
-	URL          string `yaml:"url,omitempty"` // is this being used?
 	Port         string `yaml:"port,omitempty"`
 	Debug        bool   `yaml:"debug,omitempty"`
 	ReadTimeout  int    `yaml:"read_timeout_seconds,omitempty"`

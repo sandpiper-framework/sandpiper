@@ -18,11 +18,11 @@ import (
 // Secrets generates new secrets for the server config.yaml file
 func Secrets(c *args.Context) error {
 	fmt.Println("GENERATE RANDOM SERVER 'SECRETS'")
-	api, err := apiSecret()
+	api, err := APISecret()
 	if err != nil {
 		return err
 	}
-	jwt, err := jwtSecret()
+	jwt, err := JWTSecret()
 	if err != nil {
 		return err
 	}
@@ -36,18 +36,21 @@ func Secrets(c *args.Context) error {
 	return nil
 }
 
-func apiSecret() (string, error) {
+// APISecret returns a random string suitable for an AES256 encryption key
+func APISecret() (string, error) {
 	// Base64 Encoded AES-256 key (44 chars)
-	// node -e "console.log(require('crypto').randomBytes(32).toString('base64'));"
-	return secretKey(32)
+	// similar to node -e "console.log(require('crypto').randomBytes(32).toString('base64'));"
+	return SecretKey(32)
 }
 
-func jwtSecret() (string, error) {
-	// node -e "console.log(require('crypto').randomBytes(64).toString('base64'));"
-	return secretKey(64)
+// JWTSecret returns a random string suitable for a JWT secret key
+func JWTSecret() (string, error) {
+	// similar to node -e "console.log(require('crypto').randomBytes(64).toString('base64'));"
+	return SecretKey(64)
 }
 
-func secretKey(n int) (string, error) {
+// SecretKey generates a random key suitable for secrets
+func SecretKey(n int) (string, error) {
 	s, err := randomBytes(n)
 	if err != nil {
 		return "", err
@@ -55,14 +58,14 @@ func secretKey(n int) (string, error) {
 	return toBase64(s), nil
 }
 
-func randomBytes(n int) (string, error) {
-	b := make([]byte, n/2)
+func randomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
 	if _, err := rand.Read(b); err != nil {
-		return "", err
+		return nil, err
 	}
-	return fmt.Sprintf("%x", b), nil
+	return b, nil
 }
 
-func toBase64(data string) string {
-	return base64.StdEncoding.EncodeToString([]byte(data))
+func toBase64(data []byte) string {
+	return base64.StdEncoding.EncodeToString(data)
 }

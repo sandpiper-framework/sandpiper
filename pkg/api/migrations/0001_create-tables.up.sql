@@ -2,7 +2,7 @@
  * Project: sandpiper
  * Database: sandpiper
  * Migration: Create initial database tables for server in an empty database
- * Date: 2019-11-16
+ * Date: 2020-05-18
  */
  
 BEGIN;
@@ -34,7 +34,7 @@ CREATE TYPE encoding_enum AS ENUM (
 CREATE TABLE IF NOT EXISTS companies (
   "id"           uuid PRIMARY KEY,
   "name"         text NOT NULL,
-  "sync_addr"    text UNIQUE NOT NULL, /* primary server's sync_addr */
+  "sync_addr"    text UNIQUE NOT NULL, /* primary server's sync_addr (but still want it unique) */
   "sync_api_key" text,                 /* used by secondary server */
   "sync_user_id" int,                  /* sync_user_fk constraint (can be NULL) */
   "active"       boolean,

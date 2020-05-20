@@ -17,8 +17,8 @@ type Company struct {
 	ID            uuid.UUID       `json:"id"`
 	Name          string          `json:"name"`
 	SyncAddr      string          `json:"sync_addr"`
-	SyncAPIKey    string          `json:"sync_api_key"` // only on secondary
-	SyncUserID    int             `json:"sync_user_id"` // NULL marshalls as 0
+	SyncAPIKey    string          `json:"sync_api_key,omitempty"` // only on secondary
+	SyncUserID    int             `json:"sync_user_id,omitempty"`
 	Active        bool            `json:"active"`
 	CreatedAt     time.Time       `json:"created_at"`
 	UpdatedAt     time.Time       `json:"updated_at"`
