@@ -38,11 +38,15 @@ Download the latest Sandpiper Release which contains compiled binaries for both 
 https://github.com/sandpiper-framework/sandpiper/releases
 ```
 
-There are two programs included in the release, the `api` server and the `sandpiper` command line interface. Put both of them in a directory along with the `config-sample.yaml` file.
+There are two programs included in the release, the `api` server and the `sandpiper` command line interface. Put both of them in a directory.
 
-*todo:* change `sandpiper init` to automatically create the config.yaml file
+#### Config Files
 
-##### Create Database (for each desired role)
+Both sandpiper programs require configuration settings to run. These settings are stored in [yaml](https://en.wikipedia.org/wiki/YAML) files made up of key/value pairs organized by sections (e.g. Database, Server, Application, etc.). In some cases (such as login credentials), these settings can be overridden by environment variables. See the Deployment section for more information.
+
+Two sample config files are provided (`api-config-sample.yaml` and `cli-config-sample.yaml`) as a template, but these files are also created by the database initialization procedure explained below.
+
+#### Create Database (for each desired server role)
 
 
 

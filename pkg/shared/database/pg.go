@@ -39,6 +39,9 @@ func (d dbLogger) AfterQuery(_ context.Context, q *pg.QueryEvent) error {
 	return nil
 }
 
+// todo: pass db config instead of a psn string and use runtime.GOOS to allow unix sockets
+// set pg.Connect(options) directly.
+
 // New creates new database connection to a postgres database with optional query logging
 func New(psn string, timeout int, enableLog bool) (*DB, error) {
 	uri, err := pg.ParseURL(psn)

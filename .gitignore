@@ -9,9 +9,6 @@
 *.so
 *.dylib
 
-# embedded binary source files
-bindata.go
-
 # Test binary, built with `go test -c`
 *.test
 

@@ -22,6 +22,12 @@ tasks:
       PSQLCMD:
         '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql --quiet'
 
+  init-db:
+    desc: Create the PostgreSQL database and initialize it
+    dir: cmd/cli
+    cmds:
+      - ./sandpiper init
+
   update:
     desc: Get the latest Sandpiper server repo
     cmds:

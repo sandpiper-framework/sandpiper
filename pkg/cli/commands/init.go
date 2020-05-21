@@ -254,7 +254,7 @@ func (db *Conn) addUser(companyID uuid.UUID) error {
 }
 
 func (db *Conn) createConfigFile() (string, error) {
-	name := db.serverRole + ".yaml"
+	name := "api-" + db.serverRole + ".yaml"
 	if fileExists(name) {
 		if err := os.Rename(name, name+".bak"); err != nil {
 			return "", err
