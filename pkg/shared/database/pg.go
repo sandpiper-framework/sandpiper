@@ -9,14 +9,17 @@ package database
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"log"
+	"os"
 	"time"
 
 	"github.com/go-pg/pg/v9"
 	// DB adapter
 	_ "github.com/lib/pq"
 
+	"sandpiper/pkg/shared/config"
 	"sandpiper/pkg/shared/model"
 )
 
@@ -39,22 +42,14 @@ func (d dbLogger) AfterQuery(_ context.Context, q *pg.QueryEvent) error {
 	return nil
 }
 
-// todo: pass db config instead of a psn string and use runtime.GOOS to allow unix sockets
-// set pg.Connect(options) directly.
-
 // New creates new database connection to a postgres database with optional query logging
-func New(psn string, timeout int, enableLog bool) (*DB, error) {
-	uri, err := pg.ParseURL(psn)
-	if err != nil {
-		return nil, err
-	}
+func New(c *config.Database, timeout int, enableLog bool) (*DB, error) {
 
 	// wrap db connection in our struct
-	db := &DB{DB: pg.Connect(uri)}
+	db := &DB{DB: pg.Connect(ConnectOptions(c))}
 
 	// test connectivity
-	_, err = db.Exec("SELECT 1")
-	if err != nil {
+	if _, err := db.Exec("SELECT 1"); err != nil {
 		return nil, err
 	}
 
@@ -75,6 +70,41 @@ func New(psn string, timeout int, enableLog bool) (*DB, error) {
 	return db, nil
 }
 
+// ConnectOptions takes a database config and returns go-pg specific connect options
+func ConnectOptions(c *config.Database) *pg.Options {
+	var addr = func() string {
+		host := env("DB_HOST", c.Host)
+		port := env("DB_PORT", c.Port)
+		if c.Network == "unix" {
+			if host[0:1] == "/" {
+				// unix domain socket
+				return host + "/.s.PGSQL." + port
+			}
+		}
+		return host + ":" + port
+	}
+
+	return &pg.Options{
+		Network:   env("DB_NETWORK", c.Network),   // "tcp" or "unix" (for unix domain sockets)
+		Addr:      env("DB_ADDR", addr()),         // host:port or unix socket (e.g. /var/run/postgresql/.s.PGSQL.5432)
+		Database:  env("DB_DATABASE", c.Database), // database name
+		User:      env("DB_USER", c.User),         // database role
+		Password:  env("DB_PASSWORD", c.Password), // plaintext password
+		TLSConfig: getTLSConfig(c.SSLMode),        // "disable", "allow", "verify-ca"
+	}
+}
+
+func getTLSConfig(mode string) *tls.Config {
+	pgSSLMode := env("DB_SSLMODE", mode)
+	if pgSSLMode == "disable" {
+		return nil
+	}
+	// missing or any other option
+	return &tls.Config{
+		InsecureSkipVerify: true,
+	}
+}
+
 // settings retrieves any key/value pairs from the database "settings" table.
 func (db *DB) settings() error {
 	db.Settings = &sandpiper.Setting{ID: true}
@@ -84,4 +114,12 @@ func (db *DB) settings() error {
 		return errors.New("missing db settings: database not initialized")
 	}
 	return err
+}
+
+func env(key, defValue string) string {
+	envValue := os.Getenv(key)
+	if envValue != "" {
+		return envValue
+	}
+	return defValue
 }

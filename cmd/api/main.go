@@ -11,13 +11,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/golang-migrate/migrate/v4/source/go_bindata"
-
 	"sandpiper/pkg/api"
-	"sandpiper/pkg/api/migrations"
 	"sandpiper/pkg/api/version"
 	"sandpiper/pkg/shared/config"
-	"sandpiper/pkg/shared/migrate"
+	"sandpiper/pkg/shared/database"
 )
 
 const (
@@ -36,7 +33,10 @@ func main() {
 	}
 
 	// Update the database if necessary (from bindata embedded files)
-	msg := database.Migrate(cfg.DB.URL(), embeddedFiles())
+	msg, err := database.Migrate(cfg.DB.DSN())
+	if err != nil {
+		log.Fatal("ERROR: ", err)
+	}
 	fmt.Printf("Database: \"%s\"\n%s\n", cfg.DB.Database, msg)
 
 	if cfg.Server.Debug {
@@ -47,14 +47,4 @@ func main() {
 	if err != nil {
 		log.Fatal("ERROR: ", err)
 	}
-}
-
-// embeddedFiles returns a pointer to the structure that manages access to embedded database migration files.
-// It uses an "import" specific to the pkg we are building (so this function must be local for each executable).
-func embeddedFiles() *bindata.AssetSource {
-	r := bindata.Resource(migrations.AssetNames(),
-		func(name string) ([]byte, error) {
-			return migrations.Asset(name)
-		})
-	return r
 }

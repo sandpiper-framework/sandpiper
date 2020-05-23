@@ -157,6 +157,11 @@ var Commands = []*args.Command{
 				Name:  "id",
 				Usage: "assign this server-id (for testing only)",
 			},
+			&args.BoolFlag{
+				Name:     "debug",
+				Usage:    "show debug messages during the init process",
+				Required: false,
+			},
 		},
 	},
 	{

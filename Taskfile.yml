@@ -22,7 +22,7 @@ tasks:
       PSQLCMD:
         '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql --quiet'
 
-  init-db:
+  init:
     desc: Create the PostgreSQL database and initialize it
     dir: cmd/cli
     cmds:
@@ -38,23 +38,9 @@ tasks:
       - echo '{{.GO_PACKAGES}}'
     silent: true
 
-  go-bindata:
-    desc: Add go-bindata dependency and install it if necessary
-    cmds:
-      - go get -u github.com/go-bindata/go-bindata/...
-    silent: true
-
-  bindata-api:
-    desc: Use go-bindata to encode file migrations in a go source file
-    dir: pkg/api/migrations
-    deps: [go-bindata]
-    cmds:
-      - go-bindata -ignore "^[^0-9]{4}.+$" -pkg migrations .
-
   build-api:
     desc: Build sandpiper primary server
     dir: cmd/api
-    deps: [bindata-api]
     cmds:
       - go build -v -o {{.EXE}} -ldflags="-X sandpiper/pkg/api/version.Version={{.VER}}"
     vars:
@@ -64,7 +50,6 @@ tasks:
   build-cli:
     desc: Build sandpiper cli command
     dir: cmd/cli
-    deps: [bindata-api]
     cmds:
       - go build -v -o {{.EXE}} -ldflags="-X sandpiper/pkg/cli/version.Version={{.VER}}"
     vars:

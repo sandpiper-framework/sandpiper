@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -24,13 +25,13 @@ const header = `# Copyright The Sandpiper Authors. All rights reserved.
 
 // Load returns Configuration struct
 func Load(path string) (*Configuration, error) {
-	bytes, err := ioutil.ReadFile(path)
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error reading config file \"%s\"", err)
 	}
 	var cfg = new(Configuration)
 
-	if err := yaml.Unmarshal(bytes, cfg); err != nil {
+	if err := yaml.Unmarshal(b, cfg); err != nil {
 		return nil, fmt.Errorf("unable to decode into struct, %v", err)
 	}
 	return cfg, nil
@@ -60,40 +61,74 @@ type Configuration struct {
 
 // Database structure holds settings for database configuration
 type Database struct {
-	LogQueries bool   `yaml:"log_queries,omitempty"`
-	Timeout    int    `yaml:"timeout_seconds,omitempty"`
 	Dialect    string `yaml:"dialect,omitempty"`
-	Database   string `yaml:"database,omitempty"`
-	User       string `yaml:"user,omitempty"`     // can override from env var
-	Password   string `yaml:"password,omitempty"` // can override from env var
+	Network    string `yaml:"network,omitempty"`
 	Host       string `yaml:"host,omitempty"`
 	Port       string `yaml:"port,omitempty"`
+	Database   string `yaml:"database,omitempty"`
+	User       string `yaml:"user,omitempty"`
+	Password   string `yaml:"password,omitempty"`
 	SSLMode    string `yaml:"sslmode,omitempty"`
+	Timeout    int    `yaml:"timeout_seconds,omitempty"`
+	LogQueries bool   `yaml:"log_queries,omitempty"`
 }
 
 // URL creates a connection URL from a `database` section overriding User/Password with env vars if found
 func (d *Database) URL() string {
-	// postgres://username:password@host:port/database?sslmode=disable
-	return fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=%s",
-		d.Dialect,
-		env("DB_USER", d.User),
-		env("DB_PASSWORD", d.Password),
-		d.Host,
-		d.Port,
-		d.Database,
-		d.SSLMode)
+	return d.psn(false)
 }
 
 // SafeURL creates a connection URL from a `database` config and env vars without a password
 func (d *Database) SafeURL() string {
-	// postgres://username@host:port/database?sslmode=disable
-	return fmt.Sprintf("%s://%s@%s:%s/%s?sslmode=%s",
+	return d.psn(true)
+}
+
+func (d *Database) psn(safe bool) string {
+	password := "*******"
+	if !safe {
+		password = env("DB_PASSWORD", d.Password)
+	}
+	if d.Network == "unix" {
+		// for unix sockets, use form: postgres://user@:port/database?host=/var/run/postgresql
+		return fmt.Sprintf("%s://%s@:%s/%s?host=%s",
+			d.Dialect,
+			env("DB_USER", d.User),
+			env("DB_PORT", d.Port),
+			env("DB_DATABASE", d.Database),
+			env("DB_HOST", d.Host),
+		)
+	}
+	// postgres://username:password@host:port/database?sslmode=disable
+	return fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=%s",
 		d.Dialect,
 		env("DB_USER", d.User),
-		d.Host,
-		d.Port,
-		d.Database,
-		d.SSLMode)
+		password,
+		env("DB_HOST", d.Host),
+		env("DB_DATABASE", d.Database),
+		env("DB_SSLMODE", d.SSLMode),
+	)
+}
+
+// DSN provides a connection string using key/value pairs format from on a database config
+// https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+func (d *Database) DSN() string {
+	b := make([]string,10)
+
+	var add = func(k, v, e string) {
+		val := env(e, v)
+		if val != "" {
+			b = append(b, k + "=" + v)
+		}
+	}
+
+	add("dbname",d.Database,"DB_DATABASE")
+	add("user", d.User, "DB_USER")
+	add("password", d.Password, "DB_PASSWORD")
+	add("host", d.Host, "DB_HOST")
+	add("port", d.Port, "DB_PORT")
+	add("sslmode", d.SSLMode, "DB_SSLMODE")
+
+	return strings.Join(b, " ")
 }
 
 // Server holds data necessary for server configuration

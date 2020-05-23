@@ -11,16 +11,15 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/go-pg/pg/v9"
-	"github.com/golang-migrate/migrate/v4/source/go_bindata"
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"sandpiper/pkg/api/migrations"
 	"sandpiper/pkg/shared/config"
-	database "sandpiper/pkg/shared/migrate"
+	"sandpiper/pkg/shared/database"
 	"sandpiper/pkg/shared/model"
 	"sandpiper/pkg/shared/secure"
 )
@@ -32,15 +31,19 @@ type Conn struct {
 	serverRole string
 }
 
+var debug bool
+
 // Init seeds the database for initial use
 func Init(c *args.Context) error {
 	id := c.String("id")
+	debug = c.Bool("debug")
 	fmt.Printf("INITIALIZE A SANDPIPER DATABASE\n\n")
 
 	// connect to master (template) database on server
 	mc := masterConfig()
 	mdb, err := connectDB(mc)
 	if err != nil {
+		fmt.Println(mc.SafeURL())
 		return err
 	}
 	fmt.Printf("connected to host\n\n")
@@ -48,17 +51,23 @@ func Init(c *args.Context) error {
 	// create the sandpiper database
 	sc := sandpiperConfig(mc)
 	if err := mdb.createDatabase(sc); err != nil {
+		fmt.Println(sc.SafeURL())
 		return err
 	}
 
 	// Update the database if necessary (from bindata embedded files)
 	fmt.Printf("\napplying migrations...\n")
-	msg := database.Migrate(sc.URL(), embeddedFiles())
+	debugMessage("Connect Options: %s", sc.DSN())
+	msg, err := database.Migrate(sc.DSN())
+	if err != nil {
+		return err
+	}
 	fmt.Printf("Database: \"%s\"\n%s\n\n", sc.Database, msg)
 
 	// connect to the new sandpiper database
 	sdb, err := connectDB(sc)
 	if err != nil {
+		fmt.Println(sc.SafeURL())
 		return err
 	}
 
@@ -79,15 +88,22 @@ func Init(c *args.Context) error {
 }
 
 func masterConfig() config.Database {
-	return config.Database{
+	host := "localhost"
+	if runtime.GOOS == "linux" {
+		// use unix domain sockets (best guess default)
+		host = "/var/run/postgresql"
+	}
+	conf := config.Database{
 		Dialect:  "postgres",
 		Database: "template1", // every postgres sever has this database
-		Host:     Prompt("PostgreSQL Address (localhost): ", "localhost"),
+		Host:     Prompt("PostgreSQL Address ("+host+"): ", host),
 		Port:     Prompt("PostgreSQL Port (5432): ", "5432"),
 		User:     Prompt("PostgreSQL Superuser (postgres): ", "postgres"),
 		Password: GetPassword("PostgreSQL Superuser Password: "),
 		SSLMode:  Prompt("SSL Mode (disable): ", "disable"),
 	}
+	conf.Network = network(conf.Host)
+	return conf
 }
 
 func sandpiperConfig(c config.Database) config.Database {
@@ -96,25 +112,28 @@ func sandpiperConfig(c config.Database) config.Database {
 		Database: strings.ToLower(Prompt("New Database Name (sandpiper): ", "sandpiper")),
 		User:     Prompt("Database Owner (sandpiper): ", "sandpiper"),
 		Password: Prompt("Database Owner Password: ", ""),
+		Network:  c.Network,
 		Host:     c.Host,
 		Port:     c.Port,
 		SSLMode:  c.SSLMode,
 	}
 }
 
-func connectDB(conf config.Database) (*Conn, error) {
-	// postgres://username:password@host:port/database?sslmode=disable
-	opts, err := pg.ParseURL(conf.URL())
-	if err != nil {
-		return nil, err
+func network(host string) string {
+	if host[0:1]=="/" {
+		return "unix"
 	}
+	return "tcp"
+}
 
-	// connect to the database
+func connectDB(conf config.Database) (*Conn, error) {
+	// connect to the database from a config
+	opts := database.ConnectOptions(&conf)
+	debugMessage("Connect Options: %v", opts)
 	db := pg.Connect(opts)
 
 	// test connectivity
-	_, err = db.Exec("SELECT 1")
-	if err != nil {
+	if _, err := db.Exec("SELECT 1"); err != nil {
 		return nil, err
 	}
 
@@ -313,20 +332,17 @@ func configApp() *config.Application {
 	}
 }
 
-// embeddedFiles returns a pointer to the structure that manages access to embedded database migration files.
-// It uses an "import" specific to the pkg we are building (so this function must be local for each executable).
-func embeddedFiles() *bindata.AssetSource {
-	r := bindata.Resource(migrations.AssetNames(),
-		func(name string) ([]byte, error) {
-			return migrations.Asset(name)
-		})
-	return r
-}
-
 func fileExists(f string) bool {
 	_, err := os.Stat(f)
 	if os.IsNotExist(err) {
 		return false
 	}
 	return err == nil
+}
+
+// debugMessage prints a help message to the console
+func debugMessage(format string, a ...interface{}) {
+	if debug {
+		fmt.Printf("\n"+format+"\n", a...)
+	}
 }

@@ -10,6 +10,8 @@ https://github.com/sandpiper-framework/sandpiper/releases
 
 https://www.postgresql.org/download/
 
+See our separate guides for installing PostgreSQL on specific platforms.
+
 Be sure to write down the superuser (usually `postgres`) and password. You will need them to manage your PostgreSQL server.
 
 ## Creating the Primary Database

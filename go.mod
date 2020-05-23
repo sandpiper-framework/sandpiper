@@ -3,10 +3,12 @@ module sandpiper
 go 1.14
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.4.1 // indirect
+	github.com/GuiaBolso/darwin v0.0.0-20191218124601-fd6d2aa3d244
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
+	github.com/cznic/ql v1.2.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fortytw2/dockertest v0.0.0-20171126212657-a73397bdeff4
-	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/go-pg/pg/v9 v9.1.5
 	github.com/go-pg/urlstruct v0.4.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
@@ -15,7 +17,6 @@ require (
 	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.2
-	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
 	github.com/labstack/echo/v4 v4.1.16
 	github.com/leodido/go-urn v1.2.0 // indirect

@@ -18,17 +18,7 @@ Download the binary from the official download site (or use package manager for 
 https://www.postgresql.org/download/
 ```
 
-##### Windows
-
-To start/stop service, run `pg_ctl start`, `pg_ctl stop`.
-
-##### Linux
-
-To start the service manually, run:
-
-```
-sudo service postgresql start
-```
+See the setup documents in the documentation for platform-specific instructions. Other plug-and-play options are available for those that would like to use pre-configured solutions. Please see the section on Containers and PAAS below. 
 
 #### Sandpiper Binaries
 
@@ -48,25 +38,85 @@ Two sample config files are provided (`api-config-sample.yaml` and `cli-config-s
 
 #### Create Database (for each desired server role)
 
+Before we can do anything, we need to create a sandpiper database within the PostgreSQL server. A simple command line tool is provided to take care of this for you. Open a command prompt (terminal) and enter the following commands (assuming you are currently in the root sandpiper folder).
 
+```
+cd cmd/cli
+./sandpiper init
+```
+You will be prompted for your PostgreSQL Host Address, Port and Superuser credentials. This is required to create a new database. In most cases, you can simply press Enter to accept the default value (shown in parentheses).
+
+```
+PS C:\Users\dougw\autocare\sandpiper\cmd\cli> ./sandpiper init
+sandpiper (v0.1.2-67-g5facfce-dirty)
+Copyright 2020 The Sandpiper Authors. All rights reserved.
+
+INITIALIZE A SANDPIPER DATABASE
+
+PostgreSQL Address (localhost):
+PostgreSQL Port (5432):
+PostgreSQL Superuser (postgres):
+PostgreSQL Superuser Password: *********
+SSL Mode (disable):
+connected to host
+```
+The address `localhost` (which is equivalent to 127.0.0.1) indicates you're running this command on the same machine as PostgreSQL. Otherwise, it would be a standard ip4 address on your network (e.g. 192.168.1.100) or possibly a hosted instance endpoint (e.g. myinstance.123456789012.us-east-1.rds.amazonaws.com). The superuser password (from above) will be hidden when you type.
+
+You should see "connected to host" to indicate that the connection was successful. Next, you will be prompted for the new database information.
+
+```
+New Database Name (sandpiper):
+Database Owner (sandpiper):
+Database Owner Password: focal-weedy-brood-hat
+CREATE DATABASE sandpiper;
+CREATE USER sandpiper WITH ENCRYPTED PASSWORD 'focal-weedy-brood-hat';
+user "sandpiper" already exists
+GRANT ALL PRIVILEGES ON DATABASE sandpiper TO sandpiper;
+
+applying migrations...
+Database: "sandpiper"
+DB Version: 1 (migrated from 0 to 1)
+```
+
+The recommended database name is `sandpiper` regardless of the server-role you require (primary or secondary). If you need both server-roles on one PostgreSQL server, you can name it anything you like ("secondary", "receiver", "tidepool", etc.).
+
+In the example above, we used default values except when required to enter a password for the database owner (please select a strong password of your own) and again, keep a record of it for later. You will need it when starting the server.
+
+The database owner is the only user to connect directly to the database (via the sandpiper-api server). This should not be confused with a sandpiper end-user which is stored in the `users` table for authentication and access.
+
+```
+Company Name: Better Brakes
+Server-Role (primary*/secondary): primary
+Public Sync URL: http://localhost:8081
+Added Company "Better Brakes"
+Sandpiper Admin Password: admin
+Added User "admin"
+
+initialization complete for "sandpiper"
+```
+
+In production, you would enter a strong admin password, but enter "admin" here to make testing easier. Also, the public sync URL would normally be something like `https://sandpiper.betterbrakes.com`, but we are going to test locally, on the same machine with both servers.
+
+## Deployment
+
+This section provides information on how to deploy Sandpiper in a production environment. The system was designed specifically to reduce dependencies to simplify the process. 
 
 ### Running in Production
 
-To run Sandpiper in a production environment, simply download the correct binary from the Sandpiper web site and follow the deployment instructions:
-
-[Downloads](https://sandpiper.org/downloads)
+To run Sandpiper in a production environment, simply download the correct api binary from the Sandpiper web site and follow the deployment instructions:
 
 ```
 ./api [-config="path/to/config.yaml"] (defaults to ./config.yaml")
 Also supports DB_USER and DB_PASSWORD environment variables
 ```
-## Deployment
 
-Add additional notes about how to deploy this on a live system
+### TLS (SSL) Certificate
 
-### Linux (the `systemd` init system)
+Discuss how to enable ssl.
 
-A sample systemd "unit" file (sandpiper.service) is included with the executable. Make any required changes and copy to `/etc/systemd/system/`.
+### Auto Start -- Linux (the `systemd` init system)
+
+A sample `systemd` "unit" file (sandpiper.service) is included with the executable. Make any required changes and copy to `/etc/systemd/system/`.
 
 Once you enable the service with the following command. It will start automatically on boot, after that.
 ```
@@ -82,16 +132,48 @@ $ service --status-all
 ```
 https://www.digitalocean.com/community/tutorials/understanding-systemd-units-and-unit-files
 
-### Source Code
+### Containers
+
+We provide two pre-configured solutions for testing and deploying a sandpiper installation.
+
+### Docker
+
+https://aranair.github.io/posts/2016/04/27/golang-docker-postgres-digital-ocean/
+https://marketplace.digitalocean.com/apps/dokku
+
+### Vagrant
+
+https://www.vagrantup.com/
+
+### PAAS Options
+
+If you would rather not host a sandpiper on your network, there are several ["Platform As A Service"](https://en.wikipedia.org/wiki/Platform_as_a_service) solutions that we support.
+
+#### Render
+
+https://render.com/
+https://render.com/docs/deploy-beego
+https://render.com/docs/databases
+
+#### Digital Ocean
+
+https://www.digitalocean.com/community/questions/how-to-deploy-golang-program-in-production
+https://kenyaappexperts.com/blog/how-to-deploy-golang-to-production-step-by-step/
+
+#### Google App Engine
+
+https://cloud.google.com/appengine/docs/go/
+
+## Source Code
 
 These instructions will help you get up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 The following software must be installed on your target development machine.
 
 * [git](https://git-scm.com/downloads) 
-* [Go](https://golang.org/)
+* [Go (v13+)](https://golang.org/)
 * [PostgreSQL](https://www.postgresql.org/)
-* [Task](https://taskfile.dev/)
+* [Task (v2.7+)](https://taskfile.dev/)
 
 ### Installing
 
@@ -136,7 +218,6 @@ Upon a successful login, the response body will include a java web token for sub
 ## Running the tests
 
 ... Explain how to run automated tests ...
-
 
 ## Development
 
@@ -229,7 +310,7 @@ Efforts were made to abstract and localize these dependencies.
 
 ### Notices required by included works
 
-**Starter template** ([GORSK](https://github.com/ribice/gorsk)) provided by :
+**Starter template** ([GORSK](https://github.com/ribice/gorsk)) provided by:
 
 Copyright (c) 2018 Emir Ribić
 

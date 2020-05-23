@@ -6,12 +6,13 @@
 
 database:
   dialect: postgres
-  database: sandpiper
-  user: sandpiper        # Can override with "DB_USER" env variable
-  password: development  # Can override with "DB_PASSWORD" env variable
-  host: localhost
-  port: 5432
-  sslmode: disable
+  network: tcp           # "tcp" or "unix" (for unix domain sockets) ("DB_NETWORK")
+  host: localhost        # localhost, ip addr or unix socket (/var/run/postgresql) ("DB_HOST")
+  port: 5432             # port number  ("DB_PORT")
+  database: sandpiper    # database name ("DB_DATABASE")
+  user: sandpiper        # database role ("DB_USER")
+  password: development  # plaintext password ("DB_PASSWORD")
+  sslmode: disable       # "disable", "allow", "verify-ca" ("DB_SSLMODE")
   timeout_seconds: 5
   log_queries: true
 
