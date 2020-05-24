@@ -89,18 +89,21 @@ func (c *Client) login(creds secure.Credentials) error {
 		return err
 	}
 	resp, err := c.do(req, c.auth)
-	if err != nil || resp.StatusCode != 200 {
-		return fmt.Errorf("login failed (%d)", resp.StatusCode)
+	if err != nil {
+		if resp != nil && resp.StatusCode != 200 {
+			return fmt.Errorf("login failed (%d)", resp.StatusCode)
+		}
+		return err
 	}
 
-	// GET /server
+	// GET /server (save in Client)
 	req, err = c.newRequest("GET", "/server", nil)
 	if err != nil {
 		return err
 	}
 	resp, err = c.do(req, c.server)
-	if err != nil || resp.StatusCode != 200 {
-		return fmt.Errorf("login failed (%d)", resp.StatusCode)
+	if err != nil {
+		return err
 	}
 
 	// add api version to all subsequent api calls

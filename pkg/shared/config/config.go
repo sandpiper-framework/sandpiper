@@ -19,7 +19,7 @@ const header = `# Copyright The Sandpiper Authors. All rights reserved.
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE.md file.
 
-# sandpiper configuration file (rename to "config.yaml" for default use by api server)
+# sandpiper configuration file (rename to "config.yaml" for default use)
 
 `
 
@@ -52,8 +52,8 @@ func Save(c *Configuration, filename string) error {
 
 // Configuration defines available config sections with pointers to their structs
 type Configuration struct {
-	Server  *Server      `yaml:"server,omitempty"`
 	DB      *Database    `yaml:"database,omitempty"`
+	Server  *Server      `yaml:"server,omitempty"`
 	JWT     *JWT         `yaml:"jwt,omitempty"`
 	App     *Application `yaml:"application,omitempty"`
 	Command *Command     `yaml:"command,omitempty"`
@@ -73,7 +73,7 @@ type Database struct {
 	LogQueries bool   `yaml:"log_queries,omitempty"`
 }
 
-// DSN provides a connection string using key/value pairs format from on a database config
+// DSN provides a connection string using key/value pairs format from a database config
 // https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
 func (d *Database) DSN() string {
 	return d.dsn()
@@ -92,7 +92,7 @@ func (d Database) dsn() string {
 	var add = func(k, v, e string) {
 		val := env(e, v)
 		if val != "" {
-			b = append(b, k+"="+v)
+			b = append(b, k+"="+val)
 		}
 	}
 
@@ -103,7 +103,7 @@ func (d Database) dsn() string {
 	add("port", d.Port, "DB_PORT")
 	add("sslmode", d.SSLMode, "DB_SSLMODE")
 
-	return strings.Join(b, " ")
+	return strings.TrimSpace(strings.Join(b, " "))
 }
 
 // Server holds data necessary for server configuration

@@ -5,6 +5,8 @@
 // Package command implements `sandpiper` commands (add, pull, list, ...)
 package command
 
+// sandpiper list command
+
 import (
 	"fmt"
 	"net/url"

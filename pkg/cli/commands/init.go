@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/user"
 	"runtime"
 	"strings"
 
@@ -44,21 +45,21 @@ func Init(c *args.Context) error {
 	mc := masterConfig()
 	mdb, err := connectDB(mc)
 	if err != nil {
-		fmt.Println(mc.SafeDSN())
+		connectionHelp(mc)
 		return err
 	}
 	fmt.Printf("connected to host\n\n")
 
 	// create the sandpiper database
 	sc := sandpiperConfig(mc)
+	debugMessage("Connection: %s", sc.DSN())
 	if err := mdb.createDatabase(sc); err != nil {
-		fmt.Println(sc.SafeDSN())
+		connectionHelp(sc)
 		return err
 	}
 
 	// Update the database if necessary
 	fmt.Printf("\napplying migrations...\n")
-	debugMessage("Connect Options: %s", sc.DSN())
 	msg, err := database.Migrate(sc.DSN())
 	if err != nil {
 		return err
@@ -68,7 +69,7 @@ func Init(c *args.Context) error {
 	// connect to the new sandpiper database
 	sdb, err := connectDB(sc)
 	if err != nil {
-		fmt.Println(sc.SafeDSN())
+		connectionHelp(sc)
 		return err
 	}
 
@@ -212,7 +213,7 @@ func (db *Conn) addCompany(companyID string) (*sandpiper.Company, error) {
 			fmt.Println("error: expected \"primary\" or \"secondary\"")
 		}
 	}
-	db.httpURL = Prompt("Server http URL (localhost): ", "localhost")
+	db.httpURL = Prompt("Server http URL (http://localhost): ", "http://localhost")
 
 	id, err := uuid.Parse(companyID)
 	if err != nil {
@@ -233,7 +234,7 @@ func (db *Conn) addCompany(companyID string) (*sandpiper.Company, error) {
 		return nil, err
 	}
 
-	fmt.Printf("Added Company \"%s\"\n", company.Name)
+	fmt.Printf("Added Company \"%s\"\n\n", company.Name)
 	return &company, nil
 }
 
@@ -258,7 +259,7 @@ func (db *Conn) addUser(companyID uuid.UUID) error {
 	sec := secure.New(1, "")
 
 	pw := Prompt("Sandpiper Admin Password: ", "")
-	user := sandpiper.User{
+	u := sandpiper.User{
 		FirstName: "Sandpiper",
 		LastName:  "Admin",
 		Username:  "admin",
@@ -268,10 +269,10 @@ func (db *Conn) addUser(companyID uuid.UUID) error {
 		Role:      sandpiper.SuperAdminRole,
 		Active:    true,
 	}
-	if err := db.Insert(&user); err != nil {
+	if err := db.Insert(&u); err != nil {
 		return err
 	}
-	fmt.Printf("Added User \"%s\"\n", user.Username)
+	fmt.Printf("Added User \"%s\"\n", u.Username)
 	return nil
 }
 
@@ -354,6 +355,40 @@ func fileExists(f string) bool {
 		return false
 	}
 	return err == nil
+}
+
+func connectionHelp(c config.Database) {
+	fmt.Printf("\nConnection failed for: %s\n\n", c.DSN())
+	fmt.Printf("Check \"pg_hba.conf\" for entry: \"%s\", database: \"%s\", user: \"%s\", addr: \"%s\", auth: \"md5\".\n",
+		connectType(c.Network), c.Database, currentUser(), configAddr(c),
+	)
+	fmt.Printf("See https://www.postgresql.org/docs/current/client-authentication.html\n\n")
+	if c.Network == "tcp" {
+		fmt.Printf("NOTE: \"Remote TCP/IP connections will not be possible unless the server is started with an appropriate value\n" +
+			"for the 'listen_addresses' configuration parameter, since the default behavior is to listen for TCP/IP\n" +
+			"connections only on the local loopback address localhost.\"\n\n")
+	}
+}
+
+func currentUser() string {
+	if u, err := user.Current(); err == nil {
+		return u.Username
+	}
+	return "(unknown)"
+}
+
+func configAddr(c config.Database) string {
+	if c.Network == "unix" {
+		return "(blank)"
+	}
+	return c.Host
+}
+
+func connectType(c string) string {
+	if c == "unix" {
+		return "local"
+	}
+	return "host"
 }
 
 // debugMessage prints a help message to the console

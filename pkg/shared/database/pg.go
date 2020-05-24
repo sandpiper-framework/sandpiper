@@ -105,7 +105,7 @@ func getTLSConfig(mode string) *tls.Config {
 	}
 }
 
-// settings retrieves any key/value pairs from the database "settings" table.
+// settings retrieves our database-specific "settings"
 func (db *DB) settings() error {
 	db.Settings = &sandpiper.Setting{ID: true}
 

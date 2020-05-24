@@ -28,6 +28,7 @@ type syncParams struct {
 	password     string
 	partner      string
 	partnerID    uuid.UUID
+	listOnly     bool
 	noupdate     bool
 	maxSyncProcs int
 	debug        bool
@@ -49,6 +50,7 @@ func getSyncParams(c *args.Context) (*syncParams, error) {
 		password:     g.password,
 		partner:      p,
 		partnerID:    id,
+		listOnly:     c.Bool("list"),
 		noupdate:     c.Bool("noupdate"),
 		maxSyncProcs: g.maxSyncProcs,
 		debug:        g.debug,
@@ -128,6 +130,12 @@ func StartSync(c *args.Context) error {
 		return err
 	}
 
+	// display primary servers then exit (--list option)
+	if sync.listOnly {
+		srvs.display()
+		return nil
+	}
+
 	// setup a simple waitgroup (using channel as a semaphore and max queue size)
 	wg := make(chan struct{}, sync.maxSyncProcs)
 	wgAdd := func() { wg <- struct{}{} }
@@ -163,6 +171,10 @@ func StartSync(c *args.Context) error {
 }
 
 func (sl serverList) display() {
+	if len(sl) == 0 {
+		fmt.Println("No active primary servers defined.")
+		return
+	}
 	fmt.Println("SERVER LIST:")
 	for _, srv := range sl {
 		fmt.Printf("%s: (%s)\n", srv.Name, srv.SyncAddr)

@@ -139,6 +139,11 @@ var Commands = []*args.Command{
 				Required: false,
 			},
 			&args.BoolFlag{
+				Name:     "list",
+				Usage:    "Display a list of sync servers (without performing a sync)",
+				Required: false,
+			},
+			&args.BoolFlag{
 				Name:     "noupdate",
 				Usage:    "Perform the sync without actually changing anything locally",
 				Required: false,

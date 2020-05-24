@@ -27,16 +27,16 @@ var _ orm.BeforeInsertHook = (*Setting)(nil)
 var _ orm.BeforeUpdateHook = (*Setting)(nil)
 
 // BeforeInsert hooks into insert operations, setting createdAt and updatedAt to current time
-func (b *Setting) BeforeInsert(ctx context.Context) (context.Context, error) {
+func (s *Setting) BeforeInsert(ctx context.Context) (context.Context, error) {
 	now := time.Now()
-	b.CreatedAt = now
-	b.UpdatedAt = now
+	s.CreatedAt = now
+	s.UpdatedAt = now
 	return ctx, nil
 }
 
 // BeforeUpdate hooks into update operations, setting updatedAt to current time
-func (b *Setting) BeforeUpdate(ctx context.Context) (context.Context, error) {
-	b.UpdatedAt = time.Now()
+func (s *Setting) BeforeUpdate(ctx context.Context) (context.Context, error) {
+	s.UpdatedAt = time.Now()
 	return ctx, nil
 }
 

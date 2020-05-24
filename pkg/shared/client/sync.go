@@ -15,7 +15,7 @@ import (
 
 // ActiveServers returns a list of syncable servers
 func (c *Client) ActiveServers(companyID uuid.UUID, name string) ([]sandpiper.Company, error) {
-	var results []sandpiper.Company
+	var servers []sandpiper.Company
 
 	path := "/servers"
 	if companyID != uuid.Nil {
@@ -28,8 +28,8 @@ func (c *Client) ActiveServers(companyID uuid.UUID, name string) ([]sandpiper.Co
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.do(req, results)
-	return results, err
+	_, err = c.do(req, &servers)
+	return servers, err
 }
 
 // AllSubs returns a list of all information we need for a sync

@@ -9,8 +9,6 @@ version: '2'
 vars:
   REPO:
     github.com/sandpiper-framework/sandpiper
-  GO_PACKAGES:
-    sh: go list ./...
 
 tasks:
   create-db:
@@ -32,11 +30,6 @@ tasks:
     desc: Get the latest Sandpiper server repo
     cmds:
       - go get -u {{.REPO}}
-
-  packages:
-    cmds:
-      - echo '{{.GO_PACKAGES}}'
-    silent: true
 
   build-api:
     desc: Build sandpiper primary server
