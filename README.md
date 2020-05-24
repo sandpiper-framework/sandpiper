@@ -166,7 +166,7 @@ https://cloud.google.com/appengine/docs/go/
 
 ## Source Code
 
-These instructions will help you get up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will help you get up and running on your local machine for development and testing purposes. See the Deployment section for notes on how to deploy the project on a live system.
 
 The following software must be installed on your target development machine.
 

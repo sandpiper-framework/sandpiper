@@ -29,6 +29,7 @@ type Conn struct {
 	*pg.DB
 	conf       config.Database
 	serverRole string
+	httpURL    string
 }
 
 var debug bool
@@ -43,7 +44,7 @@ func Init(c *args.Context) error {
 	mc := masterConfig()
 	mdb, err := connectDB(mc)
 	if err != nil {
-		fmt.Println(mc.SafeURL())
+		fmt.Println(mc.SafeDSN())
 		return err
 	}
 	fmt.Printf("connected to host\n\n")
@@ -51,11 +52,11 @@ func Init(c *args.Context) error {
 	// create the sandpiper database
 	sc := sandpiperConfig(mc)
 	if err := mdb.createDatabase(sc); err != nil {
-		fmt.Println(sc.SafeURL())
+		fmt.Println(sc.SafeDSN())
 		return err
 	}
 
-	// Update the database if necessary (from bindata embedded files)
+	// Update the database if necessary
 	fmt.Printf("\napplying migrations...\n")
 	debugMessage("Connect Options: %s", sc.DSN())
 	msg, err := database.Migrate(sc.DSN())
@@ -67,7 +68,7 @@ func Init(c *args.Context) error {
 	// connect to the new sandpiper database
 	sdb, err := connectDB(sc)
 	if err != nil {
-		fmt.Println(sc.SafeURL())
+		fmt.Println(sc.SafeDSN())
 		return err
 	}
 
@@ -78,11 +79,12 @@ func Init(c *args.Context) error {
 
 	fmt.Printf("\ninitialization complete for \"%s\"\n\n", sc.Database)
 
-	filename, err := sdb.createConfigFile()
+	api, cli, err := sdb.createConfigFiles()
 	if err != nil {
 		return err
 	}
-	fmt.Printf("A server config file \"%s\" was created in this folder\n\n", filename)
+	fmt.Printf("Server config file \"%s\" created in this folder\n", api)
+	fmt.Printf("Command config file \"%s\" created in this folder\n\n", cli)
 
 	return nil
 }
@@ -120,7 +122,7 @@ func sandpiperConfig(c config.Database) config.Database {
 }
 
 func network(host string) string {
-	if host[0:1]=="/" {
+	if host[0:1] == "/" {
 		return "unix"
 	}
 	return "tcp"
@@ -210,6 +212,7 @@ func (db *Conn) addCompany(companyID string) (*sandpiper.Company, error) {
 			fmt.Println("error: expected \"primary\" or \"secondary\"")
 		}
 	}
+	db.httpURL = Prompt("Server http URL (localhost): ", "localhost")
 
 	id, err := uuid.Parse(companyID)
 	if err != nil {
@@ -272,23 +275,36 @@ func (db *Conn) addUser(companyID uuid.UUID) error {
 	return nil
 }
 
-func (db *Conn) createConfigFile() (string, error) {
-	name := "api-" + db.serverRole + ".yaml"
-	if fileExists(name) {
-		if err := os.Rename(name, name+".bak"); err != nil {
-			return "", err
+func (db *Conn) createConfigFiles() (string, string, error) {
+	var protect = func(name string) string {
+		if fileExists(name) {
+			_ = os.Rename(name, name+".bak")
 		}
+		return name
 	}
-	c := config.Configuration{
+
+	nameAPI := protect("api-" + db.serverRole + ".yaml")
+	api := config.Configuration{
 		Server: configServer(db.serverRole),
 		DB:     &db.conf,
 		JWT:    configJWT(),
 		App:    configApp(),
 	}
-	if err := config.Save(&c, name); err != nil {
-		return "", err
+	if err := config.Save(&api, nameAPI); err != nil {
+		return "", "", err
 	}
-	return name, nil
+
+	nameCLI := protect("cli-config.yaml")
+	cmd := config.Command{
+		URL:          db.httpURL,
+		Port:         api.Server.Port,
+		MaxSyncProcs: 5,
+	}
+	if err := config.Save(&config.Configuration{Command: &cmd}, nameCLI); err != nil {
+		return "", "", err
+	}
+
+	return nameAPI, nameCLI, nil
 }
 
 func configServer(role string) *config.Server {

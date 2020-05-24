@@ -13,7 +13,7 @@ import (
 )
 
 // defineSchema returns a list of our database migrations
-// Each migration script is defined in a separate descriptive variable.
+// Each migration script is defined in a separate descriptive string variable.
 func defineSchema() []darwin.Migration {
 	var (
 		enums = `
@@ -37,8 +37,8 @@ func defineSchema() []darwin.Migration {
 			'z64',
 			'a85',
 			'z85'
-		);
-		`
+		);`
+
 		tblCompanies = `
 		CREATE TABLE IF NOT EXISTS companies (
 			"id"           uuid PRIMARY KEY,
@@ -49,8 +49,8 @@ func defineSchema() []darwin.Migration {
 			"active"       boolean,
 			"created_at"   timestamp,
 			"updated_at"   timestamp
-		);
-		`
+		);`
+
 		idxCompanies = `
 		CREATE UNIQUE INDEX ON companies (lower(name));
 		`
@@ -65,8 +65,8 @@ func defineSchema() []darwin.Migration {
 			"content_date"  timestamp,
 			"created_at"    timestamp,
 			"updated_at"    timestamp
-		);
-    `
+		);`
+
 		idxSlices = `
 		CREATE UNIQUE INDEX ON slices (lower(name));
     `
@@ -76,8 +76,8 @@ func defineSchema() []darwin.Migration {
 			"key"      text,
 			"value"    text,
 			PRIMARY KEY ("slice_id", "key")
-		);
-		`
+		);`
+
 		tlbTags = `
 		CREATE TABLE IF NOT EXISTS "tags" (
 			"id"          serial PRIMARY KEY,
@@ -85,15 +85,15 @@ func defineSchema() []darwin.Migration {
 			"description" text,
 			"created_at"  timestamp,
 			"updated_at"  timestamp
-		);
-    `
+		);`
+
 		tblSliceTags = `
 		CREATE TABLE IF NOT EXISTS "slice_tags" (
 			"tag_id" int REFERENCES "tags" ON DELETE CASCADE,
 			"slice_id" uuid REFERENCES "slices" ON DELETE CASCADE,
 			PRIMARY KEY ("tag_id", "slice_id")
-		);
-		`
+		);`
+
 		tblSubscriptions = `
 		CREATE TABLE IF NOT EXISTS "subscriptions" (
 			"sub_id"       uuid PRIMARY KEY,
@@ -105,11 +105,11 @@ func defineSchema() []darwin.Migration {
 			"created_at"   timestamp,
 			"updated_at"   timestamp,
 			CONSTRAINT "sub_alt_key" UNIQUE("slice_id", "company_id")
-		);
-		`
+		);`
+
 		idxSubscriptions = `
-		CREATE UNIQUE INDEX ON subscriptions (lower(name));
-    `
+		CREATE UNIQUE INDEX ON subscriptions (lower(name));`
+
 		tblGrains = `
 		CREATE TABLE IF NOT EXISTS "grains" (
 		  "id"           uuid PRIMARY KEY,
@@ -120,8 +120,8 @@ func defineSchema() []darwin.Migration {
 		  "source"       text,
 		  "created_at"   timestamp,
 		  CONSTRAINT "grains_sliceid_grainkey_key" UNIQUE("slice_id", "grain_key")
-		);
-    `
+		);`
+
 		tblActivity = `
 		CREATE TABLE IF NOT EXISTS "activity" (
 		  "id"         serial PRIMARY KEY,
@@ -130,8 +130,8 @@ func defineSchema() []darwin.Migration {
 		  "message"    text NOT NULL,
 		  "duration"   timestamp,
 		  "created_at" timestamp
-		);
-    `
+		);`
+
 		tblUsers = `
 		CREATE TABLE IF NOT EXISTS users (
 		  "id"               serial PRIMARY KEY,
@@ -149,8 +149,8 @@ func defineSchema() []darwin.Migration {
 		  "company_id"       uuid REFERENCES "companies" ON DELETE RESTRICT,
 		  "created_at"       timestamp,
 		  "updated_at"       timestamp
-		);
-    `
+		);`
+
 		tblSettings = `
 		CREATE TABLE IF NOT EXISTS "settings" (
 		  "id" bool PRIMARY KEY DEFAULT TRUE, /* only allow one row */
@@ -159,12 +159,11 @@ func defineSchema() []darwin.Migration {
 			"created_at"       timestamp,
 			"updated_at"       timestamp,
 			CONSTRAINT "settings_singleton" CHECK (id) /* only TRUE allowed */
-			);
-    `
+			);`
+
 		altCompanies = `
 		ALTER TABLE companies
-		ADD CONSTRAINT sync_user_fk FOREIGN KEY (sync_user_id) REFERENCES "users" ON DELETE RESTRICT;
-		`
+		ADD CONSTRAINT sync_user_fk FOREIGN KEY (sync_user_id) REFERENCES "users" ON DELETE RESTRICT;`
 	)
 
 	return []darwin.Migration{
@@ -220,18 +219,18 @@ func Migrate(psn string) (string, error) {
 
 // currentVersion reads all records from migration table to get the latest version
 func currentVersion(d darwin.Darwin) float64 {
-	var v float64
+	var v, ver float64
 
 	if infoList, err := d.Info(); err == nil {
 		// get latest version
 		for _, info := range infoList {
-			ver :=info.Migration.Version
-			if info.Status == darwin.Applied && ver > v {
-				v = info.Migration.Version
+			v = info.Migration.Version
+			if v > ver && info.Status == darwin.Applied {
+				ver = v
 			}
 		}
 	}
-	return v
+	return ver
 }
 
 func changes(v1, v2 float64) string {

@@ -40,7 +40,7 @@ func main() {
 	fmt.Printf("Database: \"%s\"\n%s\n", cfg.DB.Database, msg)
 
 	if cfg.Server.Debug {
-		fmt.Printf("\n%s\n%s\n", debugModeMsg, cfg.DB.SafeURL())
+		fmt.Printf("\n%s\n%s\n", debugModeMsg, cfg.DB.SafeDSN())
 	}
 
 	err = api.Start(cfg)

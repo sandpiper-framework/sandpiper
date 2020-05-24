@@ -73,55 +73,30 @@ type Database struct {
 	LogQueries bool   `yaml:"log_queries,omitempty"`
 }
 
-// URL creates a connection URL from a `database` section overriding User/Password with env vars if found
-func (d *Database) URL() string {
-	return d.psn(false)
-}
-
-// SafeURL creates a connection URL from a `database` config and env vars without a password
-func (d *Database) SafeURL() string {
-	return d.psn(true)
-}
-
-func (d *Database) psn(safe bool) string {
-	password := "*******"
-	if !safe {
-		password = env("DB_PASSWORD", d.Password)
-	}
-	if d.Network == "unix" {
-		// for unix sockets, use form: postgres://user@:port/database?host=/var/run/postgresql
-		return fmt.Sprintf("%s://%s@:%s/%s?host=%s",
-			d.Dialect,
-			env("DB_USER", d.User),
-			env("DB_PORT", d.Port),
-			env("DB_DATABASE", d.Database),
-			env("DB_HOST", d.Host),
-		)
-	}
-	// postgres://username:password@host:port/database?sslmode=disable
-	return fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=%s",
-		d.Dialect,
-		env("DB_USER", d.User),
-		password,
-		env("DB_HOST", d.Host),
-		env("DB_DATABASE", d.Database),
-		env("DB_SSLMODE", d.SSLMode),
-	)
-}
-
 // DSN provides a connection string using key/value pairs format from on a database config
 // https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
 func (d *Database) DSN() string {
-	b := make([]string,10)
+	return d.dsn()
+}
+
+// SafeDSN sanitizes a DSN connection string
+func (d *Database) SafeDSN() string {
+	var conf Database = *d
+	conf.Password = "******"
+	return conf.dsn()
+}
+
+func (d Database) dsn() string {
+	b := make([]string, 20)
 
 	var add = func(k, v, e string) {
 		val := env(e, v)
 		if val != "" {
-			b = append(b, k + "=" + v)
+			b = append(b, k+"="+v)
 		}
 	}
 
-	add("dbname",d.Database,"DB_DATABASE")
+	add("dbname", d.Database, "DB_DATABASE")
 	add("user", d.User, "DB_USER")
 	add("password", d.Password, "DB_PASSWORD")
 	add("host", d.Host, "DB_HOST")
