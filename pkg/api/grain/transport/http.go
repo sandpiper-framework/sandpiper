@@ -42,12 +42,13 @@ var (
 
 // Grain create request
 type createReq struct {
-	ID       uuid.UUID           `json:"id"` // optional
-	SliceID  uuid.UUID           `json:"slice_id" validate:"required"`
-	Key      string              `json:"grain_key" validate:"required"`
-	Source   string              `json:"source"`
-	Encoding string              `json:"encoding" validate:"required"`
-	Payload  payload.PayloadData `json:"payload" validate:"required"`
+	ID         uuid.UUID           `json:"id"` // optional
+	SliceID    uuid.UUID           `json:"slice_id" validate:"required"`
+	Key        string              `json:"grain_key" validate:"required"`
+	Source     string              `json:"source"`
+	Encoding   string              `json:"encoding" validate:"required"`
+	Payload    payload.PayloadData `json:"payload" validate:"required"`
+	PayloadLen int                 `json:"payload_Len"`
 }
 
 func (r createReq) id() uuid.UUID {
@@ -70,12 +71,13 @@ func (h *HTTP) create(c echo.Context) error {
 	}
 
 	result, err := h.svc.Create(c, replaceFlag, &sandpiper.Grain{
-		ID:       r.id(),
-		SliceID:  &r.SliceID,
-		Key:      r.Key,
-		Source:   r.Source,
-		Encoding: r.Encoding,
-		Payload:  r.Payload,
+		ID:         r.id(),
+		SliceID:    &r.SliceID,
+		Key:        r.Key,
+		Source:     r.Source,
+		Encoding:   r.Encoding,
+		Payload:    r.Payload,
+		PayloadLen: r.PayloadLen,
 	})
 	if err != nil {
 		return err

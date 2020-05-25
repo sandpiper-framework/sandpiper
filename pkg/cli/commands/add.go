@@ -68,6 +68,8 @@ func Add(c *args.Context) error {
 		return err
 	}
 
+	// todo: wrap lock/add/unlock in a transaction
+
 	// lock the slice
 	if err := api.LockSlice(p.sliceID); err != nil {
 		return err
@@ -80,11 +82,12 @@ func Add(c *args.Context) error {
 
 	// create the new grain
 	grain := &sandpiper.Grain{
-		SliceID:  &p.sliceID,
-		Key:      sandpiper.L1GrainKey,
-		Source:   filepath.Base(p.fileName),
-		Encoding: L1Encoding,
-		Payload:  data,
+		SliceID:    &p.sliceID,
+		Key:        sandpiper.L1GrainKey,
+		Source:     filepath.Base(p.fileName),
+		Encoding:   L1Encoding,
+		PayloadLen: len(data), // not persisted (just for the log)
+		Payload:    data,
 	}
 
 	// add the new grain

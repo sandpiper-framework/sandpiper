@@ -1,4 +1,4 @@
-# Sandpiper Setup on Fedora
+# Sandpiper Development Setup (Linux Fedora)
 
 # Environment
 
@@ -8,15 +8,15 @@
 
 # Steps
 
-(1) **Install VirtualBox 6.1.8 (&quot;Windows hosts&quot;)**
+(1) **Install VirtualBox 6.1.8 ("Windows hosts")**
 
 [https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads)
 
-(2) **Install Vagrant 2.2.9 (&quot;Windows 64-bit&quot;)**
+(2) **Install Vagrant 2.2.9 ("Windows 64-bit")**
 
 [https://www.vagrantup.com/downloads.html](https://www.vagrantup.com/downloads.html)
 
-(3) **Create a new vagrant file for Fedora31**
+(3) **Create a new Vagrant file for Fedora31**
 
 Open Windows PowerShell Terminal (PS prompts not shown)
 ```
@@ -26,7 +26,10 @@ cd Vagrant/Fedora31
 vagrant init generic/fedora31
 vagrant up
 ```
-(4) **Enable SSH** (I already had it setup, so not sure what is required here)
+(4) **Enable SSH**
+
+On Windows, Vagrant uses its own SSH client if one is not already installed (and found in the PATH). 
+
 ```
 Vagrant ssh-config
 Vagrant ssh
@@ -93,7 +96,7 @@ $ cd $HOME/sandpiper
 $ go mod download
 $ task build
 ```
-(11) **Create and Initialize database**
+(11) **Create and Initialize Database**
 ```
 $ task init
 $ mv cmd/cli/api-primary.yaml cmd/api/config.yaml

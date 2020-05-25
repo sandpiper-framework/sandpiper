@@ -179,7 +179,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 		fmt.Printf("req: %v\n\nresp: %v\n", req, resp)
 	}
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		msg, _ := resp.ToString()
 		return resp, fmt.Errorf("%s: %s", resp.Status, msg)
 	}

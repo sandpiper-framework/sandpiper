@@ -43,11 +43,12 @@ func (ls *LogService) Create(c echo.Context, replaceFlag bool, req *sandpiper.Gr
 		req.Payload = payload.Nil
 		if resp != nil {
 			g = &sandpiper.Grain{
-				ID:       resp.ID,
-				SliceID:  resp.SliceID,
-				Key:      resp.Key,
-				Source:   resp.Source,
-				Encoding: resp.Encoding,
+				ID:         resp.ID,
+				SliceID:    resp.SliceID,
+				Key:        resp.Key,
+				Source:     resp.Source,
+				Encoding:   resp.Encoding,
+				PayloadLen: resp.PayloadLen,
 			}
 		}
 		ls.logger.Log(

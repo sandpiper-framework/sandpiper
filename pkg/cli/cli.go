@@ -125,6 +125,7 @@ var Commands = []*args.Command{
 	{
 		/* sandpiper sync \
 		   --company "acme-brakes"  \ # an optional company name (case-insensitive) or company_id
+		   --list                   \ # show active servers without performing a sync
 		   --noupdate                 # perform the sync without actually changing anything
 		*/
 		Name:      "sync",

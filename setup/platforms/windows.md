@@ -1,4 +1,4 @@
-# Sandpiper Setup on Windows
+# Sandpiper Development Setup (Windows)
 
 # Environment
 
@@ -30,9 +30,9 @@ todo: add more setup instructions here...
 
 (4) **Install Scoop (package manager)**
 
-Prerequisites are [PowerShell 5](https://aka.ms/wmf5download) (or later, include PowerShell Core) and [.NET Framework 4.5](https://www.microsoft.com/net/download) (or later).
+open a [PowerShell](https://docs.microsoft.com/en-us/powershell/) window and execute:
+
 ```
-open a powershell windows and execute:
 PS> set-executionpolicy remotesigned -scope currentuser
 PS> iwr -useb get.scoop.sh | iex
 PS> scoop bucket add extras
