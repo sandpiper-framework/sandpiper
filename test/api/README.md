@@ -148,7 +148,7 @@ Server role: "primary"
 That last line shows that a web server is running and listening on http://localhost:8080. You should be able to open a browser and type that address and receive a response of:
 
 ```
-"Sadnpiper API OK"
+"Sandpiper API OK"
 ```
 
 We also provide this "Health Check" as the first request in the Insomnia workspace. Select that request now and Press `Send`. You should see that it returns that body response along with a 200 http status code and 13 header rows.

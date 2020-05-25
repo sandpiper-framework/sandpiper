@@ -2,83 +2,164 @@
 // https://www.dbml.org/
 // https://dbdiagram.io/
 
-Table settings  [headercolor: #8e44ad] {
-  id integer [pk, increment]
-  key string [unique, not null]
-  value string
+Enum "server_role_enum" {
+  "primary"
+  "secondary"
 }
 
-Table users {
-  id int [pk]
-  name string
-  email string
-  password string
-  company_id uuid [ref: > companies.id]
-}
-
-Table companies {
-  id uuid [pk]
-  name string
-  contact string
-  email string
-  status statustype
-}
-
-Table subscriptions  [headercolor: #8e44ad] {
-  id uuid [pk]
-  slice_id uuid [ref: > slices.id]
-  company_id uuid [ref: > companies.id]
-  name string
-  description string
-  active boolean
-}
-
-Table tags  [headercolor: #16a085] {
-  id int [pk]
-  name string
-  description string
-}
-
-Table slice_tags  [headercolor: #16a085] {
-  tag_id int [pk, ref: > tags.id]
-  slice_id uuid [pk, ref: > slices.id]
-}
-
-Table slices {
-  id uuid [pk]
-  name varchar
-  slice_type slicetype_enum
-  content_hash string [note: 'code representing all slice ids']
-  content_count integer
-  content_date datetime [note: 'when data in slice was updated']
-}
-
-Table slice_metadata {
-  slice_id uuid [pk, ref: > slices.id]
-  key string [pk]
-  value string
-}
-
-Table grains {
-  id uuid [pk]
-  slice_id uuid [ref: > slices.id]
-  grain_key string
-  payload string
-  source string
-}
-
-Enum statustype {
-  active
-  inactive
-}
-
-Enum slicetype_enum {
-  "aces-file"        // level 1
-  "pies-file"        // level 1
-  "partspro-file"    // level 1
-  "aces-item"
-  "pies-item"
+Enum "slice_type_enum" {
+  "aces-file"
+  "aces-items"
+  "asset-files"
+  "pies-file"
+  "pies-items"
   "pies-marketcopy"
   "pies-pricesheet"
-  "partspro-item"
+  "partspro-file"
 }
+
+Enum "encoding_enum" {
+  "raw"
+  "b64"
+  "z64"
+  "a85"
+  "z85"
+}
+
+Table "companies" {
+  "id" uuid [pk]
+  "name" text [not null]
+  "sync_addr" text [unique, not null]
+  "sync_api_key" text
+  "sync_user_id" int
+  "active" boolean
+  "created_at" timestamp
+  "updated_at" timestamp
+
+Indexes {
+  `lower(name)` [unique]
+}
+}
+
+Table "slices" {
+  "id" uuid [pk]
+  "name" text [not null]
+  "slice_type" slice_type_enum [not null]
+  "allow_sync" boolean
+  "content_hash" text
+  "content_count" integer
+  "content_date" timestamp
+  "created_at" timestamp
+  "updated_at" timestamp
+
+Indexes {
+  `lower(name)` [unique]
+}
+}
+
+Table "slice_metadata" {
+  "slice_id" uuid
+  "key" text
+  "value" text
+
+Indexes {
+  (slice_id, key) [pk]
+}
+}
+
+Table "tags" {
+  "id" int [pk, increment]
+  "name" text [unique, not null]
+  "description" text
+  "created_at" timestamp
+  "updated_at" timestamp
+}
+
+Table "slice_tags" {
+  "tag_id" int
+  "slice_id" uuid
+
+Indexes {
+  (tag_id, slice_id) [pk]
+}
+}
+
+Table "subscriptions" {
+  "sub_id" uuid [pk]
+  "slice_id" uuid [unique]
+  "company_id" uuid [unique]
+  "name" text [not null]
+  "description" text
+  "active" boolean
+  "created_at" timestamp
+  "updated_at" timestamp
+
+Indexes {
+  `lower(name)` [unique]
+}
+}
+
+Table "grains" {
+  "id" uuid [pk]
+  "slice_id" uuid [unique]
+  "grain_key" text [unique, not null]
+  "encoding" encoding_enum
+  "payload" text
+  "source" text
+  "created_at" timestamp
+}
+
+Table "activity" {
+  "id" int [pk, increment]
+  "sub_id" uuid
+  "success" boolean
+  "message" text [not null]
+  "duration" timestamp
+  "created_at" timestamp
+}
+
+Table "users" {
+  "id" int [pk, increment]
+  "username" text [unique, not null]
+  "password" text
+  "email" text [not null]
+  "first_name" text [not null]
+  "last_name" text [not null]
+  "phone" text
+  "active" boolean
+  "last_login" timestamp
+  "password_changed" timestamp
+  "token" text
+  "role" integer
+  "company_id" uuid
+  "created_at" timestamp
+  "updated_at" timestamp
+}
+
+Table "settings" {
+  "id" bool [pk, default: TRUE]
+  "server_role" server_role_enum
+  "server_id" uuid
+  "created_at" timestamp
+  "updated_at" timestamp
+}
+
+Ref:"slices"."id" < "slice_metadata"."slice_id" [delete: cascade]
+
+Ref:"tags"."id" < "slice_tags"."tag_id" [delete: cascade]
+
+Ref:"slices"."id" < "slice_tags"."slice_id" [delete: cascade]
+
+Ref:"slices"."id" < "subscriptions"."slice_id" [delete: cascade]
+
+Ref:"companies"."id" < "subscriptions"."company_id" [delete: cascade]
+
+Ref:"slices"."id" < "grains"."slice_id" [delete: cascade]
+
+Ref:"subscriptions"."sub_id" < "activity"."sub_id" [delete: cascade]
+
+Ref:"companies"."id" < "users"."company_id" [delete: restrict]
+
+Ref:"companies"."id" < "settings"."server_id" [delete: restrict]
+
+Ref:"users"."id" < "companies"."sync_user_id" [delete: restrict]
