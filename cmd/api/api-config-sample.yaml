@@ -2,7 +2,8 @@
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE.md file.
 
-# sandpiper server configuration file
+# Sample Sandpiper server configuration file (for documentation only). An "api-" yaml file is"
+# generated automatically by the `sandpiper init` command.
 
 database:
   dialect: postgres
@@ -13,8 +14,8 @@ database:
   user: sandpiper        # database role ("DB_USER")
   password: development  # plaintext password ("DB_PASSWORD")
   sslmode: disable       # "disable", "allow", "verify-ca" ("DB_SSLMODE")
-  timeout_seconds: 5
-  log_queries: true
+  timeout_seconds: 5     # how many seconds to wait for a sql command to return
+  log_queries: true      # display sql commands executed by the server
 
 server:
   port: 8080

@@ -1,10 +1,12 @@
 # Testing Handbook
 
-This handbook walks you through the testing process. Note that all directory paths are shown in Linux format (forward slash) since they also work in Windows PowerShell. Also, all paths (and so `cd` commands) are shown relative to the root `sandpiper` directory.
+This handbook walks you through the testing process. Note that all directory paths are shown in Linux format (forward slash) since they also work in Windows PowerShell. Also, paths are shown relative to the installation directory.
 
 ## Download Sandpiper Distribution Package
 
 https://github.com/sandpiper-framework/sandpiper/releases
+
+Under "Assets", select the proper binaries for your platform (Windows or Linux) and unzip the contents to a local directory.
 
 ## Download and Install PostgreSQL
 
@@ -19,14 +21,12 @@ Be sure to write down the superuser (usually `postgres`) and password. You will 
 Before we can do anything, we need to create a sandpiper database within the PostgreSQL server. A simple command line tool is provided to take care of this for you. Open a command prompt (terminal) window and enter the following commands (assuming you are currently in the root sandpiper folder).
 
 ```
-cd cmd/cli
-./sandpiper init
+./sandpiper init --id 10000000-0000-0000-0000-000000000000
 ```
 You will be prompted for your PostgreSQL Host Address, Port and Superuser credentials. This is required to create a new database. In most cases, you can simply press Enter to accept the default value (shown in parentheses).
 
 ```
-PS C:\Users\dougw\autocare\sandpiper\cmd\cli> ./sandpiper init --id 10000000-0000-0000-0000-000000000000
-sandpiper (v0.1.2-67-g5facfce-dirty)
+sandpiper (v0.1.2-75-gd49f4eb)
 Copyright 2020 The Sandpiper Authors. All rights reserved.
 
 INITIALIZE A SANDPIPER DATABASE
@@ -38,7 +38,7 @@ PostgreSQL Superuser Password: *********
 SSL Mode (disable):
 connected to host
 ```
-Notice that we included the `--id` option on the init command. This option lets you provide the `server_id` rather than having the software assign a random unique value (allowing our existing tests to work without change). `localhost` (which is equivalent to 127.0.0.1) indicates you're running this command on the same machine as PostgreSQL. Otherwise, it would be a standard ip4 address on your network (e.g. 192.168.1.100) or possibly a hosted instance endpoint (e.g. myinstance.123456789012.us-east-1.rds.amazonaws.com). The superuser password (from above) will be hidden when you type.
+Notice that we included the `--id` option on the init command. This option lets you provide the `server_id` rather than having the software assign a random unique value (allowing our existing tests to work without change). This should not be done in a production environment because we want each company_id to be globally unique. `localhost` (which is equivalent to 127.0.0.1) indicates you're running this command on the same machine as PostgreSQL. Otherwise, it would be a standard ip4 address on your network (e.g. 192.168.1.100) or possibly a hosted instance endpoint (e.g. myinstance.123456789012.us-east-1.rds.amazonaws.com). The superuser password (from above) will be hidden when you type.
 
 You should see "connected to host" to indicate that the connection was successful. Next, you will be prompted for the new database information.
 
@@ -48,15 +48,14 @@ Database Owner (sandpiper):
 Database Owner Password: focal-weedy-brood-hat
 CREATE DATABASE sandpiper;
 CREATE USER sandpiper WITH ENCRYPTED PASSWORD 'focal-weedy-brood-hat';
-user "sandpiper" already exists
 GRANT ALL PRIVILEGES ON DATABASE sandpiper TO sandpiper;
 
 applying migrations...
 Database: "sandpiper"
-DB Version: 1 (migrated from 0 to 1)
+DB Version: 1.15 (migrated from 0 to 1.15)
 ```
 
-The recommended database name is `sandpiper` regardless of the server-role you require (primary or secondary). If you need both server-roles, it's customary to call the secondary database `tidepool` (but any name will suffice).
+The recommended database name is `sandpiper` regardless of the server-role you require (primary or secondary). If you need both server-roles, you can name it anything you like ("secondary", "receiver", "tidepool", etc.).
 
 In the example above, we used default values except when required to enter a password for the database owner (please select a strong password of your own) and again, keep a record of it for later. You will need it when starting the server.
 
@@ -65,15 +64,20 @@ The database owner is the only user to connect directly to the database (via the
 ```
 Company Name: Better Brakes
 Server-Role (primary*/secondary): primary
-Public Sync URL: http://localhost:8081
+Public Sync URL: http://localhost:8080
+Server http URL (http://localhost): 
 Added Company "Better Brakes"
+
 Sandpiper Admin Password: admin
 Added User "admin"
 
 initialization complete for "sandpiper"
+
+Server config file "api-primary.yaml" created in C:\sandpiper
+Command config file "cli-config.yaml" created in C:\sandpiper
 ```
 
-In production, you would enter a strong admin password, but enter "admin" here to make testing easier. Also, the public sync URL would normally be something like `https://sandpiper.betterbrakes.com`, but we are going to test locally, on the same machine with both servers.
+In production, you would enter a strong admin password, but enter "admin" here to make testing easier. Also, the public sync URL would normally be something like `https://sandpiper.betterbrakes.com`, but we are going to test locally, on the same machine with both servers (using two different "ports").
 <div class="page"/>
 
 ## Creating the Secondary Database
@@ -84,10 +88,10 @@ Use the same procedure as above, but use this command to set the receiver's serv
  ./sandpiper init --id 20000000-0000-0000-0000-000000000000
  ```
  
-Enter `tidepool` for the database name, and because it is a secondary (i.e. receiver), it will not prompt for a public sync URL.
+Enter `tidepool` for the database name and accept the default Database Owner (sandpiper). Be sure to enter the same sandpiper password you used above (you will see a message that user "sandpiper" already exists, but that is not a problem as long as you use the same password).
 
 ```
-Company Name: eCat Co
+Company Name: eCatCompany
 Server-Role (primary*/secondary): secondary
 Added Company "eCat Co"
 Sandpiper Admin Password: admin
@@ -95,8 +99,17 @@ Added User "admin"
 
 initialization complete for "tidepool"
 ```
+Be sure to enter "secondary" for the Server-Role. It will not prompt for a "Public Sync URL" because its role is as a receiver".
 
 You should now have two databases, each with an "admin" user and an associated "company".
+
+## Moving the Config files
+
+The `sandpiper init` command creates two configuration files as its final step, one for the server ("api") and one for the `sandpiper` command line interface ("cli"). The files are named with the pattern (api,cli)-(server-role).yaml. So, for example, "api-primary.yaml" and "cli-primary.yaml".
+
+Most installations will only use a single server role, but in our case we're running both on the same machine for testing purposes. When the API server starts, it looks for a file named "api-config.yaml" in the current directory, so we'd normally rename ours to match this default.
+
+The `sandpiper` command looks for a file named `cli-config.yaml` in the current directory. Again, in our case, we created two server roles and so we have two configuration files.
 
 Next we'll run the sandpiper server (using the "primary" database) and create `subscriptions` and `grains` for us to sync. We'll do most of this work with a free REST client called Insomnia (someone must have thought that name was clever).
 
@@ -127,20 +140,16 @@ The "jwt" is a variable we set up to allow "chained" requests. This is a very he
 Before we can issue any requests to a server, however, we need to get one listening. This is very simple to do.
 
 ```
-cd cmd/api
-copy config-sample.yaml primary.yaml
-notepad primary.yaml
-(make any necessary changes to the `database` section and save the file) 
-./api --config primary.yaml
+./api --config "cli-primary.yaml"
 ```
 If everything is working properly, you should see something like the following:
 
 ```
-Sandpiper API Server (v0.1.2-67-g5facfce-dirty)
+Sandpiper API Server (v0.1.2-75-gd49f4eb)
 Copyright 2019-2020 The Sandpiper Authors. All rights reserved.
 
 Database: "sandpiper"
-DB Version: 1
+DB Version: 1.15
 Server role: "primary"
 
 ⇨ http server started on [::]:8080
@@ -252,3 +261,66 @@ Let's do that now by selecting the `Add Copmany (eCat)` request and pressing `Se
 Now that we have two trading partners defined, we need a structure that organizize the data we want to share between them. This structure is called a `slice` and the way we assign these slices to companies is with a `subscription`.
 
 Under the "Slice Resource" folder you should see two "POST Add" requests. In each case, the request body is provided to create a new slice.
+
+# Add Grain From File
+
+Let's use the sandpiepr CLI to add a test ACES file as a file-based grain.
+
+```
+./sandiper -u admin -p admin -c cli-primary.yaml add --slice slice2 testdata/aces-file.xml
+```
+Note that you can also set some environment variables for the global parameters.
+
+# Start Secondary Server
+
+```
+./api --config "cli-secondary.yaml"
+```
+
+Change Insomnia's "Active Environment" from "Primary" (green) to **"Secondary"** (red) using the drop-down menu.
+
+```
+POST Login
+POST Add Company 1
+```
+
+Note that this added our trading partner (Best Brakes) with their unique company_id. So we now have the same company in both databases, and their "sync_addr" is pointing to our primary server address (port 8080).
+
+# Sync Secondary with Primary
+
+Let's see what trading partners we have defined for syncing:
+
+```
+./sandpiper -u admin -p admin -c cli-secondary.yaml sync --list
+
+SERVER LIST:
+Best Brakes: (http://localhost.com:8080)
+```
+
+Just as we would expect.
+
+before we can perform the sync, though, we need to get an API access key from Best Brakes for our sync process. We can get that using the following command (against the primary server).
+
+```
+(Activate the Primary (green) environment in Insomnia)
+POST Login (using { "username": "companyadmin", "password":"companyadmin" })
+POST apikey (from the Sync request folder)
+```
+
+It should return something like the following:
+```
+{
+  "primary_id": "10000000-0000-0000-0000-000000000000",
+  "sync_api_key": "f1c77a6ee9442d006494d4904476d8f9a328465583cd8e6f3199be99dd5919f41341fc0442b09d297aa33cad1bcb8d5b32b3ddc969ef81e39d23020e08fd132138ea6c834d0753b5164e0427ce2616e3a2cd4c21d5697e9e8a37861889fd18168b61f28b8c2eee961b57d64b52784cd01c7bbacaa9bffbfe3c0f1df33a164835caa629540f141777b02de5ad0443"
+}
+```
+We need to add that key to our secondary database for "Best Brakes". That way, when we initiate the sync, we can pass along the key. We will do that now using Insomnia:
+```
+(Activate the Secondary (red) environment in Insomnia)
+POST Login (using { "username": "admin", "password": "admin" })
+PATCH Update apikey (Company 1) (from the Sync request folder)
+```
+
+```
+./sandpiper -u admin -p admin -c cli-secondary.yaml sync
+```

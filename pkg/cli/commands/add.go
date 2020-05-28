@@ -48,7 +48,7 @@ func Add(c *args.Context) error {
 	}
 
 	// make sure we are on a primary-server
-	if api.ServerRole() != "primary" {
+	if api.ServerRole() != sandpiper.PrimaryServer {
 		return errors.New("must be a \"primary\" server for `add` command")
 	}
 

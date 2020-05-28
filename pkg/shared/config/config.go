@@ -15,13 +15,22 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const header = `# Copyright The Sandpiper Authors. All rights reserved.
+const (
+	license = `# Copyright The Sandpiper Authors. All rights reserved.
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE.md file.
+`
+	apiHead = `
+# Sandpiper API configuration file (rename to 'api-config.yaml' for default use)
 
-# sandpiper configuration file (rename to "config.yaml" for default use)
+# See "api-config-sample.yaml" for env vars to use in production (instead of these hard-coded credentials)
 
 `
+	cliHead = `
+# Sandpiper CLI configuration file (rename to 'cli-config.yaml' for default use)
+
+`
+)
 
 // Load returns Configuration struct
 func Load(path string) (*Configuration, error) {
@@ -43,7 +52,11 @@ func Save(c *Configuration, filename string) error {
 	if err != nil {
 		return err
 	}
-	buf := bytes.NewBufferString(header)
+	head := apiHead
+	if c.Command != nil {
+		head = cliHead
+	}
+	buf := bytes.NewBufferString(license + head)
 	if _, err := buf.Write(b); err != nil {
 		return err
 	}

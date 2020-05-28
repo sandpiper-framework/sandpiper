@@ -96,9 +96,9 @@ func (c *Client) Grain(grainID uuid.UUID) (*sandpiper.Grain, error) {
 	return results, err
 }
 
-// Sync initiates a sync with a server
+// Sync initiates a sync with a primary server from secondary server
 func (c *Client) Sync(company sandpiper.Company) error {
-	path := fmt.Sprintf("/sync/%s", company.SyncAddr)
+	path := fmt.Sprintf("/sync/%s", company.ID)
 	req, err := c.newRequest("POST", path, nil)
 	if err != nil {
 		return err
@@ -107,7 +107,7 @@ func (c *Client) Sync(company sandpiper.Company) error {
 	return err
 }
 
-// Process performs receives a sync request and acts on it
+// Process receives a sync request and acts on it (currently unused)
 func (c *Client) Process() error {
 	req, err := c.newRequestWS("GET", "/sync", nil)
 	if err != nil {

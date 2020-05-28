@@ -2,8 +2,8 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE.md file.
 
-// Package sync contains services for syncs. Syncs must belong to a slice
-// and do not have an update method (use add/delete).
+// Package sync manages the exchange of subscriptions, slices and grains between primary and
+// secondary servers. It contains different endpoints for primary and secondary servers
 package sync
 
 /*
@@ -19,7 +19,7 @@ package sync
   the Primary controls what can be synced, but the Secondary can turn the sync off.
 
   The sync process will also observe the "active" company flag (on both sides) and the "allow_sync"
-  slice updating flag (on the Primary).
+  slice is being updated flag (on the Primary).
 */
 
 import (
@@ -44,7 +44,7 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	var p *sandpiper.Company
 
 	// must be a secondary server to start the sync
-	if err := s.rbac.EnforceServerRole("secondary"); err != nil {
+	if err := s.rbac.EnforceServerRole(sandpiper.SecondaryServer); err != nil {
 		return err
 	}
 	// must be a local admin to start the sync
@@ -91,7 +91,7 @@ func (s *Sync) connect(addr, key string) (*client.Client, error) {
 		return nil, err
 	}
 	if key == "" {
-		return nil, errors.New("api-key is empty")
+		return nil, errors.New("api-key is missing")
 	}
 	api, err := client.SyncLogin(server, key)
 	if err != nil {
@@ -230,7 +230,7 @@ func compareSlices(primary, secondary []sandpiper.Grain) (adds []uuid.UUID, dels
 // Subscriptions returns all subscriptions with slices and metadata (not paginated)
 // for the current user's company
 func (s *Sync) Subscriptions(c echo.Context) ([]sandpiper.Subscription, error) {
-	if err := s.rbac.EnforceServerRole("primary"); err != nil {
+	if err := s.rbac.EnforceServerRole(sandpiper.PrimaryServer); err != nil {
 		return nil, err
 	}
 	if err := s.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
@@ -245,7 +245,7 @@ func (s *Sync) Subscriptions(c echo.Context) ([]sandpiper.Subscription, error) {
 // with no state beyond the user token. At least it uses a unique key for the check.
 // Websockets should allow a more efficient approach.
 func (s *Sync) Grains(c echo.Context, sliceID uuid.UUID, briefFlag bool) ([]sandpiper.Grain, error) {
-	if err := s.rbac.EnforceServerRole("primary"); err != nil {
+	if err := s.rbac.EnforceServerRole(sandpiper.PrimaryServer); err != nil {
 		return nil, err
 	}
 	if err := s.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
@@ -260,7 +260,7 @@ func (s *Sync) Grains(c echo.Context, sliceID uuid.UUID, briefFlag bool) ([]sand
 
 // Process (NOT CURRENTLY USED) responds to a sync start request and "upgrades" http to a websocket
 func (s *Sync) Process(c echo.Context) error {
-	if err := s.rbac.EnforceServerRole("primary"); err != nil {
+	if err := s.rbac.EnforceServerRole(sandpiper.PrimaryServer); err != nil {
 		return err
 	}
 	if err := s.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {

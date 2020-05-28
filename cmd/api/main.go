@@ -24,7 +24,7 @@ const (
 func main() {
 	fmt.Println(version.Banner())
 
-	cfgPath := flag.String("config", "config.yaml", "Path to config file")
+	cfgPath := flag.String("config", "api-config.yaml", "Path to config file (default is api-config.yaml)")
 	flag.Parse()
 
 	cfg, err := config.Load(*cfgPath)

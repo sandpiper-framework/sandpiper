@@ -141,6 +141,7 @@ var Commands = []*args.Command{
 			},
 			&args.BoolFlag{
 				Name:     "list",
+				Aliases:  []string{"l"},
 				Usage:    "Display a list of sync servers (without performing a sync)",
 				Required: false,
 			},
@@ -174,7 +175,7 @@ var Commands = []*args.Command{
 		/* sandpiper secrets
 		 */
 		Name:      "secrets",
-		Usage:     "generate new random secrets for env vars and config.yaml file",
+		Usage:     "generate new random secrets for env vars and api-config.yaml file",
 		ArgsUsage: " ", // don't show that we accept arguments
 		Action:    command.Secrets,
 	},

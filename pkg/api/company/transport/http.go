@@ -29,7 +29,7 @@ func NewHTTP(svc company.Service, er *echo.Group) {
 	sr.POST("", h.create)
 	sr.GET("", h.list)
 	sr.GET("/:id", h.view)
-	sr.PUT("/:id", h.update) // not a PATCH, body must include *all* fields
+	sr.PATCH("/:id", h.update)
 	sr.DELETE("/:id", h.delete)
 
 	er.GET("/servers", h.servers) // ?name={text}
@@ -94,7 +94,7 @@ func (h *HTTP) list(c echo.Context) error {
 
 func (h *HTTP) view(c echo.Context) error {
 	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
+	if err != nil || id == uuid.Nil {
 		return ErrInvalidCompanyUUID
 	}
 	result, err := h.svc.View(c, id)
@@ -104,17 +104,19 @@ func (h *HTTP) view(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// Company update request
+// Company update request body
 type updateReq struct {
-	ID       uuid.UUID `json:"-"`
-	Name     string    `json:"name,omitempty" validate:"omitempty,min=3"`
-	SyncAddr string    `json:"sync_addr"`
-	Active   bool      `json:"active,omitempty" validate:"omitempty"`
+	ID         uuid.UUID `json:"id"`
+	Name       string    `json:"name" validate:"omitempty,min=3"`
+	SyncAddr   string    `json:"sync_addr"`
+	SyncAPIKey string    `json:"sync_api_key"`
+	SyncUserID int       `json:"sync_user_id"`
+	Active     bool      `json:"active"`
 }
 
 func (h *HTTP) update(c echo.Context) error {
 	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
+	if err != nil || id == uuid.Nil {
 		return ErrInvalidCompanyUUID
 	}
 	req := new(updateReq)
@@ -122,10 +124,12 @@ func (h *HTTP) update(c echo.Context) error {
 		return err
 	}
 	result, err := h.svc.Update(c, &company.Update{
-		ID:       id,
-		Name:     req.Name,
-		SyncAddr: req.SyncAddr,
-		Active:   req.Active,
+		ID:         id,
+		Name:       req.Name,
+		SyncAddr:   req.SyncAddr,
+		SyncAPIKey: req.SyncAPIKey,
+		SyncUserID: req.SyncUserID,
+		Active:     req.Active,
 	})
 	if err != nil {
 		return err
@@ -135,7 +139,7 @@ func (h *HTTP) update(c echo.Context) error {
 
 func (h *HTTP) delete(c echo.Context) error {
 	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
+	if err != nil || id == uuid.Nil {
 		return ErrInvalidCompanyUUID
 	}
 	if err := h.svc.Delete(c, id); err != nil {
@@ -146,7 +150,7 @@ func (h *HTTP) delete(c echo.Context) error {
 
 func (h *HTTP) server(c echo.Context) error {
 	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
+	if err != nil || id == uuid.Nil {
 		return ErrInvalidCompanyUUID
 	}
 	result, err := h.svc.Server(c, id)

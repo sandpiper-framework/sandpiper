@@ -27,7 +27,7 @@ func TestUser(t *testing.T) {
 		Email:     "sandy@gmail.com",
 		Role:      sandpiper.SuperAdminRole,
 	}
-	rbacSvc := rbac.New("primary")
+	rbacSvc := rbac.New(sandpiper.PrimaryServer)
 	assert.Equal(t, wantUser, rbacSvc.CurrentUser(ctx))
 }
 
@@ -54,7 +54,7 @@ func TestEnforceRole(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			rbacSvc := rbac.New("primary")
+			rbacSvc := rbac.New(sandpiper.PrimaryServer)
 			res := rbacSvc.EnforceRole(tt.args.ctx, tt.args.role)
 			assert.Equal(t, tt.wantErr, res == echo.ErrForbidden)
 		})
@@ -89,7 +89,7 @@ func TestEnforceUser(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			rbacSvc := rbac.New("primary")
+			rbacSvc := rbac.New(sandpiper.PrimaryServer)
 			res := rbacSvc.EnforceUser(tt.args.ctx, tt.args.id)
 			assert.Equal(t, tt.wantErr, res == echo.ErrForbidden)
 		})
@@ -129,7 +129,7 @@ func TestEnforceCompany(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			rbacSvc := rbac.New("primary")
+			rbacSvc := rbac.New(sandpiper.PrimaryServer)
 			res := rbacSvc.EnforceCompany(tt.args.ctx, tt.args.id)
 			assert.Equal(t, tt.wantErr, res == echo.ErrForbidden)
 		})
@@ -175,7 +175,7 @@ func TestAccountCreate(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			rbacSvc := rbac.New("primary")
+			rbacSvc := rbac.New(sandpiper.PrimaryServer)
 			res := rbacSvc.AccountCreate(tt.args.ctx, tt.args.role, tt.args.company_id)
 			assert.Equal(t, tt.wantErr, res == echo.ErrForbidden)
 		})
@@ -184,7 +184,7 @@ func TestAccountCreate(t *testing.T) {
 
 func TestIsLowerRole(t *testing.T) {
 	ctx := mock.EchoCtxWithKeys([]string{"role"}, sandpiper.CompanyAdminRole)
-	rbacSvc := rbac.New("primary")
+	rbacSvc := rbac.New(sandpiper.PrimaryServer)
 	if rbacSvc.IsLowerRole(ctx, sandpiper.AdminRole) == nil {
 		t.Error("The requested user is lower role than the user requesting it")
 	}

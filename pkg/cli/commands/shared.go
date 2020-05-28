@@ -21,7 +21,7 @@ import (
 
 const (
 	// DefaultConfigFile can be overridden by command line options
-	DefaultConfigFile = "config.yaml"
+	DefaultConfigFile = "cli-config.yaml"
 
 	// L1Encoding for level-1 grains using `sandpiper add`
 	L1Encoding = "z64"

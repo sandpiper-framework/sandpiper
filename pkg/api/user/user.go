@@ -82,7 +82,7 @@ func (u *User) Update(c echo.Context, r *Update) (*sandpiper.User, error) {
 // CreateAPIKey creates a sync user for a company (if necessary) and generates an apikey
 func (u *User) CreateAPIKey(c echo.Context) (*sandpiper.APIKey, error) {
 	// must be an api call on primary server
-	if err := u.rbac.EnforceServerRole("primary"); err != nil {
+	if err := u.rbac.EnforceServerRole(sandpiper.PrimaryServer); err != nil {
 		return nil, err
 	}
 	// caller must be companyAdmin

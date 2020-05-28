@@ -84,8 +84,9 @@ func Init(c *args.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Server config file \"%s\" created in this folder\n", api)
-	fmt.Printf("Command config file \"%s\" created in this folder\n\n", cli)
+	dir := cwd()
+	fmt.Printf("Server config file \"%s\" created in %s\n", api, dir)
+	fmt.Printf("Command config file \"%s\" created in %s\n\n", cli, dir)
 
 	return nil
 }
@@ -205,9 +206,9 @@ func (db *Conn) addCompany(companyID string) (*sandpiper.Company, error) {
 	for syncAddr == "" {
 		db.serverRole = Prompt("Server-Role (primary*/secondary): ", "primary")
 		switch db.serverRole {
-		case "primary":
+		case sandpiper.PrimaryServer:
 			syncAddr = Prompt("Public Sync URL: ", "")
-		case "secondary":
+		case sandpiper.SecondaryServer:
 			syncAddr = "(none)"
 		default:
 			fmt.Println("error: expected \"primary\" or \"secondary\"")
@@ -295,7 +296,7 @@ func (db *Conn) createConfigFiles() (string, string, error) {
 		return "", "", err
 	}
 
-	nameCLI := protect("cli-config.yaml")
+	nameCLI := protect("cli-" + db.serverRole + ".yaml")
 	cmd := config.Command{
 		URL:          db.httpURL,
 		Port:         api.Server.Port,
@@ -310,7 +311,7 @@ func (db *Conn) createConfigFiles() (string, string, error) {
 
 func configServer(role string) *config.Server {
 	port := "8080"
-	if role != "primary" {
+	if role != sandpiper.PrimaryServer {
 		port = "8081"
 	}
 	key, err := APISecret()
@@ -396,4 +397,12 @@ func debugMessage(format string, a ...interface{}) {
 	if debug {
 		fmt.Printf("\n"+format+"\n", a...)
 	}
+}
+
+func cwd() string {
+	d, err := os.Getwd()
+	if err != nil {
+		return "this folder"
+	}
+	return d
 }

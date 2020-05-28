@@ -71,7 +71,8 @@ func (s *Company) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) 
 
 // Update updates company info by primary key (assumes allowed to do this)
 func (s *Company) Update(db orm.DB, company *sandpiper.Company) error {
-	return db.Update(company)
+	_, err := db.Model(company).WherePK().UpdateNotZero()
+	return err
 }
 
 // Delete removes the company (and any related subscriptions)

@@ -19,44 +19,6 @@ import (
 	"sandpiper/pkg/shared/model"
 )
 
-// serverList defines a list of active primary servers
-type serverList []sandpiper.Company
-
-type syncParams struct {
-	addr         *url.URL // our sandpiper server
-	user         string
-	password     string
-	partner      string
-	partnerID    uuid.UUID
-	listOnly     bool
-	noupdate     bool
-	maxSyncProcs int
-	debug        bool
-}
-
-func getSyncParams(c *args.Context) (*syncParams, error) {
-	// get global params from config file and args
-	g, err := GetGlobalParams(c)
-	if err != nil {
-		return nil, err
-	}
-	// save optional "partner" param, and determine its type
-	p := c.String("partner")
-	id, _ := uuid.Parse(p) // valid id means companyID, otherwise company-name
-
-	return &syncParams{
-		addr:         g.addr,
-		user:         g.user,
-		password:     g.password,
-		partner:      p,
-		partnerID:    id,
-		listOnly:     c.Bool("list"),
-		noupdate:     c.Bool("noupdate"),
-		maxSyncProcs: g.maxSyncProcs,
-		debug:        g.debug,
-	}, nil
-}
-
 type syncCmd struct {
 	*syncParams
 	api *client.Client
@@ -107,21 +69,71 @@ func (cmd *syncCmd) getServers() (serverList, error) {
 
 // syncServer performs the actual sync on a server
 func (cmd *syncCmd) syncServer(c sandpiper.Company) error {
-	if cmd.debug {
-		fmt.Printf("syncing %s...", c.Name)
-	}
+	fmt.Printf("syncing %s...\n", c.Name)
 	return cmd.api.Sync(c)
 }
 
+type syncParams struct {
+	addr         *url.URL // our sandpiper server
+	user         string
+	password     string
+	partner      string
+	partnerID    uuid.UUID
+	listOnly     bool
+	noupdate     bool
+	maxSyncProcs int
+	debug        bool
+}
+
+func getSyncParams(c *args.Context) (*syncParams, error) {
+	// get global params from config file and args
+	g, err := GetGlobalParams(c)
+	if err != nil {
+		return nil, err
+	}
+	// save optional "partner" param, and determine its type
+	p := c.String("partner")
+	id, _ := uuid.Parse(p) // valid id means companyID, otherwise company-name
+
+	return &syncParams{
+		addr:         g.addr,
+		user:         g.user,
+		password:     g.password,
+		partner:      p,
+		partnerID:    id,
+		listOnly:     c.Bool("list"),
+		noupdate:     c.Bool("noupdate"),
+		maxSyncProcs: g.maxSyncProcs,
+		debug:        g.debug,
+	}, nil
+}
+
+// serverList defines a list of active primary servers
+type serverList []sandpiper.Company
+
+func (sl serverList) display() {
+	if len(sl) == 0 {
+		fmt.Println("No active primary servers defined.")
+		return
+	}
+	fmt.Println("SERVER LIST:")
+	for _, srv := range sl {
+		fmt.Printf("%s: (%s)\n", srv.Name, srv.SyncAddr)
+	}
+}
+
 // StartSync initiates the sync process on one or all subscriptions
-func StartSync(c *args.Context) error {
-	var result error
+func StartSync(c *args.Context) (result error) {
 	var errCount int
 
 	// sync holds params and connected client (to our server)
 	sync, err := newSyncCmd(c)
 	if err != nil {
 		return err
+	}
+
+	if sync.api.ServerRole() != sandpiper.SecondaryServer {
+		return errors.New("the 'sync' command must be initiated from a secondary server")
 	}
 
 	// get list of primary servers to sync (depending on params)
@@ -137,8 +149,8 @@ func StartSync(c *args.Context) error {
 	}
 
 	// setup a simple waitgroup (using channel as a semaphore and max queue size)
-	wg := make(chan struct{}, sync.maxSyncProcs)
-	wgAdd := func() { wg <- struct{}{} }
+	wg := make(chan int, sync.maxSyncProcs)
+	wgAdd := func() { wg <- 1 }
 	wgDone := func() { <-wg }
 	wgWait := func() {
 		for i := 0; i < sync.maxSyncProcs; i++ {
@@ -149,12 +161,9 @@ func StartSync(c *args.Context) error {
 	syncFunc := func(srv sandpiper.Company) {
 		defer wgDone() // release semaphore
 		if err := sync.syncServer(srv); err != nil {
-			// log error, but continue
-			if sync.debug {
-				fmt.Printf("%v", err)
-			}
-			// todo: log error to activity
-			result = errors.New("sync completed with errors")
+			// show error, but continue (the sync api logs all activity)
+			fmt.Printf("syncServer: %v", err)
+			result = errors.New("sync completed with errors (see activity entries for details)")
 			errCount++
 		}
 	}
@@ -168,15 +177,4 @@ func StartSync(c *args.Context) error {
 
 	fmt.Printf("Successful: %d, Errors: %d\n", len(srvs)-errCount, errCount)
 	return result
-}
-
-func (sl serverList) display() {
-	if len(sl) == 0 {
-		fmt.Println("No active primary servers defined.")
-		return
-	}
-	fmt.Println("SERVER LIST:")
-	for _, srv := range sl {
-		fmt.Printf("%s: (%s)\n", srv.Name, srv.SyncAddr)
-	}
 }

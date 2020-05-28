@@ -14,9 +14,10 @@ import (
 
 // defineSchema returns a list of our database migrations
 // Each migration script is defined in a separate descriptive string variable (versioned by major db release)
+// prefixes are "tbl" (create table), "idx" (create index), "alt" (alter)
 func defineSchema() []darwin.Migration {
 	var (
-		enums_v1 = `
+		enumsV1 = `
 		CREATE TYPE server_role_enum AS ENUM (
 			'primary',
 			'secondary'
@@ -39,7 +40,7 @@ func defineSchema() []darwin.Migration {
 			'z85'
 		);`
 
-		tblCompanies_v1 = `
+		tblCompaniesV1 = `
 		CREATE TABLE IF NOT EXISTS companies (
 			"id"           uuid PRIMARY KEY,
 			"name"         text NOT NULL,
@@ -51,10 +52,10 @@ func defineSchema() []darwin.Migration {
 			"updated_at"   timestamp
 		);`
 
-		idxCompanies_v1 = `
+		idxCompaniesV1 = `
 		CREATE UNIQUE INDEX ON companies (lower(name));
 		`
-		tblSlices_v1 = `
+		tblSlicesV1 = `
 		CREATE TABLE IF NOT EXISTS "slices" (
 			"id"            uuid PRIMARY KEY,
 			"name"          text NOT NULL,
@@ -67,10 +68,10 @@ func defineSchema() []darwin.Migration {
 			"updated_at"    timestamp
 		);`
 
-		idxSlices_v1 = `
+		idxSlicesV1 = `
 		CREATE UNIQUE INDEX ON slices (lower(name));
     `
-		tblSliceMetadata_v1 = `
+		tblSliceMetadataV1 = `
 		CREATE TABLE IF NOT EXISTS "slice_metadata" (
 			"slice_id" uuid REFERENCES "slices" ON DELETE CASCADE,
 			"key"      text,
@@ -78,7 +79,7 @@ func defineSchema() []darwin.Migration {
 			PRIMARY KEY ("slice_id", "key")
 		);`
 
-		tlbTags_v1 = `
+		tlbTagsV1 = `
 		CREATE TABLE IF NOT EXISTS "tags" (
 			"id"          serial PRIMARY KEY,
 			"name"        text UNIQUE NOT NULL, /* lowercase by convention */
@@ -87,14 +88,14 @@ func defineSchema() []darwin.Migration {
 			"updated_at"  timestamp
 		);`
 
-		tblSliceTags_v1 = `
+		tblSliceTagsV1 = `
 		CREATE TABLE IF NOT EXISTS "slice_tags" (
 			"tag_id" int REFERENCES "tags" ON DELETE CASCADE,
 			"slice_id" uuid REFERENCES "slices" ON DELETE CASCADE,
 			PRIMARY KEY ("tag_id", "slice_id")
 		);`
 
-		tblSubscriptions_v1 = `
+		tblSubscriptionsV1 = `
 		CREATE TABLE IF NOT EXISTS "subscriptions" (
 			"sub_id"       uuid PRIMARY KEY,
 			"slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
@@ -107,10 +108,10 @@ func defineSchema() []darwin.Migration {
 			CONSTRAINT "sub_alt_key" UNIQUE("slice_id", "company_id")
 		);`
 
-		idxSubscriptions_v1 = `
+		idxSubscriptionsV1 = `
 		CREATE UNIQUE INDEX ON subscriptions (lower(name));`
 
-		tblGrains_v1 = `
+		tblGrainsV1 = `
 		CREATE TABLE IF NOT EXISTS "grains" (
 		  "id"           uuid PRIMARY KEY,
 		  "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
@@ -122,7 +123,7 @@ func defineSchema() []darwin.Migration {
 		  CONSTRAINT "grains_sliceid_grainkey_key" UNIQUE("slice_id", "grain_key")
 		);`
 
-		tblActivity_v1 = `
+		tblActivityV1 = `
 		CREATE TABLE IF NOT EXISTS "activity" (
 		  "id"         serial PRIMARY KEY,
 		  "sub_id"     uuid REFERENCES "subscriptions" ON DELETE CASCADE,
@@ -132,7 +133,7 @@ func defineSchema() []darwin.Migration {
 		  "created_at" timestamp
 		);`
 
-		tblUsers_v1 = `
+		tblUsersV1 = `
 		CREATE TABLE IF NOT EXISTS users (
 		  "id"               serial PRIMARY KEY,
 		  "username"         text UNIQUE NOT NULL,
@@ -151,7 +152,7 @@ func defineSchema() []darwin.Migration {
 		  "updated_at"       timestamp
 		);`
 
-		tblSettings_v1 = `
+		tblSettingsV1 = `
 		CREATE TABLE IF NOT EXISTS "settings" (
 		  "id" bool PRIMARY KEY DEFAULT TRUE, /* only allow one row */
 			"server_role" server_role_enum,
@@ -161,7 +162,7 @@ func defineSchema() []darwin.Migration {
 			CONSTRAINT "settings_singleton" CHECK (id) /* only TRUE allowed */
 			);`
 
-		altCompanies_v1 = `
+		altCompaniesV1 = `
 		ALTER TABLE companies
 		ADD CONSTRAINT sync_user_fk FOREIGN KEY (sync_user_id) REFERENCES "users" ON DELETE RESTRICT;`
 	) // v1 release
@@ -170,24 +171,25 @@ func defineSchema() []darwin.Migration {
 	) // v2 release
 
 	// Each database change release is given a major version number (1.xx, 2.xx) with minor numbers (x.01, x.02)
-	// representing the actual migration steps within that release. Version numbers must be ascending (with the
-	// convention of skipping x.00). NEVER change or remove a step in any way once released!!!
+	// representing the actual migration steps within that release. Version numbers must be ascending with a
+	// convention to skip x.00 (i.e. "steps" start from 01). *NEVER* change/remove a step once released! (because
+	// a checksum of the script is saved with the migration)
 	return []darwin.Migration{
-		{Version: 1.01, Description: "Create Type '_enums'", Script: enums_v1},
-		{Version: 1.02, Description: "Create Table 'companies'", Script: tblCompanies_v1},
-		{Version: 1.03, Description: "Create Indexes on 'companies'", Script: idxCompanies_v1},
-		{Version: 1.04, Description: "Create Table 'slices'", Script: tblSlices_v1},
-		{Version: 1.05, Description: "Create Indexes on 'slices'", Script: idxSlices_v1},
-		{Version: 1.06, Description: "Create Table 'slice_metadata'", Script: tblSliceMetadata_v1},
-		{Version: 1.07, Description: "Create Table 'tags'", Script: tlbTags_v1},
-		{Version: 1.08, Description: "Create Table 'slice_tags'", Script: tblSliceTags_v1},
-		{Version: 1.09, Description: "Create Table 'subscriptions'", Script: tblSubscriptions_v1},
-		{Version: 1.10, Description: "Create Indexes on 'subscriptions'", Script: idxSubscriptions_v1},
-		{Version: 1.11, Description: "Create Table 'grains'", Script: tblGrains_v1},
-		{Version: 1.12, Description: "Create Table 'activity'", Script: tblActivity_v1},
-		{Version: 1.13, Description: "Create Table 'users'", Script: tblUsers_v1},
-		{Version: 1.14, Description: "Create Table 'settings'", Script: tblSettings_v1},
-		{Version: 1.15, Description: "Alter Table 'companies'", Script: altCompanies_v1},
+		{Version: 1.01, Description: "Create Type '_enums'", Script: enumsV1},
+		{Version: 1.02, Description: "Create Table 'companies'", Script: tblCompaniesV1},
+		{Version: 1.03, Description: "Create Indexes on 'companies'", Script: idxCompaniesV1},
+		{Version: 1.04, Description: "Create Table 'slices'", Script: tblSlicesV1},
+		{Version: 1.05, Description: "Create Indexes on 'slices'", Script: idxSlicesV1},
+		{Version: 1.06, Description: "Create Table 'slice_metadata'", Script: tblSliceMetadataV1},
+		{Version: 1.07, Description: "Create Table 'tags'", Script: tlbTagsV1},
+		{Version: 1.08, Description: "Create Table 'slice_tags'", Script: tblSliceTagsV1},
+		{Version: 1.09, Description: "Create Table 'subscriptions'", Script: tblSubscriptionsV1},
+		{Version: 1.10, Description: "Create Indexes on 'subscriptions'", Script: idxSubscriptionsV1},
+		{Version: 1.11, Description: "Create Table 'grains'", Script: tblGrainsV1},
+		{Version: 1.12, Description: "Create Table 'activity'", Script: tblActivityV1},
+		{Version: 1.13, Description: "Create Table 'users'", Script: tblUsersV1},
+		{Version: 1.14, Description: "Create Table 'settings'", Script: tblSettingsV1},
+		{Version: 1.15, Description: "Add Foreign Key 'sync_user_fk'", Script: altCompaniesV1},
 	}
 }
 
@@ -215,7 +217,7 @@ func Migrate(dsn string) (string, error) {
 		if v2 < v1 {
 			v2 = v1
 		}
-		return "", fmt.Errorf("migration error in v%g \"%s\" (was v%g now v%g): %w", prob.Version, prob.Description, v1, v2, err)
+		return "", fmt.Errorf("migration error in v%.2f \"%s\" (was v%.2f now v%.2f): %w", prob.Version, prob.Description, v1, v2, err)
 	}
 	close(infoChan)
 
@@ -258,7 +260,7 @@ func currentVersion(d darwin.Darwin) float64 {
 
 func changes(v1, v2 float64) string {
 	if v1 != v2 {
-		return fmt.Sprintf("DB Version: %g (migrated from %g to %g)", v2, v1, v2)
+		return fmt.Sprintf("DB Version: %.2f (migrated from %.2f to %.2f)", v2, v1, v2)
 	}
 	return fmt.Sprintf("DB Version: %g", v1)
 }

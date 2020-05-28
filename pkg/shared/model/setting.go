@@ -13,6 +13,14 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	// PrimaryServer is a constant ServerRole value
+	PrimaryServer = "primary"
+
+	// SecondaryServer is a constant ServerRole value
+	SecondaryServer = "secondary"
+)
+
 // Setting represents the setting domain model
 type Setting struct {
 	ID         bool      `json:"id" pg:",pk"`
