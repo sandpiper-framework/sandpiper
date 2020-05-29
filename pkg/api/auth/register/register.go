@@ -18,7 +18,9 @@ import (
 
 // Register ties the auth service to its logger and transport mechanisms
 func Register(db *database.DB, sec auth.Securer, log sandpiper.Logger, srv *echo.Echo, tgen auth.TokenGenerator, mwFunc echo.MiddlewareFunc) {
-	svc := auth.Initialize(db, tgen, sec, rbac.New(db.Settings.ServerRole))
+	rba := rbac.New(db.Settings.ServerRole)
+	rba.ServerID = db.Settings.ServerID
+	svc := auth.Initialize(db, tgen, sec, rba)
 	ls := al.ServiceLogger(svc, log)
 	at.NewHTTP(ls, srv, mwFunc)
 }

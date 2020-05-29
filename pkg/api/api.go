@@ -72,6 +72,7 @@ func Start(cfg *config.Configuration) error {
 		ReadTimeoutSeconds:  cfg.Server.ReadTimeout,
 		WriteTimeoutSeconds: cfg.Server.WriteTimeout,
 		ServerRole:          db.Settings.ServerRole,
+		ServerID:            db.Settings.ServerID,
 		Debug:               cfg.Server.Debug,
 	})
 

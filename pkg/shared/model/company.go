@@ -18,7 +18,7 @@ type Company struct {
 	Name          string          `json:"name"`
 	SyncAddr      string          `json:"sync_addr"`
 	SyncAPIKey    string          `json:"sync_api_key,omitempty"` // only on secondary
-	SyncUserID    int             `json:"sync_user_id,omitempty"`
+	SyncUserID    int             `json:"sync_user_id,omitempty"` // only on primary
 	Active        bool            `json:"active"`
 	CreatedAt     time.Time       `json:"created_at"`
 	UpdatedAt     time.Time       `json:"updated_at"`

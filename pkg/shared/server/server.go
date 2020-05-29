@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/go-playground/validator"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
@@ -45,6 +46,7 @@ type Settings struct {
 	ReadTimeoutSeconds  int
 	WriteTimeoutSeconds int
 	ServerRole          string
+	ServerID            uuid.UUID
 	Debug               bool
 }
 
@@ -62,7 +64,7 @@ func Start(srv *echo.Echo, cfg *Settings) {
 		srv.GET("/routes", listRoutes)
 	}
 
-	fmt.Printf("Server role: \"%s\"\n\n", cfg.ServerRole)
+	fmt.Printf("Server role: \"%s\"\nServer ID: %s\n\n", cfg.ServerRole, cfg.ServerID)
 
 	// Start server
 	go func() {

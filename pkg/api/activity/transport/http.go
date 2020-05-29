@@ -44,6 +44,7 @@ type createReq struct {
 	SubID    uuid.UUID     `json:"company_id" validate:"required"`
 	Success  bool          `json:"success" validate:"required"`
 	Message  string        `json:"message" validate:"required"`
+	Error    string        `json:"error"`
 	Duration time.Duration `json:"duration" validate:"required"`
 }
 
@@ -58,6 +59,7 @@ func (h *HTTP) create(c echo.Context) error {
 		SubID:    r.SubID,
 		Success:  r.Success,
 		Message:  r.Message,
+		Error:    r.Error,
 		Duration: r.Duration,
 	})
 

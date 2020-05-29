@@ -23,7 +23,9 @@ Before we can do anything, we need to create a sandpiper database within the Pos
 ```
 ./sandpiper init --id 10000000-0000-0000-0000-000000000000
 ```
-You will be prompted for your PostgreSQL Host Address, Port and Superuser credentials. This is required to create a new database. In most cases, you can simply press Enter to accept the default value (shown in parentheses).
+Notice that we included the `--id` option on the `init` command. This option lets you provide the `server_id` rather than having the software assign a random unique value (allowing our existing tests to work without change). This should not be done in a production environment because we want each company_id to be globally unique.
+
+You will be prompted for your PostgreSQL Host Address, Port and Superuser credentials. This is required to create a new database. In most cases, you can simply press `Enter` to accept the default value (shown in parentheses).
 
 ```
 sandpiper (v0.1.2-75-gd49f4eb)
@@ -38,7 +40,7 @@ PostgreSQL Superuser Password: *********
 SSL Mode (disable):
 connected to host
 ```
-Notice that we included the `--id` option on the init command. This option lets you provide the `server_id` rather than having the software assign a random unique value (allowing our existing tests to work without change). This should not be done in a production environment because we want each company_id to be globally unique. `localhost` (which is equivalent to 127.0.0.1) indicates you're running this command on the same machine as PostgreSQL. Otherwise, it would be a standard ip4 address on your network (e.g. 192.168.1.100) or possibly a hosted instance endpoint (e.g. myinstance.123456789012.us-east-1.rds.amazonaws.com). The superuser password (from above) will be hidden when you type.
+The `localhost` address (which is equivalent to 127.0.0.1) indicates you're running this command on the same machine as PostgreSQL. Otherwise, it would be a standard ip4 address on your network (e.g. 192.168.1.100) or possibly a hosted instance endpoint (e.g. myinstance.123456789012.us-east-1.rds.amazonaws.com). The superuser password (from above) will be hidden when you type.
 
 You should see "connected to host" to indicate that the connection was successful. Next, you will be prompted for the new database information.
 
@@ -109,7 +111,7 @@ The `sandpiper init` command creates two configuration files as its final step, 
 
 Most installations will only use a single server role, but in our case we're running both on the same machine for testing purposes. When the API server starts, it looks for a file named "api-config.yaml" in the current directory, so we'd normally rename ours to match this default.
 
-The `sandpiper` command looks for a file named `cli-config.yaml` in the current directory. Again, in our case, we created two server roles and so we have two configuration files.
+The `sandpiper` command looks for a file named `cli-config.yaml` in the current directory. Again, in our case, since we created two server-roles we have two separate API configuration files.
 
 Next we'll run the sandpiper server (using the "primary" database) and create `subscriptions` and `grains` for us to sync. We'll do most of this work with a free REST client called Insomnia (someone must have thought that name was clever).
 
@@ -258,7 +260,7 @@ Let's do that now by selecting the `Add Copmany (eCat)` request and pressing `Se
 
 ## Slices and Subscriptions
 
-Now that we have two trading partners defined, we need a structure that organizize the data we want to share between them. This structure is called a `slice` and the way we assign these slices to companies is with a `subscription`.
+Now that we have two trading partners defined, we need a structure that organizes the data we want to share between them. This structure is called a `slice` and the way we assign these slices to companies is with a `subscription`.
 
 Under the "Slice Resource" folder you should see two "POST Add" requests. In each case, the request body is provided to create a new slice.
 
@@ -320,7 +322,21 @@ We need to add that key to our secondary database for "Best Brakes". That way, w
 POST Login (using { "username": "admin", "password": "admin" })
 PATCH Update apikey (Company 1) (from the Sync request folder)
 ```
+Normally, this would be part of the "sign-up" process when a trading partner requests access to your data.
+
+Now we should be ready to perform the sync. Let's start both a primary and secondary server running (in two separate terminal windows):
+```
+open a new terminal window (cd to where your "api" binary is stored)
+./api -config api-primary.yaml
+
+open a new terminal window (cd to where your "api" binary is stored)
+./api -config api-secondary.yaml
+```
+
+Finally, open a third terminal window and execute the sync (from the secondary server)
 
 ```
+open a new terminal window (cd to where your "sandpiepr" binary is stored)
 ./sandpiper -u admin -p admin -c cli-secondary.yaml sync
 ```
+winsby881

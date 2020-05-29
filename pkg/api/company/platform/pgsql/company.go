@@ -94,13 +94,12 @@ func (s *Company) Server(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 	return company, nil
 }
 
-// Servers returns a list of active companies (except ours) for the sync process
-// optionally limited by "name"
+// Servers returns a list of active companies (except ours) for the sync process optionally limited by "name"
 func (s *Company) Servers(db orm.DB, ourCompanyID uuid.UUID, name string) ([]sandpiper.Company, error) {
 	var companies []sandpiper.Company
 
 	q := db.Model(&companies).
-		Column("id", "name", "sync_addr").
+		Column("id", "name", "sync_addr", "sync_api_key", "active").
 		Where("id <> ?", ourCompanyID).
 		Where("sync_addr <> ''").Where("active = true")
 	if name != "" {

@@ -7,6 +7,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/GuiaBolso/darwin"
 	_ "github.com/lib/pq"
@@ -15,6 +16,7 @@ import (
 // defineSchema returns a list of our database migrations
 // Each migration script is defined in a separate descriptive string variable (versioned by major db release)
 // prefixes are "tbl" (create table), "idx" (create index), "alt" (alter)
+// *NEVER* change/remove a step once released! (because a checksum of the script is saved with the migration)
 func defineSchema() []darwin.Migration {
 	var (
 		enumsV1 = `
@@ -46,15 +48,15 @@ func defineSchema() []darwin.Migration {
 			"name"         text NOT NULL,
 			"sync_addr"    text UNIQUE NOT NULL, /* primary server's sync_addr (but still want it unique) */
 			"sync_api_key" text,                 /* used by secondary server */
-			"sync_user_id" int,                  /* sync_user_fk constraint (can be NULL) */
+			"sync_user_id" int,                  /* only on primary (can be NULL) sync_user_fk constraint */
 			"active"       boolean,
 			"created_at"   timestamp,
 			"updated_at"   timestamp
 		);`
 
 		idxCompaniesV1 = `
-		CREATE UNIQUE INDEX ON companies (lower(name));
-		`
+		CREATE UNIQUE INDEX ON companies (lower(name));`
+
 		tblSlicesV1 = `
 		CREATE TABLE IF NOT EXISTS "slices" (
 			"id"            uuid PRIMARY KEY,
@@ -69,8 +71,8 @@ func defineSchema() []darwin.Migration {
 		);`
 
 		idxSlicesV1 = `
-		CREATE UNIQUE INDEX ON slices (lower(name));
-    `
+		CREATE UNIQUE INDEX ON slices (lower(name));`
+
 		tblSliceMetadataV1 = `
 		CREATE TABLE IF NOT EXISTS "slice_metadata" (
 			"slice_id" uuid REFERENCES "slices" ON DELETE CASCADE,
@@ -129,7 +131,8 @@ func defineSchema() []darwin.Migration {
 		  "sub_id"     uuid REFERENCES "subscriptions" ON DELETE CASCADE,
 		  "success"    boolean,
 		  "message"    text NOT NULL,
-		  "duration"   timestamp,
+			"error"      text,
+		  "duration"   bigint,
 		  "created_at" timestamp
 		);`
 
@@ -170,26 +173,45 @@ func defineSchema() []darwin.Migration {
 	// this is a placeholder to show our change pattern of one release per var(...) making code-folding easier.
 	) // v2 release
 
+	// minify simplifies the script so non-substantive changes (spacing, casing and comments) don't create a new checksum
+	var minify = func(script string) string {
+		b := strings.Builder{}
+		s := strings.ToLower(strings.ReplaceAll(script, "/*", "--"))
+		lines := strings.Split(s, "\n")
+		for _, line := range lines {
+			if i := strings.Index(line, "--"); i != -1 {
+				line = line[0:i]
+			}
+			b.WriteString(strings.TrimSpace(line) + "\n")
+		}
+		result := strings.TrimSpace(strings.ReplaceAll(b.String(), "\t", " "))
+		before := 0
+		for len(result) != before {
+			before = len(result)
+			result = strings.ReplaceAll(result, "  ", " ")
+		}
+		return strings.TrimSpace(result)
+	}
+
 	// Each database change release is given a major version number (1.xx, 2.xx) with minor numbers (x.01, x.02)
 	// representing the actual migration steps within that release. Version numbers must be ascending with a
-	// convention to skip x.00 (i.e. "steps" start from 01). *NEVER* change/remove a step once released! (because
-	// a checksum of the script is saved with the migration)
+	// convention to skip x.00 (i.e. "steps" start from 01).
 	return []darwin.Migration{
-		{Version: 1.01, Description: "Create Type '_enums'", Script: enumsV1},
-		{Version: 1.02, Description: "Create Table 'companies'", Script: tblCompaniesV1},
-		{Version: 1.03, Description: "Create Indexes on 'companies'", Script: idxCompaniesV1},
-		{Version: 1.04, Description: "Create Table 'slices'", Script: tblSlicesV1},
-		{Version: 1.05, Description: "Create Indexes on 'slices'", Script: idxSlicesV1},
-		{Version: 1.06, Description: "Create Table 'slice_metadata'", Script: tblSliceMetadataV1},
-		{Version: 1.07, Description: "Create Table 'tags'", Script: tlbTagsV1},
-		{Version: 1.08, Description: "Create Table 'slice_tags'", Script: tblSliceTagsV1},
-		{Version: 1.09, Description: "Create Table 'subscriptions'", Script: tblSubscriptionsV1},
-		{Version: 1.10, Description: "Create Indexes on 'subscriptions'", Script: idxSubscriptionsV1},
-		{Version: 1.11, Description: "Create Table 'grains'", Script: tblGrainsV1},
-		{Version: 1.12, Description: "Create Table 'activity'", Script: tblActivityV1},
-		{Version: 1.13, Description: "Create Table 'users'", Script: tblUsersV1},
-		{Version: 1.14, Description: "Create Table 'settings'", Script: tblSettingsV1},
-		{Version: 1.15, Description: "Add Foreign Key 'sync_user_fk'", Script: altCompaniesV1},
+		{Version: 1.01, Description: "Create Type '_enums'", Script: minify(enumsV1)},
+		{Version: 1.02, Description: "Create Table 'companies'", Script: minify(tblCompaniesV1)},
+		{Version: 1.03, Description: "Create Indexes on 'companies'", Script: minify(idxCompaniesV1)},
+		{Version: 1.04, Description: "Create Table 'slices'", Script: minify(tblSlicesV1)},
+		{Version: 1.05, Description: "Create Indexes on 'slices'", Script: minify(idxSlicesV1)},
+		{Version: 1.06, Description: "Create Table 'slice_metadata'", Script: minify(tblSliceMetadataV1)},
+		{Version: 1.07, Description: "Create Table 'tags'", Script: minify(tlbTagsV1)},
+		{Version: 1.08, Description: "Create Table 'slice_tags'", Script: minify(tblSliceTagsV1)},
+		{Version: 1.09, Description: "Create Table 'subscriptions'", Script: minify(tblSubscriptionsV1)},
+		{Version: 1.10, Description: "Create Indexes on 'subscriptions'", Script: minify(idxSubscriptionsV1)},
+		{Version: 1.11, Description: "Create Table 'grains'", Script: minify(tblGrainsV1)},
+		{Version: 1.12, Description: "Create Table 'activity'", Script: minify(tblActivityV1)},
+		{Version: 1.13, Description: "Create Table 'users'", Script: minify(tblUsersV1)},
+		{Version: 1.14, Description: "Create Table 'settings'", Script: minify(tblSettingsV1)},
+		{Version: 1.15, Description: "Add Foreign Key 'sync_user_fk'", Script: minify(altCompaniesV1)},
 	}
 }
 

@@ -107,7 +107,8 @@ CREATE TABLE IF NOT EXISTS "activity" (
   "sub_id"     uuid REFERENCES "subscriptions" ("sub_id") ON DELETE CASCADE,
   "success"    boolean,
   "message"    text NOT NULL,
-  "duration"   timestamp,
+  "error"      text,
+  "duration"   bigint,
   "created_at" timestamp
 );
 

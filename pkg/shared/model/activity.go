@@ -17,8 +17,9 @@ type Activity struct {
 	tableName    struct{}      `pg:"activity"` // we don't want the plural `activities`
 	ID           int           `json:"id" pg:",pk"`
 	SubID        uuid.UUID     `json:"sub_id"`
-	Success      bool          `json:"success"`
+	Success      bool          `json:"success" pg:",use_zero"`
 	Message      string        `json:"message"`
+	Error        string        `json:"error"`
 	Duration     time.Duration `json:"duration"`
 	CreatedAt    time.Time     `json:"created_at"`
 	Subscription *Subscription `json:"subscription"` // has one
