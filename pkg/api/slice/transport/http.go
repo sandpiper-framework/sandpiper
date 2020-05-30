@@ -47,14 +47,11 @@ var (
 
 // Slice create request
 type createReq struct {
-	ID           uuid.UUID         `json:"id"` // optional
-	Name         string            `json:"name" validate:"required,min=3"`
-	SliceType    string            `json:"slice_type" validate:"required"`
-	AllowSync    bool              `json:"allow_sync"`
-	ContentHash  string            `json:"content_hash"`
-	ContentCount int               `json:"content_count"`
-	ContentDate  time.Time         `json:"content_date"`
-	Metadata     sandpiper.MetaMap `json:"metadata"`
+	ID        uuid.UUID         `json:"id"` // optional
+	Name      string            `json:"name" validate:"required,min=3"`
+	SliceType string            `json:"slice_type" validate:"required"`
+	AllowSync bool              `json:"allow_sync"`
+	Metadata  sandpiper.MetaMap `json:"metadata"`
 }
 
 func (r createReq) id() uuid.UUID {
@@ -66,8 +63,7 @@ func (r createReq) id() uuid.UUID {
 
 // create populates createReq from body json adding UUID if not provided
 func (h *HTTP) create(c echo.Context) error {
-	r := &createReq{ContentCount: 0, ContentHash: ""}
-
+	r := new(createReq)
 	if err := c.Bind(r); err != nil {
 		return err
 	}
@@ -77,9 +73,9 @@ func (h *HTTP) create(c echo.Context) error {
 		Name:         r.Name,
 		SliceType:    r.SliceType,
 		AllowSync:    r.AllowSync,
-		ContentHash:  r.ContentHash,
-		ContentCount: r.ContentCount,
-		ContentDate:  r.ContentDate,
+		SyncStatus:   sandpiper.SyncStatusNone,
+		ContentHash:  "",
+		ContentCount: 0,
 		Metadata:     r.Metadata,
 	}
 
@@ -167,10 +163,10 @@ type updateReq struct {
 	ID           uuid.UUID `json:"-"`
 	Name         string    `json:"name,omitempty" validate:"omitempty,min=3"`
 	SLiceType    string    `json:"slice_type" validate:"required"`
-	AllowSync    bool      `json:"allow_sync"`
 	ContentHash  string    `json:"content_hash,omitempty" validate:"omitempty,min=2"`
 	ContentCount int       `json:"content_count,omitempty"`
 	ContentDate  time.Time `json:"content_date,omitempty"`
+	AllowSync    bool      `json:"allow_sync"`
 }
 
 func (h *HTTP) update(c echo.Context) error {
@@ -188,12 +184,11 @@ func (h *HTTP) update(c echo.Context) error {
 		ID:           id,
 		Name:         req.Name,
 		SliceType:    req.SLiceType,
-		AllowSync:    req.AllowSync,
 		ContentHash:  req.ContentHash,
 		ContentCount: req.ContentCount,
 		ContentDate:  req.ContentDate,
+		AllowSync:    req.AllowSync,
 	})
-
 	if err != nil {
 		return err
 	}

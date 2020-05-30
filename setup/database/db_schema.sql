@@ -52,9 +52,9 @@ CREATE TABLE IF NOT EXISTS companies (
 CREATE UNIQUE INDEX ON companies (lower(name));
 
 CREATE TABLE IF NOT EXISTS "slices" (
-  "id"            uuid PRIMARY KEY,
-  "name"          text NOT NULL,
-  "slice_type"    slice_type_enum NOT NULL,
+  "id"                uuid PRIMARY KEY,
+  "name"              text NOT NULL,
+  "slice_type"        slice_type_enum NOT NULL,
   "content_count"     integer,
   "content_date"      timestamp,
   "content_hash"      text,

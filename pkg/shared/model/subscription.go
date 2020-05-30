@@ -22,8 +22,8 @@ type Subscription struct {
 	Active      bool      `json:"active"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-	Company     *Company  `json:"company"`
-	Slice       *Slice    `json:"slice"`
+	Company     *Company  `json:"company,omitempty"`
+	Slice       *Slice    `json:"slice,omitempty"`
 }
 
 // SubsPaginated adds pagination

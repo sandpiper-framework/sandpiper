@@ -18,7 +18,7 @@ Be sure to write down the superuser (usually `postgres`) and password. You will 
 
 ## Creating the Primary Database
 
-Before we can do anything, we need to create a sandpiper database within the PostgreSQL server. A simple command line tool is provided to take care of this for you. Open a command prompt (terminal) window and enter the following commands (assuming you are currently in the root sandpiper folder).
+Before we can do anything, we need to create a sandpiper database within the PostgreSQL server. A simple command line tool is provided to take care of this for you. Open a command prompt (terminal) window and enter the following commands (assuming you are currently in the same folder as the `sandpiper` CLI).
 
 ```
 ./sandpiper init --id 10000000-0000-0000-0000-000000000000
@@ -54,7 +54,7 @@ GRANT ALL PRIVILEGES ON DATABASE sandpiper TO sandpiper;
 
 applying migrations...
 Database: "sandpiper"
-DB Version: 1.15 (migrated from 0 to 1.15)
+DB Version: 1.15 (migrated from 0.00 to 1.15)
 ```
 
 The recommended database name is `sandpiper` regardless of the server-role you require (primary or secondary). If you need both server-roles, you can name it anything you like ("secondary", "receiver", "tidepool", etc.).
@@ -76,7 +76,7 @@ Added User "admin"
 initialization complete for "sandpiper"
 
 Server config file "api-primary.yaml" created in C:\sandpiper
-Command config file "cli-config.yaml" created in C:\sandpiper
+Command config file "cli-primary.yaml" created in C:\sandpiper
 ```
 
 In production, you would enter a strong admin password, but enter "admin" here to make testing easier. Also, the public sync URL would normally be something like `https://sandpiper.betterbrakes.com`, but we are going to test locally, on the same machine with both servers (using two different "ports").
@@ -90,19 +90,24 @@ Use the same procedure as above, but use this command to set the receiver's serv
  ./sandpiper init --id 20000000-0000-0000-0000-000000000000
  ```
  
-Enter `tidepool` for the database name and accept the default Database Owner (sandpiper). Be sure to enter the same sandpiper password you used above (you will see a message that user "sandpiper" already exists, but that is not a problem as long as you use the same password).
+Complete the PostgreSQL prompts as before. When prompted for the New Database Name, enter `tidepool` and accept the default Database Owner (sandpiper). Be sure to **enter the same sandpiper password you used above** (you will see a message that user "sandpiper" already exists, but that is not a problem as long as you use the same password).
+
+You will then be prompted for the company information for the secondary database. Be sure to enter "secondary" for the Server-Role. It will not prompt for a "Public Sync URL" because its role is as a receiver":
 
 ```
 Company Name: eCatCompany
-Server-Role (primary*/secondary): secondary
-Added Company "eCat Co"
+Server-Role (primary*/secondary): secondary'
+Server http URL (http://localhost):
+Added Company "eCatCompany"
+
 Sandpiper Admin Password: admin
 Added User "admin"
 
 initialization complete for "tidepool"
-```
-Be sure to enter "secondary" for the Server-Role. It will not prompt for a "Public Sync URL" because its role is as a receiver".
 
+Server config file "api-secondary.yaml" created in C:\sandpiper
+Command config file "cli-secondary.yaml" created in C:\sandpiper
+```
 You should now have two databases, each with an "admin" user and an associated "company".
 
 ## Moving the Config files
@@ -142,7 +147,7 @@ The "jwt" is a variable we set up to allow "chained" requests. This is a very he
 Before we can issue any requests to a server, however, we need to get one listening. This is very simple to do.
 
 ```
-./api -config cli-primary.yaml
+./api -config api-primary.yaml
 ```
 If everything is working properly, you should see something like the following:
 
@@ -153,10 +158,11 @@ Copyright 2019-2020 The Sandpiper Authors. All rights reserved.
 Database: "sandpiper"
 DB Version: 1.15
 Server role: "primary"
+Server ID: 10000000-0000-0000-0000-000000000000
 
 ⇨ http server started on [::]:8080
 ```
-That last line shows that a web server is running and listening on http://localhost:8080. You should be able to open a browser and type that address and receive a response of:
+That last line shows that a web server is running and listening on [http://localhost:8080](http://localhost:8080). You should be able to open a browser and type that address and receive a response of:
 
 ```
 "Sandpiper API OK"
@@ -197,7 +203,7 @@ Let's move on to adding some Companies and Users. Select the `List Companies` re
     {
       "id": "10000000-0000-0000-0000-000000000000",
       "name": "Better Brakes",
-      "sync_addr": "http://localhost:8081",
+      "sync_addr": "http://localhost:8080",
       "active": true,
       "created_at": "2020-05-18T22:45:52.273189Z",
       "updated_at": "2020-05-18T22:45:52.273189Z",
@@ -223,11 +229,11 @@ Let's move on to adding some Companies and Users. Select the `List Companies` re
 }
 ```
 
-This is the primary server's owner. It currently has just one user (which is also the one you logged in under).
+This is the primary server's owner company. It currently has just one user (which is also the one you logged in under).
 
 It's interesting to note that the company `id` is a globally unique identifier (because they can be shared across servers), but the user `id` is simply a sequential number (because they are local to this server).
 
-A good example of a shared company is "eCat Co" (which we created as the owner of our secondary server above). When a primary company agrees to share its product data, it adds a "secondary" company to its list of companies it does business with.
+A good example of a shared company is "eCatCompany" (which we created as the owner of our secondary server above). When a primary company agrees to share its product data, it adds a "secondary" company to its list of companies it does business with.
  
 Let's do that now by selecting the `Add Copmany (eCat)` request and pressing `Send`. Then, let's add a user for our eCat company (`Add User (eCat)` under the User Resource). If you now go back and send the List Companies request again, you should see this second one added to the list:
 
@@ -235,7 +241,7 @@ Let's do that now by selecting the `Add Copmany (eCat)` request and pressing `Se
 {
   "id": "20000000-0000-0000-0000-000000000000",
   "name": "eCat Co",
-  "sync_addr": "http://sync.ecatco.com",
+  "sync_addr": "http://localhost:8081",
   "active": true,
   "created_at": "2020-05-19T01:29:06.670001Z",
   "updated_at": "2020-05-19T01:29:06.670001Z",
@@ -262,46 +268,111 @@ Let's do that now by selecting the `Add Copmany (eCat)` request and pressing `Se
 
 Now that we have two trading partners defined, we need a structure that organizes the data we want to share between them. This structure is called a `slice` and the way we assign these slices to companies is with a `subscription`.
 
-Under the "Slice Resource" folder you should see two "POST Add" requests. In each case, the request body is provided to create a new slice.
+Under the "Slice Resource" folder you should see two "POST Add" requests ("Add Slice1" & "Add Slice2"). In each case, the request body is provided to create a new slice (with metadata included in Slice2). Send "Add Slice2". You should see something like the following:
 
-# Add Grain From File
+```json
+{
+  "id": "2bea8308-1840-4802-ad38-72b53e31594c",
+  "slice_name": "Slice2",
+  "slice_type": "aces-file",
+  "content_hash": "",
+  "content_count": 0,
+  "content_date": "0001-01-01T00:00:00Z",
+  "allow_sync": false,
+  "sync_status": "none",
+  "last_sync_attempt": "0001-01-01T00:00:00Z",
+  "last_good_sync": "0001-01-01T00:00:00Z",
+  "created_at": "2020-05-30T16:02:48.9188445-05:00",
+  "updated_at": "2020-05-30T16:02:48.9188445-05:00",
+  "metadata": {
+    "pcdb-version": "2019-09-27",
+    "vcdb-version": "2019-09-27"
+  }
+}
+```
+Adding a subscription assigns a slice to a company (note that a slice could actually be assigned to more than one company). Go ahead and find the "Add Subscription 1" request in the "Subscription Resource" folder and "Send" it. You should see a response like this:
 
-Let's use the sandpiepr CLI to add a test ACES file as a file-based grain.
+```json
+{
+  "id": "2276e31d-7014-4947-b4ec-1bc170627593",
+  "slice_id": "2bea8308-1840-4802-ad38-72b53e31594c",
+  "company_id": "20000000-0000-0000-0000-000000000000",
+  "name": "Subscription 1 (company2, slice2)",
+  "description": "",
+  "active": true,
+  "created_at": "2020-05-30T16:17:34.8817721-05:00",
+  "updated_at": "2020-05-30T16:17:34.8817721-05:00"
+}
+```
+We now have a slice assigned to a subscription. Next we will add a "grain" to that slice.
+
+## Add Grain From File
+
+We will use the `sandpiper` CLI utility to add a test ACES file as a file-based grain. Open a second terminal window (keeping the API server running)
 
 ```
-./sandiper -u admin -p admin -c cli-primary.yaml add --slice slice2 testdata/aces-file.xml
+./sandpiper -u admin -p admin -c cli-primary.yaml add --slice slice2 testdata/aces-file.xml
 ```
-Note that you can also set some environment variables for the global parameters.
+If you don't see any error, it was added successfully. Note: you can also set environment variables for these user and password parameters.
 
-# Start Secondary Server
+To see what was added, go back to Insomnia and Send the "List Grains (w/o payload)" request. You should see something like this:
+```json
+{
+  "grains": [
+    {
+      "id": "793b8629-a237-4e2c-9b35-9d0a8cc4723f",
+      "slice_id": "2bea8308-1840-4802-ad38-72b53e31594c",
+      "grain_key": "level-1",
+      "source": "aces-file.xml",
+      "encoding": "z64",
+      "payload_len": 2880,
+      "created_at": "2020-05-30T21:24:03.97232Z"
+    }
+  ],
+  "page": 0
+}
+```
+
+You can also run the "w/ payload" version to see the ACES file encoded in the "payload". Not that the "encoding" is shown as "z64" which means the file was first zipped and then converted to base64 format for storage in the database.
+
+## Start Secondary Server
+In that second terminal window, start a "secondary" server with the following command.
+```
+./api -config api-secondary.yaml
 
 ```
-./api -config cli-secondary.yaml
+You should now have two servers listening for commands on separate "ports" and accessing their own data pools. 
 ```
+Database: "tidepool"
+DB Version: 1.15
+Server role: "secondary"
+Server ID: 20000000-0000-0000-0000-000000000000
 
-Change Insomnia's "Active Environment" from "Primary" (green) to **"Secondary"** (red) using the drop-down menu.
+⇨ http server started on [::]:8081
+```
+Change Insomnia's "Active Environment" from "Primary" (green) to **"Secondary"** (red) using the drop-down menu so we can run API requests against the secondary server. Use the Login request to get an authentication token. Then Add "Company 1".
 
 ```
 POST Login
 POST Add Company 1
 ```
-
-Note that this added our trading partner (Best Brakes) with their unique company_id. So we now have the same company in both databases, and their "sync_addr" is pointing to our primary server address (port 8080).
-
-# Sync Secondary with Primary
-
-Let's see what trading partners we have defined for syncing:
-
-```
-./sandpiper -u admin -p admin -c cli-secondary.yaml sync --list
-
-SERVER LIST:
-Best Brakes: (http://localhost:8080)
+You should see something like the following:
+```json
+{
+  "id": "10000000-0000-0000-0000-000000000000",
+  "name": "Best Brakes",
+  "sync_addr": "http://localhost:8080",
+  "active": true,
+  "created_at": "2020-05-30T16:37:20.7613935-05:00",
+  "updated_at": "2020-05-30T16:37:20.7613935-05:00"
+}
 ```
 
-Just as we would expect.
+Note this added our trading partner (Best Brakes) with their unique company_id. So we now have the same company in both databases, and their "sync_addr" is pointing to our primary server address (port 8080).
 
-before we can perform the sync, though, we need to get an API access key from Best Brakes for our sync process. We can get that using the following command (against the primary server).
+## Assign API Key
+
+Before we can perform the sync, though, we need to get an API access key from Best Brakes for our sync process. We can get that using the following command (against the primary server). Notice that we changed the user (and password) to "companyadmin".
 
 ```
 (Activate the Primary (green) environment in Insomnia)
@@ -322,7 +393,11 @@ We need to add that key to our secondary database for "Best Brakes". That way, w
 POST Login (using { "username": "admin", "password": "admin" })
 PATCH Update apikey (Company 1) (from the Sync request folder)
 ```
-Normally, this would be part of the "sign-up" process when a trading partner requests access to your data.
+It uses an Insomnia variable we created to copy the generated apikey to the PATCH request.
+ 
+Normally, this apikey transfer would be part of the "sign-up" process when a trading partner requests access to your data.
+
+## Sync Secondary with Primary
 
 Now we should be ready to perform the sync. Let's start both a primary and secondary server running (in two separate terminal windows):
 ```
@@ -333,9 +408,71 @@ open a new terminal window (cd to where your "api" binary is stored)
 ./api -config api-secondary.yaml
 ```
 
-Finally, open a third terminal window and execute the sync (from the secondary server)
+Open a third terminal window and execute the sync command with the --list option (from the secondary server) to see what trading partners we have defined.
+
+```
+./sandpiper -u admin -p admin -c cli-secondary.yaml sync --list
+
+SERVER LIST:
+Best Brakes: (http://localhost:8080)
+```
+Just as we would expect.
+
+Finally, perform the sync process:
 
 ```
 open a new terminal window (cd to where your "sandpiper" binary is stored)
 ./sandpiper -u admin -p admin -c cli-secondary.yaml sync
 ```
+
+If everything worked according to plan, you should see the following results:
+
+```
+syncing Best Brakes...
+Successful: 1, Errors: 0
+```
+
+You can see what was done in Insomnia. Under the Secondary (red) environment, run the List Subscriptions request. These are new subscriptions that were defined on the primary server for eCatCompany. It shows both the company you synced with and the slices that were created.
+
+```json
+{
+  "subs": [
+    {
+      "id": "2276e31d-7014-4947-b4ec-1bc170627593",
+      "slice_id": "2bea8308-1840-4802-ad38-72b53e31594c",
+      "company_id": "10000000-0000-0000-0000-000000000000",
+      "name": "Subscription 1 (company2, slice2)",
+      "description": "",
+      "active": true,
+      "created_at": "2020-05-30T22:03:12.039147Z",
+      "updated_at": "2020-05-30T22:03:12.039147Z",
+      "company": {
+        "id": "10000000-0000-0000-0000-000000000000",
+        "name": "Best Brakes",
+        "sync_addr": "http://localhost:8080",
+        "sync_api_key": "76e3ce4cc95b38a1c67ebf398f4c254ee8f173...",
+        "active": true,
+        "created_at": "2020-05-30T21:37:20.761394Z",
+        "updated_at": "2020-05-30T21:58:58.339608Z"
+      },
+      "slice": {
+        "id": "2bea8308-1840-4802-ad38-72b53e31594c",
+        "slice_name": "Slice2",
+        "slice_type": "aces-file",
+        "content_hash": "92891e0296ed93bc03c31e1c09f6287d299431a3",
+        "content_count": 1,
+        "content_date": "2020-05-30T21:24:03.98232Z",
+        "allow_sync": true,
+        "sync_status": "success",
+        "last_sync_attempt": "2020-05-30T22:03:12.050148Z",
+        "last_good_sync": "2020-05-30T22:03:12.07415Z",
+        "created_at": "2020-05-30T22:03:12.035152Z",
+        "updated_at": "2020-05-30T22:03:12.07415Z"
+      }
+    }
+  ],
+  "page": 0
+}
+```
+
+If you use one of the "List Grains" requests, you will also see that the grain was delivered as well.

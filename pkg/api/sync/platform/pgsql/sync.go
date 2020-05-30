@@ -242,7 +242,8 @@ func (s *Sync) BeginSyncUpdate(db orm.DB, sliceID uuid.UUID) error {
 		SyncStatus:      sandpiper.SyncStatusUpdating,
 		LastSyncAttempt: time.Now(),
 	}
-	if _, err := db.Model(&m).WherePK().UpdateNotZero(); err != nil {
+	if _, err := db.Model(&m).Column("sync_status", "last_sync_attempt").
+		WherePK().Update(); err != nil {
 		return err
 	}
 	return nil
