@@ -115,55 +115,55 @@ func defineSchema() []darwin.Migration {
 
 		tblGrainsV1 = `
 		CREATE TABLE IF NOT EXISTS "grains" (
-		  "id"           uuid PRIMARY KEY,
-		  "slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
-		  "grain_key"    text NOT NULL,
-		  "encoding"     encoding_enum,
-		  "payload"      text,
-		  "source"       text,
-		  "created_at"   timestamp,
-		  CONSTRAINT "grains_sliceid_grainkey_key" UNIQUE("slice_id", "grain_key")
+			"id"           uuid PRIMARY KEY,
+			"slice_id"     uuid REFERENCES "slices" ON DELETE CASCADE,
+			"grain_key"    text NOT NULL,
+			"encoding"     encoding_enum,
+			"payload"      text,
+			"source"       text,
+			"created_at"   timestamp,
+			CONSTRAINT "grains_sliceid_grainkey_key" UNIQUE("slice_id", "grain_key")
 		);`
 
 		tblActivityV1 = `
 		CREATE TABLE IF NOT EXISTS "activity" (
-		  "id"         serial PRIMARY KEY,
-		  "sub_id"     uuid REFERENCES "subscriptions" ON DELETE CASCADE,
-		  "success"    boolean,
-		  "message"    text NOT NULL,
+			"id"         serial PRIMARY KEY,
+			"sub_id"     uuid REFERENCES "subscriptions" ON DELETE CASCADE,
+			"success"    boolean,
+			"message"    text NOT NULL,
 			"error"      text,
-		  "duration"   bigint,
-		  "created_at" timestamp
+			"duration"   bigint,
+			"created_at" timestamp
 		);`
 
 		tblUsersV1 = `
 		CREATE TABLE IF NOT EXISTS users (
-		  "id"               serial PRIMARY KEY,
-		  "username"         text UNIQUE NOT NULL,
-		  "password"         text,
-		  "email"            text NOT NULL,
-		  "first_name"       text NOT NULL,
-		  "last_name"        text NOT NULL,
-		  "phone"            text,
-		  "active"           boolean,
-		  "last_login"       timestamp,
-		  "password_changed" timestamp,
-		  "token"            text,
-		  "role"             integer,
-		  "company_id"       uuid REFERENCES "companies" ON DELETE RESTRICT,
-		  "created_at"       timestamp,
-		  "updated_at"       timestamp
+			"id"               serial PRIMARY KEY,
+			"username"         text UNIQUE NOT NULL,
+			"password"         text,
+			"email"            text NOT NULL,
+			"first_name"       text NOT NULL,
+			"last_name"        text NOT NULL,
+			"phone"            text,
+			"active"           boolean,
+			"last_login"       timestamp,
+			"password_changed" timestamp,
+			"token"            text,
+			"role"             integer,
+			"company_id"       uuid REFERENCES "companies" ON DELETE RESTRICT,
+			"created_at"       timestamp,
+			"updated_at"       timestamp
 		);`
 
 		tblSettingsV1 = `
 		CREATE TABLE IF NOT EXISTS "settings" (
-		  "id" bool PRIMARY KEY DEFAULT TRUE, /* only allow one row */
+			"id" bool PRIMARY KEY DEFAULT TRUE, /* only allow one row */
 			"server_role" server_role_enum,
 			"server_id" uuid REFERENCES "companies" ON DELETE RESTRICT,
 			"created_at"       timestamp,
 			"updated_at"       timestamp,
 			CONSTRAINT "settings_singleton" CHECK (id) /* only TRUE allowed */
-			);`
+		);`
 
 		altCompaniesV1 = `
 		ALTER TABLE companies
@@ -173,7 +173,7 @@ func defineSchema() []darwin.Migration {
 	// this is a placeholder to show our change pattern of one release per var(...) making code-folding easier.
 	) // v2 release
 
-	// minify simplifies the script so non-substantive changes (spacing, casing and comments) don't create a new checksum
+	// minify simplifies the script to keep certain changes (spacing, casing and comments) from creating a new checksum
 	var minify = func(script string) string {
 		b := strings.Builder{}
 		s := strings.ToLower(strings.ReplaceAll(script, "/*", "--"))

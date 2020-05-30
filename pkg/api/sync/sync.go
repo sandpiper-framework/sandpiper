@@ -116,7 +116,7 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (
 		if !found {
 			// add this subscription (and its slice) locally
 			local = remote.SemiDeepCopy()
-			local.CompanyID = primaryID // change to our frame of reference for the add
+			local.CompanyID = primaryID  // change to our frame of reference for the add
 			local.Slice.ContentHash = "" // force a re-sync
 			if err := s.sdb.AddSlice(s.db, local.Slice); err != nil {
 				return err
@@ -190,8 +190,12 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	if err := s.sdb.DeleteGrains(s.db, deletes); err != nil {
 		return err
 	}
-	// update local metadata
-	if err := s.sdb.UpdateSliceMetadata(s.db, localSlice, remoteSlice); err != nil {
+	// replace local slice metadata with remote's
+	meta, err := s.api.SliceMetaData(remoteSlice.ID)
+	if err != nil {
+		return err
+	}
+	if err := s.sdb.ReplaceSliceMetadata(s.db, remoteSlice.ID, meta); err != nil {
 		return err
 	}
 	// Update ContentHash, ContentCount & ContentDate and verify against remote

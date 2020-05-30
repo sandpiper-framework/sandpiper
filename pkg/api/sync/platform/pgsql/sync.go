@@ -66,7 +66,7 @@ func (s *Sync) Primary(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 	return company, nil
 }
 
-// Subscriptions returns list of all local subscriptions (with slice & metadata) for a company
+// Subscriptions returns list of all local subscriptions (with slice but not metadata) for a company
 // without pagination
 func (s *Sync) Subscriptions(db orm.DB, companyID uuid.UUID) ([]sandpiper.Subscription, error) {
 	var subs []sandpiper.Subscription
@@ -126,18 +126,6 @@ func (s *Sync) AddSlice(db orm.DB, slice *sandpiper.Slice) error {
 	return nil
 }
 
-// Slice returns a slice and its metadata
-func (s *Sync) Slice(db orm.DB, sliceID uuid.UUID) (*sandpiper.Slice, error) {
-	slice := &sandpiper.Slice{ID: sliceID}
-	err := db.Model(slice).WherePK().Select()
-	if err != nil {
-		return nil, err
-	}
-	// insert any metadata for the slice as a map
-	slice.Metadata, err = metaDataMap(db, slice.ID)
-	return slice, nil
-}
-
 // RefreshSlice updates the content fields and checks against source slice to make
 // sure the sync agrees
 func (s *Sync) RefreshSlice(db orm.DB, slice *sandpiper.Slice) error {
@@ -168,16 +156,14 @@ func (s *Sync) RefreshSlice(db orm.DB, slice *sandpiper.Slice) error {
 	return err
 }
 
-// metaDataMap returns a map of slice metadata. We use this separate query instead of
-// an orm relationship because we don't want array of structs in json here.
-// Maps marshal as {"key1": "value1", "key2": "value2", ...}
-func metaDataMap(db orm.DB, sliceID uuid.UUID) (sandpiper.MetaMap, error) {
+// SliceMetadata returns slice metadata for a sliceID
+func (s *Sync) SliceMetadata(db orm.DB, sliceID uuid.UUID) (sandpiper.MetaArray, error) {
 	var meta sandpiper.MetaArray
 	err := db.Model(&meta).Where("slice_id = ?", sliceID).Select()
 	if err != nil {
 		return nil, err
 	}
-	return meta.ToMap(sliceID), nil
+	return meta, nil
 }
 
 // SliceAccess checks if a slice is included in a company's subscriptions.
@@ -197,26 +183,22 @@ func (s *Sync) SliceAccess(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) er
 	}
 }
 
-// UpdateSliceMetadata replaces target metadata with the source metadata
-func (s *Sync) UpdateSliceMetadata(db orm.DB, target, source *sandpiper.Slice) error {
-	// see if there are any changes to make
-	if target.Metadata.Equals(source.Metadata) {
-		return nil
-	}
-	// drop existing target slice metadata
+// ReplaceSliceMetadata replaces target metadata with the source metadata
+func (s *Sync) ReplaceSliceMetadata(db orm.DB, sliceID uuid.UUID, metaArray sandpiper.MetaArray) error {
+	// drop existing slice metadata
 	md := new(sandpiper.SliceMetadata)
-	if _, err := db.Model(md).Where("slice_id = ?", target.ID).Delete(); err != nil {
+	if _, err := db.Model(md).Where("slice_id = ?", sliceID).Delete(); err != nil {
 		return err
 	}
-	// add new source slice metadata
-	meta := &sandpiper.SliceMetadata{SliceID: source.ID}
-	for k, v := range source.Metadata {
-		meta.Key, meta.Value = k, v
+	// add new source metadata
+	meta := &sandpiper.SliceMetadata{SliceID: sliceID}
+	for _, m := range metaArray {
+		meta.Key = m.Key
+		meta.Value = m.Value
 		if err := db.Insert(meta); err != nil {
 			return err
 		}
 	}
-	target.Metadata = source.Metadata
 	return nil
 }
 

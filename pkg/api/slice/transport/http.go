@@ -33,6 +33,7 @@ func NewHTTP(svc slice.Service, er *echo.Group) {
 	sr.PATCH("/:id", h.update) // only update supplied fields
 	sr.DELETE("/:id", h.delete)
 	sr.GET("/name/:name", h.viewByName)
+	sr.GET("/metadata/:id", h.metadata)
 	sr.PUT("/lock/:id", h.lock)
 	sr.PUT("/unlock/:id", h.unlock)
 }
@@ -145,6 +146,20 @@ func (h *HTTP) list(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, sandpiper.SlicesPaginated{Slices: result, Page: p.Page})
+}
+
+func (h *HTTP) metadata(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return ErrInvalidSliceUUID
+	}
+
+	result, err := h.svc.Metadata(c, id)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, result)
 }
 
 // Slice update request

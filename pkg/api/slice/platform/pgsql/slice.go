@@ -173,7 +173,7 @@ func (s *Slice) ViewByName(db orm.DB, companyID uuid.UUID, name string) (*sandpi
 	// insert any metadata for the slice as a map
 	slice.Metadata, err = metaDataMap(db, slice.ID)
 
-	return slice, nil
+	return slice, err
 }
 
 // List returns a list of all slices limited by scope and paginated
@@ -223,6 +223,16 @@ func (s *Slice) List(db orm.DB, tags *sandpiper.TagQuery, sc *sandpiper.Scope, p
 	}
 
 	return slices, nil
+}
+
+// Metadata returns an array of metadata for a slice
+func (s *Slice) Metadata(db orm.DB, sliceID uuid.UUID) (sandpiper.MetaArray, error) {
+	var meta sandpiper.MetaArray
+	err := db.Model(&meta).Where("slice_id = ?", sliceID).Select()
+	if err != nil {
+		return nil, err
+	}
+	return meta, nil
 }
 
 // Update updates slice info by primary key (assumes allowed to do this)

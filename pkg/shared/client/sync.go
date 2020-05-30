@@ -19,7 +19,7 @@ func (c *Client) ActiveServers(companyID uuid.UUID, name string) ([]sandpiper.Co
 
 	path := "/servers"
 	if companyID != uuid.Nil {
-		path = fmt.Sprintf("/servers/%s", companyID.String())
+		path = fmt.Sprintf("/servers/%s", companyID)
 	}
 	if name != "" {
 		path = path + "?name=" + name
@@ -49,7 +49,7 @@ func (c *Client) SubsByCompany(companyID uuid.UUID) ([]sandpiper.Subscription, e
 	var results []sandpiper.Subscription
 
 	// todo: add paging support (looping to retrieve everything)
-	path := fmt.Sprintf("/companies/%s/subs", companyID.String())
+	path := fmt.Sprintf("/companies/%s/subs", companyID)
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (c *Client) SubByName(name string) (*sandpiper.Subscription, error) {
 func (c *Client) GrainIDs(sliceID uuid.UUID) ([]sandpiper.Grain, error) {
 	var results []sandpiper.Grain
 
-	path := fmt.Sprintf("/sync/slice/%s?brief=yes", sliceID.String())
+	path := fmt.Sprintf("/sync/slice/%s?brief=yes", sliceID)
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -87,12 +87,24 @@ func (c *Client) GrainIDs(sliceID uuid.UUID) ([]sandpiper.Grain, error) {
 // Grain returns grain (including payload) by id
 func (c *Client) Grain(grainID uuid.UUID) (*sandpiper.Grain, error) {
 	results := new(sandpiper.Grain)
-	path := fmt.Sprintf("/grains/%s", grainID.String())
+	path := fmt.Sprintf("/grains/%s", grainID)
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
 	_, err = c.do(req, results)
+	return results, err
+}
+
+// SliceMetaData returns an array of slice metadata records for a slice
+func (c *Client) SliceMetaData(sliceID uuid.UUID) (sandpiper.MetaArray, error) {
+	var results sandpiper.MetaArray
+	path := fmt.Sprintf("/slices/metadata/%s", sliceID)
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.do(req, &results)
 	return results, err
 }
 

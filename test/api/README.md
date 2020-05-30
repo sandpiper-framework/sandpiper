@@ -336,7 +336,6 @@ open a new terminal window (cd to where your "api" binary is stored)
 Finally, open a third terminal window and execute the sync (from the secondary server)
 
 ```
-open a new terminal window (cd to where your "sandpiepr" binary is stored)
+open a new terminal window (cd to where your "sandpiper" binary is stored)
 ./sandpiper -u admin -p admin -c cli-secondary.yaml sync
 ```
-winsby881

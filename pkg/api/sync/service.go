@@ -61,7 +61,8 @@ type Repository interface {
 	SliceAccess(orm.DB, uuid.UUID, uuid.UUID) error
 	AddSlice(orm.DB, *sandpiper.Slice) error
 	RefreshSlice(orm.DB, *sandpiper.Slice) error
-	UpdateSliceMetadata(orm.DB, *sandpiper.Slice, *sandpiper.Slice) error
+	SliceMetadata(orm.DB, uuid.UUID) (sandpiper.MetaArray, error)
+	ReplaceSliceMetadata(orm.DB, uuid.UUID, sandpiper.MetaArray) error
 	Grains(orm.DB, uuid.UUID, bool) ([]sandpiper.Grain, error)
 	AddGrain(orm.DB, *sandpiper.Grain) error
 	DeleteGrains(orm.DB, []uuid.UUID) error
