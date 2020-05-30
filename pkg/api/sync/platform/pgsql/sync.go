@@ -120,7 +120,7 @@ func (s *Sync) AddSlice(db orm.DB, slice *sandpiper.Slice) error {
 		}
 		slice.Name = slice.Name + " (" + slice.ID.String() + ")"
 	}
-	if err := db.Insert(&slice); err != nil {
+	if err := db.Insert(slice); err != nil {
 		return err
 	}
 	return nil
@@ -246,8 +246,10 @@ func (s *Sync) AddGrain(db orm.DB, grain *sandpiper.Grain) error {
 }
 
 // DeleteGrains removes all provided grain ids
-func (s *Sync) DeleteGrains(db orm.DB, ids []uuid.UUID) error {
-	_, err := db.Model((*sandpiper.Grain)(nil)).Where("id in (?)", pg.In(ids)).Delete()
+func (s *Sync) DeleteGrains(db orm.DB, ids []uuid.UUID) (err error) {
+	if len(ids) > 0 {
+		_, err = db.Model((*sandpiper.Grain)(nil)).Where("id in (?)", pg.In(ids)).Delete()
+	}
 	return err
 }
 

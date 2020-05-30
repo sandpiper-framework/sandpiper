@@ -80,8 +80,8 @@ CREATE TABLE IF NOT EXISTS "slice_tags" (
 
 CREATE TABLE IF NOT EXISTS "subscriptions" (
   "sub_id"       uuid PRIMARY KEY,
-  "slice_id"     uuid REFERENCES "slices" ("id") ON DELETE CASCADE,
-  "company_id"   uuid REFERENCES "companies" ("id") ON DELETE CASCADE,
+  "slice_id"     uuid REFERENCES "slices" ("id") ON DELETE RESTRICT,
+  "company_id"   uuid REFERENCES "companies" ("id") ON DELETE RESTRICT,
   "name"         text NOT NULL,
   "description"  text,
   "active"       boolean,

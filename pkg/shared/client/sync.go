@@ -40,7 +40,7 @@ func (c *Client) AllSubs() ([]sandpiper.Subscription, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.do(req, results)
+	_, err = c.do(req, &results)
 	return results, err
 }
 
@@ -54,7 +54,7 @@ func (c *Client) SubsByCompany(companyID uuid.UUID) ([]sandpiper.Subscription, e
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.do(req, results)
+	_, err = c.do(req, &results)
 	return results, err
 }
 
@@ -80,7 +80,7 @@ func (c *Client) GrainIDs(sliceID uuid.UUID) ([]sandpiper.Grain, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.do(req, results)
+	_, err = c.do(req, &results)
 	return results, err
 }
 

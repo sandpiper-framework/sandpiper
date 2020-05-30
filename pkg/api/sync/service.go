@@ -42,8 +42,8 @@ type Sync struct {
 	sdb  Repository
 	rbac RBAC
 	sec  Securer
-	key  string // secret key for en/decrypting sync credentials
-	api  *client.Client
+	key  string         // secret key for en/decrypting sync credentials
+	api  *client.Client // maintains our login to partner server for sync
 }
 
 // Securer represents security interface

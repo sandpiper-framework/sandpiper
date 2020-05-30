@@ -163,7 +163,7 @@ func StartSync(c *args.Context) (result error) {
 		if err := sync.syncServer(srv); err != nil {
 			// show error, but continue (the sync api logs all activity)
 			fmt.Printf("syncServer: %v", err)
-			result = errors.New("sync completed with errors (see activity entries for details)")
+			result = errors.New("sync completed with errors (see activity logs for details)")
 			errCount++
 		}
 	}

@@ -37,7 +37,7 @@ func New(baseURL *url.URL, debugFlag bool) *Client {
 	var timeout time.Duration = 10
 
 	if debugFlag {
-		timeout = 3600
+		timeout = 600
 	}
 
 	netClient := &http.Client{
@@ -65,8 +65,8 @@ func Login(addr *url.URL, user, password string, debug bool) (*Client, error) {
 }
 
 // SyncLogin to the sandpiper api server using api-key (saving token in the client struct)
-func SyncLogin(addr *url.URL, key string) (*Client, error) {
-	c := New(addr, false)
+func SyncLogin(addr *url.URL, key string, debug bool) (*Client, error) {
+	c := New(addr, debug)
 	if err := c.login(secure.Credentials{SyncAPIKey: key}); err != nil {
 		return nil, err
 	}

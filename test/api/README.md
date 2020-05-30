@@ -296,7 +296,7 @@ Let's see what trading partners we have defined for syncing:
 ./sandpiper -u admin -p admin -c cli-secondary.yaml sync --list
 
 SERVER LIST:
-Best Brakes: (http://localhost.com:8080)
+Best Brakes: (http://localhost:8080)
 ```
 
 Just as we would expect.

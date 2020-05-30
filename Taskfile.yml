@@ -72,6 +72,24 @@ tasks:
     cmds:
       - ./api
 
+  primary:
+    desc: Launch sandpiper primary (publication) server
+    dir: cmd/api
+    cmds:
+      - ./api -config api-primary.yaml
+
+  secondary:
+    desc: Launch sandpiper secondary (subscribing) server
+    dir: cmd/api
+    cmds:
+      - ./api -config api-secondary.yaml
+
+  sync:
+    desc: Initiate a sync process against our secondary server
+    dir: cmd/cli
+    cmds:
+      - ./sandpiper -config cli-secondary.yaml sync
+
   release-docker:
     desc: Create a docker file for release
     deps: [build]

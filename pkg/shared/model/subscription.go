@@ -15,8 +15,8 @@ import (
 // Subscription represents subscription model (also a m2m junction table between companies and slices)
 type Subscription struct {
 	SubID       uuid.UUID `json:"id" pg:",pk"`
-	SliceID     uuid.UUID `json:"-" pg:",unique:altkey"`
-	CompanyID   uuid.UUID `json:"-" pg:",unique:altkey"`
+	SliceID     uuid.UUID `json:"slice_id" pg:",unique:altkey"`
+	CompanyID   uuid.UUID `json:"company_id" pg:",unique:altkey"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Active      bool      `json:"active"`
@@ -51,6 +51,20 @@ func (b *Subscription) BeforeInsert(ctx context.Context) (context.Context, error
 func (b *Subscription) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	b.UpdatedAt = time.Now()
 	return ctx, nil
+}
+
+// SemiDeepCopy makes a copy of subscription without sharing memory (but one level deep)
+func (b *Subscription) SemiDeepCopy() Subscription {
+	sub := *b
+	if sub.Company != nil {
+		company := *sub.Company
+		sub.Company = &company
+	}
+	if sub.Slice != nil {
+		slice := *sub.Slice
+		sub.Slice = &slice
+	}
+	return sub
 }
 
 func init() {

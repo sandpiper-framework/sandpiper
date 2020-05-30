@@ -43,6 +43,12 @@ type subsArray []sandpiper.Subscription
 func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	var p *sandpiper.Company
 
+	// log activity even if early exit
+	defer func(begin time.Time) {
+		msg := fmt.Sprintf("Syncing \"%s\" (%s)", p.Name, p.SyncAddr)
+		_ = s.sdb.LogActivity(s.db, uuid.Nil, msg, time.Since(begin), err)
+	}(time.Now())
+
 	// must be a secondary server to start the sync
 	if err := s.rbac.EnforceServerRole(sandpiper.SecondaryServer); err != nil {
 		return err
@@ -51,13 +57,6 @@ func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return err
 	}
-
-	// log activity even if early exit
-	defer func(begin time.Time) {
-		msg := fmt.Sprintf("Syncing \"%s\" (%s)", p.Name, p.SyncAddr)
-		_ = s.sdb.LogActivity(s.db, uuid.Nil, msg, time.Since(begin), err)
-	}(time.Now())
-
 	// get company information for the primary server we're syncing
 	p, err = s.sdb.Primary(s.db, primaryID)
 	if err != nil {
@@ -93,7 +92,7 @@ func (s *Sync) connect(addr, key string) (*client.Client, error) {
 	if key == "" {
 		return nil, errors.New("api-key is missing")
 	}
-	api, err := client.SyncLogin(server, key)
+	api, err := client.SyncLogin(server, key, false) // nowhere to get a debug flag
 	if err != nil {
 		return nil, err
 	}
@@ -110,17 +109,19 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (
 	subs.Load(locals)
 
 	// run through primary (remote) subs and add to ours (local) if missing
-	// (the slice for a new subscription is also added, but not the slice metadata,
-	// which is added during the sync process)
+	// (the slice for a new subscription is also added, but not the slice metadata, which
+	// is added during the sync process)
 	for _, remote := range prims {
 		local, found := subs[remote.SubID]
 		if !found {
-			local = remote
+			// add this subscription (and its slice) locally
+			local = remote.SemiDeepCopy()
 			local.CompanyID = primaryID // change to our frame of reference for the add
-			if err := s.sdb.AddSubscription(s.db, local); err != nil {
+			local.Slice.ContentHash = "" // force a re-sync
+			if err := s.sdb.AddSlice(s.db, local.Slice); err != nil {
 				return err
 			}
-			if err := s.sdb.AddSlice(s.db, remote.Slice); err != nil {
+			if err := s.sdb.AddSubscription(s.db, local); err != nil {
 				return err
 			}
 		} else {
@@ -145,7 +146,7 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	// log activity at slice level *only* if an error occurs
 	defer func(begin time.Time) {
 		if err != nil {
-			msg := "Slice \"" + localSlice.Name + "\" sync error."
+			msg := "Slice \"" + localSlice.Name + "\""
 			_ = s.sdb.LogActivity(s.db, subID, msg, time.Since(begin), err)
 		}
 	}(time.Now())
@@ -154,7 +155,8 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 		return errors.New("slice locked (being updated) on server")
 	}
 
-	if !slicesInSync(remoteSlice, localSlice) {
+	if slicesMatch(remoteSlice, localSlice) {
+		// nothing to do
 		return nil
 	}
 
@@ -184,7 +186,7 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 			return err
 		}
 	}
-	// remove obsolete grains
+	// remove obsolete grains (if any)
 	if err := s.sdb.DeleteGrains(s.db, deletes); err != nil {
 		return err
 	}
@@ -197,10 +199,10 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	return err
 }
 
-// slicesInSync checks if slice has chanced and so needs to be updated
-func slicesInSync(remoteSlice, localSlice *sandpiper.Slice) bool {
+// slicesMatch checks if slice has chanced and so needs to be updated
+func slicesMatch(remoteSlice, localSlice *sandpiper.Slice) bool {
 	// todo: should we recalc local hash or can we just use the last one saved?
-	return remoteSlice.ContentHash != localSlice.ContentHash
+	return remoteSlice.ContentHash == localSlice.ContentHash
 }
 
 // compareSlices returns adds and deletes necessary to make the secondary match primary
@@ -233,7 +235,7 @@ func (s *Sync) Subscriptions(c echo.Context) ([]sandpiper.Subscription, error) {
 	if err := s.rbac.EnforceServerRole(sandpiper.PrimaryServer); err != nil {
 		return nil, err
 	}
-	if err := s.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
+	if err := s.rbac.EnforceRole(c, sandpiper.SyncRole); err != nil {
 		return nil, err
 	}
 	companyID := s.rbac.CurrentUser(c).CompanyID
@@ -248,7 +250,7 @@ func (s *Sync) Grains(c echo.Context, sliceID uuid.UUID, briefFlag bool) ([]sand
 	if err := s.rbac.EnforceServerRole(sandpiper.PrimaryServer); err != nil {
 		return nil, err
 	}
-	if err := s.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
+	if err := s.rbac.EnforceRole(c, sandpiper.SyncRole); err != nil {
 		return nil, err
 	}
 	companyID := s.rbac.CurrentUser(c).CompanyID
@@ -263,7 +265,7 @@ func (s *Sync) Process(c echo.Context) error {
 	if err := s.rbac.EnforceServerRole(sandpiper.PrimaryServer); err != nil {
 		return err
 	}
-	if err := s.rbac.EnforceRole(c, sandpiper.CompanyAdminRole); err != nil {
+	if err := s.rbac.EnforceRole(c, sandpiper.SyncRole); err != nil {
 		return err
 	}
 

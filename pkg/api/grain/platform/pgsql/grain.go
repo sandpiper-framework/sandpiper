@@ -59,7 +59,7 @@ func (s *Grain) View(db orm.DB, id uuid.UUID) (*sandpiper.Grain, error) {
 	var grain = &sandpiper.Grain{ID: id}
 
 	err := db.Model(grain).
-		Column("grain.id", "grain_key", "encoding", "payload", "grain.created_at").
+		Column("grain.id", "slice_id", "grain_key", "source", "encoding", "payload", "grain.created_at").
 		ColumnExpr("length(payload) AS payload_len").
 		Relation("Slice").WherePK().Select()
 	if err != nil {
