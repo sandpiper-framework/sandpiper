@@ -64,7 +64,7 @@ func (s *Slice) ViewByName(c echo.Context, name string) (*sandpiper.Slice, error
 }
 
 // Metadata returns an array of metadata records for a slice
-func (s *Slice)	Metadata(c echo.Context, sliceID uuid.UUID) (sandpiper.MetaArray, error) {
+func (s *Slice) Metadata(c echo.Context, sliceID uuid.UUID) (sandpiper.MetaArray, error) {
 	// todo: do we care who has access to this?
 	return s.sdb.Metadata(s.db, sliceID)
 }

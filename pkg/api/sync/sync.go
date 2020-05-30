@@ -147,7 +147,9 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	defer func(begin time.Time) {
 		if err != nil {
 			msg := "Slice \"" + localSlice.Name + "\""
-			_ = s.sdb.LogActivity(s.db, subID, msg, time.Since(begin), err)
+			if e := s.sdb.LogActivity(s.db, subID, msg, time.Since(begin), err); e != nil {
+				err = fmt.Errorf("%w; LogActivity Error: %v", err, e)
+			}
 		}
 	}(time.Now())
 
@@ -175,8 +177,17 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	// determine local changes required to make local grains match remote grains
 	adds, deletes := compareSlices(remoteIDs, localIDs)
 
+	// start syncing grains (with a quasi-transaction on the slice row)
+	if err := s.sdb.BeginSyncUpdate(s.db, remoteSlice.ID); err != nil {
+		return err
+	}
+	defer func(sliceID uuid.UUID) {
+		if e := s.sdb.FinalizeSyncUpdate(s.db, sliceID, err); e != nil {
+			err = fmt.Errorf("FinalizeSyncUpdate Error: %v (%w)", e, err)
+		}
+	}(remoteSlice.ID)
+
 	// add new grains
-	// todo: add in one big batched transaction... could be important for level-2+
 	for _, grainID := range adds {
 		grain, err := s.api.Grain(grainID)
 		if err != nil {

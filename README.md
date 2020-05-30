@@ -14,9 +14,8 @@ the instructions below to install locally for your desired platform.
 
 Download the binary from the official download site (or use package manager for your platform such as apt or scoop).
 
-```
-https://www.postgresql.org/download/
-```
+[https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+
 
 See the setup documents in the documentation for platform-specific instructions. Other plug-and-play options are available for those that would like to use pre-configured solutions. Please see the section on Containers and PAAS below. 
 
@@ -24,9 +23,7 @@ See the setup documents in the documentation for platform-specific instructions.
 
 Download the latest Sandpiper Release which contains compiled binaries for both Windows and Linux.
 
-```
-https://github.com/sandpiper-framework/sandpiper/releases
-```
+[https://github.com/sandpiper-framework/sandpiper/releases](https://github.com/sandpiper-framework/sandpiper/releases)
 
 There are two programs included in the release, the `api` server and the `sandpiper` command line interface. Put both of them in a directory.
 

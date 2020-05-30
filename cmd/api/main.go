@@ -32,7 +32,7 @@ func main() {
 		log.Fatal("ERROR: ", err)
 	}
 
-	// Update the database if necessary (from bindata embedded files)
+	// Update the database if necessary from code (as defined in "shared/database/schema.go")
 	msg, err := database.Migrate(cfg.DB.DSN())
 	if err != nil {
 		log.Fatal("ERROR: ", err)

@@ -4,6 +4,8 @@
 
 package sandpiper
 
+/* this model is not currently used (but keeping for web socket sync */
+
 // SyncRequest models the sync communication request
 type SyncRequest struct {
 	Action  string `json:"action"`

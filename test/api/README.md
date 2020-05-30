@@ -142,7 +142,7 @@ The "jwt" is a variable we set up to allow "chained" requests. This is a very he
 Before we can issue any requests to a server, however, we need to get one listening. This is very simple to do.
 
 ```
-./api --config "cli-primary.yaml"
+./api -config cli-primary.yaml
 ```
 If everything is working properly, you should see something like the following:
 
@@ -276,7 +276,7 @@ Note that you can also set some environment variables for the global parameters.
 # Start Secondary Server
 
 ```
-./api --config "cli-secondary.yaml"
+./api -config cli-secondary.yaml
 ```
 
 Change Insomnia's "Active Environment" from "Primary" (green) to **"Secondary"** (red) using the drop-down menu.

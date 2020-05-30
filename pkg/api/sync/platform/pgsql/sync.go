@@ -235,6 +235,39 @@ func (s *Sync) DeleteGrains(db orm.DB, ids []uuid.UUID) (err error) {
 	return err
 }
 
+// BeginSyncUpdate starts a quasi-transaction on a slice sync
+func (s *Sync) BeginSyncUpdate(db orm.DB, sliceID uuid.UUID) error {
+	m := sandpiper.Slice{
+		ID:              sliceID,
+		SyncStatus:      sandpiper.SyncStatusUpdating,
+		LastSyncAttempt: time.Now(),
+	}
+	if _, err := db.Model(&m).WherePK().UpdateNotZero(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// FinalizeSyncUpdate completes the quasi-transaction on a slice sync
+func (s *Sync) FinalizeSyncUpdate(db orm.DB, sliceID uuid.UUID, err error) error {
+	var goodSync time.Time
+
+	status := sandpiper.SyncStatusError
+	if err == nil {
+		status = sandpiper.SyncStatusSuccess
+		goodSync = time.Now()
+	}
+	m := sandpiper.Slice{
+		ID:           sliceID,
+		SyncStatus:   status,
+		LastGoodSync: goodSync,
+	}
+	if _, err := db.Model(&m).WherePK().UpdateNotZero(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // checkDupSubName returns true if name found in database
 func checkDupSubName(db orm.DB, name string) error {
 	// attempt to select by unique key

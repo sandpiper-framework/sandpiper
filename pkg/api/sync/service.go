@@ -66,6 +66,8 @@ type Repository interface {
 	Grains(orm.DB, uuid.UUID, bool) ([]sandpiper.Grain, error)
 	AddGrain(orm.DB, *sandpiper.Grain) error
 	DeleteGrains(orm.DB, []uuid.UUID) error
+	BeginSyncUpdate(orm.DB, uuid.UUID) error
+	FinalizeSyncUpdate(orm.DB, uuid.UUID, error) error
 }
 
 // RBAC represents role-based-access-control interface

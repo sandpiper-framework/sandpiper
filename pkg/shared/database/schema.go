@@ -40,6 +40,12 @@ func defineSchema() []darwin.Migration {
 			'z64',
 			'a85',
 			'z85'
+		);
+		CREATE TYPE sync_status_enum AS ENUM (
+			'none',
+			'updating',
+			'success',
+			'error'
 		);`
 
 		tblCompaniesV1 = `
@@ -59,15 +65,18 @@ func defineSchema() []darwin.Migration {
 
 		tblSlicesV1 = `
 		CREATE TABLE IF NOT EXISTS "slices" (
-			"id"            uuid PRIMARY KEY,
-			"name"          text NOT NULL,
-			"slice_type"    slice_type_enum NOT NULL,
-			"allow_sync"    boolean,
-			"content_hash"  text,
-			"content_count" integer,
-			"content_date"  timestamp,
-			"created_at"    timestamp,
-			"updated_at"    timestamp
+			"id"                uuid PRIMARY KEY,
+			"name"              text NOT NULL,
+			"slice_type"        slice_type_enum NOT NULL,
+			"content_count"     integer,
+			"content_date"      timestamp,
+			"content_hash"      text,
+			"allow_sync"        boolean,                    /* locked during content update */
+			"sync_status"       sync_status_enum NOT NULL,  /* only on secondary */
+			"last_sync_attempt" timestamp,                  /* only on secondary */
+      "last_good_sync"    timestamp,                  /* only on secondary */
+			"created_at"        timestamp,
+			"updated_at"        timestamp
 		);`
 
 		idxSlicesV1 = `

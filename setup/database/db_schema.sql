@@ -32,6 +32,13 @@ CREATE TYPE encoding_enum AS ENUM (
   'z85'
 );
 
+CREATE TYPE sync_status_enum AS ENUM (
+  'none',
+  'updating',
+  'success',
+  'error'
+);
+
 CREATE TABLE IF NOT EXISTS companies (
   "id"           uuid PRIMARY KEY,
   "name"         text NOT NULL,
@@ -48,12 +55,15 @@ CREATE TABLE IF NOT EXISTS "slices" (
   "id"            uuid PRIMARY KEY,
   "name"          text NOT NULL,
   "slice_type"    slice_type_enum NOT NULL,
-  "allow_sync"    boolean,
-  "content_hash"  text,
-  "content_count" integer,
-  "content_date"  timestamp,
-  "created_at"    timestamp,
-  "updated_at"    timestamp
+  "content_count"     integer,
+  "content_date"      timestamp,
+  "content_hash"      text,
+  "allow_sync"        boolean,                    /* locked during content update */
+  "sync_status"       sync_status_enum NOT NULL,  /* only on secondary */
+  "last_sync_attempt" timestamp,                  /* only on secondary */
+  "last_good_sync"    timestamp,                  /* only on secondary */
+  "created_at"        timestamp,
+  "updated_at"        timestamp
 );
 CREATE UNIQUE INDEX ON slices (lower(name));
 

@@ -15,19 +15,30 @@ import (
 // MetaMap is used for slice metadata serialization
 type MetaMap map[string]string
 
+// SyncStatus Enum
+const (
+	SyncStatusNone     = "none"
+	SyncStatusUpdating = "updating"
+	SyncStatusSuccess  = "success"
+	SyncStatusError    = "error"
+)
+
 // Slice represents a single slice container
 type Slice struct {
-	ID           uuid.UUID  `json:"id" pg:",pk"`
-	Name         string     `json:"slice_name"`
-	SliceType    string     `json:"slice_type"`
-	AllowSync    bool       `json:"allow_sync"`
-	ContentHash  string     `json:"content_hash"`
-	ContentCount int        `json:"content_count"`
-	ContentDate  time.Time  `json:"content_date"`
-	CreatedAt    time.Time  `json:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at"`
-	Metadata     MetaMap    `json:"metadata,omitempty" pg:"-"`
-	Companies    []*Company `json:"companies,omitempty" pg:"many2many:subscriptions"`
+	ID              uuid.UUID  `json:"id" pg:",pk"`
+	Name            string     `json:"slice_name"`
+	SliceType       string     `json:"slice_type"`
+	ContentHash     string     `json:"content_hash"`
+	ContentCount    int        `json:"content_count"`
+	ContentDate     time.Time  `json:"content_date"`
+	AllowSync       bool       `json:"allow_sync"`
+	SyncStatus      string     `json:"sync_status"`
+	LastSyncAttempt time.Time  `json:"last_sync_attempt"`
+	LastGoodSync    time.Time  `json:"last_good_sync"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
+	Metadata        MetaMap    `json:"metadata,omitempty" pg:"-"`
+	Companies       []*Company `json:"companies,omitempty" pg:"many2many:subscriptions"`
 }
 
 // SlicesPaginated adds pagination
