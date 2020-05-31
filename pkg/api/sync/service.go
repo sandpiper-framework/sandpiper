@@ -54,7 +54,7 @@ type Securer interface {
 // Repository represents available resource actions using a repository-abstraction-pattern interface.
 type Repository interface {
 	Primary(orm.DB, uuid.UUID) (*sandpiper.Company, error)
-	LogActivity(orm.DB, uuid.UUID, string, time.Duration, error) error
+	LogActivity(orm.DB, uuid.UUID, uuid.UUID, string, time.Duration, error) error
 	Subscriptions(orm.DB, uuid.UUID) ([]sandpiper.Subscription, error)
 	AddSubscription(orm.DB, sandpiper.Subscription) error
 	DeactivateSubscription(orm.DB, uuid.UUID) error

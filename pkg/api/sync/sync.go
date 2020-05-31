@@ -40,13 +40,14 @@ import (
 type subsArray []sandpiper.Subscription
 
 // Start sends a sync request to a primary sandpiper server from our secondary server
+// todo: log activity to primary server as well! (only on success?)
 func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	var p *sandpiper.Company
 
 	// log activity even if early exit
 	defer func(begin time.Time) {
 		msg := fmt.Sprintf("Syncing \"%s\" (%s)", p.Name, p.SyncAddr)
-		_ = s.sdb.LogActivity(s.db, uuid.Nil, msg, time.Since(begin), err)
+		_ = s.sdb.LogActivity(s.db, primaryID, uuid.Nil, msg, time.Since(begin), err)
 	}(time.Now())
 
 	// must be a secondary server to start the sync
@@ -134,7 +135,7 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (
 			}
 		}
 		if local.Active {
-			if err := s.syncSlice(local.SubID, local.Slice, remote.Slice); err != nil {
+			if err := s.syncSlice(primaryID, local.SubID, local.Slice, remote.Slice); err != nil {
 				return err
 			}
 		}
@@ -142,14 +143,15 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (
 	return nil
 }
 
-// syncSlice does the actual work of looking for changes and doing the update
-// todo: slice metadata should be considered "content" and so reflected in the hash!
-func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Slice) (err error) {
+// syncSlice does the actual work of looking for changes and doing the update.
+// surround the sync with a begin/finalize update of the slice row to approximate a transaction
+// and log results (and errors) to the activity table
+func (s *Sync) syncSlice(primaryID, subID uuid.UUID, localSlice, remoteSlice *sandpiper.Slice) (err error) {
 	// log activity at slice level *only* if an error occurs
 	defer func(begin time.Time) {
 		if err != nil {
 			msg := "Slice \"" + localSlice.Name + "\""
-			if e := s.sdb.LogActivity(s.db, subID, msg, time.Since(begin), err); e != nil {
+			if e := s.sdb.LogActivity(s.db, primaryID, subID, msg, time.Since(begin), err); e != nil {
 				err = fmt.Errorf("%w; LogActivity Error: %v", err, e)
 			}
 		}

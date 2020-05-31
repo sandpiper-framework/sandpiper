@@ -16,6 +16,7 @@ import (
 // defineSchema returns a list of our database migrations
 // Each migration script is defined in a separate descriptive string variable (versioned by major db release)
 // prefixes are "tbl" (create table), "idx" (create index), "alt" (alter)
+// comments must only appear after sql on a line and cannot span lines (comments are stripped before checksum calc)
 // *NEVER* change/remove a step once released! (because a checksum of the script is saved with the migration)
 func defineSchema() []darwin.Migration {
 	var (
@@ -137,6 +138,7 @@ func defineSchema() []darwin.Migration {
 		tblActivityV1 = `
 		CREATE TABLE IF NOT EXISTS "activity" (
 			"id"         serial PRIMARY KEY,
+			"company_id" uuid REFERENCES "companies" ON DELETE CASCADE,
 			"sub_id"     uuid REFERENCES "subscriptions" ON DELETE CASCADE,
 			"success"    boolean,
 			"message"    text NOT NULL,
@@ -182,7 +184,7 @@ func defineSchema() []darwin.Migration {
 	// this is a placeholder to show our change pattern of one release per var(...) making code-folding easier.
 	) // v2 release
 
-	// minify simplifies the script to keep certain changes (spacing, casing and comments) from creating a new checksum
+	// minify simplifies the script to keep certain changes (spaces, tabs, case and comments) from creating a new checksum
 	var minify = func(script string) string {
 		b := strings.Builder{}
 		s := strings.ToLower(strings.ReplaceAll(script, "/*", "--"))

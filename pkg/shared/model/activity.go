@@ -13,10 +13,10 @@ import (
 )
 
 // Activity logs for sync requests
-// todo: add company to this table making it easier to see which company had problems
 type Activity struct {
 	tableName    struct{}      `pg:"activity"` // we don't want the plural `activities`
 	ID           int           `json:"id" pg:",pk"`
+	CompanyID    uuid.UUID     `json:"company_id""`
 	SubID        uuid.UUID     `json:"sub_id"`
 	Success      bool          `json:"success" pg:",use_zero"`
 	Message      string        `json:"message"`

@@ -37,17 +37,18 @@ func NewSync() *Sync {
 }
 
 // LogActivity adds a sync log entry to the activity table
-func (s *Sync) LogActivity(db orm.DB, subID uuid.UUID, msg string, d time.Duration, err error) error {
+func (s *Sync) LogActivity(db orm.DB, companyID, subID uuid.UUID, msg string, d time.Duration, err error) error {
 	var errMsg string
 	if err != nil {
 		errMsg = fmt.Sprintf("%v", err)
 	}
 	activity := sandpiper.Activity{
-		SubID:    subID,
-		Success:  err == nil,
-		Message:  msg,
-		Error:    errMsg,
-		Duration: d,
+		CompanyID: companyID,
+		SubID:     subID,
+		Success:   err == nil,
+		Message:   msg,
+		Error:     errMsg,
+		Duration:  d,
 	}
 	if err := db.Insert(&activity); err != nil {
 		return err
