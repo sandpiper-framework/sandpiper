@@ -282,9 +282,13 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 See also the list of [contributors](https://github.com/orgs/sandpiper-framework/people) who participated in this project.
 
-## License
+## License & Copyrights
+
+Copyright (c) 2019-2020 The Sandpiper Authors. All rights reserved.
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+The Sandpiper logo and mascot images are Copyright 2020 [Megan Winsby](https://www.linkedin.com/in/mwinsby/). Used with permission.
 
 ## Acknowledgments
 
