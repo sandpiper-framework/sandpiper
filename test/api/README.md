@@ -183,7 +183,7 @@ Assuming you didn't change anything when running the `sandpiper init` command, t
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjIjoiNWMzN2QyZmQtY2EzZC00ZTVlLThkOGEtNDUwNmFlMzA1OGUwIiwiZSI6ImFkbWlu...",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjIjoiNWMzN2QyZmQtY2EzZC00ZTVlLThkOGEtNDUwNmFbWlu...",
   "expires": "2020-05-18T16:27:43-05:00",
   "refresh_token": "d16e1a83587fd1546a204725c97dcca29c2c7422"
 }
@@ -311,11 +311,12 @@ We now have a slice assigned to a subscription. Next we will add a "grain" to th
 We will use the `sandpiper` CLI utility to add a test ACES file as a file-based grain. Open a second terminal window (keeping the API server running)
 
 ```
+open a new terminal window (cd to where your "cli" binary is stored)
 ./sandpiper -u admin -p admin -c cli-primary.yaml add --slice slice2 testdata/aces-file.xml
 ```
 If you don't see any error, it was added successfully. Note: you can also set environment variables for these user and password parameters.
 
-To see what was added, go back to Insomnia and Send the "List Grains (w/o payload)" request. You should see something like this:
+To see what was added, go back to Insomnia and Send the `List Grains (w/o payload)` request. You should see something like this:
 ```json
 {
   "grains": [
@@ -333,16 +334,15 @@ To see what was added, go back to Insomnia and Send the "List Grains (w/o payloa
 }
 ```
 
-You can also run the "w/ payload" version to see the ACES file encoded in the "payload". Not that the "encoding" is shown as "z64" which means the file was first zipped and then converted to base64 format for storage in the database.
+You can also run the "w/ payload" version to see the ACES file encoded in the "payload". Note that the "encoding" is shown as "z64" which means the file was first zipped and then converted to base64 format for storage in the database.
 
 ## Start Secondary Server
 In that second terminal window, start a "secondary" server with the following command.
 ```
+open a new terminal window (cd to where your "api" binary is stored)
 ./api -config api-secondary.yaml
 
-```
-You should now have two servers listening for commands on separate "ports" and accessing their own data pools. 
-```
+...
 Database: "tidepool"
 DB Version: 1.15
 Server role: "secondary"
@@ -350,6 +350,9 @@ Server ID: 20000000-0000-0000-0000-000000000000
 
 ⇨ http server started on [::]:8081
 ```
+
+You should now have two servers listening for commands on separate "ports" and accessing their own data pools. 
+
 Change Insomnia's "Active Environment" from "Primary" (green) to **"Secondary"** (red) using the drop-down menu so we can run API requests against the secondary server. Use the Login request to get an authentication token. Then Add "Company 1".
 
 ```
@@ -368,7 +371,7 @@ You should see something like the following:
 }
 ```
 
-Note this added our trading partner (Best Brakes) with their unique company_id. So we now have the same company in both databases, and their "sync_addr" is pointing to our primary server address (port 8080).
+Note this added our trading partner (Best Brakes) with their unique company_id. So we now have the same company in both databases, and their "sync_addr" is pointing to our primary server address (port 8080). In a production environment, this would be a publically accessible url (e.g. sync.bestbrakes.com) where the server is listening.
 
 ## Assign API Key
 
@@ -384,7 +387,7 @@ It should return something like the following:
 ```
 {
   "primary_id": "10000000-0000-0000-0000-000000000000",
-  "sync_api_key": "f1c77a6ee9442d006494d4904476d8f9a328465583cd8e6f3199be99dd5919f41341fc0442b09d297aa33cad1bcb8d5b32b3ddc969ef81e39d23020e08fd132138ea6c834d0753b5164e0427ce2616e3a2cd4c21d5697e9e8a37861889fd18168b61f28b8c2eee961b57d64b52784cd01c7bbacaa9bffbfe3c0f1df33a164835caa629540f141777b02de5ad0443"
+  "sync_api_key": "f1c77a6ee9442d006494d4904476d8f9a328465583cd8e6f3199be99dd5919f41341fc0442b09d297aa33cad1bcb8d5b32b3ddc969ef81e39d23020e08fd132138ea6c83..."
 }
 ```
 We need to add that key to our secondary database for "Best Brakes". That way, when we initiate the sync, we can pass along the key. We will do that now using Insomnia:
@@ -393,9 +396,9 @@ We need to add that key to our secondary database for "Best Brakes". That way, w
 POST Login (using { "username": "admin", "password": "admin" })
 PATCH Update apikey (Company 1) (from the Sync request folder)
 ```
-It uses an Insomnia variable we created to copy the generated apikey to the PATCH request.
+It uses an Insomnia variable we created to copy the generated apikey (from the POST apikey response) to the PATCH request.
  
-Normally, this apikey transfer would be part of the "sign-up" process when a trading partner requests access to your data.
+Normally, this apikey hand-off would be part of the "sign-up" process when a trading partner requests access to your data.
 
 ## Sync Secondary with Primary
 
@@ -476,3 +479,6 @@ You can see what was done in Insomnia. Under the Secondary (red) environment, ru
 ```
 
 If you use one of the "List Grains" requests, you will also see that the grain was delivered as well.
+
+You've now completed your first sync request.
+

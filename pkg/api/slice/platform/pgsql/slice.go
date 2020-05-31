@@ -252,7 +252,7 @@ func (s *Slice) Delete(db orm.DB, slice *sandpiper.Slice) error {
 func (s *Slice) Refresh(db orm.DB, sliceID uuid.UUID) error {
 
 	// calculate hash of all grains in the slice
-	hash, count, err := HashSliceGrains(db, sliceID)
+	hash, count, err := HashSlice(db, sliceID)
 	if err != nil {
 		return err
 	}
@@ -321,31 +321,43 @@ func selectError(err error) error {
 	return err
 }
 
-// HashSliceGrains returns a sha1 hash of all grains in a slice
-func HashSliceGrains(db orm.DB, sliceID uuid.UUID) (string, int, error) {
-	type result struct {
-		ID uuid.UUID
-	}
+// HashSlice returns a sha1 hash of all metadata and grains in a slice
+func HashSlice(db orm.DB, sliceID uuid.UUID) (string, int, error) {
 	var (
-		rows []result
+		ids  []uuid.UUID
 		b    bytes.Buffer
+		meta sandpiper.MetaArray
 	)
 
-	var hashIDs = func(rs []result) string {
-		if len(rs) == 0 {
+	var hash = func(meta sandpiper.MetaArray, ids []uuid.UUID) string {
+		if len(meta) == 0 && len(ids) == 0 {
 			return ""
 		}
-		for _, r := range rs {
-			b.Write(r.ID[:])
+		for _, u := range ids {
+			b.Write(u[:])
+		}
+		for _, m := range meta {
+			b.WriteString(m.Key)
+			b.WriteString(m.Value)
 		}
 		return fmt.Sprintf("%x", sha1.Sum(b.Bytes()))
 	}
 
-	// get grain ids for the slice (sorted)
-	err := db.Model().Table("grains").Column("id").Where("slice_id = ?", sliceID).Order("id").Select(&rows)
-	if err != nil {
+	// get slice metadata (sorted!)
+	if err := db.Model(&meta).
+		Where("slice_id = ?", sliceID).
+		Order("key").
+		Select(); err != nil {
 		return "", 0, err
 	}
 
-	return hashIDs(rows), len(rows), nil
+	// get grain ids for the slice (sorted!)
+	if err := db.Model().Table("grains").Column("id").
+		Where("slice_id = ?", sliceID).
+		Order("id").
+		Select(&ids); err != nil {
+		return "", 0, err
+	}
+
+	return hash(meta, ids), len(ids), nil
 }

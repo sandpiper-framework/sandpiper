@@ -131,7 +131,7 @@ func (s *Sync) AddSlice(db orm.DB, slice *sandpiper.Slice) error {
 func (s *Sync) RefreshSlice(db orm.DB, slice *sandpiper.Slice) error {
 
 	// use a public function from the slice service to get our slice information
-	hash, count, err := slicesvc.HashSliceGrains(db, slice.ID)
+	hash, count, err := slicesvc.HashSlice(db, slice.ID)
 	if err != nil {
 		return err
 	}
@@ -183,18 +183,33 @@ func (s *Sync) SliceAccess(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) er
 	}
 }
 
-// ReplaceSliceMetadata replaces target metadata with the source metadata
-func (s *Sync) ReplaceSliceMetadata(db orm.DB, sliceID uuid.UUID, metaArray sandpiper.MetaArray) error {
+// ReplaceSliceMetadata replaces our metadata with the source metadata if it has changed
+func (s *Sync) ReplaceSliceMetadata(db orm.DB, sliceID uuid.UUID, source sandpiper.MetaArray) error {
+	var target sandpiper.MetaArray
+
+	// get our metadata for the slice
+	err := db.Model(&target).Where("slice_id = ?", sliceID).Select()
+	if err != nil {
+		return err
+	}
+
+	// change arrays to maps for easy comparison and exit if nothing changed
+	m1 := source.ToMap(sliceID)
+	m2 := target.ToMap(sliceID)
+	if m1.Equals(m2) {
+		return nil
+	}
+
 	// drop existing slice metadata
 	md := new(sandpiper.SliceMetadata)
 	if _, err := db.Model(md).Where("slice_id = ?", sliceID).Delete(); err != nil {
 		return err
 	}
-	// add new source metadata
+
+	// add new slice metadata from source
 	meta := &sandpiper.SliceMetadata{SliceID: sliceID}
-	for _, m := range metaArray {
-		meta.Key = m.Key
-		meta.Value = m.Value
+	for _, m := range source {
+		meta.Key, meta.Value = m.Key, m.Value
 		if err := db.Insert(meta); err != nil {
 			return err
 		}

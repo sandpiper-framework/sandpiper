@@ -142,6 +142,8 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (
 	return nil
 }
 
+// syncSlice does the actual work of looking for changes and doing the update
+// todo: slice metadata should be considered "content" and so reflected in the hash!
 func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Slice) (err error) {
 	// log activity at slice level *only* if an error occurs
 	defer func(begin time.Time) {
@@ -187,6 +189,11 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 		}
 	}(remoteSlice.ID)
 
+	// remove obsolete grains (if any)
+	if err := s.sdb.DeleteGrains(s.db, deletes); err != nil {
+		return err
+	}
+
 	// add new grains
 	for _, grainID := range adds {
 		grain, err := s.api.Grain(grainID)
@@ -197,10 +204,7 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 			return err
 		}
 	}
-	// remove obsolete grains (if any)
-	if err := s.sdb.DeleteGrains(s.db, deletes); err != nil {
-		return err
-	}
+
 	// replace local slice metadata with remote's
 	meta, err := s.api.SliceMetaData(remoteSlice.ID)
 	if err != nil {
@@ -209,14 +213,15 @@ func (s *Sync) syncSlice(subID uuid.UUID, localSlice, remoteSlice *sandpiper.Sli
 	if err := s.sdb.ReplaceSliceMetadata(s.db, remoteSlice.ID, meta); err != nil {
 		return err
 	}
-	// Update ContentHash, ContentCount & ContentDate and verify against remote
+	// Update ContentHash, ContentCount & ContentDate and verify our own hash against remote's
 	err = s.sdb.RefreshSlice(s.db, remoteSlice)
 	return err
 }
 
 // slicesMatch checks if slice has chanced and so needs to be updated
 func slicesMatch(remoteSlice, localSlice *sandpiper.Slice) bool {
-	// todo: should we recalc local hash or can we just use the last one saved?
+	// we can safely use the previous hash saved for comparison because we performed a deep
+	// check of our own content when completing the previous sync
 	return remoteSlice.ContentHash == localSlice.ContentHash
 }
 
