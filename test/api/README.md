@@ -80,7 +80,6 @@ Command config file "cli-primary.yaml" created in C:\sandpiper
 ```
 
 In production, you would enter a strong admin password, but enter "admin" here to make testing easier. Also, the public sync URL would normally be something like `https://sandpiper.betterbrakes.com`, but we are going to test locally, on the same machine with both servers (using two different "ports").
-<div class="page"/>
 
 ## Creating the Secondary Database
 
@@ -120,7 +119,7 @@ The `sandpiper` command looks for a file named `cli-config.yaml` in the current 
 
 Next we'll run the sandpiper server (using the "primary" database) and create `subscriptions` and `grains` for us to sync. We'll do most of this work with a free REST client called Insomnia (someone must have thought that name was clever).
 
-## Insomnia REST Client
+## Insomnia REST Client ("Core")
 
 https://insomnia.rest/
 
@@ -387,7 +386,7 @@ It should return something like the following:
 ```
 {
   "primary_id": "10000000-0000-0000-0000-000000000000",
-  "sync_api_key": "f1c77a6ee9442d006494d4904476d8f9a328465583cd8e6f3199be99dd5919f41341fc0442b09d297aa33cad1bcb8d5b32b3ddc969ef81e39d23020e08fd132138ea6c83..."
+  "sync_api_key": "f1c77a6ee9442d006494d4904476d8f9a328465583cd8e6f3199be99dd5919f41341fc0442b09d297aa33cad..."
 }
 ```
 We need to add that key to our secondary database for "Best Brakes". That way, when we initiate the sync, we can pass along the key. We will do that now using Insomnia:

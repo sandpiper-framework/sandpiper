@@ -76,4 +76,5 @@ type RBAC interface {
 	EnforceRole(echo.Context, sandpiper.AccessLevel) error
 	EnforceScope(echo.Context) (*sandpiper.Scope, error)
 	EnforceServerRole(string) error
+	OurServer() *sandpiper.Server
 }

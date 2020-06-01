@@ -42,7 +42,7 @@ var (
 // activity create request
 type createReq struct {
 	CompanyID uuid.UUID     `json:"company_id" validate:"required"`
-	SubID     uuid.UUID     `json:"company_id"`
+	SubID     uuid.UUID     `json:"sub_id"`
 	Success   bool          `json:"success" validate:"required"`
 	Message   string        `json:"message" validate:"required"`
 	Error     string        `json:"error"`

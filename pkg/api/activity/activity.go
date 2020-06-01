@@ -13,7 +13,7 @@ import (
 
 // Create makes a new sync activity record. Must be a sandpiper admin.
 func (s *Activity) Create(c echo.Context, req sandpiper.Activity) (*sandpiper.Activity, error) {
-	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
+	if err := s.rbac.EnforceRole(c, sandpiper.SyncRole); err != nil {
 		return nil, err
 	}
 	return s.sdb.Create(s.db, req)

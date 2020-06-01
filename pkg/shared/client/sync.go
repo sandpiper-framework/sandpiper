@@ -6,7 +6,9 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -106,6 +108,32 @@ func (c *Client) SliceMetaData(sliceID uuid.UUID) (sandpiper.MetaArray, error) {
 	}
 	_, err = c.do(req, &results)
 	return results, err
+}
+
+// LogActivity adds an activity record to the primary server
+func (c *Client) LogActivity(serverID, subID uuid.UUID, msg string, duration time.Duration, e error) error {
+	errMsg := ""
+	if e != nil {
+		errMsg = fmt.Sprintf("%v", e)
+	}
+	activity := sandpiper.Activity{
+		CompanyID: serverID,
+		SubID:     subID,
+		Success:   e == nil,
+		Message:   msg,
+		Error:     errMsg,
+		Duration:  duration,
+	}
+	body, err := json.Marshal(activity)
+	if err != nil {
+		return err
+	}
+	req, err := c.newRequest("POST", "/activity", body)
+	if err != nil {
+		return err
+	}
+	_, err = c.do(req, nil)
+	return err
 }
 
 // Sync initiates a sync with a primary server from secondary server

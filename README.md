@@ -17,7 +17,7 @@ Download the binary from the official download site (or use package manager for 
 [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 
 
-See the setup documents in the documentation for platform-specific instructions. Other plug-and-play options are available for those that would like to use pre-configured solutions. Please see the section on Containers and PAAS below. 
+See the setup documents in the documentation for platform-specific instructions. Other plug-and-play options are available for those that would like to use pre-configured solutions. Please see the section on Containers and PaaS below. 
 
 #### Sandpiper Binaries
 
@@ -142,9 +142,9 @@ https://marketplace.digitalocean.com/apps/dokku
 
 https://www.vagrantup.com/
 
-### PAAS Options
+### PaaS Options
 
-If you would rather not host a sandpiper on your network, there are several ["Platform As A Service"](https://en.wikipedia.org/wiki/Platform_as_a_service) solutions that we support.
+If you would rather not host a sandpiper on your network, there are several ["Platform as a Service"](https://en.wikipedia.org/wiki/Platform_as_a_service) solutions that we support.
 
 #### Render
 

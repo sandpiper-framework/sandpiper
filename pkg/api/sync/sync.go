@@ -40,14 +40,15 @@ import (
 type subsArray []sandpiper.Subscription
 
 // Start sends a sync request to a primary sandpiper server from our secondary server
-// todo: log activity to primary server as well! (only on success?)
 func (s *Sync) Start(c echo.Context, primaryID uuid.UUID) (err error) {
 	var p *sandpiper.Company
 
 	// log activity even if early exit
 	defer func(begin time.Time) {
 		msg := fmt.Sprintf("Syncing \"%s\" (%s)", p.Name, p.SyncAddr)
-		_ = s.sdb.LogActivity(s.db, primaryID, uuid.Nil, msg, time.Since(begin), err)
+		if e := s.sdb.LogActivity(s.db, primaryID, uuid.Nil, msg, time.Since(begin), err); e != nil {
+			err = fmt.Errorf("%w; LogActivity Error: %v", err, e)
+		}
 	}(time.Now())
 
 	// must be a secondary server to start the sync
@@ -149,12 +150,15 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (
 func (s *Sync) syncSlice(primaryID, subID uuid.UUID, localSlice, remoteSlice *sandpiper.Slice) (err error) {
 	// log activity at slice level *only* if an error occurs
 	defer func(begin time.Time) {
+		duration := time.Since(begin)
+		msg := "Slice \"" + localSlice.Name + "\""
 		if err != nil {
-			msg := "Slice \"" + localSlice.Name + "\""
-			if e := s.sdb.LogActivity(s.db, primaryID, subID, msg, time.Since(begin), err); e != nil {
+			if e := s.sdb.LogActivity(s.db, primaryID, subID, msg, duration, err); e != nil {
 				err = fmt.Errorf("%w; LogActivity Error: %v", err, e)
 			}
 		}
+		// log always to primary
+		_ = s.api.LogActivity(s.rbac.OurServer().ID, subID, msg, duration, err)
 	}(time.Now())
 
 	if !remoteSlice.AllowSync {
@@ -217,6 +221,7 @@ func (s *Sync) syncSlice(primaryID, subID uuid.UUID, localSlice, remoteSlice *sa
 	}
 	// Update ContentHash, ContentCount & ContentDate and verify our own hash against remote's
 	err = s.sdb.RefreshSlice(s.db, remoteSlice)
+
 	return err
 }
 
