@@ -23,6 +23,8 @@ commands:
    pull     save file-based grains to the file system
    list     list slices (if no slice provided) or file-based grains by slice_id or slice_name
    sync     start the sync process on active subscriptions
+   init     initialize a sandpiper primary or secondary database
+   secrets  generate  new random secrets for env vars and api-config.yaml file 
    help, h  Shows a list of commands or help for one command
 ```
 
@@ -30,7 +32,7 @@ If the password is not provided, you will be prompted for it.
 
 ### Configuration file
 
-All commands look for a `config.yml` file in the current directory to determine the sandpiper server address (this can be overridden by the `--config` option or by the SANDPIPER_CONFIG environment variable). 
+All commands look for a `cli-config.yml` file in the current directory to determine the sandpiper server address (this can be overridden by the `--config` option or by the SANDPIPER_CONFIG environment variable). 
 
 Here is an example of the config.yml file.
 
@@ -40,6 +42,66 @@ command:
   port: 8080
   max_sync_proceses: 5
 ```
+
+## Initialize a Sandpiper database
+
+The `init` command will create, migrate and seed a new primary or secondary postgresql database. (Please see the "Testing Workbook" for slightly different instructions if not installing for production).
+
+When you issue this command, you will be prompted for your PostgreSQL Host Address, Port and Superuser credentials. This is required to create a new database. In most cases, you can simply press `Enter` to accept the default value (shown in parentheses).
+
+```
+sandpiper (v0.1.2-75-gd49f4eb)
+Copyright 2020 The Sandpiper Authors. All rights reserved.
+
+INITIALIZE A SANDPIPER DATABASE
+
+PostgreSQL Address (localhost):
+PostgreSQL Port (5432):
+PostgreSQL Superuser (postgres):
+PostgreSQL Superuser Password: *********
+SSL Mode (disable):
+connected to host
+```
+The `localhost` address (which is equivalent to 127.0.0.1) indicates you're running this command on the same machine as PostgreSQL. Otherwise, it would be a standard ip4 address on your network (e.g. 192.168.1.100) or possibly a hosted instance endpoint (e.g. myinstance.123456789012.us-east-1.rds.amazonaws.com). The superuser password (from above) will be hidden when you type.
+
+You should see "connected to host" to indicate that the connection was successful. Next, you will be prompted for the new database information.
+
+```
+New Database Name (sandpiper):
+Database Owner (sandpiper):
+Database Owner Password: focal-weedy-brood-hat
+CREATE DATABASE sandpiper;
+CREATE USER sandpiper WITH ENCRYPTED PASSWORD 'focal-weedy-brood-hat';
+GRANT ALL PRIVILEGES ON DATABASE sandpiper TO sandpiper;
+
+applying migrations...
+Database: "sandpiper"
+DB Version: 1.15 (migrated from 0.00 to 1.15)
+```
+
+The recommended database name is `sandpiper` regardless of the server-role you require (primary or secondary). If you need both server-roles, you can name it anything you like ("secondary", "receiver", "tidepool", etc.).
+
+In the example above, we used default values except when required to enter a password for the database owner (please select a strong password of your own) and again, keep a record of it for later. You will need it when starting the server.
+
+The database owner is the only user to connect directly to the database (via the sandpiper-api server). This should not be confused with a sandpiper end-user which is stored in the `users` table for authentication and access.
+
+```
+Company Name: Better Brakes
+Server-Role (primary*/secondary): primary
+Public Sync URL: http://localhost:8080
+Server http URL (http://localhost): 
+Added Company "Better Brakes"
+
+Sandpiper Admin Password: admin
+Added User "admin"
+
+initialization complete for "sandpiper"
+
+Server config file "api-primary.yaml" created in C:\sandpiper
+Command config file "cli-primary.yaml" created in C:\sandpiper
+```
+
+In production, you would enter a strong admin password, but enter "admin" here to make testing easier. Also, the public sync URL would normally be something like `https://sandpiper.betterbrakes.com`, but we are going to test locally, on the same machine with both servers (using two different "ports").
 
 ## Add File-Based Objects
 
@@ -179,3 +241,11 @@ command-options:
    --noupdate                 Perform the sync without actually changing anything locally (default: false)
    --help, -h                 show help (default: false)
 ```
+
+## Generate API Secrets
+
+```
+sandpiper secrets
+```
+
+This command will generate random values suitable for API secrets. Secrets are generated automatically by `sandpiper init`, but could be useful if you want to reset your secrets later.

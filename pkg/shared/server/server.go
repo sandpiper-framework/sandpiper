@@ -64,7 +64,7 @@ func Start(srv *echo.Echo, cfg *Settings) {
 		srv.GET("/routes", listRoutes)
 	}
 
-	fmt.Printf("Server role: \"%s\"\nServer ID: %s\n\n", cfg.ServerRole, cfg.ServerID)
+	fmt.Printf("Server Role: \"%s\"\nServer ID: %s\n\n", cfg.ServerRole, cfg.ServerID)
 
 	// Start server
 	go func() {

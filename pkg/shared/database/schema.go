@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/GuiaBolso/darwin"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 // defineSchema returns a list of our database migrations
@@ -75,7 +75,7 @@ func defineSchema() []darwin.Migration {
 			"allow_sync"        boolean,                    /* locked during content update */
 			"sync_status"       sync_status_enum NOT NULL,  /* only on secondary */
 			"last_sync_attempt" timestamp,                  /* only on secondary */
-      "last_good_sync"    timestamp,                  /* only on secondary */
+			"last_good_sync"    timestamp,                  /* only on secondary */
 			"created_at"        timestamp,
 			"updated_at"        timestamp
 		);`
@@ -235,60 +235,62 @@ func Migrate(dsn string) (string, error) {
 		return "", err
 	}
 
-	driver := darwin.NewGenericDriver(db, darwin.PostgresDialect{})
-	schema := defineSchema()
+	count, v1, err := currentVersion(db)
+	if err != nil {
+		return "", err
+	}
 
-	// use a channel to see which steps were applied
-	infoChan := make(chan darwin.MigrationInfo, len(schema))
+	schema := defineSchema()
+	if count == len(schema) && v1 == schema[count-1].Version {
+		// already up-to-date
+		return changes(v1, v1), nil
+	}
+
+	// setup for the migrations
+	driver := darwin.NewGenericDriver(db, darwin.PostgresDialect{})
+	infoChan := make(chan darwin.MigrationInfo, len(schema)) // for error reporting
 	d := darwin.New(driver, schema, infoChan)
 
-	v1 = currentVersion(d)
-
+	// perform the migrations
 	if err := d.Migrate(); err != nil {
 		close(infoChan)
-		v2, prob := lastApplied(infoChan)
-		if v2 < v1 {
-			v2 = v1
-		}
-		return "", fmt.Errorf("migration error in v%.2f \"%s\" (was v%.2f now v%.2f): %w", prob.Version, prob.Description, v1, v2, err)
+		_, v2, _ = currentVersion(db)
+		return "", fmt.Errorf("migration (was v%.2f now v%.2f): %w\n\n%s\n", v1, v2, err, progress(infoChan))
 	}
 	close(infoChan)
 
-	v2 = v1
-	if v, _ := lastApplied(infoChan); v != 0 {
-		v2 = v
+	_, v2, err = currentVersion(db)
+	if err != nil {
+		return "", err
 	}
 
 	return changes(v1, v2), nil
 }
 
-// lastApplied returns the last migration version applied (if any)
-func lastApplied(ch <-chan darwin.MigrationInfo) (appliedVer float64, errMigration darwin.Migration) {
-	for info := range ch {
-		switch info.Status {
-		case darwin.Applied:
-			appliedVer = info.Migration.Version
-		case darwin.Error:
-			errMigration = info.Migration
-		}
-	}
-	return appliedVer, errMigration
-}
-
-// currentVersion reads all records from migration table to get the latest version
-func currentVersion(d darwin.Darwin) float64 {
-	var v, ver float64
-
-	if infoList, err := d.Info(); err == nil {
-		// get latest version
-		for _, info := range infoList {
-			v = info.Migration.Version
-			if v > ver && info.Status == darwin.Applied {
-				ver = v
+// currentVersion reads from migration table to get the latest version and number of steps applied
+func currentVersion(db *sql.DB) (count int, ver float64, err error) {
+	s := `select count(*) as n, max(version) as ver from darwin_migrations;`
+	err = db.QueryRow(s).Scan(&count, &ver)
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			if pqErr.Code == "42P01" {
+				// missing table is not an error during first migration
+				count, ver, err = 0, 0, nil
 			}
 		}
 	}
-	return ver
+	return count, ver, err
+}
+
+// progress returns the steps attempted during this migration
+func progress(ch <-chan darwin.MigrationInfo) string {
+	var b strings.Builder
+
+	for info := range ch {
+		_, _ = fmt.Fprintf(&b, "v%.2f: \"%s\" (%s) Error: %v\n",
+			info.Migration.Version, info.Migration.Description, info.Status.String(), info.Error)
+	}
+	return b.String()
 }
 
 func changes(v1, v2 float64) string {

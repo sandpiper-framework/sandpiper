@@ -157,7 +157,7 @@ func (s *Sync) syncSlice(primaryID, subID uuid.UUID, localSlice, remoteSlice *sa
 				err = fmt.Errorf("%w; LogActivity Error: %v", err, e)
 			}
 		}
-		// log always to primary
+		// log every sync attempt to primary (ignoring error)
 		_ = s.api.LogActivity(s.rbac.OurServer().ID, subID, msg, duration, err)
 	}(time.Now())
 
