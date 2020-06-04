@@ -5,9 +5,11 @@
 Description=Sandpiper Primary Server
 
 [Service]
-ExecStart=/home/ubuntu/sandpiper/primary
+Type=simple
+ExecStart=/home/ubuntu/sandpiper/api
 WorkingDirectory=/home/ubuntu/sandpiper
 Restart=always
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
