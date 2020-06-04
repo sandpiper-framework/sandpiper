@@ -1,4 +1,4 @@
-# Sandpiper Development Setup (Linux Fedora)
+# Sandpiper Development Setup (Linux Ubuntu)
 
 # Environment
 
@@ -95,5 +95,3 @@ you should see `http server started on ...`
 ctrl-c  # to stop server
 ```
 (9) **Follow instructions in Testing Workbook**
-
-

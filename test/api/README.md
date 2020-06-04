@@ -1,6 +1,8 @@
 # Testing Handbook
 
-This handbook walks you through the testing process. Note that all directory paths are shown in Linux format (forward slash) since they also work in Windows PowerShell. Also, paths are shown relative to the installation directory.
+This handbook walks you through the testing process. The goal is to set up two servers (publisher and receiver), add a subscription and data file to the publisher and have it sync up with the receiver.
+
+Note that all directory paths are shown in Linux format (forward slash) since they also work in Windows PowerShell. Also, paths are shown relative to the installation directory.
 
 ## Download Sandpiper Distribution Package
 
@@ -480,4 +482,3 @@ You can see what was done in Insomnia. Under the Secondary (red) environment, ru
 If you use one of the "List Grains" requests, you will also see that the grain was delivered as well.
 
 You've now completed your first sync request.
-

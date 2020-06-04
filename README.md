@@ -16,7 +16,6 @@ Download the binary from the official download site (or use package manager for 
 
 [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 
-
 See the setup documents in the documentation for platform-specific instructions. Other plug-and-play options are available for those that would like to use pre-configured solutions. Please see the section on Containers and PaaS below. 
 
 #### Sandpiper Binaries
@@ -31,7 +30,7 @@ There are two programs included in the release, the `api` server and the `sandpi
 
 Both sandpiper programs require configuration settings to run. These settings are stored in [yaml](https://en.wikipedia.org/wiki/YAML) files made up of key/value pairs organized by sections (e.g. Database, Server, Application, etc.). In some cases (such as login credentials), these settings can be overridden by environment variables. See the Deployment section for more information.
 
-Two sample config files are provided (`api-config-sample.yaml` and `cli-config-sample.yaml`) as a template, but these files are also created by the database initialization procedure explained below.
+Two sample config files are provided (`api-config-sample.yaml` and `cli-config-sample.yaml`) as a template, but live versions of these files are also created by the database initialization procedure explained below.
 
 #### Create Database (for each desired server role)
 
@@ -45,7 +44,7 @@ You will be prompted for your PostgreSQL Host Address, Port and Superuser creden
 
 ```
 PS C:\Users\dougw\autocare\sandpiper\cmd\cli> ./sandpiper init
-sandpiper (v0.1.2-67-g5facfce-dirty)
+sandpiper (v0.1.2-67-g5facfce)
 Copyright 2020 The Sandpiper Authors. All rights reserved.
 
 INITIALIZE A SANDPIPER DATABASE
@@ -67,32 +66,35 @@ Database Owner (sandpiper):
 Database Owner Password: focal-weedy-brood-hat
 CREATE DATABASE sandpiper;
 CREATE USER sandpiper WITH ENCRYPTED PASSWORD 'focal-weedy-brood-hat';
-user "sandpiper" already exists
 GRANT ALL PRIVILEGES ON DATABASE sandpiper TO sandpiper;
 
 applying migrations...
 Database: "sandpiper"
-DB Version: 1 (migrated from 0 to 1)
+DB Version: 1.15 (migrated from 0.00 to 1.15)
 ```
 
 The recommended database name is `sandpiper` regardless of the server-role you require (primary or secondary). If you need both server-roles on one PostgreSQL server, you can name it anything you like ("secondary", "receiver", "tidepool", etc.).
 
-In the example above, we used default values except when required to enter a password for the database owner (please select a strong password of your own) and again, keep a record of it for later. You will need it when starting the server.
+In the example above, we used default values except when required to enter a password for the database owner (**please select a strong password of your own**) and again, keep a record of it for later. You will need it when starting the server. (The password will also be saved in the generated api config file, so remove it if security is a concern.)
 
-The database owner is the only user to connect directly to the database (via the sandpiper-api server). This should not be confused with a sandpiper end-user which is stored in the `users` table for authentication and access.
+The database owner is the only user to connect directly to the database (via the sandpiper-api server). This should not be confused with a sandpiper end-user which is stored in the `users` table for authentication and API access.
 
 ```
 Company Name: Better Brakes
 Server-Role (primary*/secondary): primary
-Public Sync URL: http://localhost:8081
+Public Sync URL: https://sandpiper.betterbrakes.com
+Server http URL (http://localhost):
 Added Company "Better Brakes"
-Sandpiper Admin Password: admin
+Sandpiper Admin Password: severe-wire-rubric-cat
 Added User "admin"
 
 initialization complete for "sandpiper"
+
+Server config file "api-primary.yaml" created in C:\sandpiper\cmd\cli
+Command config file "cli-primary.yaml" created in C:\sandpiper\cmd\cli
 ```
 
-In production, you would enter a strong admin password, but enter "admin" here to make testing easier. Also, the public sync URL would normally be something like `https://sandpiper.betterbrakes.com`, but we are going to test locally, on the same machine with both servers.
+The "Public Sync URL" should be the listening address of the Sandpiper API on this machine. The "Server http UR"L is used by the `sandpiper` command to access your database (but could be the same as the public URL). An "admin" user is added by default. Please provide your own strong password and keep it for your records. Both the user and password can be changed later through the admin screens (when they become available).
 
 ## Deployment
 
@@ -126,6 +128,13 @@ $ sudo systemctl {status|start|stop|restart} sandpiper
 Display all services
 ```
 $ service --status-all
+```
+Log file entries are stored in /var/log/syslog which you can view with any of these commands:
+```
+less /var/log/syslog
+dmesg | less
+journalctl
+tail -f -n 20 /var/log/syslog
 ```
 https://www.digitalocean.com/community/tutorials/understanding-systemd-units-and-unit-files
 
@@ -174,9 +183,9 @@ The following software must be installed on your target development machine.
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+Step-by-step instructions for several popular platforms are provided in the `setup` directory of the project [here](https://github.com/sandpiper-framework/sandpiper/tree/master/setup/platforms).
 
-1. Clone the project under the current directory (e.g. $HOME/source/)
+You can also download (clone) the project using git with the following command:
 
 ```
 git clone https://github.com/sandpiper-framework/sandpiper.git
