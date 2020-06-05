@@ -1,6 +1,6 @@
 // Copyright The Sandpiper Authors. All rights reserved.
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE.md file.
+// This file is licensed under the Artistic License 2.0.
+// License text can be found in the project's LICENSE file.
 
 package sandpiper
 
@@ -26,11 +26,13 @@ func (p *PaginationReq) Transform() *Pagination {
 		p.Limit = paginationMaxLimit
 	}
 
-	return &Pagination{Limit: p.Limit, Offset: p.Page * p.Limit}
+	return &Pagination{Page: p.Page, Offset: p.Page * p.Limit, Limit: p.Limit}
 }
 
 // Pagination holds range response settings
 type Pagination struct {
-	Limit  int `json:"limit,omitempty"`
-	Offset int `json:"offset,omitempty"`
+	Page   int `json:"page"`
+	Offset int `json:"offset"`
+	Limit  int `json:"limit"`
+	Count  int `json:"count"`
 }

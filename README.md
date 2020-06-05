@@ -293,9 +293,10 @@ See also the list of [contributors](https://github.com/orgs/sandpiper-framework/
 
 ## License & Copyrights
 
-Copyright (c) 2019-2020 The Sandpiper Authors. All rights reserved.
+License: Artistic-2.0
+[![License: Artistic-2.0](https://img.shields.io/badge/License-Artistic%202.0-0298c3.svg)](https://opensource.org/licenses/Artistic-2.0)
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+Copyright (c) 2019-2020 The Sandpiper Authors. All rights reserved.
 
 The Sandpiper logo and mascot images are Copyright 2020 [Megan Winsby](https://www.linkedin.com/in/mwinsby/). Used with permission.
 

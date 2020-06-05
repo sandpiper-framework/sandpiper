@@ -1,6 +1,6 @@
 // Copyright The Sandpiper Authors. All rights reserved.
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE.md file.
+// This file is licensed under the Artistic License 2.0.
+// License text can be found in the project's LICENSE file.
 
 package pgsql
 
@@ -33,8 +33,6 @@ func NewGrain() *Grain {
 var (
 	// ErrGrainNotFound indicates select returned no rows
 	ErrGrainNotFound = echo.NewHTTPError(http.StatusNotFound, "Grain does not exist.")
-	//ErrAlreadyExists = echo.NewHTTPError(http.StatusInternalServerError, "Grain key already exists for this Slice.")
-	//ErrDecodePayload = echo.NewHTTPError(http.StatusInternalServerError, "Error preparing payload for database.")
 )
 
 // Create creates a new grain in database (assumes allowed to do this).

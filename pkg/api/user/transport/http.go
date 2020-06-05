@@ -1,6 +1,6 @@
 // Copyright The Sandpiper Authors. All rights reserved.
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE.md file.
+// This file is licensed under the Artistic License 2.0.
+// License text can be found in the project's LICENSE file.
 
 package transport
 
@@ -87,24 +87,18 @@ func (h *HTTP) create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, usr)
 }
 
-type listResponse struct {
-	Users []sandpiper.User `json:"users"`
-	Page  int              `json:"page"`
-}
-
 func (h *HTTP) list(c echo.Context) error {
 	p := new(sandpiper.PaginationReq)
 	if err := c.Bind(p); err != nil {
 		return err
 	}
-
-	result, err := h.svc.List(c, p.Transform())
-
+	paging := p.Transform()
+	result, err := h.svc.List(c, paging)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, listResponse{result, p.Page})
+	return c.JSON(http.StatusOK, sandpiper.UsersPaginated{Users: result, Paging: *paging})
 }
 
 func (h *HTTP) view(c echo.Context) error {

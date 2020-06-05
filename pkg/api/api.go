@@ -1,6 +1,6 @@
 // Copyright The Sandpiper Authors. All rights reserved.
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE.md file.
+// This file is licensed under the Artistic License 2.0.
+// License text can be found in the project's LICENSE file.
 
 // Package api creates each service used by the server (grouped by api version)
 // with middleware, logging and routing, and then starts the web server.

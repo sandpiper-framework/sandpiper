@@ -1,6 +1,6 @@
 // Copyright The Sandpiper Authors. All rights reserved.
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE.md file.
+// This file is licensed under the Artistic License 2.0.
+// License text can be found in the project's LICENSE file.
 
 // Package server sets up the echo server with middleware, binder and validater
 // from configuration file allows starting (with graceful shutdown)

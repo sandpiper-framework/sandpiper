@@ -4,8 +4,8 @@
 
  This script is provided for documentation purposes only. See the README.md file for more information.
 
- Date: 2020-05-18
- DB Version 1.14
+ Date: 2020-06-01
+ DB Version 1.15
 */
  
 CREATE TYPE server_role_enum AS ENUM (

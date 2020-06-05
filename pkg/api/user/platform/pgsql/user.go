@@ -1,6 +1,6 @@
 // Copyright The Sandpiper Authors. All rights reserved.
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE.md file.
+// This file is licensed under the Artistic License 2.0.
+// License text can be found in the project's LICENSE file.
 
 package pgsql
 
@@ -63,16 +63,18 @@ func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 }
 
 // List returns list of all users retrievable for the current user, depending on role
-func (u *User) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.User, error) {
-	var users []sandpiper.User
+func (u *User) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) (users []sandpiper.User, err error) {
 
 	q := db.Model(&users).Limit(p.Limit).Offset(p.Offset).Order("username")
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
-	if err := q.Select(); err != nil {
+
+	p.Count, err = q.SelectAndCount()
+	if err != nil {
 		return nil, err
 	}
+
 	return users, nil
 }
 

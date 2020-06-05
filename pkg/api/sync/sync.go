@@ -1,6 +1,6 @@
 // Copyright The Sandpiper Authors. All rights reserved.
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE.md file.
+// This file is licensed under the Artistic License 2.0.
+// License text can be found in the project's LICENSE file.
 
 // Package sync manages the exchange of subscriptions, slices and grains between primary and
 // secondary servers. It contains different endpoints for primary and secondary servers
@@ -136,6 +136,7 @@ func (s *Sync) syncSubscriptions(locals, prims subsArray, primaryID uuid.UUID) (
 			}
 		}
 		if local.Active {
+			// sync the grains for a slice
 			if err := s.syncSlice(primaryID, local.SubID, local.Slice, remote.Slice); err != nil {
 				return err
 			}
