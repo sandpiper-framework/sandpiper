@@ -17,8 +17,8 @@ import (
 
 const (
 	license = `# Copyright The Sandpiper Authors. All rights reserved.
-# Use of this source code is governed by an MIT-style
-# license that can be found in the LICENSE.md file.
+# Use of this source code is governed by The Artistic License 2.0 as
+# found in the LICENSE file.
 `
 	apiHead = `
 # Sandpiper API configuration file (rename to 'api-config.yaml' for default use)

@@ -49,6 +49,10 @@ func Start(cfg *config.Configuration) error {
 	// setup echo server (singleton)
 	srv := server.New()
 
+	// welcome screen
+	// todo: use pkger to embed the assets and server them from code
+	srv.Static("/", "../../public")
+
 	// create version group using token authentication middleware
 	v1 := srv.Group("/v1")
 	v1.Use(tok.MWFunc())

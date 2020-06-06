@@ -7,8 +7,7 @@ info:
     name: Doug Winsby
     email: dougw@winsbygroup.com
   license:
-    name: MIT
-    url: http://opensource.org/licenses/MIT
+    name: Artistic License 2.0
 servers:
 - url: https://sandpiper.winsbygroup.com/v1
   description: Reference server

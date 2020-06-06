@@ -26,13 +26,17 @@ func (p *PaginationReq) Transform() *Pagination {
 		p.Limit = paginationMaxLimit
 	}
 
-	return &Pagination{Page: p.Page, Offset: p.Page * p.Limit, Limit: p.Limit}
+	if p.Page == 0 {
+		p.Page = 1
+	}
+
+	return &Pagination{Page: p.Page, Limit: p.Limit, Offset: (p.Page - 1) * p.Limit}
 }
 
 // Pagination holds range response settings
 type Pagination struct {
-	Page   int `json:"page"`
-	Offset int `json:"offset"`
-	Limit  int `json:"limit"`
-	Count  int `json:"count"`
+	Page   int `json:"page_number"`
+	Limit  int `json:"items_limit"`
+	Count  int `json:"items_total"`
+	Offset int `json:"-"` // for database queries
 }

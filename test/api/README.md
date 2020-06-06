@@ -226,7 +226,11 @@ Let's move on to adding some Companies and Users. Select the `List Companies` re
       ]
     }
   ],
-  "page": 0
+  "paging": {
+    "page_number": 1,
+    "items_limit": 100,
+    "items_total": 1
+  }
 }
 ```
 
@@ -330,8 +334,7 @@ To see what was added, go back to Insomnia and Send the `List Grains (w/o payloa
       "payload_len": 2880,
       "created_at": "2020-05-30T21:24:03.97232Z"
     }
-  ],
-  "page": 0
+  ]
 }
 ```
 
@@ -474,8 +477,7 @@ You can see what was done in Insomnia. Under the Secondary (red) environment, ru
         "updated_at": "2020-05-30T22:03:12.07415Z"
       }
     }
-  ],
-  "page": 0
+  ]
 }
 ```
 

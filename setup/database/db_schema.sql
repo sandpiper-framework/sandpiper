@@ -1,6 +1,6 @@
 /*
- Copyright The Sandpiper Authors. All rights reserved. Use of this source code is governed by an
- MIT-style license that can be found in the LICENSE.md file.
+ Copyright The Sandpiper Authors. All rights reserved. Use of this source code is governed by
+ The Artistic License 2.0 as found in the LICENSE file.
 
  This script is provided for documentation purposes only. See the README.md file for more information.
 

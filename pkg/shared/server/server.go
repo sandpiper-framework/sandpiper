@@ -32,7 +32,7 @@ func New() *echo.Echo {
 		secure.CORS(),
 		secure.Headers(),
 	)
-	e.GET("/", healthCheck)
+	e.GET("/check", healthCheck)
 	e.Validator = &CustomValidator{V: validator.New()}
 	custErr := &customErrHandler{e: e}
 	e.HTTPErrorHandler = custErr.handler

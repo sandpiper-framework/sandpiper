@@ -77,13 +77,13 @@ func (h *HTTP) list(c echo.Context) error {
 	if err := c.Bind(p); err != nil {
 		return err
 	}
-
-	result, err := h.svc.List(c, p.Transform())
+	paging := p.Transform()
+	result, err := h.svc.List(c, paging)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, sandpiper.ActivityPaginated{Syncs: result, Page: p.Page})
+	return c.JSON(http.StatusOK, sandpiper.ActivityPaginated{Syncs: result, Paging: *paging})
 }
 
 func (h *HTTP) view(c echo.Context) error {
