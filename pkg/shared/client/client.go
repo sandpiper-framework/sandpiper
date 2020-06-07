@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/secure"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/secure"
 )
 
 const apiVer = "/v1"

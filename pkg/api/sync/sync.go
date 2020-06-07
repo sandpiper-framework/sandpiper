@@ -31,8 +31,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/shared/client"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/client"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // todo: change sync process to a websocket connection instead of separate http calls

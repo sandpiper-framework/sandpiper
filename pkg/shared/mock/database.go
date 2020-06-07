@@ -14,7 +14,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 
-	"sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // NewPGContainer instantiates new postgresql docker container

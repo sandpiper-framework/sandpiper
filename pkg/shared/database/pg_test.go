@@ -11,8 +11,8 @@ import (
 	"github.com/fortytw2/dockertest"
 	"github.com/stretchr/testify/assert"
 
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 func TestNew(t *testing.T) {

@@ -13,7 +13,7 @@ import (
 
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"sandpiper/pkg/cli/commands"
+	"github.com/sandpiper-framework/sandpiper/pkg/cli/commands"
 )
 
 // sandpiper [global options] command [command options] [arguments]

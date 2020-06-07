@@ -19,10 +19,10 @@ import (
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"sandpiper/pkg/shared/config"
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/secure"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/config"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/secure"
 )
 
 // Conn creates a receiver struct for a database connection

@@ -12,8 +12,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/slice"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/slice"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the slice service

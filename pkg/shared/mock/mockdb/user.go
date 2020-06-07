@@ -3,7 +3,7 @@ package mockdb
 import (
 	"github.com/go-pg/pg/v9/orm"
 
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // User database mock

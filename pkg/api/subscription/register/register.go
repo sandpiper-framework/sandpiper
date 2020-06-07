@@ -7,13 +7,13 @@ package subscription
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/subscription"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/subscription"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	sl "sandpiper/pkg/api/subscription/logging"
-	st "sandpiper/pkg/api/subscription/transport"
-	"sandpiper/pkg/shared/database"
+	sl "github.com/sandpiper-framework/sandpiper/pkg/api/subscription/logging"
+	st "github.com/sandpiper-framework/sandpiper/pkg/api/subscription/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // Register ties the subscription service to its logger and transport mechanisms

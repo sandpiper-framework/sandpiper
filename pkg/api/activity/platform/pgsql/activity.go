@@ -9,7 +9,7 @@ package pgsql
 import (
 	"github.com/go-pg/pg/v9/orm"
 
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // Activity represents the client for activity table

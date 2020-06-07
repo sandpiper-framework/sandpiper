@@ -11,8 +11,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/auth"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/auth"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the auth service

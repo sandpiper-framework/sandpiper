@@ -7,13 +7,13 @@ package sync
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/activity"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/activity"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	sl "sandpiper/pkg/api/activity/logging"
-	st "sandpiper/pkg/api/activity/transport"
-	"sandpiper/pkg/shared/database"
+	sl "github.com/sandpiper-framework/sandpiper/pkg/api/activity/logging"
+	st "github.com/sandpiper-framework/sandpiper/pkg/api/activity/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // Register ties the sync service to its logger and transport mechanisms

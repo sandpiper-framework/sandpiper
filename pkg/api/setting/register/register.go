@@ -7,13 +7,13 @@ package setting
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/setting"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/setting"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	gl "sandpiper/pkg/api/setting/logging"
-	gt "sandpiper/pkg/api/setting/transport"
-	"sandpiper/pkg/shared/database"
+	gl "github.com/sandpiper-framework/sandpiper/pkg/api/setting/logging"
+	gt "github.com/sandpiper-framework/sandpiper/pkg/api/setting/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // Register ties the setting service to its logger and transport mechanisms

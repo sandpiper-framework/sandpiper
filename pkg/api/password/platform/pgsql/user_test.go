@@ -9,9 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"sandpiper/pkg/api/password/platform/pgsql"
-	"sandpiper/pkg/shared/mock"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/password/platform/pgsql"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/mock"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 func TestView(t *testing.T) {

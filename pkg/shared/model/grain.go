@@ -12,7 +12,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 
-	"sandpiper/pkg/shared/payload"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/payload"
 )
 
 const

@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // Custom errors

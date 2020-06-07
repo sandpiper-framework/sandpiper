@@ -19,8 +19,8 @@ import (
 	// DB adapter
 	_ "github.com/lib/pq"
 
-	"sandpiper/pkg/shared/config"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/config"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 type dbLogger struct{}

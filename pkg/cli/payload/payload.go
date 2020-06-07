@@ -8,7 +8,7 @@ package payload
 import (
 	"os"
 
-	"sandpiper/pkg/shared/payload"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/payload"
 )
 
 // FromFile encodes a filesystem file for storing in the database

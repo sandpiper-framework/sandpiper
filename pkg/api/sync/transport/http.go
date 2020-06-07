@@ -15,7 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 
-	"sandpiper/pkg/api/sync"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/sync"
 )
 
 // Custom errors

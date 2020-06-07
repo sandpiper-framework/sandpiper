@@ -3,7 +3,7 @@ package server_test
 import (
 	"testing"
 
-	"sandpiper/pkg/shared/server"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/server"
 )
 
 // Improve tests

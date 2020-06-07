@@ -31,11 +31,29 @@ tasks:
     cmds:
       - go get -u {{.REPO}}
 
+  rice:
+    desc: Add rice dependency and install if necessary
+    cmds:
+      - go get github.com/GeertJohan/go.rice/rice
+    silent: true
+
+  rice-api:
+    desc: Use rice to encode static http files in a go source file
+    dir: pkg/api
+    deps: [rice]
+    cmds:
+      - rice embed-go
+    sources:
+      - api.go
+    generates:
+      - rice-box.go
+
   build-api:
     desc: Build sandpiper primary server
     dir: cmd/api
+    deps: [rice-api]
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X sandpiper/pkg/api/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X github.com/sandpiper-framework/sandpiper/pkg/api/version.Version={{.VER}}"
     vars:
       EXE: api{{exeExt}}
       VER: {sh: git describe --always --long --dirty}
@@ -44,7 +62,7 @@ tasks:
     desc: Build sandpiper cli command
     dir: cmd/cli
     cmds:
-      - go build -v -o {{.EXE}} -ldflags="-X sandpiper/pkg/cli/version.Version={{.VER}}"
+      - go build -v -o {{.EXE}} -ldflags="-X github.com/sandpiper-framework/sandpiper/pkg/cli/version.Version={{.VER}}"
     vars:
       EXE: sandpiper{{exeExt}}
       VER: {sh: git describe --always --long --dirty}

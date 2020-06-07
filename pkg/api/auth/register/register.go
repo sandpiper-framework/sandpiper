@@ -7,13 +7,13 @@ package auth
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/auth"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/auth"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	al "sandpiper/pkg/api/auth/logging"
-	at "sandpiper/pkg/api/auth/transport"
-	"sandpiper/pkg/shared/database"
+	al "github.com/sandpiper-framework/sandpiper/pkg/api/auth/logging"
+	at "github.com/sandpiper-framework/sandpiper/pkg/api/auth/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // Register ties the auth service to its logger and transport mechanisms

@@ -10,9 +10,9 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/activity/platform/pgsql"
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/activity/platform/pgsql"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // Service represents activity application interface (note no update!)

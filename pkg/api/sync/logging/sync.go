@@ -13,8 +13,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/sync"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/sync"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // ServiceLogger creates new logger wrapping the sync service

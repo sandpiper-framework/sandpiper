@@ -7,26 +7,31 @@
 package api
 
 import (
-	"sandpiper/pkg/shared/config"
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/middleware/jwt"
-	"sandpiper/pkg/shared/secure"
-	"sandpiper/pkg/shared/server"
-	"sandpiper/pkg/shared/zlog"
+	"net/http"
+
+	"github.com/GeertJohan/go.rice"
+	"github.com/labstack/echo/v4"
+
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/config"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/middleware/jwt"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/secure"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/server"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/zlog"
 
 	// One import for each service to register (with identifying alias).
 	// Must use a register subdirectory to avoid "import cycle" errors.
-	ac "sandpiper/pkg/api/activity/register"
-	au "sandpiper/pkg/api/auth/register"
-	co "sandpiper/pkg/api/company/register"
-	gr "sandpiper/pkg/api/grain/register"
-	pa "sandpiper/pkg/api/password/register"
-	se "sandpiper/pkg/api/setting/register"
-	sl "sandpiper/pkg/api/slice/register"
-	su "sandpiper/pkg/api/subscription/register"
-	sy "sandpiper/pkg/api/sync/register"
-	ta "sandpiper/pkg/api/tag/register"
-	us "sandpiper/pkg/api/user/register"
+	ac "github.com/sandpiper-framework/sandpiper/pkg/api/activity/register"
+	au "github.com/sandpiper-framework/sandpiper/pkg/api/auth/register"
+	co "github.com/sandpiper-framework/sandpiper/pkg/api/company/register"
+	gr "github.com/sandpiper-framework/sandpiper/pkg/api/grain/register"
+	pa "github.com/sandpiper-framework/sandpiper/pkg/api/password/register"
+	se "github.com/sandpiper-framework/sandpiper/pkg/api/setting/register"
+	sl "github.com/sandpiper-framework/sandpiper/pkg/api/slice/register"
+	su "github.com/sandpiper-framework/sandpiper/pkg/api/subscription/register"
+	sy "github.com/sandpiper-framework/sandpiper/pkg/api/sync/register"
+	ta "github.com/sandpiper-framework/sandpiper/pkg/api/tag/register"
+	us "github.com/sandpiper-framework/sandpiper/pkg/api/user/register"
 )
 
 // Start configures and launches the API services
@@ -49,9 +54,11 @@ func Start(cfg *config.Configuration) error {
 	// setup echo server (singleton)
 	srv := server.New()
 
-	// welcome screen
-	// todo: use pkger to embed the assets and server them from code
-	srv.Static("/", "../../public")
+	// sign-up screen (files served from packaged code in `pkged.go`)
+	// publicDir := pkger.Dir("/public")
+	// relative to this source file
+	publicDir := rice.MustFindBox("../../public").HTTPBox()
+	srv.GET("/", echo.WrapHandler(http.FileServer(publicDir)))
 
 	// create version group using token authentication middleware
 	v1 := srv.Group("/v1")

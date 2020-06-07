@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // SliceByName returns a slice by unique key name

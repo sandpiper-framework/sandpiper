@@ -7,13 +7,13 @@ package slice
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/slice"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/slice"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	sl "sandpiper/pkg/api/slice/logging"
-	st "sandpiper/pkg/api/slice/transport"
-	"sandpiper/pkg/shared/database"
+	sl "github.com/sandpiper-framework/sandpiper/pkg/api/slice/logging"
+	st "github.com/sandpiper-framework/sandpiper/pkg/api/slice/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // Register ties the slice service to its logger and transport mechanisms

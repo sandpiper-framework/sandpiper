@@ -15,8 +15,8 @@ import (
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2" // conflicts with one of our package names
 
-	"sandpiper/pkg/shared/client"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/client"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 type syncCmd struct {

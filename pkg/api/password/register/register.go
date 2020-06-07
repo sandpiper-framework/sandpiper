@@ -7,13 +7,13 @@ package password
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/password"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/password"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	pl "sandpiper/pkg/api/password/logging"
-	pt "sandpiper/pkg/api/password/transport"
-	"sandpiper/pkg/shared/database"
+	pl "github.com/sandpiper-framework/sandpiper/pkg/api/password/logging"
+	pt "github.com/sandpiper-framework/sandpiper/pkg/api/password/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // Register ties the company service to its logger and transport mechanisms

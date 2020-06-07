@@ -16,9 +16,9 @@ import (
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2" // conflicts with our package name
 
-	"sandpiper/pkg/cli/payload"
-	"sandpiper/pkg/shared/client"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/cli/payload"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/client"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 type addParams struct {

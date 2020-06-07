@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"sandpiper/pkg/shared/middleware/secure"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/middleware/secure"
 )
 
 func echoHandler(mw ...echo.MiddlewareFunc) *echo.Echo {

@@ -7,7 +7,7 @@ package sandpiper_test
 import (
 	"testing"
 
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 func TestChangePassword(t *testing.T) {

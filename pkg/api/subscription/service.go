@@ -12,9 +12,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/subscription/platform/pgsql"
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/subscription/platform/pgsql"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // Service represents subscription application interface

@@ -7,13 +7,13 @@ package user
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/user"
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/user"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	ul "sandpiper/pkg/api/user/logging"
-	ut "sandpiper/pkg/api/user/transport"
+	ul "github.com/sandpiper-framework/sandpiper/pkg/api/user/logging"
+	ut "github.com/sandpiper-framework/sandpiper/pkg/api/user/transport"
 )
 
 // Register ties the user service to its logger and transport mechanisms

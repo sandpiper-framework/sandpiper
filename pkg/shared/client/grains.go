@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // GrainExists will return basic information about a grain if it exists

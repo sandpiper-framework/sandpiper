@@ -9,9 +9,9 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/setting/platform/pgsql"
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/setting/platform/pgsql"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // Service represents setting application interface (note no update!)

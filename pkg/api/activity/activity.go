@@ -8,7 +8,7 @@ package activity
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // Create makes a new sync activity record (most often by a secondary sync user).

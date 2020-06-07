@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // ActiveServers returns a list of syncable servers

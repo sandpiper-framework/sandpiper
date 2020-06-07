@@ -5,7 +5,7 @@
 package mock
 
 import (
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // JWT mock

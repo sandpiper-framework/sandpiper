@@ -12,10 +12,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/sync/platform/pgsql"
-	"sandpiper/pkg/shared/client"
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/sync/platform/pgsql"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/client"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // Service represents sync application interface

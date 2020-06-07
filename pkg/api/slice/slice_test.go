@@ -5,7 +5,7 @@
 package slice_test
 
 import (
-	"sandpiper/pkg/api/slice"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/slice"
 	"testing"
 )
 

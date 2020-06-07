@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"sandpiper/pkg/shared/secure"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/secure"
 )
 
 // We can't test the results one-way because the AES algorithm is not deterministic. (A new

@@ -8,8 +8,8 @@ package user
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/secure"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/secure"
 )
 
 // Create creates a new user account

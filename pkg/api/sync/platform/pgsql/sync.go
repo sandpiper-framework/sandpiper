@@ -18,8 +18,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	slicesvc "sandpiper/pkg/api/slice/platform/pgsql"
-	"sandpiper/pkg/shared/model"
+	slicesvc "github.com/sandpiper-framework/sandpiper/pkg/api/slice/platform/pgsql"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // Custom errors

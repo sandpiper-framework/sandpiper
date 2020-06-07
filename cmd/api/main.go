@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"log"
 
-	"sandpiper/pkg/api"
-	"sandpiper/pkg/api/version"
-	"sandpiper/pkg/shared/config"
-	"sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/api"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/version"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/config"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 const (

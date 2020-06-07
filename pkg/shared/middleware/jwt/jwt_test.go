@@ -9,9 +9,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"sandpiper/pkg/shared/middleware/jwt"
-	"sandpiper/pkg/shared/mock"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/middleware/jwt"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/mock"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 func echoHandler(mw ...echo.MiddlewareFunc) *echo.Echo {

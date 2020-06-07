@@ -20,7 +20,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"sandpiper/pkg/shared/middleware/secure"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/middleware/secure"
 )
 
 // New instantiates new Echo server.

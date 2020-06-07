@@ -9,10 +9,10 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/auth/platform/pgsql"
-	"sandpiper/pkg/shared/database"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/secure"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/auth/platform/pgsql"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/secure"
 )
 
 // Auth represents auth application service

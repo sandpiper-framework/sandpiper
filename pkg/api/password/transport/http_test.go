@@ -14,12 +14,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"sandpiper/pkg/api/password"
-	"sandpiper/pkg/api/password/transport"
-	"sandpiper/pkg/shared/mock"
-	"sandpiper/pkg/shared/mock/mockdb"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/server"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/password"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/password/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/mock"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/mock/mockdb"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/server"
 )
 
 func TestChangePassword(t *testing.T) {

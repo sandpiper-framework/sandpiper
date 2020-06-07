@@ -7,13 +7,13 @@ package company
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/company"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/company"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	cl "sandpiper/pkg/api/company/logging"
-	ct "sandpiper/pkg/api/company/transport"
-	"sandpiper/pkg/shared/database"
+	cl "github.com/sandpiper-framework/sandpiper/pkg/api/company/logging"
+	ct "github.com/sandpiper-framework/sandpiper/pkg/api/company/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // Register ties the company service to its logger and transport mechanisms

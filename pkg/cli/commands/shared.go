@@ -16,7 +16,7 @@ import (
 	"github.com/howeyc/gopass"
 	args "github.com/urfave/cli/v2"
 
-	"sandpiper/pkg/shared/config"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/config"
 )
 
 const (

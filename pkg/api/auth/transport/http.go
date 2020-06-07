@@ -11,7 +11,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/auth"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/auth"
 )
 
 // HTTP represents auth http service

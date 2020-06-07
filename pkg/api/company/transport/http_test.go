@@ -19,13 +19,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"sandpiper/pkg/api/company"
-	"sandpiper/pkg/api/company/transport"
-	"sandpiper/pkg/shared/mock"
-	"sandpiper/pkg/shared/mock/mockdb"
-	"sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/company"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/company/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/mock"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/mock/mockdb"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 
-	"sandpiper/pkg/shared/server"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/server"
 )
 
 func TestCreate(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	"sandpiper/pkg/shared/payload"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/payload"
 )
 
 func TestEncode(t *testing.T) {

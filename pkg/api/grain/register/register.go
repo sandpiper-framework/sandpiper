@@ -7,13 +7,13 @@ package grain
 import (
 	"github.com/labstack/echo/v4"
 
-	"sandpiper/pkg/api/grain"
-	"sandpiper/pkg/shared/model"
-	"sandpiper/pkg/shared/rbac"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/grain"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/rbac"
 
-	gl "sandpiper/pkg/api/grain/logging"
-	gt "sandpiper/pkg/api/grain/transport"
-	"sandpiper/pkg/shared/database"
+	gl "github.com/sandpiper-framework/sandpiper/pkg/api/grain/logging"
+	gt "github.com/sandpiper-framework/sandpiper/pkg/api/grain/transport"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 )
 
 // Register ties the grain service to its logger and transport mechanisms
