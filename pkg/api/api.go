@@ -54,11 +54,13 @@ func Start(cfg *config.Configuration) error {
 	// setup echo server (singleton)
 	srv := server.New()
 
-	// sign-up screen (files served from packaged code in `pkged.go`)
-	// publicDir := pkger.Dir("/public")
+	// sign-up screen (files served from source code in `rice-box.go`)
 	// relative to this source file
-	publicDir := rice.MustFindBox("../../public").HTTPBox()
-	srv.GET("/", echo.WrapHandler(http.FileServer(publicDir)))
+	public := http.FileServer(rice.MustFindBox("../../public").HTTPBox())
+	srv.GET("/", echo.WrapHandler(public))
+	srv.GET("/js/*", echo.WrapHandler(http.StripPrefix("/", public)))
+	srv.GET("/css/*", echo.WrapHandler(http.StripPrefix("/", public)))
+	srv.GET("/images/*", echo.WrapHandler(http.StripPrefix("/", public)))
 
 	// create version group using token authentication middleware
 	v1 := srv.Group("/v1")
