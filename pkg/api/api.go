@@ -7,11 +7,7 @@
 package api
 
 import (
-	"net/http"
-
-	"github.com/GeertJohan/go.rice"
-	"github.com/labstack/echo/v4"
-
+	"github.com/sandpiper-framework/sandpiper/pkg/api/static"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/config"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/middleware/jwt"
@@ -54,13 +50,8 @@ func Start(cfg *config.Configuration) error {
 	// setup echo server (singleton)
 	srv := server.New()
 
-	// sign-up screen (files served from source code in `rice-box.go`)
-	// relative to this source file
-	public := http.FileServer(rice.MustFindBox("../../public").HTTPBox())
-	srv.GET("/", echo.WrapHandler(public))
-	srv.GET("/js/*", echo.WrapHandler(http.StripPrefix("/", public)))
-	srv.GET("/css/*", echo.WrapHandler(http.StripPrefix("/", public)))
-	srv.GET("/images/*", echo.WrapHandler(http.StripPrefix("/", public)))
+	// routing for static files (sign-up screen)
+	static.FileServer(srv)
 
 	// create version group using token authentication middleware
 	v1 := srv.Group("/v1")

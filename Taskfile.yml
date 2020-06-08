@@ -39,12 +39,12 @@ tasks:
 
   rice-api:
     desc: Use rice to encode static http files in a go source file
-    dir: pkg/api
+    dir: pkg/api/static
     deps: [rice]
     cmds:
       - rice embed-go
     sources:
-      - ../../public/
+      - ../../../public/
     generates:
       - rice-box.go
 
