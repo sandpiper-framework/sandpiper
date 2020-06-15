@@ -7,7 +7,6 @@ package pgsql
 // company service database access
 
 import (
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strings"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // Company represents the client for company table
@@ -57,16 +57,18 @@ func (s *Company) View(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 }
 
 // List returns list of all companies
-func (s *Company) List(db orm.DB, sc *sandpiper.Scope, p *params.Params) ([]sandpiper.Company, error) {
-	var companies []sandpiper.Company
+func (s *Company) List(db orm.DB, sc *sandpiper.Scope, p *params.Params) (companies []sandpiper.Company, err error) {
 
 	q := db.Model(&companies).Relation("Users").Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("name")
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
-	if err := q.Select(); err != nil {
+
+	p.Paging.Count, err = q.SelectAndCount()
+	if err != nil {
 		return nil, err
 	}
+
 	return companies, nil
 }
 

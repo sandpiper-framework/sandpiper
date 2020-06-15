@@ -7,9 +7,9 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/secure"
 )
 
@@ -28,7 +28,7 @@ func (u *User) List(c echo.Context, p *params.Params) ([]sandpiper.User, error) 
 	if err != nil {
 		return nil, err
 	}
-	return u.sdb.List(u.db, q, p)
+	return u.sdb.List(u.db, p, q)
 }
 
 // View returns a single user if allowed

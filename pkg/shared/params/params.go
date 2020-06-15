@@ -5,20 +5,22 @@
 package params
 
 import (
-	sandpiper "github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 	"net/url"
 	"strings"
 
+	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
+
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
 // convert url query params to pg where clauses for filtering and ordering
 
 /*
 Query Strings:
-	?sort=title,asc&filter={"title":"bar"}
+	?sort=title,asc&filter=title:"bar"
 	?sort=title,asc&sort=lname,desc&range={0,24}&filter={"title":"bar"}&expand=user
-	filter={"lname":"Johnson", age: 39}
+	filter=lname: "Johnson", age: 39
 	page=2
   limit=20  # limit to define the number of items returned in the response
   sort = [title,asc lname,desc]
@@ -60,4 +62,27 @@ func Parse(c echo.Context) (*Params, error) {
 		}
 	}
 	return p, nil
+}
+
+// AddSort includes zero or more order clauses to an existing query
+func (p *Params) AddSort(q *orm.Query) {
+	for _, sort := range p.Sort {
+		s := strings.ReplaceAll(sort, ",", " ")
+		q.Order(s)
+	}
+}
+
+// AddFilter includes zero or more and-ed where clauses to an existing query
+// e.g. lname: "Johnson", age: 39
+func (p *Params) AddFilter(q *orm.Query) {
+	for _, filter := range p.Filter {
+		for _, f := range strings.Split(filter, ",") {
+			i := strings.Index(f, ":")
+			if i != -1 {
+				lhs := strings.TrimSpace(f[:i])
+				rhs := strings.TrimSpace(f[i+1:])
+				q.Where(lhs + " = ?", rhs)
+			}
+		}
+	}
 }

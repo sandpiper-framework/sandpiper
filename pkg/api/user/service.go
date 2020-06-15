@@ -55,7 +55,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.User) (*sandpiper.User, error)
 	View(orm.DB, int) (*sandpiper.User, error)
-	List(orm.DB, *sandpiper.Scope, *params.Params) ([]sandpiper.User, error)
+	List(orm.DB, *params.Params, *sandpiper.Scope) ([]sandpiper.User, error)
 	Update(orm.DB, *sandpiper.User) error
 	Delete(orm.DB, *sandpiper.User) error
 	CompanySyncUser(orm.DB, uuid.UUID) (*sandpiper.User, error)

@@ -7,7 +7,6 @@ package transport
 // activity routing
 
 import (
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,6 +16,7 @@ import (
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/activity"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // HTTP represents user http service

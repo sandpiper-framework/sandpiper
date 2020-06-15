@@ -7,7 +7,6 @@ package transport
 // tag service routing functions
 
 import (
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strconv"
 
@@ -16,6 +15,7 @@ import (
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/tag"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // HTTP represents user http service

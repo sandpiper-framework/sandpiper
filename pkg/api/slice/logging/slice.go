@@ -56,10 +56,10 @@ func (ls *LogService) List(c echo.Context, p *params.Params, tags *params.TagQue
 			c,
 			source, "List slice request", err,
 			map[string]interface{}{
-				"params":  p,
-				"tags": tags,
-				"resp": resp,
-				"took": time.Since(begin),
+				"params": p,
+				"tags":   tags,
+				"resp":   resp,
+				"took":   time.Since(begin),
 			},
 		)
 	}(time.Now())

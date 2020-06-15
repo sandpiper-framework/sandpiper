@@ -10,7 +10,6 @@ package pgsql
 // The payload is transferred (and stored) as a (possibly encoded) binary object.
 
 import (
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strings"
 
@@ -20,6 +19,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // Grain represents the client for grain table
@@ -99,8 +99,7 @@ func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.U
 }
 
 // List returns a list of all grains with scoping and pagination (optionally for a slice)
-func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpiper.Scope, p *params.Params) ([]sandpiper.Grain, error) {
-	var grains []sandpiper.Grain
+func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpiper.Scope, p *params.Params) (grains []sandpiper.Grain, err error) {
 	var q *orm.Query
 
 	// columns to select (optionally returning payload)
@@ -132,8 +131,11 @@ func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpip
 		q = db.Model(&grains).ColumnExpr(cols)
 	}
 
+	// add paging
+	q = q.Limit(p.Paging.Limit).Offset(p.Paging.Offset())
+
 	// execute the query
-	err := q.Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Select(&grains)
+	p.Paging.Count, err = q.SelectAndCount(&grains)
 	if err != nil {
 		return nil, err
 	}

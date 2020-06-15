@@ -7,7 +7,6 @@ package pgsql
 // tag service database access
 
 import (
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 
 	"github.com/go-pg/pg/v9"
@@ -16,6 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // Tag represents the client for tag table
@@ -57,13 +57,15 @@ func (s *Tag) View(db orm.DB, id int) (*sandpiper.Tag, error) {
 }
 
 // List returns list of all tags
-func (s *Tag) List(db orm.DB, p *params.Params) ([]sandpiper.Tag, error) {
-	var tags []sandpiper.Tag
+func (s *Tag) List(db orm.DB, p *params.Params) (tags []sandpiper.Tag, err error) {
 
-	err := db.Model(&tags).Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("name").Select()
+	q := db.Model(&tags).Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("name")
+
+	p.Paging.Count, err = q.SelectAndCount()
 	if err != nil {
 		return nil, err
 	}
+
 	return tags, nil
 }
 

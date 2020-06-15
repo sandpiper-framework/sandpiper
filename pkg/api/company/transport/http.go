@@ -7,7 +7,6 @@ package transport
 // company service routing functions
 
 import (
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/company"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // HTTP represents user http service

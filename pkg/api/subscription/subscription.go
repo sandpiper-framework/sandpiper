@@ -8,9 +8,9 @@ package subscription
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // Create adds a new subscription if administrator

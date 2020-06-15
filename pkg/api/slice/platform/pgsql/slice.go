@@ -189,9 +189,8 @@ func (s *Slice) List(db orm.DB, p *params.Params, tags *params.TagQuery, sc *san
 		return q, nil
 	}
 
-	err := db.Model(&slices).Relation("Companies", filterFn).
-		Limit(p.Paging.Limit).Offset(p.Paging.Offset()).
-		Order("name").Select()
+	// we can't use sql pagination because we could further limit by tags
+	err := db.Model(&slices).Relation("Companies", filterFn).Order("name").Select()
 	if err != nil {
 		return nil, err
 	}
@@ -207,6 +206,12 @@ func (s *Slice) List(db orm.DB, p *params.Params, tags *params.TagQuery, sc *san
 
 	if len(slices) == 0 {
 		return slices, nil
+	}
+
+	// perform our own pagination
+	offset := p.Paging.Offset() - 1
+	if offset >= 0 {
+		slices = slices[offset : offset+p.Paging.Limit]
 	}
 
 	// look up metadata for all slices returned above (using an "in" list)

@@ -8,9 +8,9 @@ package pgsql
 
 import (
 	"github.com/go-pg/pg/v9/orm"
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // Activity represents the client for activity table
@@ -41,14 +41,15 @@ func (s *Activity) View(db orm.DB, id int) (*sandpiper.Activity, error) {
 }
 
 // List returns a list of all activity with scoping and pagination
-func (s *Activity) List(db orm.DB, p *params.Params) ([]sandpiper.Activity, error) {
-	var acts []sandpiper.Activity
-	var err error
+func (s *Activity) List(db orm.DB, p *params.Params) (acts []sandpiper.Activity, err error) {
 
-	err = db.Model(&acts).Relation("Subscription").Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Select()
+	q := db.Model(&acts).Relation("Subscription").Limit(p.Paging.Limit).Offset(p.Paging.Offset())
+
+	p.Paging.Count, err = q.SelectAndCountEstimate(50000)
 	if err != nil {
 		return nil, err
 	}
+
 	return acts, nil
 }
 
