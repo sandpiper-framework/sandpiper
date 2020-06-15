@@ -14,16 +14,12 @@ import (
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
-// convert url query params to pg where clauses for filtering and ordering
+// convert url query params to sql clauses for filtering, ordering, paging and related model inclusion
 
 /*
 Query Strings:
-	?sort=title,asc&filter=title:"bar"
-	?sort=title,asc&sort=lname,desc&range={0,24}&filter={"title":"bar"}&expand=user
-	filter=lname: "Johnson", age: 39
-	page=2
-  limit=20  # limit to define the number of items returned in the response
-  sort = [title,asc lname,desc]
+	?sort=title,asc&sort=zipcode:desc,city,&filter=lname:Johnson,age:39&include=user
+	?page=2&limit=20  # limit to define the number of items returned in the response
 */
 
 // Params hold the url query parameters
@@ -31,7 +27,7 @@ type Params struct {
 	RawQuery string
 	Filter   []string
 	Sort     []string
-	Expand   []string
+	Include  []string
 	Paging   *sandpiper.Pagination
 }
 
@@ -40,7 +36,7 @@ func Parse(c echo.Context) (*Params, error) {
 
 	p := &Params{
 		RawQuery: c.QueryString(),
-		Paging:   &sandpiper.Pagination{}, // paging is never nil because of the way we set those values
+		Paging:   sandpiper.NewPagination(), // paging is never nil because of the way we set those values
 	}
 
 	params, err := url.ParseQuery(p.RawQuery) // c.QueryParams() does not return an err
@@ -53,8 +49,8 @@ func Parse(c echo.Context) (*Params, error) {
 			p.Filter = v
 		case "sort":
 			p.Sort = v
-		case "expand":
-			p.Expand = v
+		case "include":
+			p.Include = v
 		case "page":
 			p.Paging.SetPage(v)
 		case "limit":
@@ -65,24 +61,51 @@ func Parse(c echo.Context) (*Params, error) {
 }
 
 // AddSort includes zero or more order clauses to an existing query
-func (p *Params) AddSort(q *orm.Query) {
+// a missing direction implies ascending (asc)
+// e.g. ?sort=title:asc,lname:desc
+func (p *Params) AddSort(q *orm.Query) (added bool) {
+	// can have zero or more sort instructions
 	for _, sort := range p.Sort {
-		s := strings.ReplaceAll(sort, ",", " ")
-		q.Order(s)
+		// each sort can have one or more comma-separated sort fields
+		for _, f := range strings.Split(sort, ",") {
+			// an optional colon separates the order direction, but postgresql requires a space
+			s := strings.ReplaceAll(f, ":", " ")
+			q.Order(s)
+			added = true
+		}
 	}
+	return added
 }
 
-// AddFilter includes zero or more and-ed where clauses to an existing query
-// e.g. lname: "Johnson", age: 39
+// AddFilter includes zero or more where clauses to an existing query
+// Conditions are field:value and only support equivalence (=) (for now)
+// All conditions within a filter (and across filters) are ANDed together (for now)
+// All comparison values are strings (which works because of postgresql's "automatically coerced" literals
+// https://dba.stackexchange.com/questions/238983)
+// e.g. ?filter=lname:Johnson, age:39&filter=role:200
 func (p *Params) AddFilter(q *orm.Query) {
+	// can have zero or more filters
 	for _, filter := range p.Filter {
+		// each filter can have one or more comma-separated conditions
 		for _, f := range strings.Split(filter, ",") {
+			// we currently only support exact equals
 			i := strings.Index(f, ":")
 			if i != -1 {
-				lhs := strings.TrimSpace(f[:i])
-				rhs := strings.TrimSpace(f[i+1:])
-				q.Where(lhs + " = ?", rhs)
+				field := strings.TrimSpace(f[:i])
+				value := strings.TrimSpace(f[i+1:])
+				q.Where(field+" = ?", value)
 			}
 		}
 	}
+}
+
+// WantRelated checks to see if a particular related model should be included in the results
+func (p *Params) WantRelated(name string) bool {
+	// can have zero or one include requests (stop after one match)
+	for _, req := range p.Include {
+		if strings.ToLower(req) == name {
+			return true
+		}
+	}
+	return false
 }

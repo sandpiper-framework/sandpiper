@@ -21,6 +21,11 @@ type Pagination struct {
 	Count int `json:"items_total"`
 }
 
+// NewPagination is the Pagination constructor with default values
+func NewPagination() *Pagination {
+	return &Pagination{Page: 1, Limit: paginationDefaultLimit}
+}
+
 // SetPage is a setter method for page number
 func (p *Pagination) SetPage(pages []string) {
 	if len(pages) > 0 {

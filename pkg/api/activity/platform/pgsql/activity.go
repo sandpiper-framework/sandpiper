@@ -43,7 +43,16 @@ func (s *Activity) View(db orm.DB, id int) (*sandpiper.Activity, error) {
 // List returns a list of all activity with scoping and pagination
 func (s *Activity) List(db orm.DB, p *params.Params) (acts []sandpiper.Activity, err error) {
 
-	q := db.Model(&acts).Relation("Subscription").Limit(p.Paging.Limit).Offset(p.Paging.Offset())
+	q := db.Model(&acts)
+	if p.WantRelated("subscription") {
+		q.Relation("Subscription")
+	}
+	p.AddFilter(q)
+	if !p.AddSort(q) {
+		// default ordering
+		q.Order("id desc")
+	}
+	q.Limit(p.Paging.Limit).Offset(p.Paging.Offset())
 
 	p.Paging.Count, err = q.SelectAndCountEstimate(50000)
 	if err != nil {

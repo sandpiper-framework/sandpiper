@@ -23,7 +23,7 @@ type Activity struct {
 	Error        string        `json:"error"`
 	Duration     time.Duration `json:"duration"`
 	CreatedAt    time.Time     `json:"created_at"`
-	Subscription *Subscription `json:"subscription"` // has one
+	Subscription *Subscription `json:"subscription,omitempty"` // has one
 }
 
 // ActivityPaginated adds pagination

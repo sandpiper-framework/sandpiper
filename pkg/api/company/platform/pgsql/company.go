@@ -59,10 +59,19 @@ func (s *Company) View(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 // List returns list of all companies
 func (s *Company) List(db orm.DB, sc *sandpiper.Scope, p *params.Params) (companies []sandpiper.Company, err error) {
 
-	q := db.Model(&companies).Relation("Users").Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("name")
+	q := db.Model(&companies)
+	if p.WantRelated("users") {
+		q.Relation("Users")
+	}
+	p.AddFilter(q)
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
+	if !p.AddSort(q) {
+		// default ordering
+		q.Order("name")
+	}
+	q.Limit(p.Paging.Limit).Offset(p.Paging.Offset())
 
 	p.Paging.Count, err = q.SelectAndCount()
 	if err != nil {
