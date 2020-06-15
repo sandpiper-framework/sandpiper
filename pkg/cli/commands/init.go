@@ -154,9 +154,8 @@ func (db *Conn) createDatabase(c config.Database) error {
 		// allow duplicate role errors
 		if ok && pgErr.Field('C') != "42P04" {
 			return err
-		} else {
-			fmt.Printf("database \"%s\" already exists\n", c.Database)
 		}
+		fmt.Printf("database \"%s\" already exists\n", c.Database)
 	}
 
 	s = fmt.Sprintf("CREATE USER %s WITH ENCRYPTED PASSWORD '%s';", c.User, c.Password)
@@ -166,9 +165,8 @@ func (db *Conn) createDatabase(c config.Database) error {
 		// allow duplicate role errors
 		if ok && pgErr.Field('C') != "42710" {
 			return err
-		} else {
-			fmt.Printf("user \"%s\" already exists\n", c.User)
 		}
+		fmt.Printf("user \"%s\" already exists\n", c.User)
 	}
 
 	s = fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE %s TO %s;", c.Database, c.User)

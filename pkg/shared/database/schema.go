@@ -234,6 +234,7 @@ func Migrate(dsn string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer db.Close()
 
 	count, v1, err := currentVersion(db)
 	if err != nil {
@@ -275,7 +276,7 @@ func currentVersion(db *sql.DB) (count int, ver float64, err error) {
 		if pqErr, ok := err.(*pq.Error); ok {
 			if pqErr.Code == "42P01" {
 				// missing table is not an error during first migration
-				count, ver, err = 0, 0, nil
+				err = nil
 			}
 		}
 	}
@@ -297,5 +298,16 @@ func changes(v1, v2 float64) string {
 	if v1 != v2 {
 		return fmt.Sprintf("DB Version: %.2f (migrated from %.2f to %.2f)", v2, v1, v2)
 	}
-	return fmt.Sprintf("DB Version: %g", v1)
+	return fmt.Sprintf("DB Version: %.2f", v1)
+}
+
+// Schema returns the current schema definitions as a string for display
+func Schema() string {
+	var b strings.Builder
+
+	schema := defineSchema()
+	for _, m := range schema {
+		fmt.Fprintf(&b, "-- %s (%.2f)\n%s\n\n", m.Description, m.Version, m.Script)
+	}
+	return b.String()
 }

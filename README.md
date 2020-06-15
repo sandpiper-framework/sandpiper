@@ -1,5 +1,11 @@
 # Sandpiper
 
+[![GitHub Release](https://img.shields.io/badge/release-v0.3--alpha-blueviolet)](https://github.com/sandpiper-framework/sandpiper/releases)
+[![License: Artistic-2.0](https://img.shields.io/badge/License-Artistic%202.0-0298c3.svg)](https://opensource.org/licenses/Artistic-2.0)
+[![GitHub Stars](https://img.shields.io/github/stars/sandpiper-framework/sandpiper)]()
+[![Go Report Card](https://goreportcard.com/badge/github.com/sandpiper-framework/sandpiper)](https://goreportcard.com/report/github.com/sandpiper-framework/sandpiper)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](code_of_conduct.md)
+
 The Sandpiper framework provides a standard decentralized model to distribute and synchronize shared product
 data sets between a primary sender (the "publisher") and a secondary receiver (the "subscriber").
 
@@ -12,7 +18,7 @@ There are only a few prerequisites for getting a Sandpiper installation up and r
 Sandpiper requires access to a PostgreSQL sever for its data storage (for both primary and secondary roles). This can be an existing installation (either on premises or in the cloud) or follow
 the instructions below to install locally for your desired platform.
 
-Download the binary from the official download site (or use package manager for your platform such as apt or scoop).
+Download the binary from the official download site (or use package manager for your platform such as apt).
 
 [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 
@@ -94,7 +100,7 @@ Server config file "api-primary.yaml" created in C:\sandpiper\cmd\cli
 Command config file "cli-primary.yaml" created in C:\sandpiper\cmd\cli
 ```
 
-The "Public Sync URL" should be the listening address of the Sandpiper API on this machine. The "Server http UR"L is used by the `sandpiper` command to access your database (but could be the same as the public URL). An "admin" user is added by default. Please provide your own strong password and keep it for your records. Both the user and password can be changed later through the admin screens (when they become available).
+The "Public Sync URL" should be the listening address of the Sandpiper API on this machine. The "Server http URL" is used by the `sandpiper` command to access your database (but could be the same as the public URL). An "admin" user is added by default. Please provide your own strong admin password and keep it for your records. Both the user and password can be changed later through the admin screens (when they become available).
 
 ## Deployment
 
@@ -102,7 +108,9 @@ This section provides information on how to deploy Sandpiper in a production env
 
 ### Running in Production
 
-To run Sandpiper in a production environment, simply download the correct api binary from the Sandpiper web site and follow the deployment instructions:
+To run Sandpiper in a production environment, download the correct api binary from the Sandpiper web site and follow the deployment instructions for your platform.
+
+The command to start the api server is:
 
 ```
 ./api [-config="path/to/config.yaml"] (defaults to ./config.yaml")
@@ -278,9 +286,6 @@ Instead of passing database client as `s.db` , inside this function pass it as `
 
 Please read [CONTRIBUTING](CONTRIBUTING.md) for details on our process for submitting pull requests. Note also that this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
 
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](code_of_conduct.md)
-
-
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
@@ -294,7 +299,6 @@ See also the list of [contributors](https://github.com/orgs/sandpiper-framework/
 ## License & Copyrights
 
 License: Artistic-2.0
-[![License: Artistic-2.0](https://img.shields.io/badge/License-Artistic%202.0-0298c3.svg)](https://opensource.org/licenses/Artistic-2.0)
 
 Copyright (c) 2019-2020 The Sandpiper Authors. All rights reserved.
 

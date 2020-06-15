@@ -7,6 +7,7 @@ package transport
 // user routing functions
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strconv"
 
@@ -88,17 +89,16 @@ func (h *HTTP) create(c echo.Context) error {
 }
 
 func (h *HTTP) list(c echo.Context) error {
-	p := new(sandpiper.PaginationReq)
-	if err := c.Bind(p); err != nil {
+	p, err := params.Parse(c)
+	if err != nil {
 		return err
 	}
-	paging := p.Transform()
-	result, err := h.svc.List(c, paging)
+	result, err := h.svc.List(c, p)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, sandpiper.UsersPaginated{Users: result, Paging: *paging})
+	return c.JSON(http.StatusOK, sandpiper.UsersPaginated{Users: result, Paging: p.Paging})
 }
 
 func (h *HTTP) view(c echo.Context) error {

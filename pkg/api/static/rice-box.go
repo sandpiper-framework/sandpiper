@@ -11,9 +11,9 @@ func init() {
 	// define files
 	file3 := &embedded.EmbeddedFile{
 		Filename:    "css/style.css",
-		FileModTime: time.Unix(1591640285, 0),
+		FileModTime: time.Unix(1591641234, 0),
 
-		Content: string("@import url(https://fonts.googleapis.com/css?family=Roboto:300);\r\n\r\n.register-page {\r\n  width: 360px;\r\n  padding: 8% 0 0;\r\n  margin: auto;\r\n}\r\n.form {\r\n  position: relative;\r\n  z-index: 1;\r\n  background: #FFFFFF;\r\n  max-width: 360px;\r\n  margin: 0 auto 100px;\r\n  padding: 45px;\r\n  text-align: center;\r\n  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);\r\n}\r\n.form input, select {\r\n  font-family: \"Roboto\", sans-serif;\r\n  outline: 0;\r\n  background: #f2f2f2;\r\n  width: 100%;\r\n  border: 0;\r\n  margin: 0 0 15px;\r\n  padding: 15px;\r\n  box-sizing: border-box;\r\n  font-size: 14px;\r\n}\r\n.form button {\r\n  font-family: \"Roboto\", sans-serif;\r\n  text-transform: uppercase;\r\n  outline: 0;\r\n  background: rgb(61, 72, 122);\r\n  width: 100%;\r\n  border: 0;\r\n  padding: 15px;\r\n  color: #FFFFFF;\r\n  font-size: 14px;\r\n  -webkit-transition: all 0.3s ease;\r\n  transition: all 0.3s ease;\r\n  cursor: pointer;\r\n}\r\n.form button:hover,.form button:active,.form button:focus {\r\n  background: #43A047;\r\n}\r\n.form .message {\r\n  margin: 15px 0 0;\r\n  color: #b3b3b3;\r\n  font-size: 12px;\r\n}\r\n.form .message a {\r\n  color: #b3b3b3;\r\n  text-decoration: none;\r\n}\r\n.container {\r\n  position: relative;\r\n  z-index: 1;\r\n  max-width: 300px;\r\n  margin: 0 auto;\r\n}\r\n.container:before, .container:after {\r\n  content: \"\";\r\n  display: block;\r\n  clear: both;\r\n}\r\n.container .info {\r\n  margin: 50px auto;\r\n  text-align: center;\r\n}\r\n.container .info h1 {\r\n  margin: 0 0 15px;\r\n  padding: 0;\r\n  font-size: 36px;\r\n  font-weight: 300;\r\n  color: #1a1a1a;\r\n}\r\n.container .info span {\r\n  color: #4d4d4d;\r\n  font-size: 12px;\r\n}\r\n.container .info span a {\r\n  color: #000000;\r\n  text-decoration: none;\r\n}\r\n.container .info span .fa {\r\n  color: #EF3B3A;\r\n}\r\nbody {\r\n  background: rgb(58, 78, 168); /* fallback for old browsers */\r\n  background: -webkit-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: -moz-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: -o-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: linear-gradient(to left, #060b22, rgb(58, 78, 168));\r\n  font-family: \"Roboto\", sans-serif;\r\n  -webkit-font-smoothing: antialiased;\r\n  -moz-osx-font-smoothing: grayscale;      \r\n}\r\n.logo {\r\n  display: block;\r\n  margin-left: auto;\r\n  margin-right: auto;\r\n  width: 75%;\r\n  margin-bottom: 20px;\r\n}"),
+		Content: string("@import url(https://fonts.googleapis.com/css?family=Roboto:300);\r\n\r\n.register-page {\r\n  width: 360px;\r\n  padding: 8% 0 0;\r\n  margin: auto;\r\n}\r\n.form {\r\n  position: relative;\r\n  z-index: 1;\r\n  background: #FFFFFF;\r\n  max-width: 360px;\r\n  margin: 0 auto 100px;\r\n  padding: 45px 45px 25px 45px;\r\n  text-align: center;\r\n  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);\r\n}\r\n.form input, select {\r\n  font-family: \"Roboto\", sans-serif;\r\n  outline: 0;\r\n  background: #f2f2f2;\r\n  width: 100%;\r\n  border: 0;\r\n  margin: 0 0 15px;\r\n  padding: 15px;\r\n  box-sizing: border-box;\r\n  font-size: 14px;\r\n}\r\n.form button {\r\n  font-family: \"Roboto\", sans-serif;\r\n  font-weight: bold;\r\n  font-size: 14px;\r\n  color: #FFFFFF;\r\n  background: rgb(61, 72, 122);\r\n  text-transform: uppercase;\r\n  outline: 0;\r\n  width: 100%;\r\n  border: 0;\r\n  padding: 15px;\r\n  cursor: pointer;\r\n}\r\n.form button:hover,.form button:active,.form button:focus {\r\n  background: #43A047;\r\n}\r\n.form .message {\r\n  margin: 15px 0 0;\r\n  color: #b3b3b3;\r\n  font-size: 12px;\r\n}\r\n.form .message a {\r\n  color: #b3b3b3;\r\n  text-decoration: none;\r\n}\r\n.container {\r\n  position: relative;\r\n  z-index: 1;\r\n  max-width: 300px;\r\n  margin: 0 auto;\r\n}\r\n.container:before, .container:after {\r\n  content: \"\";\r\n  display: block;\r\n  clear: both;\r\n}\r\n.container .info {\r\n  margin: 50px auto;\r\n  text-align: center;\r\n}\r\n.container .info h1 {\r\n  margin: 0 0 15px;\r\n  padding: 0;\r\n  font-size: 36px;\r\n  font-weight: 300;\r\n  color: #1a1a1a;\r\n}\r\n.container .info span {\r\n  color: #4d4d4d;\r\n  font-size: 12px;\r\n}\r\n.container .info span a {\r\n  color: #000000;\r\n  text-decoration: none;\r\n}\r\n.container .info span .fa {\r\n  color: #EF3B3A;\r\n}\r\nbody {\r\n  background: rgb(58, 78, 168); /* fallback for old browsers */\r\n  background: -webkit-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: -moz-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: -o-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: linear-gradient(to left, #060b22, rgb(58, 78, 168));\r\n  font-family: \"Roboto\", sans-serif;\r\n  -webkit-font-smoothing: antialiased;\r\n  -moz-osx-font-smoothing: grayscale;      \r\n}\r\n.logo {\r\n  display: block;\r\n  margin-left: auto;\r\n  margin-right: auto;\r\n  width: 75%;\r\n  margin-bottom: 20px;\r\n}"),
 	}
 	file5 := &embedded.EmbeddedFile{
 		Filename:    "images/favicon-16x16.png",
@@ -35,7 +35,7 @@ func init() {
 	}
 	file8 := &embedded.EmbeddedFile{
 		Filename:    "index.html",
-		FileModTime: time.Unix(1591639927, 0),
+		FileModTime: time.Unix(1591640991, 0),
 
 		Content: string("<!DOCTYPE html>\r\n<html lang=\"en\">\r\n  <head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n    <title>Request Sandpiper Access</title>\r\n    <link rel=\"icon\" type=\"image/png\" href=\"images/favicon-32x32.png\" sizes=\"32x32\" />\r\n    <link rel=\"icon\" type=\"image/png\" href=\"images/favicon-16x16.png\" sizes=\"16x16\" />\r\n    <link rel=\"stylesheet\" href=\"css/style.css\" />\r\n  </head>\r\n  <div class=\"register-page\">\r\n    <a href=\"https://sandpiperframework.org\"><img src=\"images/logo.svg\" alt=\"logo\" class=\"logo\"/></a>\r\n    <div class=\"form\">\r\n      <form class=\"login-form\">\r\n        <input type=\"text\" placeholder=\"name\" />\r\n        <input type=\"text\" placeholder=\"email\" />\r\n        <input type=\"text\" placeholder=\"company\" />\r\n        <input type=\"text\" placeholder=\"sandpiper server id\" />\r\n        <select id = \"kind\">\r\n          <option value = \"1\">classification</option>\r\n          <option value = \"1\">Distributor</option>\r\n          <option value = \"2\">Retailer</option>\r\n          <option value = \"3\">Electronic Catalog</option>\r\n          <option value = \"4\">Other</option>\r\n        </select>\r\n        <button>register</button>\r\n        <p class=\"message\"><a href=\"#\">Terms & Conditions</a></p>\r\n      </form>\r\n    </div>\r\n  </div>\r\n</html>\r\n"),
 	}
@@ -43,7 +43,7 @@ func init() {
 	// define dirs
 	dir1 := &embedded.EmbeddedDir{
 		Filename:   "",
-		DirModTime: time.Unix(1591639927, 0),
+		DirModTime: time.Unix(1591640991, 0),
 		ChildFiles: []*embedded.EmbeddedFile{
 			file8, // "index.html"
 
@@ -51,7 +51,7 @@ func init() {
 	}
 	dir2 := &embedded.EmbeddedDir{
 		Filename:   "css",
-		DirModTime: time.Unix(1591640285, 0),
+		DirModTime: time.Unix(1591641234, 0),
 		ChildFiles: []*embedded.EmbeddedFile{
 			file3, // "css/style.css"
 
@@ -80,7 +80,7 @@ func init() {
 	// register embeddedBox
 	embedded.RegisterEmbeddedBox(`../../../public`, &embedded.EmbeddedBox{
 		Name: `../../../public`,
-		Time: time.Unix(1591639927, 0),
+		Time: time.Unix(1591640991, 0),
 		Dirs: map[string]*embedded.EmbeddedDir{
 			"":       dir1,
 			"css":    dir2,

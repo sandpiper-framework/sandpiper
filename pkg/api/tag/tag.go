@@ -8,6 +8,7 @@ package tag
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
@@ -24,7 +25,7 @@ func (s *Tag) Create(c echo.Context, req sandpiper.Tag) (*sandpiper.Tag, error) 
 }
 
 // List returns list of tags that you can view
-func (s *Tag) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Tag, error) {
+func (s *Tag) List(c echo.Context, p *params.Params) ([]sandpiper.Tag, error) {
 	return s.sdb.List(s.db, p)
 }
 

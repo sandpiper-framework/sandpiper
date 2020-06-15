@@ -7,6 +7,7 @@ package subscription
 // subscription service logger
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"time"
 
 	"github.com/google/uuid"
@@ -49,7 +50,7 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Subscription) (resp *
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Subscription, err error) {
+func (ls *LogService) List(c echo.Context, req *params.Params) (resp []sandpiper.Subscription, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,

@@ -11,6 +11,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/subscription/platform/pgsql"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
@@ -20,7 +21,7 @@ import (
 // Service represents subscription application interface
 type Service interface {
 	Create(echo.Context, sandpiper.Subscription) (*sandpiper.Subscription, error)
-	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Subscription, error)
+	List(echo.Context, *params.Params) ([]sandpiper.Subscription, error)
 	View(echo.Context, sandpiper.Subscription) (*sandpiper.Subscription, error)
 	Delete(echo.Context, uuid.UUID) error
 	Update(echo.Context, *Update) (*sandpiper.Subscription, error)
@@ -53,7 +54,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.Subscription) (*sandpiper.Subscription, error)
 	View(orm.DB, sandpiper.Subscription) (*sandpiper.Subscription, error)
-	List(orm.DB, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Subscription, error)
+	List(orm.DB, *sandpiper.Scope, *params.Params) ([]sandpiper.Subscription, error)
 	Update(orm.DB, *sandpiper.Subscription) error
 	Delete(orm.DB, *sandpiper.Subscription) error
 }

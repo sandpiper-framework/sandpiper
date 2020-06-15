@@ -8,6 +8,7 @@ package grain
 
 import (
 	"fmt"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"time"
 
 	"github.com/google/uuid"
@@ -66,7 +67,7 @@ func (ls *LogService) Create(c echo.Context, replaceFlag bool, req *sandpiper.Gr
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, payload bool, req *sandpiper.Pagination) (resp []sandpiper.Grain, err error) {
+func (ls *LogService) List(c echo.Context, payload bool, req *params.Params) (resp []sandpiper.Grain, err error) {
 	// todo: consider a "debug" level that shows entire resp
 	defer func(begin time.Time) {
 		ls.logger.Log(

@@ -11,6 +11,7 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/tag/platform/pgsql"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
@@ -20,7 +21,7 @@ import (
 // Service represents tag application interface
 type Service interface {
 	Create(echo.Context, sandpiper.Tag) (*sandpiper.Tag, error)
-	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Tag, error)
+	List(echo.Context, *params.Params) ([]sandpiper.Tag, error)
 	View(echo.Context, int) (*sandpiper.Tag, error)
 	Delete(echo.Context, int) error
 	Update(echo.Context, *Update) (*sandpiper.Tag, error)
@@ -55,7 +56,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.Tag) (*sandpiper.Tag, error)
 	View(orm.DB, int) (*sandpiper.Tag, error)
-	List(orm.DB, *sandpiper.Pagination) ([]sandpiper.Tag, error)
+	List(orm.DB, *params.Params) ([]sandpiper.Tag, error)
 	Update(orm.DB, *sandpiper.Tag) error
 	Delete(orm.DB, *sandpiper.Tag) error
 	Assign(orm.DB, int, uuid.UUID) error

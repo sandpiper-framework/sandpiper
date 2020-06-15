@@ -134,10 +134,8 @@ func Pull(c *args.Context) error {
 
 	if pull.slice == "" {
 		return pull.allSlices()
-	} else {
-		return pull.oneSlice()
 	}
-
+	return pull.oneSlice()
 }
 
 func saveGrainToFile(basePath string, slice *sandpiper.Slice, grain *sandpiper.Grain) error {

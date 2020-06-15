@@ -13,12 +13,13 @@ import (
 	"github.com/sandpiper-framework/sandpiper/pkg/api/slice/platform/pgsql"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // Service represents slice application interface
 type Service interface {
 	Create(echo.Context, sandpiper.Slice) (*sandpiper.Slice, error)
-	List(echo.Context, *sandpiper.TagQuery, *sandpiper.Pagination) ([]sandpiper.Slice, error)
+	List(echo.Context, *params.Params, *params.TagQuery) ([]sandpiper.Slice, error)
 	View(echo.Context, uuid.UUID) (*sandpiper.Slice, error)
 	ViewByName(echo.Context, string) (*sandpiper.Slice, error)
 	Metadata(echo.Context, uuid.UUID) (sandpiper.MetaArray, error)
@@ -58,7 +59,7 @@ type Repository interface {
 	View(orm.DB, uuid.UUID) (*sandpiper.Slice, error)
 	ViewBySub(db orm.DB, companyID uuid.UUID, sliceID uuid.UUID) (*sandpiper.Slice, error)
 	ViewByName(orm.DB, uuid.UUID, string) (*sandpiper.Slice, error)
-	List(orm.DB, *sandpiper.TagQuery, *sandpiper.Scope, *sandpiper.Pagination) ([]sandpiper.Slice, error)
+	List(orm.DB, *params.Params, *params.TagQuery, *sandpiper.Scope) ([]sandpiper.Slice, error)
 	Metadata(orm.DB, uuid.UUID) (sandpiper.MetaArray, error)
 	Update(orm.DB, *sandpiper.Slice) error
 	Delete(orm.DB, *sandpiper.Slice) error

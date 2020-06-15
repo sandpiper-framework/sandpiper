@@ -7,6 +7,7 @@ package transport
 // grain routing
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -93,17 +94,17 @@ func (h *HTTP) list(c echo.Context) error {
 		includePayload = true
 	}
 
-	p := new(sandpiper.PaginationReq)
-	if err := c.Bind(p); err != nil {
-		return err
-	}
-
-	result, err := h.svc.List(c, includePayload, p.Transform())
+	p, err := params.Parse(c)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, sandpiper.GrainsPaginated{Grains: result, Page: p.Page})
+	result, err := h.svc.List(c, includePayload, p)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, sandpiper.GrainsPaginated{Grains: result, Paging: p.Paging})
 }
 
 func (h *HTTP) listBySlice(c echo.Context) error {
@@ -118,17 +119,17 @@ func (h *HTTP) listBySlice(c echo.Context) error {
 		includePayload = true
 	}
 
-	p := new(sandpiper.PaginationReq)
-	if err := c.Bind(p); err != nil {
-		return err
-	}
-
-	result, err := h.svc.ListBySlice(c, sliceID, includePayload, p.Transform())
+	p, err := params.Parse(c)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, sandpiper.GrainsPaginated{Grains: result, Page: p.Page})
+	result, err := h.svc.ListBySlice(c, sliceID, includePayload, p)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, sandpiper.GrainsPaginated{Grains: result, Paging: p.Paging})
 }
 
 func (h *HTTP) view(c echo.Context) error {

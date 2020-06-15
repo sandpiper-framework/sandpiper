@@ -8,6 +8,7 @@ package subscription
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
@@ -21,7 +22,7 @@ func (s *Subscription) Create(c echo.Context, req sandpiper.Subscription) (*sand
 }
 
 // List returns list of subscriptions that you can view
-func (s *Subscription) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Subscription, error) {
+func (s *Subscription) List(c echo.Context, p *params.Params) ([]sandpiper.Subscription, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err

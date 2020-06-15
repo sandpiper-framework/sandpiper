@@ -7,6 +7,7 @@ package pgsql
 // subscription service database access
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strings"
 
@@ -68,10 +69,10 @@ func (s *Subscription) View(db orm.DB, sub sandpiper.Subscription) (*sandpiper.S
 }
 
 // List returns list of all subscriptions
-func (s *Subscription) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Subscription, error) {
+func (s *Subscription) List(db orm.DB, sc *sandpiper.Scope, p *params.Params) ([]sandpiper.Subscription, error) {
 	var subs []sandpiper.Subscription
 
-	q := queryAll(db, &subs).Limit(p.Limit).Offset(p.Offset).Order("name")
+	q := queryAll(db, &subs).Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("name")
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}

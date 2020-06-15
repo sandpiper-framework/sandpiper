@@ -179,6 +179,14 @@ var Commands = []*args.Command{
 		ArgsUsage: " ", // don't show that we accept arguments
 		Action:    command.Secrets,
 	},
+	{
+		/* sandpiper schema
+		 */
+		Name:      "schema",
+		Usage:     "display current database schema as defined by internal migrations",
+		ArgsUsage: " ", // don't show that we accept arguments
+		Action:    command.Schema,
+	},
 }
 
 // CommandNotFound exits program reporting the invalid command

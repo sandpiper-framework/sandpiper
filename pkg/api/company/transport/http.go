@@ -7,6 +7,7 @@ package transport
 // company service routing functions
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -76,20 +77,20 @@ func (h *HTTP) create(c echo.Context) error {
 }
 
 type listResponse struct {
-	Companies []sandpiper.Company `json:"companies"`
-	Page      int                 `json:"page"`
+	Companies []sandpiper.Company   `json:"companies"`
+	Paging    *sandpiper.Pagination `json:"paging"`
 }
 
 func (h *HTTP) list(c echo.Context) error {
-	p := new(sandpiper.PaginationReq)
-	if err := c.Bind(p); err != nil {
-		return err
-	}
-	result, err := h.svc.List(c, p.Transform())
+	p, err := params.Parse(c)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, listResponse{result, p.Page})
+	result, err := h.svc.List(c, p)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, listResponse{result, p.Paging})
 }
 
 func (h *HTTP) view(c echo.Context) error {

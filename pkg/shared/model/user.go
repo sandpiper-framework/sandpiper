@@ -45,8 +45,8 @@ func (u *User) UpdateLastLogin(token string) {
 
 // UsersPaginated adds pagination
 type UsersPaginated struct {
-	Users  []User     `json:"users"`
-	Paging Pagination `json:"paging"`
+	Users  []User      `json:"users"`
+	Paging *Pagination `json:"paging"`
 }
 
 // compile-time check variables for model hooks (which take no memory)

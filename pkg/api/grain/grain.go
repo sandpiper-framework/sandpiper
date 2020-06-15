@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // Create makes a new grain to hold our syncable data-objects. Must be a sandpiper admin.
@@ -43,7 +44,7 @@ func (s *Grain) ViewByKeys(c echo.Context, sliceID uuid.UUID, grainKey string, p
 }
 
 // List returns list of grains scoped by user
-func (s *Grain) List(c echo.Context, payload bool, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+func (s *Grain) List(c echo.Context, payload bool, p *params.Params) ([]sandpiper.Grain, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
@@ -52,7 +53,7 @@ func (s *Grain) List(c echo.Context, payload bool, p *sandpiper.Pagination) ([]s
 }
 
 // ListBySlice returns a list of grains for a slice scoped by user
-func (s *Grain) ListBySlice(c echo.Context, sliceID uuid.UUID, payloadFlag bool, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+func (s *Grain) ListBySlice(c echo.Context, sliceID uuid.UUID, payloadFlag bool, p *params.Params) ([]sandpiper.Grain, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err

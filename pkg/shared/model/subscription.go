@@ -28,8 +28,8 @@ type Subscription struct {
 
 // SubsPaginated adds pagination
 type SubsPaginated struct {
-	Subs []Subscription `json:"subs"`
-	Page int            `json:"page"`
+	Subs   []Subscription `json:"subs"`
+	Paging *Pagination    `json:"paging"`
 }
 
 // SubsMap allows fast lookups by SubID

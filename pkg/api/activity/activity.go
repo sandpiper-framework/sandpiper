@@ -7,6 +7,7 @@ package activity
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
@@ -28,7 +29,7 @@ func (s *Activity) View(c echo.Context, activityID int) (*sandpiper.Activity, er
 }
 
 // List returns list of sync activity scoped by user
-func (s *Activity) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Activity, error) {
+func (s *Activity) List(c echo.Context, p *params.Params) ([]sandpiper.Activity, error) {
 	if err := s.rbac.EnforceRole(c, sandpiper.AdminRole); err != nil {
 		return nil, err
 	}

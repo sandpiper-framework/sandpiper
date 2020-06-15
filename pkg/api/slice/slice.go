@@ -8,6 +8,7 @@ package slice
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"time"
 
@@ -29,7 +30,7 @@ func (s *Slice) Create(c echo.Context, req sandpiper.Slice) (*sandpiper.Slice, e
 }
 
 // List returns list of slices
-func (s *Slice) List(c echo.Context, tags *sandpiper.TagQuery, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(c echo.Context, p *params.Params, tags *params.TagQuery) ([]sandpiper.Slice, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err
@@ -39,7 +40,7 @@ func (s *Slice) List(c echo.Context, tags *sandpiper.TagQuery, p *sandpiper.Pagi
 		// only admin can query by tags (internal structuring of slices)
 		return nil, ErrTagsNotAllowed
 	}
-	return s.sdb.List(s.db, tags, q, p)
+	return s.sdb.List(s.db, p, tags, q)
 }
 
 // View returns a single slice if allowed

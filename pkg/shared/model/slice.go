@@ -43,8 +43,8 @@ type Slice struct {
 
 // SlicesPaginated adds pagination
 type SlicesPaginated struct {
-	Slices []Slice `json:"slices"`
-	Page   int     `json:"page"`
+	Slices []Slice     `json:"slices"`
+	Paging *Pagination `json:"paging"`
 }
 
 // compile-time check variables for model hooks (which take no memory)
@@ -93,7 +93,7 @@ type SliceMetadata struct {
 // MetaArray is an array of slice metadata
 type MetaArray []SliceMetadata
 
-// The ToMap method converts array of metadata key/value structs to a map
+// ToMap converts array of metadata key/value structs to a map
 func (a MetaArray) ToMap(sliceID uuid.UUID) MetaMap {
 	mm := make(MetaMap)
 	for _, meta := range a {

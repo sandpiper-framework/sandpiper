@@ -2,7 +2,7 @@
 // This file is licensed under the Artistic License 2.0.
 // License text can be found in the project's LICENSE file.
 
-package sandpiper
+package params
 
 import (
 	"net/url"
@@ -11,28 +11,28 @@ import (
 
 // TagQuery is used to store tag query parameters
 type TagQuery struct {
-	RawQuery string
-	IsUnion  bool
-	TagList  []string
+	IsUnion bool
+	TagList []string
 }
 
-// NewTagQuery returns a new tag query structure with parsed tags
-func NewTagQuery(params url.Values, q string) *TagQuery {
+// NewTagQuery searches the url query string for tag filters
+func NewTagQuery(tags url.Values) *TagQuery {
 	tq := new(TagQuery)
-	tq.RawQuery = q
-	for k, v := range params {
-		tags := strings.ReplaceAll(v[0], " ", "")
+	for k, v := range tags {
 		if k == "tags" {
-			tq.IsUnion = true
-			tq.TagList = strings.Split(tags, ",")
-			return tq
+			tq.assign(v[0], true)
 		}
 		if k == "tags-all" {
-			tq.TagList = strings.Split(tags, ",")
-			return tq
+			tq.assign(v[0], false)
 		}
 	}
-	return tq // empty struct
+	return tq
+}
+
+// assign adds values to the underlying struct
+func (q *TagQuery) assign(vals string, isUnion bool) {
+	q.TagList = strings.Split(vals, ",")
+	q.IsUnion = isUnion
 }
 
 // Provided checks to see if a tag query was included in the url

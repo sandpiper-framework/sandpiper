@@ -9,6 +9,7 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/activity/platform/pgsql"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
@@ -18,7 +19,7 @@ import (
 // Service represents activity application interface (note no update!)
 type Service interface {
 	Create(echo.Context, sandpiper.Activity) (*sandpiper.Activity, error)
-	List(echo.Context, *sandpiper.Pagination) ([]sandpiper.Activity, error)
+	List(echo.Context, *params.Params) ([]sandpiper.Activity, error)
 	View(echo.Context, int) (*sandpiper.Activity, error)
 	Delete(echo.Context, int) error
 }
@@ -50,7 +51,7 @@ type Securer interface {
 type Repository interface {
 	Create(orm.DB, sandpiper.Activity) (*sandpiper.Activity, error)
 	View(orm.DB, int) (*sandpiper.Activity, error)
-	List(orm.DB, *sandpiper.Pagination) ([]sandpiper.Activity, error)
+	List(orm.DB, *params.Params) ([]sandpiper.Activity, error)
 	Delete(orm.DB, int) error
 }
 

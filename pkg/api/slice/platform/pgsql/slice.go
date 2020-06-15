@@ -21,6 +21,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // Custom errors
@@ -51,7 +52,7 @@ func (sl sliceList) IDs() []uuid.UUID {
 }
 
 // FilterByTags creates a new Slices array using the tag query
-func (sl sliceList) FilterByTags(db orm.DB, tags *sandpiper.TagQuery) (sliceList, error) {
+func (sl sliceList) FilterByTags(db orm.DB, tags *params.TagQuery) (sliceList, error) {
 	var tagged sliceList
 	// See "Toxi" Solution http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
 
@@ -82,7 +83,7 @@ func (sl sliceList) FilterByTags(db orm.DB, tags *sandpiper.TagQuery) (sliceList
 		taggedSet[slice.ID] = true
 	}
 
-	// run through received slice list "sl" and add to results if found in tagged set
+	// run through received slice list "sl" and include in results only if found in tagged set
 	// uses "filtering without allocating" (https://github.com/golang/go/wiki/SliceTricks)
 	results := sl[:0]
 	for _, slice := range sl {
@@ -177,7 +178,7 @@ func (s *Slice) ViewByName(db orm.DB, companyID uuid.UUID, name string) (*sandpi
 }
 
 // List returns a list of all slices limited by scope and paginated
-func (s *Slice) List(db orm.DB, tags *sandpiper.TagQuery, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Slice, error) {
+func (s *Slice) List(db orm.DB, p *params.Params, tags *params.TagQuery, sc *sandpiper.Scope) ([]sandpiper.Slice, error) {
 	var slices sliceList
 
 	// filter function adds optional condition to "Companies" relationship
@@ -189,7 +190,7 @@ func (s *Slice) List(db orm.DB, tags *sandpiper.TagQuery, sc *sandpiper.Scope, p
 	}
 
 	err := db.Model(&slices).Relation("Companies", filterFn).
-		Limit(p.Limit).Offset(p.Offset).
+		Limit(p.Paging.Limit).Offset(p.Paging.Offset()).
 		Order("name").Select()
 	if err != nil {
 		return nil, err

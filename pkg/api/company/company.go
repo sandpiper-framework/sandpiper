@@ -10,6 +10,7 @@ package company
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
@@ -23,7 +24,7 @@ func (s *Company) Create(c echo.Context, req sandpiper.Company) (*sandpiper.Comp
 }
 
 // List returns list of companies that you can view
-func (s *Company) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
+func (s *Company) List(c echo.Context, p *params.Params) ([]sandpiper.Company, error) {
 	q, err := s.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err

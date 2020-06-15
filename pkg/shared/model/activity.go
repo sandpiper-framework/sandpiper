@@ -28,8 +28,8 @@ type Activity struct {
 
 // ActivityPaginated adds pagination
 type ActivityPaginated struct {
-	Syncs  []Activity `json:"activity"`
-	Paging Pagination `json:"paging"`
+	Syncs  []Activity  `json:"activity"`
+	Paging *Pagination `json:"paging"`
 }
 
 // compile-time check variables for model hooks (which take no memory)

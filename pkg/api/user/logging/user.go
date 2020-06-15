@@ -7,6 +7,7 @@ package user
 // user service logger
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -49,7 +50,7 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.User) (resp *sandpipe
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.User, err error) {
+func (ls *LogService) List(c echo.Context, req *params.Params) (resp []sandpiper.User, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,

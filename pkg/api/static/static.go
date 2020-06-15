@@ -14,7 +14,7 @@ import (
 
 // FileServer serves from embedded files in `rice-box.go`
 func FileServer(srv *echo.Echo) {
-  // relative to this source file (three levels down!)
+	// relative to this source file (three levels down!)
 	public := http.FileServer(rice.MustFindBox("../../../public").HTTPBox())
 	srv.GET("/", echo.WrapHandler(public))
 	srv.GET("/*/*", echo.WrapHandler(http.StripPrefix("/", public)))

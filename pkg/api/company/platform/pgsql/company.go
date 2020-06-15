@@ -7,6 +7,7 @@ package pgsql
 // company service database access
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strings"
 
@@ -21,7 +22,7 @@ import (
 // Company represents the client for company table
 type Company struct{}
 
-// NewCompany returns a new company database instance
+// NewCompany returns a new company model
 func NewCompany() *Company {
 	return &Company{}
 }
@@ -56,10 +57,10 @@ func (s *Company) View(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
 }
 
 // List returns list of all companies
-func (s *Company) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Company, error) {
+func (s *Company) List(db orm.DB, sc *sandpiper.Scope, p *params.Params) ([]sandpiper.Company, error) {
 	var companies []sandpiper.Company
 
-	q := db.Model(&companies).Relation("Users").Limit(p.Limit).Offset(p.Offset).Order("name")
+	q := db.Model(&companies).Relation("Users").Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("name")
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
@@ -83,11 +84,8 @@ func (s *Company) Delete(db orm.DB, company *sandpiper.Company) error {
 
 // Server returns a single active company by ID for the sync process
 func (s *Company) Server(db orm.DB, id uuid.UUID) (*sandpiper.Company, error) {
-	company := new(sandpiper.Company)
-	err := db.Model(company).
-		Column("id", "name", "sync_addr").
-		Where("id = ?", id).Where("active = true").
-		Select()
+	company := &sandpiper.Company{ID: id}
+	err := db.Model(company).Column("id", "name", "sync_addr").WherePK().Where("active = true").Select()
 	if err != nil {
 		return nil, err
 	}
@@ -100,8 +98,7 @@ func (s *Company) Servers(db orm.DB, ourCompanyID uuid.UUID, name string) ([]san
 
 	q := db.Model(&companies).
 		Column("id", "name", "sync_addr", "sync_api_key", "active").
-		Where("id <> ?", ourCompanyID).
-		Where("sync_addr <> ''").Where("active = true")
+		Where("id <> ?", ourCompanyID).Where("sync_addr <> ''").Where("active = true")
 	if name != "" {
 		q = q.Where("lower(name) = ?", strings.ToLower(name))
 	}

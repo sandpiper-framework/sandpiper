@@ -7,6 +7,7 @@ package slice
 // slice service logger
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"time"
 
 	"github.com/google/uuid"
@@ -49,20 +50,20 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Slice) (resp *sandpip
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, tags *sandpiper.TagQuery, req *sandpiper.Pagination) (resp []sandpiper.Slice, err error) {
+func (ls *LogService) List(c echo.Context, p *params.Params, tags *params.TagQuery) (resp []sandpiper.Slice, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			c,
 			source, "List slice request", err,
 			map[string]interface{}{
+				"params":  p,
 				"tags": tags,
-				"req":  req,
 				"resp": resp,
 				"took": time.Since(begin),
 			},
 		)
 	}(time.Now())
-	return ls.Service.List(c, tags, req)
+	return ls.Service.List(c, p, tags)
 }
 
 // View logging

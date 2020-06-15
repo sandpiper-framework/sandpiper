@@ -7,6 +7,7 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/secure"
@@ -22,7 +23,7 @@ func (u *User) Create(c echo.Context, req sandpiper.User) (*sandpiper.User, erro
 }
 
 // List returns list of users
-func (u *User) List(c echo.Context, p *sandpiper.Pagination) ([]sandpiper.User, error) {
+func (u *User) List(c echo.Context, p *params.Params) ([]sandpiper.User, error) {
 	q, err := u.rbac.EnforceScope(c)
 	if err != nil {
 		return nil, err

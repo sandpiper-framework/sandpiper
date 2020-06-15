@@ -15,9 +15,10 @@ import (
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/payload"
 )
 
-const
-// L1GrainKey is always the same for level-1 grains
-L1GrainKey = "level-1"
+const (
+	// L1GrainKey is always the same for level-1 grains
+	L1GrainKey = "level-1"
+)
 
 // Grain represents the sandpiper syncable-object
 type Grain struct {
@@ -36,8 +37,8 @@ type Grain struct {
 var _ orm.BeforeInsertHook = (*Grain)(nil)
 
 // BeforeInsert hooks into insert operations, setting createdAt and updatedAt to current time
-func (b *Grain) BeforeInsert(ctx context.Context) (context.Context, error) {
-	b.CreatedAt = time.Now()
+func (g *Grain) BeforeInsert(ctx context.Context) (context.Context, error) {
+	g.CreatedAt = time.Now()
 	return ctx, nil
 }
 
@@ -74,6 +75,6 @@ func (g *Grain) DisplayFull() string {
 
 // GrainsPaginated adds pagination
 type GrainsPaginated struct {
-	Grains []Grain `json:"grains"`
-	Page   int     `json:"page"`
+	Grains []Grain     `json:"grains"`
+	Paging *Pagination `json:"paging"`
 }

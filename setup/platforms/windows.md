@@ -30,7 +30,9 @@ todo: add more setup instructions here...
 
 (4) **Install Scoop (package manager)**
 
-open a [PowerShell](https://docs.microsoft.com/en-us/powershell/) window and execute:
+This is an optional step. We use this package manager to install `task` (and 7zip, nodejs and yarn on new machines). But you could simply download the correct Task binary from the project's [release page](https://github.com/go-task/task/releases) and add to your PATH. If you take that approach, skip this step and the next one.
+
+To install Scoop, open a [PowerShell](https://docs.microsoft.com/en-us/powershell/) window and execute:
 
 ```
 PS> set-executionpolicy remotesigned -scope currentuser
@@ -40,6 +42,8 @@ PS> scoop bucket add extras
 
 (5) **Install Taskfile.dev**
 
+[Task](https://taskfile.dev/#/) is a cross-platform build tool designed to be easier than [Make](https://www.gnu.org/software/make/).
+
 ```
 PS> scoop install task
 ```
@@ -47,29 +51,29 @@ PS> scoop install task
 (6) **Get Sandpiper from GitHub**
 
 ```
-$ cd $HOME
-$ git clone https://github.com/sandpiper-framework/sandpiper.git
+PS> cd $HOME
+PS> git clone https://github.com/sandpiper-framework/sandpiper.git
 ```
 
 (7) **Compile Sandpiper**
 
 ```
-$ cd $HOME/sandpiper
-$ go mod download
-$ task build
+PS> cd $HOME/sandpiper
+PS> go mod download
+PS> task build
 ```
 
 (8) **Create and Initialize database**
 
 ```
-$ task init
-$ mv cmd/cli/api-primary.yaml cmd/api/config.yaml
+PS> task init
+PS> copy cmd/cli/api-primary.yaml cmd/api/api-config.yaml
 ```
 
 (9) **Test Server**
 
 ```
-$ task server
+PS> task server
 you should see `http server started on ...`
 ctrl-c  # to stop server
 ```
@@ -81,5 +85,5 @@ ctrl-c  # to stop server
 To set a session-level environment variable in PowerShell
 
 ```
-$env:SANDPIPER_USER='admin'
+PS> $env:SANDPIPER_USER='admin'
 ```

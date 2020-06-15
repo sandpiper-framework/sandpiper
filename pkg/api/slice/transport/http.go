@@ -15,6 +15,7 @@ import (
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/slice"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // HTTP represents user http service
@@ -129,19 +130,19 @@ func (h *HTTP) viewByName(c echo.Context) error {
 
 func (h *HTTP) list(c echo.Context) error {
 	// allow slices filtered by tags (/slices?tags=aaa,bbb or /slices?tags-all=aaa,bbb)
-	tags := sandpiper.NewTagQuery(c.QueryParams(), c.QueryString())
+	tags := params.NewTagQuery(c.QueryParams())
 
-	p := new(sandpiper.PaginationReq)
-	if err := c.Bind(p); err != nil {
-		return err
-	}
-
-	result, err := h.svc.List(c, tags, p.Transform())
+	p, err := params.Parse(c)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, sandpiper.SlicesPaginated{Slices: result, Page: p.Page})
+	result, err := h.svc.List(c, p, tags)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, sandpiper.SlicesPaginated{Slices: result, Paging: p.Paging})
 }
 
 func (h *HTTP) metadata(c echo.Context) error {

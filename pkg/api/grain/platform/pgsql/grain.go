@@ -10,6 +10,7 @@ package pgsql
 // The payload is transferred (and stored) as a (possibly encoded) binary object.
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strings"
 
@@ -98,7 +99,7 @@ func (s *Grain) CompanySubscribed(db orm.DB, companyID uuid.UUID, grainID uuid.U
 }
 
 // List returns a list of all grains with scoping and pagination (optionally for a slice)
-func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.Grain, error) {
+func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpiper.Scope, p *params.Params) ([]sandpiper.Grain, error) {
 	var grains []sandpiper.Grain
 	var q *orm.Query
 
@@ -132,7 +133,7 @@ func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpip
 	}
 
 	// execute the query
-	err := q.Limit(p.Limit).Offset(p.Offset).Select(&grains)
+	err := q.Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Select(&grains)
 	if err != nil {
 		return nil, err
 	}

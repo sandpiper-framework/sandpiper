@@ -7,6 +7,7 @@ package transport
 // tag service routing functions
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strconv"
 
@@ -72,21 +73,21 @@ func (h *HTTP) create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, result)
 }
 
-type listResponse struct {
-	Tags []sandpiper.Tag `json:"tags"`
-	Page int             `json:"page"`
+type pagedResponse struct {
+	Tags   []sandpiper.Tag       `json:"data"`
+	Paging *sandpiper.Pagination `json:"paging"`
 }
 
 func (h *HTTP) list(c echo.Context) error {
-	p := new(sandpiper.PaginationReq)
-	if err := c.Bind(p); err != nil {
-		return err
-	}
-	result, err := h.svc.List(c, p.Transform())
+	p, err := params.Parse(c)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, listResponse{result, p.Page})
+	result, err := h.svc.List(c, p)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, pagedResponse{result, p.Paging})
 }
 
 func (h *HTTP) view(c echo.Context) error {

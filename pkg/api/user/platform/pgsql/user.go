@@ -7,6 +7,7 @@ package pgsql
 // user service database access
 
 import (
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"net/http"
 	"strings"
 
@@ -63,14 +64,14 @@ func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 }
 
 // List returns list of all users retrievable for the current user, depending on role
-func (u *User) List(db orm.DB, sc *sandpiper.Scope, p *sandpiper.Pagination) (users []sandpiper.User, err error) {
+func (u *User) List(db orm.DB, sc *sandpiper.Scope, p *params.Params) (users []sandpiper.User, err error) {
 
-	q := db.Model(&users).Limit(p.Limit).Offset(p.Offset).Order("username")
+	q := db.Model(&users).Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("username")
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
 
-	p.Count, err = q.SelectAndCount()
+	p.Paging.Count, err = q.SelectAndCount()
 	if err != nil {
 		return nil, err
 	}

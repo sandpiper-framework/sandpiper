@@ -8,6 +8,7 @@ package activity
 
 import (
 	"fmt"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -49,7 +50,7 @@ func (ls *LogService) Create(c echo.Context, req sandpiper.Activity) (resp *sand
 }
 
 // List logging
-func (ls *LogService) List(c echo.Context, req *sandpiper.Pagination) (resp []sandpiper.Activity, err error) {
+func (ls *LogService) List(c echo.Context, req *params.Params) (resp []sandpiper.Activity, err error) {
 	// todo: consider a "debug" level that shows entire resp
 	defer func(begin time.Time) {
 		ls.logger.Log(

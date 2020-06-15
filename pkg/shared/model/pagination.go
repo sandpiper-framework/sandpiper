@@ -4,39 +4,53 @@
 
 package sandpiper
 
+import (
+	"strconv"
+)
+
 // Pagination constants
 const (
 	paginationDefaultLimit = 100
 	paginationMaxLimit     = 1000
 )
 
-// PaginationReq holds pagination http fields and tags
-type PaginationReq struct {
-	Limit int `Condition:"limit"`
-	Page  int `Condition:"page" validate:"min=0"`
+// Pagination holds range response settings
+type Pagination struct {
+	Page  int `json:"page_number"`
+	Limit int `json:"page_size"`
+	Count int `json:"items_total"`
 }
 
-// Transform checks and converts http pagination into database pagination model
-func (p *PaginationReq) Transform() *Pagination {
-	if p.Limit < 1 {
-		p.Limit = paginationDefaultLimit
+// SetPage is a setter method for page number
+func (p *Pagination) SetPage(pages []string) {
+	if len(pages) > 0 {
+		p.Page, _ = strconv.Atoi(pages[0])
 	}
-
-	if p.Limit > paginationMaxLimit {
-		p.Limit = paginationMaxLimit
-	}
-
 	if p.Page == 0 {
 		p.Page = 1
 	}
-
-	return &Pagination{Page: p.Page, Limit: p.Limit, Offset: (p.Page - 1) * p.Limit}
 }
 
-// Pagination holds range response settings
-type Pagination struct {
-	Page   int `json:"page_number"`
-	Limit  int `json:"items_limit"`
-	Count  int `json:"items_total"`
-	Offset int `json:"-"` // for database queries
+// SetLimit is a setter method for item limit per page
+func (p *Pagination) SetLimit(limits []string) {
+	if len(limits) > 0 {
+		p.Limit, _ = strconv.Atoi(limits[0])
+	}
+	if p.Limit < 1 {
+		p.Limit = paginationDefaultLimit
+	}
+	if p.Limit > paginationMaxLimit {
+		p.Limit = paginationMaxLimit
+	}
+}
+
+// Offset method calculates the sql offset value
+func (p *Pagination) Offset() int {
+	return (p.Page - 1) * p.Limit
+}
+
+// PaginationReq holds pagination http fields and tags
+type PaginationReq struct {
+	Limit int `query:"limit"`
+	Page  int `query:"page" validate:"min=0"`
 }
