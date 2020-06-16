@@ -19,7 +19,7 @@ import (
 /*
 Query Strings:
 	?sort=title,asc&sort=zipcode:desc,city,&filter=lname:Johnson,age:39&include=user
-	?page=2&limit=20  # limit to define the number of items returned in the response
+	?page=2&pagesize=20  # limit to define the number of items returned in the response
 */
 
 // Params hold the url query parameters
@@ -52,9 +52,9 @@ func Parse(c echo.Context) (*Params, error) {
 		case "include":
 			p.Include = v
 		case "page":
-			p.Paging.SetPage(v)
-		case "limit":
-			p.Paging.SetLimit(v)
+			p.Paging.SetPageNumber(v)
+		case "pagesize":
+			p.Paging.SetPageSize(v)
 		}
 	}
 	return p, nil
@@ -63,7 +63,8 @@ func Parse(c echo.Context) (*Params, error) {
 // AddSort includes zero or more order clauses to an existing query
 // a missing direction implies ascending (asc)
 // e.g. ?sort=title:asc,lname:desc
-func (p *Params) AddSort(q *orm.Query) (added bool) {
+func (p *Params) AddSort(q *orm.Query, defaultSort string) {
+	var added bool
 	// can have zero or more sort instructions
 	for _, sort := range p.Sort {
 		// each sort can have one or more comma-separated sort fields
@@ -74,14 +75,16 @@ func (p *Params) AddSort(q *orm.Query) (added bool) {
 			added = true
 		}
 	}
-	return added
+	if !added && defaultSort != "" {
+		q.Order(defaultSort)
+	}
 }
 
 // AddFilter includes zero or more where clauses to an existing query
 // Conditions are field:value and only support equivalence (=) (for now)
 // All conditions within a filter (and across filters) are ANDed together (for now)
-// All comparison values are strings (which works because of postgresql's "automatically coerced" literals
-// https://dba.stackexchange.com/questions/238983)
+// All comparison values are strings (which works because of postgresql's "automatically coerced" literals,
+// see https://dba.stackexchange.com/questions/238983)
 // e.g. ?filter=lname:Johnson, age:39&filter=role:200
 func (p *Params) AddFilter(q *orm.Query) {
 	// can have zero or more filters

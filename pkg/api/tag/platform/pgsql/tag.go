@@ -59,8 +59,9 @@ func (s *Tag) View(db orm.DB, id int) (*sandpiper.Tag, error) {
 // List returns list of all tags
 func (s *Tag) List(db orm.DB, p *params.Params) (tags []sandpiper.Tag, err error) {
 
-	q := db.Model(&tags).Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("name")
-
+	q := db.Model(&tags).Limit(p.Paging.PageSize).Offset(p.Paging.Offset())
+	p.AddFilter(q)
+	p.AddSort(q, "name")
 	p.Paging.Count, err = q.SelectAndCount()
 	if err != nil {
 		return nil, err

@@ -174,7 +174,7 @@ func TestList(t *testing.T) {
 				}},
 			udb: &mockdb.User{
 				ListFn: func(db orm.DB, q *sandpiper.Scope, p *sandpiper.Pagination) ([]sandpiper.User, error) {
-					if p.Limit == 100 && p.Offset == 100 {
+					if p.PageSize == 100 && p.Offset == 100 {
 						return []sandpiper.User{
 							{
 								ID:        10,

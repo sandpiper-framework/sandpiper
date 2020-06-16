@@ -48,11 +48,8 @@ func (s *Activity) List(db orm.DB, p *params.Params) (acts []sandpiper.Activity,
 		q.Relation("Subscription")
 	}
 	p.AddFilter(q)
-	if !p.AddSort(q) {
-		// default ordering
-		q.Order("id desc")
-	}
-	q.Limit(p.Paging.Limit).Offset(p.Paging.Offset())
+	p.AddSort(q, "id desc")
+	q.Limit(p.Paging.PageSize).Offset(p.Paging.Offset())
 
 	p.Paging.Count, err = q.SelectAndCountEstimate(50000)
 	if err != nil {

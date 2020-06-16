@@ -7,7 +7,6 @@ package company
 // company service logger
 
 import (
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/company"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 )
 
 // ServiceLogger creates new logger wrapping the company service

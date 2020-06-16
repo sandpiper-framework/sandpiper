@@ -211,7 +211,7 @@ func (s *Slice) List(db orm.DB, p *params.Params, tags *params.TagQuery, sc *san
 	// perform our own pagination
 	offset := p.Paging.Offset() - 1
 	if offset >= 0 {
-		slices = slices[offset : offset+p.Paging.Limit]
+		slices = slices[offset : offset+p.Paging.PageSize]
 	}
 
 	// look up metadata for all slices returned above (using an "in" list)

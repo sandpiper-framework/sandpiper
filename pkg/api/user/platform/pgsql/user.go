@@ -66,16 +66,12 @@ func (u *User) Update(db orm.DB, user *sandpiper.User) error {
 // List returns all users retrievable by the current user, depending on role
 func (u *User) List(db orm.DB, p *params.Params, sc *sandpiper.Scope) (users []sandpiper.User, err error) {
 
-	q := db.Model(&users).Limit(p.Paging.Limit).Offset(p.Paging.Offset())
+	q := db.Model(&users).Limit(p.Paging.PageSize).Offset(p.Paging.Offset())
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
 	p.AddFilter(q)
-	if !p.AddSort(q) {
-		// default ordering
-		q.Order("username")
-	}
-
+	p.AddSort(q, "username")
 	p.Paging.Count, err = q.SelectAndCount()
 	if err != nil {
 		return nil, err

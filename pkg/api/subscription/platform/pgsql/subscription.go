@@ -71,11 +71,12 @@ func (s *Subscription) View(db orm.DB, sub sandpiper.Subscription) (*sandpiper.S
 // List returns list of all subscriptions
 func (s *Subscription) List(db orm.DB, sc *sandpiper.Scope, p *params.Params) (subs []sandpiper.Subscription, err error) {
 
-	q := queryAll(db, &subs).Limit(p.Paging.Limit).Offset(p.Paging.Offset()).Order("name")
+	q := queryAll(db, &subs).Limit(p.Paging.PageSize).Offset(p.Paging.Offset())
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
-
+	p.AddFilter(q)
+	p.AddSort(q, "name")
 	p.Paging.Count, err = q.SelectAndCount()
 	if err != nil {
 		return nil, err

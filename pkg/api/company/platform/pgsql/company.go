@@ -67,11 +67,8 @@ func (s *Company) List(db orm.DB, sc *sandpiper.Scope, p *params.Params) (compan
 	if sc != nil {
 		q.Where(sc.Condition, sc.ID)
 	}
-	if !p.AddSort(q) {
-		// default ordering
-		q.Order("name")
-	}
-	q.Limit(p.Paging.Limit).Offset(p.Paging.Offset())
+	p.AddSort(q, "name")
+	q.Limit(p.Paging.PageSize).Offset(p.Paging.Offset())
 
 	p.Paging.Count, err = q.SelectAndCount()
 	if err != nil {

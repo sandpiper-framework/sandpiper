@@ -132,7 +132,7 @@ func (s *Grain) List(db orm.DB, sliceID uuid.UUID, payloadFlag bool, sc *sandpip
 	}
 
 	// add paging
-	q = q.Limit(p.Paging.Limit).Offset(p.Paging.Offset())
+	q = q.Limit(p.Paging.PageSize).Offset(p.Paging.Offset())
 
 	// execute the query
 	p.Paging.Count, err = q.SelectAndCount(&grains)

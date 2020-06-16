@@ -8,7 +8,6 @@ package grain
 
 import (
 	"fmt"
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/grain"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/params"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/payload"
 )
 

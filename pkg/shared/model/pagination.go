@@ -8,54 +8,50 @@ import (
 	"strconv"
 )
 
+// limit the number of items returned from a list query and allow paging through them
+
 // Pagination constants
 const (
-	paginationDefaultLimit = 100
-	paginationMaxLimit     = 1000
+	defaultPageSize = 100
+	maxPageSize     = 1000
 )
 
 // Pagination holds range response settings
 type Pagination struct {
-	Page  int `json:"page_number"`
-	Limit int `json:"page_size"`
-	Count int `json:"items_total"`
+	PageNumber int `json:"page_number"`
+	PageSize   int `json:"page_size"`
+	Count      int `json:"items_total"`
 }
 
 // NewPagination is the Pagination constructor with default values
 func NewPagination() *Pagination {
-	return &Pagination{Page: 1, Limit: paginationDefaultLimit}
+	return &Pagination{PageNumber: 1, PageSize: defaultPageSize}
 }
 
-// SetPage is a setter method for page number
-func (p *Pagination) SetPage(pages []string) {
+// SetPageNumber is a setter method for page number
+func (p *Pagination) SetPageNumber(pages []string) {
 	if len(pages) > 0 {
-		p.Page, _ = strconv.Atoi(pages[0])
+		p.PageNumber, _ = strconv.Atoi(pages[0])
 	}
-	if p.Page == 0 {
-		p.Page = 1
+	if p.PageNumber == 0 {
+		p.PageNumber = 1
 	}
 }
 
-// SetLimit is a setter method for item limit per page
-func (p *Pagination) SetLimit(limits []string) {
+// SetPageSize is a setter method for item limit per page
+func (p *Pagination) SetPageSize(limits []string) {
 	if len(limits) > 0 {
-		p.Limit, _ = strconv.Atoi(limits[0])
+		p.PageSize, _ = strconv.Atoi(limits[0])
 	}
-	if p.Limit < 1 {
-		p.Limit = paginationDefaultLimit
+	if p.PageSize < 1 {
+		p.PageSize = defaultPageSize
 	}
-	if p.Limit > paginationMaxLimit {
-		p.Limit = paginationMaxLimit
+	if p.PageSize > maxPageSize {
+		p.PageSize = maxPageSize
 	}
 }
 
 // Offset method calculates the sql offset value
 func (p *Pagination) Offset() int {
-	return (p.Page - 1) * p.Limit
-}
-
-// PaginationReq holds pagination http fields and tags
-type PaginationReq struct {
-	Limit int `query:"limit"`
-	Page  int `query:"page" validate:"min=0"`
+	return (p.PageNumber - 1) * p.PageSize
 }
