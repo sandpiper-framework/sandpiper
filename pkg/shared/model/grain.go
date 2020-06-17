@@ -75,6 +75,6 @@ func (g *Grain) DisplayFull() string {
 
 // GrainsPaginated adds pagination
 type GrainsPaginated struct {
-	Grains []Grain     `json:"grains"`
+	Grains []Grain     `json:"data"`
 	Paging *Pagination `json:"paging"`
 }

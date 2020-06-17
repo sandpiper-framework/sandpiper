@@ -12,8 +12,8 @@ import (
 
 // Pagination constants
 const (
-	defaultPageSize = 100
-	maxPageSize     = 1000
+	defaultPageSize = 50
+	maxPageSize     = 250
 )
 
 // Pagination holds range response settings

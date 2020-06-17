@@ -18,7 +18,7 @@ import (
 
 /*
 Query Strings:
-	?sort=title,asc&sort=zipcode:desc,city,&filter=lname:Johnson,age:39&include=user
+	?sort=title:asc,zipcode:desc,city,&filter=lname:Johnson,age:39&include=user
 	?page=2&pagesize=20  # limit to define the number of items returned in the response
 */
 

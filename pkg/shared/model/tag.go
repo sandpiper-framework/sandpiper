@@ -59,6 +59,12 @@ func (t *Tag) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
+// TagsPaginated defines the list response
+type TagsPaginated struct {
+	Tags   []Tag       `json:"data"`
+	Paging *Pagination `json:"paging"`
+}
+
 func init() {
 	// Register many to many model so ORM can better recognize m2m relation.
 	// This should be done before dependant models are used.

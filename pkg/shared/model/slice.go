@@ -41,12 +41,6 @@ type Slice struct {
 	Companies       []*Company `json:"companies,omitempty" pg:"many2many:subscriptions"`
 }
 
-// SlicesPaginated adds pagination
-type SlicesPaginated struct {
-	Slices []Slice     `json:"slices"`
-	Paging *Pagination `json:"paging"`
-}
-
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*Slice)(nil)
 var _ orm.BeforeUpdateHook = (*Slice)(nil)
@@ -115,4 +109,10 @@ func (a MetaMap) Equals(b MetaMap) bool {
 		}
 	}
 	return true
+}
+
+// SlicePaginated defines the list response
+type SlicePaginated struct {
+	Slices []Slice     `json:"data"`
+	Paging *Pagination `json:"paging"`
 }

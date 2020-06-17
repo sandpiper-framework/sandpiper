@@ -44,3 +44,9 @@ func (b *Company) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	b.UpdatedAt = time.Now()
 	return ctx, nil
 }
+
+// CompanyPaginated adds pagination
+type CompanyPaginated struct {
+	Companies []Company   `json:"data"`
+	Paging    *Pagination `json:"paging"`
+}

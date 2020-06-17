@@ -43,12 +43,6 @@ func (u *User) UpdateLastLogin(token string) {
 	u.LastLogin = time.Now()
 }
 
-// UsersPaginated adds pagination
-type UsersPaginated struct {
-	Users  []User      `json:"users"`
-	Paging *Pagination `json:"paging"`
-}
-
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*User)(nil)
 var _ orm.BeforeUpdateHook = (*User)(nil)
@@ -65,4 +59,10 @@ func (u *User) BeforeInsert(ctx context.Context) (context.Context, error) {
 func (u *User) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	u.UpdatedAt = time.Now()
 	return ctx, nil
+}
+
+// UsersPaginated defines the list response
+type UsersPaginated struct {
+	Users  []User      `json:"data"`
+	Paging *Pagination `json:"paging"`
 }

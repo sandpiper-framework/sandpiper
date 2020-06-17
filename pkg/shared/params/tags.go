@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// TagQuery is used to store tag query parameters
+// TagQuery is used to store tag query uri parameters
 type TagQuery struct {
 	IsUnion bool
 	TagList []string

@@ -26,15 +26,6 @@ type Subscription struct {
 	Slice       *Slice    `json:"slice,omitempty"`
 }
 
-// SubsPaginated adds pagination
-type SubsPaginated struct {
-	Subs   []Subscription `json:"subs"`
-	Paging *Pagination    `json:"paging"`
-}
-
-// SubsMap allows fast lookups by SubID
-type SubsMap map[uuid.UUID]Subscription
-
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*Subscription)(nil)
 var _ orm.BeforeUpdateHook = (*Subscription)(nil)
@@ -67,15 +58,24 @@ func (b *Subscription) SemiDeepCopy() Subscription {
 	return sub
 }
 
-func init() {
-	// Register many to many model so ORM can better recognize m2m relation.
-	// This should be done before dependant models are used.
-	orm.RegisterTable((*Subscription)(nil))
-}
+// SubsMap allows fast lookups by SubID
+type SubsMap map[uuid.UUID]Subscription
 
 // Load fills a map of subs for fast lookup [sub_id: sub]
 func (m SubsMap) Load(subs []Subscription) {
 	for _, sub := range subs {
 		m[sub.SubID] = sub
 	}
+}
+
+// SubsPaginated adds pagination
+type SubsPaginated struct {
+	Subs   []Subscription `json:"data"`
+	Paging *Pagination    `json:"paging"`
+}
+
+func init() {
+	// Register many to many model so ORM can better recognize m2m relation.
+	// This should be done before dependant models are used.
+	orm.RegisterTable((*Subscription)(nil))
 }

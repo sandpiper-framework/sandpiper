@@ -26,12 +26,6 @@ type Activity struct {
 	Subscription *Subscription `json:"subscription,omitempty"` // has one
 }
 
-// ActivityPaginated adds pagination
-type ActivityPaginated struct {
-	Syncs  []Activity  `json:"activity"`
-	Paging *Pagination `json:"paging"`
-}
-
 // compile-time check variables for model hooks (which take no memory)
 var _ orm.BeforeInsertHook = (*Activity)(nil)
 
@@ -39,4 +33,10 @@ var _ orm.BeforeInsertHook = (*Activity)(nil)
 func (b *Activity) BeforeInsert(ctx context.Context) (context.Context, error) {
 	b.CreatedAt = time.Now()
 	return ctx, nil
+}
+
+// ActivityPaginated defines the list response
+type ActivityPaginated struct {
+	Activity []Activity  `json:"data"`
+	Paging   *Pagination `json:"paging"`
 }

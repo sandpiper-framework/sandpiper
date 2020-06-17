@@ -38,8 +38,8 @@ func (c *Client) SliceByID(sliceID uuid.UUID) (*sandpiper.Slice, error) {
 }
 
 // ListSlices returns a list of all slices
-func (c *Client) ListSlices() (*sandpiper.SlicesPaginated, error) {
-	var results sandpiper.SlicesPaginated
+func (c *Client) ListSlices() (*sandpiper.SlicePaginated, error) {
+	var results sandpiper.SlicePaginated
 
 	// todo: add paging support as an argument
 	req, err := c.newRequest("GET", "/slices", nil)

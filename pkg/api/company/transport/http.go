@@ -76,11 +76,6 @@ func (h *HTTP) create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, result)
 }
 
-type listResponse struct {
-	Companies []sandpiper.Company   `json:"companies"`
-	Paging    *sandpiper.Pagination `json:"paging"`
-}
-
 func (h *HTTP) list(c echo.Context) error {
 	p, err := params.Parse(c)
 	if err != nil {
@@ -90,7 +85,7 @@ func (h *HTTP) list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, listResponse{result, p.Paging})
+	return c.JSON(http.StatusOK, sandpiper.CompanyPaginated{Companies: result, Paging: p.Paging})
 }
 
 func (h *HTTP) view(c echo.Context) error {
