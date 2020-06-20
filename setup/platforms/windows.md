@@ -30,7 +30,7 @@ todo: add more setup instructions here...
 
 (4) **Install Scoop (package manager)**
 
-This is an optional step. We use this package manager to install `task` (and 7zip, nodejs and yarn on new machines). But you could simply download the correct Task binary from the project's [release page](https://github.com/go-task/task/releases) and add to your PATH. If you take that approach, skip this step and the next one.
+Scoop provides an easy way to install `task`. You could also just download the correct Task binary from its [release page](https://github.com/go-task/task/releases) and add to your PATH. If you take that approach, skip this step and the next one. (Scoop can also be used to install other common utilities like 7zip, nodejs and yarn.)
 
 To install Scoop, open a [PowerShell](https://docs.microsoft.com/en-us/powershell/) window and execute:
 
@@ -65,9 +65,15 @@ PS> task build
 
 (8) **Create and Initialize database**
 
+Follow the instructions found with the `sandpiper` CLI utility. The command is `sandpiper init` which is also included as a `task` command (as shown below).
+
 ```
 PS> task init
+```
+Copy the server and command config files for default use (so you won't need a runtime parameter to select the correct file).
+```
 PS> copy cmd/cli/api-primary.yaml cmd/api/api-config.yaml
+PS> copy cmd/cli/cli-primary.yaml cmd/api/cli-config.yaml
 ```
 
 (9) **Test Server**

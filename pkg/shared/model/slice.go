@@ -111,8 +111,8 @@ func (a MetaMap) Equals(b MetaMap) bool {
 	return true
 }
 
-// SlicePaginated defines the list response
-type SlicePaginated struct {
+// SlicesPaginated defines the list response
+type SlicesPaginated struct {
 	Slices []Slice     `json:"data"`
 	Paging *Pagination `json:"paging"`
 }

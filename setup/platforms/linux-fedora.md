@@ -97,10 +97,19 @@ $ go mod download
 $ task build
 ```
 (11) **Create and Initialize Database**
+
+Follow the instructions found with the `sandpiper` CLI utility. The command is `sandpiper init` which is also included as a `task` command (as shown below).
+
 ```
 $ task init
-$ mv cmd/cli/api-primary.yaml cmd/api/config.yaml
 ```
+Rename the server and command config files for default use (so you won't need a runtime parameter to select the correct file).
+
+```
+$ mv cmd/cli/api-primary.yaml cmd/api/api-config.yaml
+$ mv cmd/cli/cli-primary.yaml cmd/cli/cli-config.yaml
+```
+
 (12) **Test Server**
 ```
 $ task server

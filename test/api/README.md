@@ -59,7 +59,7 @@ Database: "sandpiper"
 DB Version: 1.15 (migrated from 0.00 to 1.15)
 ```
 
-The recommended database name is `sandpiper` regardless of the server-role you require (primary or secondary). If you need both server-roles, you can name it anything you like ("secondary", "receiver", "tidepool", etc.).
+The recommended database name is `sandpiper` regardless of the server-role you require (primary or secondary). If you need both server-roles, you can name the second database anything you like ("secondary", "receiver", "tidepool", etc.).
 
 In the example above, we used default values except when required to enter a password for the database owner (please select a strong password of your own) and again, keep a record of it for later. You will need it when starting the server.
 
@@ -97,7 +97,7 @@ You will then be prompted for the company information for the secondary database
 
 ```
 Company Name: eCatCompany
-Server-Role (primary*/secondary): secondary'
+Server-Role (primary*/secondary): secondary
 Server http URL (http://localhost):
 Added Company "eCatCompany"
 
@@ -163,7 +163,7 @@ Server ID: 10000000-0000-0000-0000-000000000000
 
 ⇨ http server started on [::]:8080
 ```
-That last line shows that a web server is running and listening on [http://localhost:8080](http://localhost:8080). You should be able to open a browser and type that address and receive a response of:
+That last line shows that a web server is running and listening on [http://localhost:8080/check](http://localhost:8080/check). You should be able to open a browser and type that address and receive a response of:
 
 ```
 "Sandpiper API OK"
@@ -190,7 +190,7 @@ Assuming you didn't change anything when running the `sandpiper init` command, t
 }
 ```
 
-That token has now been saved in our `jwt` variable, and we can use it to make authenticated requests (as admin). The user information is actually encrypted in the token itself so that the server knows who is making those requests.
+That token has now been saved in our Insomnia `jwt` variable, and we can use it to make authenticated requests (as admin). The user information is actually encrypted in the token itself so that the server knows who is making those requests.
 
 If you look at the console where you're running the server, you will also notice that there is lots of information displayed whenever a request is made. There's a setting in the config file to supress some of these messages, but for now it can be helpful while testing to keep it.
 

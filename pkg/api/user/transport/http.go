@@ -29,7 +29,7 @@ func NewHTTP(svc user.Service, er *echo.Group) {
 	er.POST("/apikey", h.createAPIKey)
 	ur := er.Group("/users")
 	ur.POST("", h.create)
-	ur.GET("", h.list) // todo: .../users?$sort="last_name ASC"&$filter="active":false
+	ur.GET("", h.list)
 	ur.GET("/:id", h.view)
 	ur.PATCH("/:id", h.update) // only update supplied fields
 	ur.DELETE("/:id", h.delete)
@@ -93,6 +93,7 @@ func (h *HTTP) list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	result, err := h.svc.List(c, p)
 	if err != nil {
 		return err

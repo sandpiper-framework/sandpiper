@@ -142,7 +142,7 @@ func (h *HTTP) list(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, sandpiper.SlicePaginated{Slices: result, Paging: p.Paging})
+	return c.JSON(http.StatusOK, sandpiper.SlicesPaginated{Slices: result, Paging: p.Paging})
 }
 
 func (h *HTTP) metadata(c echo.Context) error {

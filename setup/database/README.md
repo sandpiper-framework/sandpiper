@@ -6,7 +6,7 @@ Sandpiper requires a PostgreSQL sever. Please see the appropriate setup document
 
 # Creating Primary or Secondary Database
 
-The `sandpiper init` command should be used to create a new primary or secondary database. This process will also initialize the database (admin user, etc.) and create configuration files for the server and sandpiper command line program to use.
+The `sandpiper init` command should be used to create a new primary or secondary database, build the tables and initialize the database (with admin user, etc.). It will also create configuration files for the server and sandpiper command line program to use.
 
 # Database Migrations
 

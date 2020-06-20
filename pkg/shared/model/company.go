@@ -45,8 +45,8 @@ func (b *Company) BeforeUpdate(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-// CompanyPaginated adds pagination
-type CompanyPaginated struct {
+// CompaniesPaginated adds pagination
+type CompaniesPaginated struct {
 	Companies []Company   `json:"data"`
 	Paging    *Pagination `json:"paging"`
 }

@@ -85,7 +85,7 @@ func (h *HTTP) list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, sandpiper.CompanyPaginated{Companies: result, Paging: p.Paging})
+	return c.JSON(http.StatusOK, sandpiper.CompaniesPaginated{Companies: result, Paging: p.Paging})
 }
 
 func (h *HTTP) view(c echo.Context) error {

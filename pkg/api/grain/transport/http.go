@@ -4,7 +4,7 @@
 
 package transport
 
-// grain routing
+// routing of grain resources
 
 import (
 	"net/http"
@@ -119,6 +119,7 @@ func (h *HTTP) listBySlice(c echo.Context) error {
 		includePayload = true
 	}
 
+	// get any additional list-based url options (sort, filter, etc)
 	p, err := params.Parse(c)
 	if err != nil {
 		return err

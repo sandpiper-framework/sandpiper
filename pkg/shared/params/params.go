@@ -60,7 +60,7 @@ func Parse(c echo.Context) (*Params, error) {
 	return p, nil
 }
 
-// AddSort includes zero or more order clauses to an existing query
+// AddSort includes zero or more "order by" clauses to an existing query
 // a missing direction implies ascending (asc)
 // e.g. ?sort=title:asc,lname:desc
 func (p *Params) AddSort(q *orm.Query, defaultSort string) {
@@ -80,7 +80,7 @@ func (p *Params) AddSort(q *orm.Query, defaultSort string) {
 	}
 }
 
-// AddFilter includes zero or more where clauses to an existing query
+// AddFilter includes zero or more "where" clauses to an existing query
 // Conditions are field:value and only support equivalence (=) (for now)
 // All conditions within a filter (and across filters) are ANDed together (for now)
 // All comparison values are strings (which works because of postgresql's "automatically coerced" literals,
