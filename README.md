@@ -43,13 +43,12 @@ Two sample config files are provided (`api-config-sample.yaml` and `cli-config-s
 Before we can do anything, we need to create a sandpiper database within the PostgreSQL server. A simple command line tool is provided to take care of this for you. Open a command prompt (terminal) and enter the following commands (assuming you are currently in the root sandpiper folder).
 
 ```
-cd cmd/cli
 ./sandpiper init
 ```
 You will be prompted for your PostgreSQL Host Address, Port and Superuser credentials. This is required to create a new database. In most cases, you can simply press Enter to accept the default value (shown in parentheses).
 
 ```
-PS C:\Users\dougw\autocare\sandpiper\cmd\cli> ./sandpiper init
+PS C:\sandpiper> ./sandpiper init
 sandpiper (v0.1.2-67-g5facfce)
 Copyright 2020 The Sandpiper Authors. All rights reserved.
 
@@ -317,7 +316,7 @@ The Sandpiper logo and mascot images are Copyright 2020 [Megan Winsby](https://w
 9. [zxcvbn-go](https://github.com/nbutton23/zxcvbn-go) - Password strength checker
 10. [DockerTest](https://github.com/fortytw2/dockertest) - Testing database queries (might need to change this lib choice)
 11. [Testify/Assert](https://github.com/stretchr/testify) - Asserting test results
-12. [go-bindata](https://github.com/go-bindata/go-bindata) - Turn data file into go code (for migrations)
+12. [go-rice](https://github.com/GeertJohan/go.rice) - Turn data file into go code (for static html)
 13. [uuid](https://github.com/google/uuid) - Google's library to generate and manipulate uuid values
 14. [cli](https://github.com/urfave/cli) - Command line argument processing
 

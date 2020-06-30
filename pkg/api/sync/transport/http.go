@@ -8,12 +8,13 @@ package transport
 
 // Some functionality intentionally duplicates other services because we plan on
 // changing this service to use websockets eventually and it will be easier if
-// isolated now.
+// isolated now. We also don't want pagination of these resources.
 
 import (
+	"net/http"
+
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"net/http"
 
 	"github.com/sandpiper-framework/sandpiper/pkg/api/sync"
 )
@@ -35,7 +36,7 @@ func NewHTTP(svc sync.Service, er *echo.Group) {
 	sr := er.Group("/sync")
 	sr.POST("/:compid", h.start)   // for secondary servers only
 	sr.GET("", h.process)          // for primary servers only
-	sr.GET("/subs", h.subs)        // subscriptions for requesting user
+	sr.GET("/subs", h.subs)        // get my subscriptions
 	sr.GET("/slice/:id", h.grains) // ?brief=yes|no
 }
 

@@ -14,7 +14,7 @@ import (
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
-// convert url query params to sql clauses for filtering, ordering, paging and related model inclusion
+// convert url query params to struct for sql filtering, ordering, paging and related model inclusion
 
 /*
 Query Strings:

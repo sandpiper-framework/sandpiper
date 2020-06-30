@@ -46,33 +46,6 @@ func (c *Client) AllSubs() ([]sandpiper.Subscription, error) {
 	return results, err
 }
 
-// SubsByCompany returns a list of slices for supplied company_id
-func (c *Client) SubsByCompany(companyID uuid.UUID) ([]sandpiper.Subscription, error) {
-	var results []sandpiper.Subscription
-
-	// todo: add paging support (looping to retrieve everything)
-	path := fmt.Sprintf("/companies/%s/subs", companyID)
-	req, err := c.newRequest("GET", path, nil)
-	if err != nil {
-		return nil, err
-	}
-	_, err = c.do(req, &results)
-	return results, err
-}
-
-// SubByName returns the subscription matching the supplied name
-func (c *Client) SubByName(name string) (*sandpiper.Subscription, error) {
-	sub := new(sandpiper.Subscription)
-
-	path := fmt.Sprintf("/subs/name/%s", name)
-	req, err := c.newRequest("GET", path, nil)
-	if err != nil {
-		return nil, err
-	}
-	_, err = c.do(req, sub)
-	return sub, err
-}
-
 // GrainIDs returns grain-ids for a slice
 func (c *Client) GrainIDs(sliceID uuid.UUID) ([]sandpiper.Grain, error) {
 	var results []sandpiper.Grain

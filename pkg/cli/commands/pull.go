@@ -182,5 +182,6 @@ func saveGrainToFile(basePath string, slice *sandpiper.Slice, grain *sandpiper.G
 		return err
 	}
 
+	// flush io buffers to disk
 	return f.Sync()
 }

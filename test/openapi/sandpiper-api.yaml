@@ -312,11 +312,11 @@ components:
       description: AccessRole represents access role type
       type: integer
       format: int64
-      x-go-package: autocare.org/sandpiper/pkg/model
+      x-go-package: sandpiper/pkg/model
     HTTP:
       description: HTTP represents password http transport service
       type: object
-      x-go-package: autocare.org/sandpiper/pkg/api/password/transport
+      x-go-package: sandpiper/pkg/api/password/transport
     Role:
       description: Role model
       type: object
@@ -328,7 +328,7 @@ components:
         name:
           type: string
           x-go-name: Name
-      x-go-package: autocare.org/sandpiper/pkg/model
+      x-go-package: sandpiper/pkg/model
     AuthToken:
       description: a JWT response
       type: object
@@ -348,7 +348,7 @@ components:
         username:
           type: string
           x-go-name: Username
-      x-go-package: autocare.org/sandpiper/pkg/api/auth/transport    
+      x-go-package: sandpiper/pkg/api/auth/transport    
     Error:
       type: object
       properties:
@@ -392,7 +392,7 @@ components:
           type: string
           x-go-name: OldPassword
       x-go-name: changeReq
-      x-go-package: autocare.org/sandpiper/pkg/api/password/transport
+      x-go-package: sandpiper/pkg/api/password/transport
     userCreate:
       description: User create request
       type: object
@@ -410,10 +410,6 @@ components:
         last_name:
           type: string
           x-go-name: LastName
-        location_id:
-          type: integer
-          format: int64
-          x-go-name: LocationID
         password:
           type: string
           x-go-name: Password
@@ -426,7 +422,7 @@ components:
           type: string
           x-go-name: Username
       x-go-name: createReq
-      x-go-package: autocare.org/sandpiper/pkg/api/user/transport
+      x-go-package: sandpiper/pkg/api/user/transport
     userUpdate:
       description: User update request
       type: object
@@ -447,7 +443,7 @@ components:
           type: string
           x-go-name: Phone
       x-go-name: updateReq
-      x-go-package: autocare.org/sandpiper/pkg/api/user/transport
+      x-go-package: sandpiper/pkg/api/user/transport
     User:
       description: User represents user domain model
       type: object
@@ -510,7 +506,7 @@ components:
         username:
           type: string
           x-go-name: Username
-      x-go-package: autocare.org/sandpiper/pkg/model
+      x-go-package: sandpiper/pkg/model
   responses:
     ok:
       description: Success response
@@ -576,15 +572,15 @@ components:
           schema:
             type: object
             properties:
-              page:
-                type: integer
-                format: int64
-                x-go-name: Page
-              users:
+              data:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
                 x-go-name: Users
+              page:
+                type: integer
+                format: int64
+                x-go-name: Page
     userResp:
       description: User model response
       content:

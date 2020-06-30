@@ -9,12 +9,12 @@ package command
 
 import (
 	"fmt"
-	"github.com/sandpiper-framework/sandpiper/pkg/shared/client"
 	"net/url"
 
 	"github.com/google/uuid"
 	args "github.com/urfave/cli/v2"
 
+	"github.com/sandpiper-framework/sandpiper/pkg/shared/client"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/model"
 )
 
@@ -56,27 +56,28 @@ func List(c *args.Context) error {
 				printSliceBrief(slice)
 			}
 		}
-	} else {
-		if p.sliceID == uuid.Nil {
-			// use provided slice-name to get the slice-id
-			slice, err = api.SliceByName(p.slice)
-			if err != nil {
-				return err
-			}
-			p.sliceID = slice.ID
-		}
-		// return a list of paginated grains for the slice-id
-		// todo: add pagination logic
-		result, err := api.ListGrains(p.sliceID, p.full)
+		return nil
+	}
+
+	if p.sliceID == uuid.Nil {
+		// use provided slice-name to get the slice-id
+		slice, err = api.SliceByName(p.slice)
 		if err != nil {
 			return err
 		}
-		for _, grain := range result.Grains {
-			if p.full {
-				printGrainFull(&grain)
-			} else {
-				printGrainBrief(&grain)
-			}
+		p.sliceID = slice.ID
+	}
+	// return a list of paginated grains for the slice-id
+	// todo: add pagination logic
+	result, err := api.ListGrains(p.sliceID, p.full)
+	if err != nil {
+		return err
+	}
+	for _, grain := range result.Grains {
+		if p.full {
+			printGrainFull(&grain)
+		} else {
+			printGrainBrief(&grain)
 		}
 	}
 	return nil

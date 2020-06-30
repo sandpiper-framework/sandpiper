@@ -25,7 +25,7 @@ type User struct {
 	LastLogin       time.Time   `json:"last_login,omitempty"`
 	PasswordChanged time.Time   `json:"password_changed,omitempty"`
 	Token           string      `json:"-"`
-	Role            AccessLevel `json:"role,omitempty"`
+	Role            AccessLevel `json:"role"`
 	CompanyID       uuid.UUID   `json:"company_id"` // belongs-to company
 	CreatedAt       time.Time   `json:"created_at"`
 	UpdatedAt       time.Time   `json:"updated_at"`

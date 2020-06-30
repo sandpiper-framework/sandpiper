@@ -226,14 +226,14 @@ func (s *Sync) syncSlice(primaryID, subID uuid.UUID, localSlice, remoteSlice *sa
 	return err
 }
 
-// slicesMatch checks if slice has chanced and so needs to be updated
+// slicesMatch checks if a slice has changed and so needs to be updated
 func slicesMatch(remoteSlice, localSlice *sandpiper.Slice) bool {
 	// we can safely use the previous hash saved for comparison because we performed a deep
 	// check of our own content when completing the previous sync
 	return remoteSlice.ContentHash == localSlice.ContentHash
 }
 
-// compareSlices returns adds and deletes necessary to make the secondary match primary
+// compareSlices returns adds/deletes necessary to make the secondary match primary
 func compareSlices(primary, secondary []sandpiper.Grain) (adds []uuid.UUID, dels []uuid.UUID) {
 	// load primary grain ids into a set (marked as not matched)
 	p := make(map[uuid.UUID]bool)

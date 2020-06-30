@@ -181,7 +181,7 @@ func (s *Slice) ViewByName(db orm.DB, companyID uuid.UUID, name string) (*sandpi
 func (s *Slice) List(db orm.DB, p *params.Params, tags *params.TagQuery, sc *sandpiper.Scope) ([]sandpiper.Slice, error) {
 	var slices sliceList
 
-	// filter function adds optional condition to "Companies" relationship
+	// filter function adds optional scoping to "Companies" relationship
 	var filterFn = func(q *orm.Query) (*orm.Query, error) {
 		if sc != nil {
 			return q.Where(sc.Condition, sc.ID), nil

@@ -70,8 +70,7 @@ func (s Slice) Validate() bool {
 		"pies-items",
 		"pies-marketcopy",
 		"pies-pricesheet",
-		"partspro-file",
-		"partspro-items":
+		"partspro-file":
 		return true
 	}
 	return false

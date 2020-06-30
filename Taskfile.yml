@@ -12,7 +12,7 @@ vars:
 
 tasks:
   create-db:
-    desc: Create the database(s) from default postgresql installation using "psql" (*obsoleted* by `sandpiper init`)
+    desc: Create database(s) using "psql" (*obsoleted* by `sandpiper init`)
     dir: pkg/api/migrations
     cmds:
       - "{{.PSQLCMD}}"
@@ -21,7 +21,7 @@ tasks:
         '{{if eq OS "linux"}}sudo -u postgres {{end}}psql --username=postgres --file=db_create.sql --quiet'
 
   init:
-    desc: Create the PostgreSQL database and initialize it
+    desc: Create the database, perform migrations and seed required values
     dir: cmd/cli
     cmds:
       - ./sandpiper init
@@ -70,6 +70,13 @@ tasks:
   build:
     desc: Build all sandpiper executables
     deps: [build-api, build-cli]
+
+  schema:
+    desc: Display database schema migrations
+    dir: cmd/cli
+    cmds:
+      - ./sandpiper schema
+    silent: true
 
   test:
     desc: Run test suite (having trouble with dockertesting under Windows!)
