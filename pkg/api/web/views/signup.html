@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Request Sandpiper Access ({{.company}})</title>
+    <link rel="icon" type="image/png" href="/static/img/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/static/img/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <div class="register-page">
+    <a href="https://sandpiperframework.org"><img src="/static/img/logo.svg" alt="logo" class="logo"/></a>
+    <div class="form">
+      <form class="login-form" method="POST">
+        <input type="text" name="name" placeholder="name" />
+        <input type="text" name="email" placeholder="email" />
+        <input type="text" name="company" placeholder="company" />
+        <input type="text" name="serverid" placeholder="sandpiper server id" />
+        <select id="kind" name="kind">
+          <option value="1">Distributor</option>
+          <option value="2">Retailer</option>
+          <option value="3">Electronic Catalog</option>
+          <option value="4">Other</option>
+        </select>
+        <button type="submit">register</button>
+        <p class="message"><a href="{{.terms}}">Terms & Conditions</a></p>
+      </form>
+    </div>
+  </div>
+</html>

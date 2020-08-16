@@ -142,11 +142,11 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS "settings" (
-  "id" bool PRIMARY KEY DEFAULT TRUE, /* only allow one row */
+  "id"          bool PRIMARY KEY DEFAULT TRUE, /* only allow one row */
   "server_role" server_role_enum,
-  "server_id" uuid REFERENCES "companies" ("id") ON DELETE RESTRICT,
-  "created_at"       timestamp,
-  "updated_at"       timestamp,
+  "server_id"   uuid REFERENCES "companies" ("id") ON DELETE RESTRICT,
+  "created_at"  timestamp,
+  "updated_at"  timestamp,
   CONSTRAINT "settings_singleton" CHECK (id) /* only TRUE allowed */
 );
 

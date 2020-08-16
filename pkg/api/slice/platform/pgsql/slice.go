@@ -197,18 +197,17 @@ func (s *Slice) List(db orm.DB, p *params.Params, tags *params.TagQuery, sc *san
 
 	// create new Slices limited to TagQuery (if one was provided)
 	if tags.Provided() {
-		filtered, err := slices.FilterByTags(db, tags)
+		slices, err = slices.FilterByTags(db, tags)
 		if err != nil {
 			return nil, err
 		}
-		slices = filtered
 	}
 
 	if len(slices) == 0 {
 		return slices, nil
 	}
 
-	// perform our own pagination
+	// perform our own pagination (rather than with sql)
 	offset := p.Paging.Offset() - 1
 	if offset >= 0 {
 		slices = slices[offset : offset+p.Paging.PageSize]

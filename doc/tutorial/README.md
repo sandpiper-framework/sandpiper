@@ -1,6 +1,6 @@
 # Testing Handbook
 
-This handbook walks you through the testing process. The goal is to set up two servers (publisher and receiver), add a subscription and data file to the publisher and have it sync up with the receiver.
+This handbook walks through the testing process. The goal is to set up two servers (publisher and receiver), add a subscription and data file to the publisher and have it sync up with the receiver.
 
 Note that all directory paths are shown in Linux format (forward slash) since they also work in Windows PowerShell. Also, paths are shown relative to the installation directory.
 

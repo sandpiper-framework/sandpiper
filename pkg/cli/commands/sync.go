@@ -30,7 +30,7 @@ func newSyncCmd(c *args.Context) (*syncCmd, error) {
 	if err != nil {
 		return nil, err
 	}
-	// make sure we allow at least one concurrent sync process
+	// at least one concurrent sync process
 	if p.maxSyncProcs <= 0 {
 		p.maxSyncProcs = 1
 	}
@@ -43,10 +43,8 @@ func newSyncCmd(c *args.Context) (*syncCmd, error) {
 }
 
 // getServers returns list of servers to sync with
-func (cmd *syncCmd) getServers() (serverList, error) {
-	var srvs serverList
-	var err error
-
+func (cmd *syncCmd) getServers() (srvs serverList, err error) {
+	// lookup is based on command options
 	switch {
 	case cmd.partner == "":
 		// retrieve all syncable servers

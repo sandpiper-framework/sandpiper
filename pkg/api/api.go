@@ -7,7 +7,7 @@
 package api
 
 import (
-	"github.com/sandpiper-framework/sandpiper/pkg/api/static"
+	"github.com/sandpiper-framework/sandpiper/pkg/api/web"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/config"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/database"
 	"github.com/sandpiper-framework/sandpiper/pkg/shared/middleware/jwt"
@@ -50,8 +50,8 @@ func Start(cfg *config.Configuration) error {
 	// setup echo server (singleton)
 	srv := server.New()
 
-	// routing for static files (sign-up screen)
-	static.FileServer(srv)
+	// routing for static files and templates (sign-up screen)
+	web.FileServer(srv)
 
 	// create version group using token authentication middleware
 	v1 := srv.Group("/v1")

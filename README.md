@@ -317,8 +317,9 @@ The Sandpiper logo and mascot images are Copyright 2020 [Megan Winsby](https://w
 10. [DockerTest](https://github.com/fortytw2/dockertest) - Testing database queries (might need to change this lib choice)
 11. [Testify/Assert](https://github.com/stretchr/testify) - Asserting test results
 12. [go-rice](https://github.com/GeertJohan/go.rice) - Turn data file into go code (for static html)
-13. [uuid](https://github.com/google/uuid) - Google's library to generate and manipulate uuid values
-14. [cli](https://github.com/urfave/cli) - Command line argument processing
+13. [goview](https://github.com/foolin/goview) - html template extensions on html/template 
+14. [uuid](https://github.com/google/uuid) - Google's library to generate and manipulate uuid values
+15. [cli](https://github.com/urfave/cli) - Command line argument processing
 
 Efforts were made to abstract and localize these dependencies.
 
