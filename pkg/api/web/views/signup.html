@@ -12,10 +12,10 @@
     <a href="https://sandpiperframework.org"><img src="/static/img/logo.svg" alt="logo" class="logo"/></a>
     <div class="form">
       <form class="login-form" method="POST">
-        <input type="text" name="name" placeholder="name" />
-        <input type="text" name="email" placeholder="email" />
-        <input type="text" name="company" placeholder="company" />
-        <input type="text" name="serverid" placeholder="sandpiper server id" />
+        <input type="text" name="name" placeholder="name" required />
+        <input type="text" name="email" placeholder="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Invalid email address" />
+        <input type="text" name="company" placeholder="company" required />
+        <input type="text" name="serverid" placeholder="sandpiper server id" required pattern="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" title="Invalid uuid format (8-4-4-4-12)" />
         <select id="kind" name="kind">
           <option value="1">Distributor</option>
           <option value="2">Retailer</option>

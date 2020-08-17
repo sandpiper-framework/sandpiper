@@ -2,7 +2,7 @@
 // This file is licensed under the Artistic License 2.0.
 // License text can be found in the project's LICENSE file.
 
-// Package web manages server-side rendering including signup and login
+// Package web manages server-side rendering including signup, login and downloads
 package web
 
 import (
@@ -14,44 +14,75 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type signupValues struct {
-	Name string
-	Email string
-	Company string
-	SandpiperID string
-	Kind string
-}
-
 // FileServer serves static files and templates from embedded files in `rice-box.go`
 func FileServer(srv *echo.Echo) {
-	// static files file server
-	box := rice.MustFindBox("static")
-	static := http.StripPrefix("/static/", http.FileServer(box.HTTPBox()))
-
 	// set view engine (for templates)
 	views := gorice.New(rice.MustFindBox("views"))
 	srv.Renderer = echoview.Wrap(views)
 
-	// routes
-	srv.GET("/", login)
-	srv.GET("/signup", signup)
+	// handle all static assets
+	box := rice.MustFindBox("static")
+	static := http.StripPrefix("/static/", http.FileServer(box.HTTPBox()))
 	srv.GET("/static/*", echo.WrapHandler(static))
+
+	// login page
+	srv.GET("/", login)
+	srv.POST("/", login)
+
+	// signup page
+	srv.GET("/signup", signup)
+	srv.POST("/signup", signup)
+
+	// todo: download page
+	// srv.GET("/download", download)
+	// srv.POST("/download", download)
 }
 
 func login(c echo.Context) error {
-	// full name with extension to render just the file
-	vars := echo.Map{	// todo: replace this with config data
-		"company": "Better Brakes",
-		"terms": "http://betterbrakes.com/terms",
+	type loginValues struct {
+		Email    string
+		Password string
 	}
-	return c.Render(http.StatusOK, "login.html", vars)
+	// GET
+	if c.Request().Method == http.MethodGet {
+		vars := echo.Map{ // todo: replace this with config data
+			"company": "Better Brakes",
+			"terms":   "http://betterbrakes.com/terms",
+		}
+		return c.Render(http.StatusOK, "login.html", vars)
+	}
+	// POST
+	result := new(loginValues)
+	if err := c.Bind(result); err != nil {
+		return err
+	}
+	// todo: authenticate with loginValues, then save jwt and redirect to download.
+	return c.JSON(http.StatusOK, result)
 }
 
 func signup(c echo.Context) error {
-	// full name with extension to render just the file
-	vars := echo.Map{	// todo: replace this with config data
-		"company": "Better Brakes",
-		"terms": "http://betterbrakes.com/terms",
+	type signupValues struct {
+		Name     string
+		Email    string
+		Company  string
+		ServerID string
+		Kind     string
 	}
-	return c.Render(http.StatusOK, "signup.html", vars)
+	// GET
+	if c.Request().Method == http.MethodGet {
+		// render signup page
+		vars := echo.Map{ // todo: replace this with config data
+			"company": "Better Brakes",
+			"terms":   "http://betterbrakes.com/terms",
+		}
+		return c.Render(http.StatusOK, "signup.html", vars)
+	}
+	// POST
+	result := new(signupValues)
+	if err := c.Bind(result); err != nil {
+		return err
+	}
+	// todo: do something with signupValues, then display a thank you page.
+	// todo: the thank you can be a conditional block on the signup.html page
+	return c.JSON(http.StatusOK, result)
 }

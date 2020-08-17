@@ -48,3 +48,6 @@ application:
   # 4 # very unguessable: strong protection from offline slow-hash scenario. (guesses >= 10^10)
   min_password_strength: 1  # 0,1,2,3,4
   service_logging: true
+  company: Better Brakes
+  termsurl: https://betterbrakes/terms
+

@@ -39,6 +39,5 @@ require (
 	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
 	golang.org/x/sys v0.0.0-20200812155832-6a926be9bd1d // indirect
 	golang.org/x/text v0.3.3 // indirect
-	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/yaml.v2 v2.2.8
 )

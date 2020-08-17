@@ -10,78 +10,24 @@ func init() {
 
 	// define files
 	file3 := &embedded.EmbeddedFile{
-		Filename:    "login.html",
-		FileModTime: time.Unix(1597608065, 0),
-
-		Content: string("<!doctype html>\r\n<html lang=\"en\">\r\n  <head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n    <title>Request Sandpiper Access ({{.company}})</title>\r\n    <link rel=\"icon\" type=\"image/png\" href=\"/static/img/favicon-32x32.png\" sizes=\"32x32\" />\r\n    <link rel=\"icon\" type=\"image/png\" href=\"/static/img/favicon-16x16.png\" sizes=\"16x16\" />\r\n    <link rel=\"stylesheet\" href=\"/static/css/style.css\" />\r\n  </head>\r\n  <div class=\"register-page\">\r\n    <a href=\"https://sandpiperframework.org\"><img src=\"/static/img/logo.svg\" alt=\"logo\" class=\"logo\"/></a>\r\n    <div class=\"form\">\r\n      <form class=\"login-form\" method=\"POST\">\r\n        <input type=\"text\" name=\"email\" placeholder=\"email\" />\r\n        <input type=\"text\" name=\"password\" placeholder=\"password\" />\r\n        <button type=\"submit\">login</button>\r\n        <p class=\"message\">New User? <a href=\"signup\">Request Access</a></p>\r\n      </form>\r\n    </div>\r\n  </div>\r\n</html>\r\n"),
-	}
-	file4 := &embedded.EmbeddedFile{
-		Filename:    "signup.html",
-		FileModTime: time.Unix(1597608126, 0),
-
-		Content: string("<!DOCTYPE html>\r\n<html lang=\"en\">\r\n  <head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n    <title>Request Sandpiper Access ({{.company}})</title>\r\n    <link rel=\"icon\" type=\"image/png\" href=\"/static/img/favicon-32x32.png\" sizes=\"32x32\" />\r\n    <link rel=\"icon\" type=\"image/png\" href=\"/static/img/favicon-16x16.png\" sizes=\"16x16\" />\r\n    <link rel=\"stylesheet\" href=\"/static/css/style.css\" />\r\n  </head>\r\n  <div class=\"register-page\">\r\n    <a href=\"https://sandpiperframework.org\"><img src=\"/static/img/logo.svg\" alt=\"logo\" class=\"logo\"/></a>\r\n    <div class=\"form\">\r\n      <form class=\"login-form\" method=\"POST\">\r\n        <input type=\"text\" name=\"name\" placeholder=\"name\" />\r\n        <input type=\"text\" name=\"email\" placeholder=\"email\" />\r\n        <input type=\"text\" name=\"company\" placeholder=\"company\" />\r\n        <input type=\"text\" name=\"serverid\" placeholder=\"sandpiper server id\" />\r\n        <select id=\"kind\" name=\"kind\">\r\n          <option value=\"1\">Distributor</option>\r\n          <option value=\"2\">Retailer</option>\r\n          <option value=\"3\">Electronic Catalog</option>\r\n          <option value=\"4\">Other</option>\r\n        </select>\r\n        <button type=\"submit\">register</button>\r\n        <p class=\"message\"><a href=\"{{.terms}}\">Terms & Conditions</a></p>\r\n      </form>\r\n    </div>\r\n  </div>\r\n</html>\r\n"),
-	}
-
-	// define dirs
-	dir1 := &embedded.EmbeddedDir{
-		Filename:   "",
-		DirModTime: time.Unix(1597608126, 0),
-		ChildFiles: []*embedded.EmbeddedFile{
-			file3, // "login.html"
-			file4, // "signup.html"
-
-		},
-	}
-	dir2 := &embedded.EmbeddedDir{
-		Filename:   "layouts",
-		DirModTime: time.Unix(1597596962, 0),
-		ChildFiles: []*embedded.EmbeddedFile{},
-	}
-
-	// link ChildDirs
-	dir1.ChildDirs = []*embedded.EmbeddedDir{
-		dir2, // "layouts"
-
-	}
-	dir2.ChildDirs = []*embedded.EmbeddedDir{}
-
-	// register embeddedBox
-	embedded.RegisterEmbeddedBox(`views`, &embedded.EmbeddedBox{
-		Name: `views`,
-		Time: time.Unix(1597608126, 0),
-		Dirs: map[string]*embedded.EmbeddedDir{
-			"":        dir1,
-			"layouts": dir2,
-		},
-		Files: map[string]*embedded.EmbeddedFile{
-			"login.html":  file3,
-			"signup.html": file4,
-		},
-	})
-}
-
-func init() {
-
-	// define files
-	file7 := &embedded.EmbeddedFile{
 		Filename:    "css/style.css",
 		FileModTime: time.Unix(1591641234, 0),
 
 		Content: string("@import url(https://fonts.googleapis.com/css?family=Roboto:300);\r\n\r\n.register-page {\r\n  width: 360px;\r\n  padding: 8% 0 0;\r\n  margin: auto;\r\n}\r\n.form {\r\n  position: relative;\r\n  z-index: 1;\r\n  background: #FFFFFF;\r\n  max-width: 360px;\r\n  margin: 0 auto 100px;\r\n  padding: 45px 45px 25px 45px;\r\n  text-align: center;\r\n  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);\r\n}\r\n.form input, select {\r\n  font-family: \"Roboto\", sans-serif;\r\n  outline: 0;\r\n  background: #f2f2f2;\r\n  width: 100%;\r\n  border: 0;\r\n  margin: 0 0 15px;\r\n  padding: 15px;\r\n  box-sizing: border-box;\r\n  font-size: 14px;\r\n}\r\n.form button {\r\n  font-family: \"Roboto\", sans-serif;\r\n  font-weight: bold;\r\n  font-size: 14px;\r\n  color: #FFFFFF;\r\n  background: rgb(61, 72, 122);\r\n  text-transform: uppercase;\r\n  outline: 0;\r\n  width: 100%;\r\n  border: 0;\r\n  padding: 15px;\r\n  cursor: pointer;\r\n}\r\n.form button:hover,.form button:active,.form button:focus {\r\n  background: #43A047;\r\n}\r\n.form .message {\r\n  margin: 15px 0 0;\r\n  color: #b3b3b3;\r\n  font-size: 12px;\r\n}\r\n.form .message a {\r\n  color: #b3b3b3;\r\n  text-decoration: none;\r\n}\r\n.container {\r\n  position: relative;\r\n  z-index: 1;\r\n  max-width: 300px;\r\n  margin: 0 auto;\r\n}\r\n.container:before, .container:after {\r\n  content: \"\";\r\n  display: block;\r\n  clear: both;\r\n}\r\n.container .info {\r\n  margin: 50px auto;\r\n  text-align: center;\r\n}\r\n.container .info h1 {\r\n  margin: 0 0 15px;\r\n  padding: 0;\r\n  font-size: 36px;\r\n  font-weight: 300;\r\n  color: #1a1a1a;\r\n}\r\n.container .info span {\r\n  color: #4d4d4d;\r\n  font-size: 12px;\r\n}\r\n.container .info span a {\r\n  color: #000000;\r\n  text-decoration: none;\r\n}\r\n.container .info span .fa {\r\n  color: #EF3B3A;\r\n}\r\nbody {\r\n  background: rgb(58, 78, 168); /* fallback for old browsers */\r\n  background: -webkit-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: -moz-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: -o-linear-gradient(right, #060b22, rgb(58, 78, 168));\r\n  background: linear-gradient(to left, #060b22, rgb(58, 78, 168));\r\n  font-family: \"Roboto\", sans-serif;\r\n  -webkit-font-smoothing: antialiased;\r\n  -moz-osx-font-smoothing: grayscale;      \r\n}\r\n.logo {\r\n  display: block;\r\n  margin-left: auto;\r\n  margin-right: auto;\r\n  width: 75%;\r\n  margin-bottom: 20px;\r\n}"),
 	}
-	file9 := &embedded.EmbeddedFile{
+	file5 := &embedded.EmbeddedFile{
 		Filename:    "img/favicon-16x16.png",
 		FileModTime: time.Unix(1591403053, 0),
 
 		Content: string("\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\b\x06\x00\x00\x00\x1f\xf3\xffa\x00\x00\x01\x02IDAT8O\x8d\x93}q\x02A\fG\x1f\n\x8a\x03Z\x05\x05\x05P\x05\x80\x82\xd6\x01T\x018hqP\x14\x80\x03@A\xc1A\x1d\x14\t\xcc\xebl\x98\xe5z\xb7\\f\xee\x0f\xf2\xf16\xf9%t\xf8o\x8f\xc0\f\x18\x01\xfd\x14\xfe\x01\xf6\xc0\n8\xe6%\x9d\xecG\x17X\x00\xf3\x1ah\xee\xfa\x04\xde\xc3\x11\x00\x8bwًw\x18\u007f]\fL\n\x80T\xdb\x0e;\x00\xfa\xce\xc0\x1b\xf0ZCt\x9c\xb9\x00\xe7\xfc\xae\x14;\u007fn\xcb4^\x95\xf3$\xe0\xab\xf2\xc2\x14ئL\x85S\x13E\xfc\xad\xe9b-\xc0`/\v\xbe$\xc5uٝqG\x114I\xbe\x87\x94\u007f\x8c\x11b5\xb6n\x81_\xc9\x04\xab\xcd,_c\xa9@\xf00݆yW\x8d\xda\x00l{\xd3@?\xb5\x01(\xe8\xb8\x01\xb0j\x03P\xc0\x10\xadv\x8d\xa5\xd9K\xed_\x0f\xa9\x04\xf0\x0e\x14\xafj\xa78\xfb\xd2\b\xee\xfd\xa3\xe9\x84\xc3\xdf\x04\xf0/\xadx\xcf)\xd1\x17\xbd\x15O\xfa\xe6F.\xa0\xfd/\x1eK\xff\t\x13\x00\x00\x00\x00IEND\xaeB`\x82"),
 	}
-	filea := &embedded.EmbeddedFile{
+	file6 := &embedded.EmbeddedFile{
 		Filename:    "img/favicon-32x32.png",
 		FileModTime: time.Unix(1591403053, 0),
 
 		Content: string("\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \b\x06\x00\x00\x00szz\xf4\x00\x00\x02|IDATXG\xb5\xd7K\xc8MQ\x14\xc0\xf1\xdf7 \x8c<\xf2,D\f\x94G\x89B\x14I!$\xa5\x18\b呈\xa4d\x86\x91PJ\x1e\x03\xaf\x91\"\x06\x842\xf1\x1a\x11\x92G\x91\xc7\x00\x13&H^)%\xad\xaf\xf3\xddN\xb7{\xee\xdd\xe7\xbbǪݹݻ\x1e\xff\xbb\xf6\xdek\xadӡ\x9c,\xc4\x12L\xc6\xc0l\xfd\xc5G|\xc03<\xc6m\xbcOqݑ\xa04\x14\x1b\xb1\n\xa3\x13\xf4C\xe5;\xceg\xebV3\x9bV\x00{\xb0\x1e\xc3\x12\x037Rۏ]E\xf6E\x00\xfdq\x1aK\xdb\b\x9c7\xbd\x81y\x8d|5\x02\x98\x82\x87\x15\x05λ\xf9\x93e\xf2S\xfe\xcbz\x80Ax\x85\xbe\xff\x01 \\\xc6a]\x80\xa7]\xfe\xeb\x01.%\xa4\xfd\x11\xae\xe5\x007!\xc0S%n\xc9L\xfc\n\x83<\xc0Nā)\x92\xfb؊\au\n\xa3\xb0-[\xa9\x10{\x11\a\xbc\x060\v7ѣ\xc0\xc3e\xac\xc5\xd7&\x11\xd6\xe1d\"A\xfc\xfb\xc8\xc2\xe3\xae\f\x9cÊ&\xc6sp'\xc1\xf9QlN\xd0\v\x95C\xd8\x11\x00\xc3\xf1\x12}\n\f#p\x00\xd4\xcb\x1a\xac\xc6v<\xc9~\x9c\x98?`-@\xa2rN\b\x80-8\xd2D\xb9\xb6_u:\x11t\x12\xf2\xbf\xf7\xc6[\fN\xcc\xc2\xe6\x008\x8e8\xc9ER\x04\x10E*V\x1c\xa6w9\xe3\xe8\x03\x01\xd6/\x01\xe2T\x00\\\xc7\xfc&\xca'\xb2^\x90௦\x12\xdb\x1a\xdb\x11 \xf1\x8c5\xae\x81\x83\xbb\x01p\f\x17\xf1\x05\x9f\xb3\xe7\x00L\xc74\xcc\xc8>\x97\x01\xa8\xd7\xed\xd9\x00h6~\xb4jF\xed\x04mf\x1b۶;_\a\xaa\x0e4\x06c\x11ϑ\x18\x92[\xd1ޣ\xd9uJ\x95\x19X\x99\xcd\fQ듥*\x80Ve\xbc\b\xe8I\x15\x00\xbd\xb2\xbb\x1fi.+\x87\xab\x00\x88+\x1cW\xb9;\xb2\xa6\n\x80}\xcdF\xae&T17v\x96\xe2v\xe5^V/\xca\xfa\x89ι\xa1]\x80\xb8fo\xcaF\xce\xf4\xe7\xe2V\xbb\x001#\x9c\xe9\x06@\f\xbc1?\xb4]\a\xae`qI\x80\xe7\x18_E!Z\x84\xab%\x83\xffF\xb4운\xb3\x05e\xff\xfdkLŷ*\x00j\xcd$1\x031\t/\xab\x9b\x1b:M\xbb\x93\x81帐\x188\x86σ8\xd05\x86\xd7ە\x05H\r\x1e\xf3^\xbc\x9c\x9e\xcdޖ\vy\xcb\x00\x8c\xc8F\xe9\x18\xa7cM\xc8y\xfd\x89\x17\x88\x13\x1e\xafu\x11<\x06\x9c\x96\xf2\x0f\x00\xddl\xca\a\xee\xc0?\x00\x00\x00\x00IEND\xaeB`\x82"),
 	}
-	fileb := &embedded.EmbeddedFile{
+	file7 := &embedded.EmbeddedFile{
 		Filename:    "img/logo.svg",
 		FileModTime: time.Unix(1591631914, 0),
 
@@ -89,53 +35,107 @@ func init() {
 	}
 
 	// define dirs
-	dir5 := &embedded.EmbeddedDir{
+	dir1 := &embedded.EmbeddedDir{
 		Filename:   "",
 		DirModTime: time.Unix(1597281071, 0),
 		ChildFiles: []*embedded.EmbeddedFile{},
 	}
-	dir6 := &embedded.EmbeddedDir{
+	dir2 := &embedded.EmbeddedDir{
 		Filename:   "css",
 		DirModTime: time.Unix(1591641234, 0),
 		ChildFiles: []*embedded.EmbeddedFile{
-			file7, // "css/style.css"
+			file3, // "css/style.css"
 
 		},
 	}
-	dir8 := &embedded.EmbeddedDir{
+	dir4 := &embedded.EmbeddedDir{
 		Filename:   "img",
 		DirModTime: time.Unix(1591633059, 0),
 		ChildFiles: []*embedded.EmbeddedFile{
-			file9, // "img/favicon-16x16.png"
-			filea, // "img/favicon-32x32.png"
-			fileb, // "img/logo.svg"
+			file5, // "img/favicon-16x16.png"
+			file6, // "img/favicon-32x32.png"
+			file7, // "img/logo.svg"
 
 		},
 	}
 
 	// link ChildDirs
-	dir5.ChildDirs = []*embedded.EmbeddedDir{
-		dir6, // "css"
-		dir8, // "img"
+	dir1.ChildDirs = []*embedded.EmbeddedDir{
+		dir2, // "css"
+		dir4, // "img"
 
 	}
-	dir6.ChildDirs = []*embedded.EmbeddedDir{}
-	dir8.ChildDirs = []*embedded.EmbeddedDir{}
+	dir2.ChildDirs = []*embedded.EmbeddedDir{}
+	dir4.ChildDirs = []*embedded.EmbeddedDir{}
 
 	// register embeddedBox
 	embedded.RegisterEmbeddedBox(`static`, &embedded.EmbeddedBox{
 		Name: `static`,
 		Time: time.Unix(1597281071, 0),
 		Dirs: map[string]*embedded.EmbeddedDir{
-			"":    dir5,
-			"css": dir6,
-			"img": dir8,
+			"":    dir1,
+			"css": dir2,
+			"img": dir4,
 		},
 		Files: map[string]*embedded.EmbeddedFile{
-			"css/style.css":         file7,
-			"img/favicon-16x16.png": file9,
-			"img/favicon-32x32.png": filea,
-			"img/logo.svg":          fileb,
+			"css/style.css":         file3,
+			"img/favicon-16x16.png": file5,
+			"img/favicon-32x32.png": file6,
+			"img/logo.svg":          file7,
+		},
+	})
+}
+
+func init() {
+
+	// define files
+	filea := &embedded.EmbeddedFile{
+		Filename:    "login.html",
+		FileModTime: time.Unix(1597681352, 0),
+
+		Content: string("<!doctype html>\r\n<html lang=\"en\">\r\n  <head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n    <title>Login {{.company}}</title>\r\n    <link rel=\"icon\" type=\"image/png\" href=\"/static/img/favicon-32x32.png\" sizes=\"32x32\" />\r\n    <link rel=\"icon\" type=\"image/png\" href=\"/static/img/favicon-16x16.png\" sizes=\"16x16\" />\r\n    <link rel=\"stylesheet\" href=\"/static/css/style.css\" />\r\n  </head>\r\n  <div class=\"register-page\">\r\n    <a href=\"https://sandpiperframework.org\"><img src=\"/static/img/logo.svg\" alt=\"logo\" class=\"logo\"/></a>\r\n    <div class=\"form\">\r\n      <form class=\"login-form\" method=\"POST\">\r\n        <input type=\"text\" name=\"email\" placeholder=\"email\" required />\r\n        <input type=\"password\" name=\"password\" placeholder=\"password\" required />\r\n        <button type=\"submit\">login</button>\r\n        <p class=\"message\">New User? <a href=\"signup\">Request Access</a></p>\r\n      </form>\r\n    </div>\r\n  </div>\r\n</html>\r\n"),
+	}
+	fileb := &embedded.EmbeddedFile{
+		Filename:    "signup.html",
+		FileModTime: time.Unix(1597682652, 0),
+
+		Content: string("<!DOCTYPE html>\r\n<html lang=\"en\">\r\n  <head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n    <title>Request Sandpiper Access ({{.company}})</title>\r\n    <link rel=\"icon\" type=\"image/png\" href=\"/static/img/favicon-32x32.png\" sizes=\"32x32\" />\r\n    <link rel=\"icon\" type=\"image/png\" href=\"/static/img/favicon-16x16.png\" sizes=\"16x16\" />\r\n    <link rel=\"stylesheet\" href=\"/static/css/style.css\" />\r\n  </head>\r\n  <div class=\"register-page\">\r\n    <a href=\"https://sandpiperframework.org\"><img src=\"/static/img/logo.svg\" alt=\"logo\" class=\"logo\"/></a>\r\n    <div class=\"form\">\r\n      <form class=\"login-form\" method=\"POST\">\r\n        <input type=\"text\" name=\"name\" placeholder=\"name\" required />\r\n        <input type=\"text\" name=\"email\" placeholder=\"email\" required pattern=\"[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$\" title=\"Invalid email address\" />\r\n        <input type=\"text\" name=\"company\" placeholder=\"company\" required />\r\n        <input type=\"text\" name=\"serverid\" placeholder=\"sandpiper server id\" required pattern=\"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\" title=\"Invalid uuid format (8-4-4-4-12)\" />\r\n        <select id=\"kind\" name=\"kind\">\r\n          <option value=\"1\">Distributor</option>\r\n          <option value=\"2\">Retailer</option>\r\n          <option value=\"3\">Electronic Catalog</option>\r\n          <option value=\"4\">Other</option>\r\n        </select>\r\n        <button type=\"submit\">register</button>\r\n        <p class=\"message\"><a href=\"{{.terms}}\">Terms & Conditions</a></p>\r\n      </form>\r\n    </div>\r\n  </div>\r\n</html>\r\n"),
+	}
+
+	// define dirs
+	dir8 := &embedded.EmbeddedDir{
+		Filename:   "",
+		DirModTime: time.Unix(1597682652, 0),
+		ChildFiles: []*embedded.EmbeddedFile{
+			filea, // "login.html"
+			fileb, // "signup.html"
+
+		},
+	}
+	dir9 := &embedded.EmbeddedDir{
+		Filename:   "layouts",
+		DirModTime: time.Unix(1597596962, 0),
+		ChildFiles: []*embedded.EmbeddedFile{},
+	}
+
+	// link ChildDirs
+	dir8.ChildDirs = []*embedded.EmbeddedDir{
+		dir9, // "layouts"
+
+	}
+	dir9.ChildDirs = []*embedded.EmbeddedDir{}
+
+	// register embeddedBox
+	embedded.RegisterEmbeddedBox(`views`, &embedded.EmbeddedBox{
+		Name: `views`,
+		Time: time.Unix(1597682652, 0),
+		Dirs: map[string]*embedded.EmbeddedDir{
+			"":        dir8,
+			"layouts": dir9,
+		},
+		Files: map[string]*embedded.EmbeddedFile{
+			"login.html":  filea,
+			"signup.html": fileb,
 		},
 	})
 }
