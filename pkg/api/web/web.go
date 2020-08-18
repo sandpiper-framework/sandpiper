@@ -56,7 +56,7 @@ func login(c echo.Context) error {
 	if err := c.Bind(result); err != nil {
 		return err
 	}
-	// todo: authenticate with loginValues, then save jwt and redirect to download.
+	// todo: authenticate with loginValues, then save jwt in cookie and redirect to download.
 	return c.JSON(http.StatusOK, result)
 }
 
@@ -68,21 +68,25 @@ func signup(c echo.Context) error {
 		ServerID string
 		Kind     string
 	}
+
+	vars := echo.Map{ // todo: replace this with config data
+		"company": "Better Brakes",
+		"terms":   "http://betterbrakes.com/terms",
+	}
+
 	// GET
 	if c.Request().Method == http.MethodGet {
 		// render signup page
-		vars := echo.Map{ // todo: replace this with config data
-			"company": "Better Brakes",
-			"terms":   "http://betterbrakes.com/terms",
-		}
 		return c.Render(http.StatusOK, "signup.html", vars)
 	}
+
 	// POST
 	result := new(signupValues)
 	if err := c.Bind(result); err != nil {
 		return err
 	}
-	// todo: do something with signupValues, then display a thank you page.
-	// todo: the thank you can be a conditional block on the signup.html page
-	return c.JSON(http.StatusOK, result)
+	// todo: do something with signupValues (maybew email or save to table)
+	// display an Acknowledgment
+	vars["thankyou"] = true
+	return c.Render(http.StatusOK, "signup.html", vars)
 }
