@@ -7,8 +7,10 @@ package web
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/GeertJohan/go.rice"
+	"github.com/foolin/goview"
 	"github.com/foolin/goview/supports/echoview-v4"
 	"github.com/foolin/goview/supports/gorice"
 	"github.com/labstack/echo/v4"
@@ -17,7 +19,9 @@ import (
 // FileServer serves static files and templates from embedded files in `rice-box.go`
 func FileServer(srv *echo.Echo) {
 	// set view engine (for templates)
-	views := gorice.New(rice.MustFindBox("views"))
+	viewConfig := goview.DefaultConfig
+	// viewConfig.DisableCache = true // auto reload template file for debug.
+	views := gorice.NewWithConfig(rice.MustFindBox("views"), viewConfig)
 	srv.Renderer = echoview.Wrap(views)
 
 	// handle all static assets
@@ -33,9 +37,9 @@ func FileServer(srv *echo.Echo) {
 	srv.GET("/signup", signup)
 	srv.POST("/signup", signup)
 
-	// todo: download page
-	// srv.GET("/download", download)
-	// srv.POST("/download", download)
+	// download page
+	srv.GET("/download", download)
+	srv.POST("/download", download)
 }
 
 func login(c echo.Context) error {
@@ -57,7 +61,8 @@ func login(c echo.Context) error {
 		return err
 	}
 	// todo: authenticate with loginValues, then save jwt in cookie and redirect to download.
-	return c.JSON(http.StatusOK, result)
+	// NOTE: I'm not sure this is a proper use of redirect. Not sure how to do it another way.
+	return c.Redirect(http.StatusFound, "/download")
 }
 
 func signup(c echo.Context) error {
@@ -85,8 +90,36 @@ func signup(c echo.Context) error {
 	if err := c.Bind(result); err != nil {
 		return err
 	}
-	// todo: do something with signupValues (maybew email or save to table)
+	// todo: do something with signupValues (maybe email or save to table)
 	// display an Acknowledgment
 	vars["thankyou"] = true
 	return c.Render(http.StatusOK, "signup.html", vars)
+}
+
+func download(c echo.Context) error {
+	type tableRow struct {
+		SliceName   string
+		SliceType   string
+		ContentDate string
+	}
+	type tableData struct {
+		Downloading bool
+		Rows []tableRow
+	}
+
+	// GET
+	if c.Request().Method == http.MethodGet {
+		// todo: pull from database
+		data := tableData{
+			Rows: []tableRow{
+				{"slice1", "aces-file", time.Now().Format("2006-01-02")},
+				{"slice2", "pies-file", time.Now().Format("2006-01-02")},
+			},
+		}
+		return c.Render(http.StatusOK, "download.html", data)
+	}
+
+	// POST
+	vars := echo.Map{"Downloading": true}
+	return c.Render(http.StatusOK, "download.html", vars)
 }

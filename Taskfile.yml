@@ -44,8 +44,10 @@ tasks:
     cmds:
       - rice embed-go
     sources:
-      - views/*.html
-      - views/layouts/*.html
+      - views/*
+      - views/layouts/*
+      - static/css/*
+      - static/img/*
     generates:
       - rice-box.go
 

@@ -84,6 +84,12 @@
 .container .info span .fa {
   color: #EF3B3A;
 }
+.reverse {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 300;
+  color: white;
+}
 body {
   background: rgb(58, 78, 168); /* fallback for old browsers */
   background: -webkit-linear-gradient(right, #060b22, rgb(58, 78, 168));
