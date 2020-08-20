@@ -51,6 +51,7 @@ func Start(cfg *config.Configuration) error {
 	srv := server.New()
 
 	// routing for static files and templates (sign-up screen)
+	// todo: create a "WebServer" service and pass in db, log, config, etc.
 	web.FileServer(srv)
 
 	// create version group using token authentication middleware
